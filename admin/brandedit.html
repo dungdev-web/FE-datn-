@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/css.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Base style */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f1f3f9;
+  margin: 0;
+  padding: 0;
+}
+
+.main-content {
+  padding: 40px 20px;
+}
+
+/* Container */
+.brand-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px 30px;
+  background: linear-gradient(145deg, #ffffff, #f0f3f7);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.brand-container:hover {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+.brand-container h2 {
+  text-align: center;
+  font-size: 26px;
+  color: #222;
+  margin-bottom: 30px;
+  font-weight: 600;
+  position: relative;
+}
+
+.brand-container h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: #007bff;
+  margin: 10px auto 0;
+  border-radius: 10px;
+}
+
+/* Form layout */
+.brand-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+/* Input fields */
+.input-field {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccd2dc;
+  font-size: 15px;
+  transition: 0.2s border ease;
+  background-color: #fff;
+}
+
+.input-field:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+/* Readonly style */
+.readonly input {
+  background-color: #f1f1f1;
+  color: #888;
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+/* Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.submit-btn {
+  padding: 12px 28px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+.submit-btn:hover {
+  background-color: #218838;
+  box-shadow: 0 6px 18px rgba(40, 167, 69, 0.35);
+}
+
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-wrapper">
+        <img src="/images/logo/logo-den.png" alt="Logo" class="logo">
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="user-info">
+        <img src="/images/logo/anhdep.jpg" alt="Admin" class="avatar">
+        <div class="email-role">
+          <div class="email">admin@gmail.com</div>
+          <div class="role">Administrator</div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="sub-header">
+    <div class="sub-header-left">
+      <button class="menu-toggle"><i class="fa-solid fa-list"></i></button>
+    </div>
+    <div class="sub-header-right">
+      <span class="home-icon"><i class="fa-solid fa-house"></i></span> / <span>Danh sách bài viết</span>
+    </div>
+  </div>
+
+
+  <div class="container">
+    <nav class="sidebar">
+      <ul class="menu">
+        <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-list"></i> Quản lý danh mục <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách danh mục</a></li>
+            <li><a href="#">Thêm mới danh mục</a></li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-tags"></i> Quản lý nhãn hiệu <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách nhãn hiệu</a></li>
+            <li><a href="#">Thêm mới nhãn hiệu</a></li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-box"></i> Quản lý sản phẩm <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách sản phẩm</a></li>
+            <li><a href="#">Thêm mới sản phẩm</a></li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-newspaper"></i> Quản lý bài viết <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách bài viết</a></li>
+            <li><a href="#">Thêm mới bài viết</a></li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-gift"></i> Quản lý khuyến mại <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách khuyến mại</a></li>
+            <li><a href="#">Thêm mới khuyến mại</a></li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-shopping-cart"></i> Quản lý đơn hàng <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách đơn hàng</a></li>
+            <li><a href="#">Thêm mới đơn hàng</a></li>
+          </ul>
+        </li>
+
+        <li class="has-submenu">
+          <a href="#"><i class="fa-solid fa-user"></i> Quản lý tài khoản <i
+              class="fa-solid fa-chevron-down submenu-icon"></i></a>
+          <ul class="submenu">
+            <li><a href="#">Danh sách tài khoản</a></li>
+            <li><a href="#">Thêm mới tài khoản</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <main class="main-content">
+  <div class="brand-container">
+    <h2>Cập nhật nhãn hiệu</h2>
+
+    <form class="brand-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brand-name">Tên nhãn hiệu <span class="required">*</span></label>
+          <input type="text" id="brand-name" class="input-field" placeholder="Nhập tên nhãn hiệu" required>
+        </div>
+
+        <div class="form-group">
+          <label for="brand-status">Trạng thái</label>
+          <select id="brand-status" class="input-field">
+            <option value="active">Hiển thị</option>
+            <option value="inactive">Ẩn</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="brand-image">Ảnh nhãn hiệu</label>
+          <input type="file" id="brand-image" class="input-field" accept="image/*">
+        </div>
+
+        <div class="form-group readonly">
+          <label>Ngày tạo</label>
+          <input type="text" class="input-field" value="Tự động tạo" readonly>
+        </div>
+
+        <div class="form-group readonly">
+          <label>Ngày cập nhật</label>
+          <input type="text" class="input-field" value="Tự động cập nhật" readonly>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">
+          <i class="fa-solid fa-plus"></i>Cập nhật nhãn hiệu
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+
+
+
+  </div>
+
+</body>
+<script>
+  const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+  submenuToggles.forEach(toggle => {
+    toggle.addEventListener('click', function (e) {
+      e.preventDefault();
+      const parent = this.parentElement;
+      parent.classList.toggle('open');
+    });
+  });
+
+</script>
+
+</html>

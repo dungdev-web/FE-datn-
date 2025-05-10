@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/css.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Layout tổng */
+.main-content {
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.user-list {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+/* Tiêu đề */
+.user-list h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Nút thao tác */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.actions .btn {
+  padding: 8px 12px;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.actions .btn:hover {
+  opacity: 0.9;
+}
+
+.btn-search {
+  background-color: #4bd963;
+}
+
+.btn-refresh {
+  background-color: cadetblue;
+}
+
+.btn-export {
+  background-color: orange;
+}
+
+/* Bảng người dùng */
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th,
+.order-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.order-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.order-table tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+
+.order-table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Dòng lọc */
+.filter-row input,
+.filter-row select {
+  width: 100%;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.filter-row select:focus,
+.filter-row input:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #f0f8ff;
+}
+
+/* Label trạng thái */
+.status-label {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+  font-size: 13px;
+  color: white;
+}
+
+.status-active {
+  background-color: #28a745; /* xanh lá */
+}
+
+.status-inactive {
+  background-color: #dc3545; /* đỏ */
+}
+
+/* Icon thao tác */
+.view-icon,
+.view-status-icon {
+  cursor: pointer;
+  margin: 0 5px;
+  color: #555;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.view-icon:hover {
+  color: #17a2b8; /* xanh dương nhẹ */
+}
+
+.view-status-icon:hover {
+  color: #ffc107; /* vàng */
+}
+
+/* Phân trang */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.page-btn.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  font-weight: bold;
+}
+
+.page-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+/* Cột mã */
+.col-short {
+  width: 80px; /* Hoặc giá trị bạn muốn */
+  word-wrap: break-word;
+}
+
+
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-wrapper">
+                <img src="/images/logo/logo-den.png" alt="Logo" class="logo">
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="user-info">
+                <img src="/images/logo/anhdep.jpg" alt="Admin" class="avatar">
+                <div class="email-role">
+                    <div class="email">admin@gmail.com</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="menu-toggle"><i class="fa-solid fa-list"></i></button>
+        </div>
+        <div class="sub-header-right">
+            <span class="home-icon"><i class="fa-solid fa-house"></i></span> / <span>Danh sách bài viết</span>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <nav class="sidebar">
+            <ul class="menu">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-list"></i> Quản lý danh mục <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách danh mục</a></li>
+                        <li><a href="#">Thêm mới danh mục</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-tags"></i> Quản lý nhãn hiệu <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách nhãn hiệu</a></li>
+                        <li><a href="#">Thêm mới nhãn hiệu</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-box"></i> Quản lý sản phẩm <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách sản phẩm</a></li>
+                        <li><a href="#">Thêm mới sản phẩm</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-newspaper"></i> Quản lý bài viết <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách bài viết</a></li>
+                        <li><a href="#">Thêm mới bài viết</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-gift"></i> Quản lý khuyến mại <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách khuyến mại</a></li>
+                        <li><a href="#">Thêm mới khuyến mại</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-shopping-cart"></i> Quản lý đơn hàng <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách đơn hàng</a></li>
+                        <li><a href="#">Thêm mới đơn hàng</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-user"></i> Quản lý tài khoản <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách tài khoản</a></li>
+                        <li><a href="#">Thêm mới tài khoản</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <main class="main-content">
+  <div class="user-list">
+    <h2>Danh sách người dùng</h2>
+
+    <div class="actions">
+      <button class="btn btn-search"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+      <button class="btn btn-refresh"><i class="fa-solid fa-rotate-right"></i> Làm mới</button>
+      <button class="btn btn-export"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</button>
+    </div>
+
+    <table class="order-table">
+      <thead>
+        <tr>
+          <th class="col-short">Mã</th>
+          <th>Tên người dùng</th>
+          <th>Email</th>
+          <th>Điện thoại</th>
+          <th>Vai trò</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+        <tr class="filter-row">
+          <th><input type="text" placeholder="mã..." /></th>
+          <th><input type="text" placeholder="Lọc tên..." /></th>
+          <th><input type="text" placeholder="Lọc email..." /></th>
+          <th><input type="text" placeholder="Lọc SĐT..." /></th>
+          <th>
+            <select>
+              <option value="">Tất cả</option>
+              <option value="admin">Admin</option>
+              <option value="user">Người dùng</option>
+            </select>
+          </th>
+          <th>
+            <select>
+              <option value="">Tất cả</option>
+              <option value="active">Hoạt động</option>
+              <option value="inactive">Tạm khóa</option>
+            </select>
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>U01</td>
+          <td>Nguyễn Văn A</td>
+          <td>a.nguyen@example.com</td>
+          <td>0901234567</td>
+          <td>Admin</td>
+          <td><span class="status-label status-active">Hoạt động</span></td>
+          <td>
+            <i class="fa-solid fa-eye view-icon" title="Xem"></i>
+            <i class="fa-solid fa-user-pen view-status-icon" title="Chỉnh sửa"></i>
+          </td>
+        </tr>
+        <tr>
+          <td>U02</td>
+          <td>Trần Thị B</td>
+          <td>b.tran@example.com</td>
+          <td>0912345678</td>
+          <td>Người dùng</td>
+          <td><span class="status-label status-inactive">Tạm khóa</span></td>
+          <td>
+            <i class="fa-solid fa-eye view-icon" title="Xem"></i>
+            <i class="fa-solid fa-user-pen view-status-icon" title="Chỉnh sửa"></i>
+          </td>
+        </tr>
+        <!-- Thêm các dòng người dùng khác nếu cần -->
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button class="page-btn" disabled><i class="fa-solid fa-angle-left"></i></button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn"><i class="fa-solid fa-angle-right"></i></button>
+    </div>
+  </div>
+</main>
+
+
+
+    </div>
+
+</body>
+<script>
+    const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+
+</script>
+
+</html>

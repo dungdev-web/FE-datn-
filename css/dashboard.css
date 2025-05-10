@@ -1,0 +1,72 @@
+/* Container cho các cards */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  
+  /* Style chung cho mỗi card */
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 150px; /* Đặt chiều cao cố định cho card */
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  
+  /* Icon bên trái */
+  .card .icon {
+    flex-shrink: 0;
+    width: 70px; /* Tăng kích thước icon */
+    height: 70px; /* Đảm bảo icon có chiều cao */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 36px; /* Tăng kích thước icon */
+    margin-right: 16px;
+  }
+  
+  /* Tùy màu cho từng loại icon */
+  .icon-life-ring { background: #4e73df; }
+  .icon-sun       { background: #f6c23e; }
+  .icon-envelope  { background: #1cc88a; }
+  .icon-cart      { background: #858796; }
+  .icon-bookmark  { background: #36b9cc; }
+  .icon-user      { background: #e74a3b; }
+  
+  /* Phần text info */
+  .card .info .title {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .card .info .number {
+    margin: 4px 0;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Link xem chi tiết */
+  .card .info .details-link {
+    font-size: 0.8rem;
+    color: #adb5bd;
+    text-decoration: none;
+  }
+  
+  .card .info .details-link:hover {
+    text-decoration: underline;
+    color: #6c757d;
+  }
+  
