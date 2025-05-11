@@ -2,8 +2,8 @@
 import "../../css/detail.css";
 import "../../css/product.css";
 import "../../css/style.css";
-import Show1sanpham from "@/app/component/product_home";
-import Product4box from "@/app/component/produtc";
+import Show1sanpham from "@/app/(client)/component/product_home";
+import Product4box from "@/app/(client)/component/produtc";
 export default function Detail() {
   return (
     <>

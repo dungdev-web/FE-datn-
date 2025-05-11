@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./css/style.css"
-import Header from "./component/header";
-import Footer from "./component/footer";
+import Header from "../component/header";
+import Footer from "../component/footer";
 
 
 export default function RootLayout({
