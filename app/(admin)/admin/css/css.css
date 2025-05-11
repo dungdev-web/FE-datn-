@@ -27,9 +27,8 @@
   }
   
   /* LOGO */
-  .header-left {
+  /* .header-left {
     position: relative;    /* tạo context cho logo-wrapper */
-  }
   
   .logo-wrapper {
     position: absolute;
