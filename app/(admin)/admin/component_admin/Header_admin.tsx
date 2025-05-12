@@ -14,8 +14,11 @@ export default function Header_admin() {
           </div>
         </div>
 
-        <div className="header-right">
-          <input type="text" />
+        <div className="header-right flex gap-[10px] items-center">
+          <input
+            type="text"
+            className="h-[40px] w-full px-4 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm placeholder-gray-400"
+          />
           <div className="relative w-12 h-12 flex items-center justify-center">
             {/* Sóng 1 */}
             <span className="absolute w-full h-full rounded-full bg-red-400/40 animate-[radar-ping_2s_ease-out_infinite] pointer-events-none"></span>
