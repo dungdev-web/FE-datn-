@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/css.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <style>
+    /* Reset và thiết lập chung */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f8fa;
+  color: #333;
+  line-height: 1.6;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  padding: 50px 15px;
+}
+
+/* Thẻ chứa thông tin người dùng */
+.user-profile-page {
+  width: 100%;
+  max-width: 960px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.user-profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.user-profile-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e0e0e0;
+}
+
+.user-profile-info {
+  margin-left: 20px;
+}
+
+.user-name {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.user-email, .user-phone {
+  font-size: 16px;
+  color: #666;
+}
+
+.user-email span, .user-phone span {
+  font-weight: 500;
+}
+
+/* Thông tin vai trò và trạng thái */
+.user-profile-meta {
+  display: flex;
+  gap: 30px;
+  margin-top: 30px;
+  font-size: 16px;
+  color: #555;
+}
+
+.role, .status {
+  display: flex;
+  align-items: center;
+}
+
+.label {
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.status-label {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-label.active {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.status-label.inactive {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+/* Các hành động của người dùng */
+.user-profile-actions {
+  margin-top: 40px;
+  display: flex;
+  gap: 20px;
+  justify-content: flex-start;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  gap: 10px;
+}
+
+.action-btn i {
+  font-size: 18px;
+}
+
+.btn-edit {
+  background-color: #007bff;
+}
+
+.btn-edit:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.btn-lock {
+  background-color: #dc3545;
+}
+
+.btn-lock:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+.btn-back {
+  background-color: #6c757d;
+}
+
+.btn-back:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* Responsive cho thiết bị di động */
+@media (max-width: 768px) {
+  .user-profile-page {
+    padding: 20px;
+  }
+
+  .user-profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-profile-info {
+    margin-left: 0;
+    margin-top: 15px;
+  }
+
+  .user-profile-meta {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .user-profile-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+   </style>
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-wrapper">
+                <img src="/images/logo/logo-den.png" alt="Logo" class="logo">
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="user-info">
+                <img src="/images/logo/anhdep.jpg" alt="Admin" class="avatar">
+                <div class="email-role">
+                    <div class="email">admin@gmail.com</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="menu-toggle"><i class="fa-solid fa-list"></i></button>
+        </div>
+        <div class="sub-header-right">
+            <span class="home-icon"><i class="fa-solid fa-house"></i></span> / <span>Danh sách bài viết</span>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <nav class="sidebar">
+            <ul class="menu">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-list"></i> Quản lý danh mục <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách danh mục</a></li>
+                        <li><a href="#">Thêm mới danh mục</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-tags"></i> Quản lý nhãn hiệu <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách nhãn hiệu</a></li>
+                        <li><a href="#">Thêm mới nhãn hiệu</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-box"></i> Quản lý sản phẩm <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách sản phẩm</a></li>
+                        <li><a href="#">Thêm mới sản phẩm</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-newspaper"></i> Quản lý bài viết <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách bài viết</a></li>
+                        <li><a href="#">Thêm mới bài viết</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-gift"></i> Quản lý khuyến mại <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách khuyến mại</a></li>
+                        <li><a href="#">Thêm mới khuyến mại</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-shopping-cart"></i> Quản lý đơn hàng <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách đơn hàng</a></li>
+                        <li><a href="#">Thêm mới đơn hàng</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-user"></i> Quản lý tài khoản <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách tài khoản</a></li>
+                        <li><a href="#">Thêm mới tài khoản</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    <main class="main-content">
+  <div class="user-detail-card">
+    <div class="user-header">
+      <img src="https://via.placeholder.com/100" alt="Ảnh đại diện" class="user-avatar" />
+      <div class="user-info">
+        <h2>Nguyễn Văn A</h2>
+        <p class="email"><strong>Email:</strong> a.nguyen@example.com</p>
+        <p class="phone"><strong>Điện thoại:</strong> 0901234567</p>
+      </div>
+    </div>
+
+    <div class="user-meta">
+      <p><strong>Vai trò:</strong> Admin</p>
+      <p><strong>Trạng thái:</strong> <span class="status-label status-active">Hoạt động</span></p>
+    </div>
+
+    <div class="user-actions">
+      <button class="btn btn-edit"><i class="fa-solid fa-pen"></i> Chỉnh sửa</button>
+      <button class="btn btn-lock"><i class="fa-solid fa-lock"></i> Khóa tài khoản</button>
+      <button class="btn btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+    </div>
+  </div>
+</main>
+
+
+
+    </div>
+
+</body>
+<script>
+    const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+
+</script>
+
+</html>
