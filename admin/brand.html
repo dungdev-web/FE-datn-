@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/css.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-wrapper">
+                <img src="/images/logo/logo-den.png" alt="Logo" class="logo">
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="user-info">
+                <img src="/images/logo/anhdep.jpg" alt="Admin" class="avatar">
+                <div class="email-role">
+                    <div class="email">admin@gmail.com</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="menu-toggle"><i class="fa-solid fa-list"></i></button>
+        </div>
+        <div class="sub-header-right">
+            <span class="home-icon"><i class="fa-solid fa-house"></i></span> / <span>Danh sách bài viết</span>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <nav class="sidebar">
+            <ul class="menu">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-list"></i> Quản lý danh mục <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách danh mục</a></li>
+                        <li><a href="#">Thêm mới danh mục</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-tags"></i> Quản lý nhãn hiệu <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách nhãn hiệu</a></li>
+                        <li><a href="#">Thêm mới nhãn hiệu</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-box"></i> Quản lý sản phẩm <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách sản phẩm</a></li>
+                        <li><a href="#">Thêm mới sản phẩm</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-newspaper"></i> Quản lý bài viết <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách bài viết</a></li>
+                        <li><a href="#">Thêm mới bài viết</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-gift"></i> Quản lý khuyến mại <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách khuyến mại</a></li>
+                        <li><a href="#">Thêm mới khuyến mại</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-shopping-cart"></i> Quản lý đơn hàng <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách đơn hàng</a></li>
+                        <li><a href="#">Thêm mới đơn hàng</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-user"></i> Quản lý tài khoản <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách tài khoản</a></li>
+                        <li><a href="#">Thêm mới tài khoản</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+
+        <main class="main-content">
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="icon icon-life-ring"><i class="fa-solid fa-life-ring"></i></div>
+                    <div class="info">
+                        <p class="title">Số lượng sản phẩm</p>
+                        <p class="number">5</p>
+                        <a href="#" class="details-link">(Xem chi tiết)</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-sun"><i class="fa-solid fa-sun"></i></div>
+                    <div class="info">
+                        <p class="title">Tổng số danh mục</p>
+                        <p class="number">4</p>
+                        <a href="#" class="details-link">(Xem chi tiết)</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-envelope"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="info">
+                        <p class="title">Tổng số bài viết</p>
+                        <p class="number">2</p>
+                        <a href="#" class="details-link">(Xem chi tiết)</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-cart"><i class="fa-solid fa-shopping-cart"></i></div>
+                    <div class="info">
+                        <p class="title">Tổng số đơn hàng</p>
+                        <p class="number">7</p>
+                        <a href="#" class="details-link">(Xem chi tiết)</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-bookmark"><i class="fa-solid fa-bookmark"></i></div>
+                    <div class="info">
+                        <p class="title">Tổng số nhãn hiệu</p>
+                        <p class="number">4</p>
+                        <a href="#" class="details-link">(Xem chi tiết)</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="icon icon-user"><i class="fa-solid fa-user"></i></div>
+                    <div class="info">
+                        <p class="title">Tổng số user</p>
+                        <p class="number">6</p>
+                        <a href="#" class="details-link">(Xem chi tiết)</a>
+                    </div>
+                </div>
+            </div>
+           
+
+        </main>
+
+    </div>
+
+</body>
+<script>
+    const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+
+</script>
+
+</html>
