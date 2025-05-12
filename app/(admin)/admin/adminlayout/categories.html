@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/css.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .category-list {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+    
+        .category-list h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+    
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+    
+        .actions .btn {
+            padding: 8px 12px;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+    
+        .btn-add { background-color: #021688; }
+        .btn-refresh { background-color: cadetblue; }
+        .btn-search { background-color: #4bd963; }
+    
+        .actions .btn:hover {
+            opacity: 0.9;
+        }
+    
+        .category-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    
+        .category-table th,
+        .category-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left; /* Đã đổi từ center sang left */
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+     
+        .category-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            text-align: center;
+        }
+        .category-table tbody tr:nth-child(odd) {
+    background-color: #f2f2f2;
+}
+
+.category-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+/* Căn giữa cột trạng thái */
+.category-table td.status-column {
+    text-align: center;
+}
+
+        .edit-icon,
+        .delete-icon {
+            cursor: pointer;
+            margin: 0 5px;
+            color: #555;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+    
+        .edit-icon:hover { color: #28a745; }
+        .delete-icon:hover { color: #dc3545; }
+    
+        .filter-row input,
+        .filter-row select {
+            width: 100%;
+            padding: 6px 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 25px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+    
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+    
+        .page-btn:hover,
+        .page-btn.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+    
+        .page-btn[disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 24px;
+        }
+    
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+    
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+    
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+    
+        input:checked + .slider:before {
+            transform: translateX(18px);
+        }
+    
+        @media (max-width: 768px) {
+            .category-list { padding: 15px; }
+    
+            .category-table th,
+            .category-table td {
+                font-size: 12px;
+                padding: 6px;
+            }
+        }
+    </style>
+    
+    
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-wrapper">
+                <img src="/images/logo/logo-den.png" alt="Logo" class="logo">
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="user-info">
+                <img src="/images/logo/anhdep.jpg" alt="Admin" class="avatar">
+                <div class="email-role">
+                    <div class="email">admin@gmail.com</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="menu-toggle"><i class="fa-solid fa-list"></i></button>
+        </div>
+        <div class="sub-header-right">
+            <span class="home-icon"><i class="fa-solid fa-house"></i></span> / <span>Danh sách bài viết</span>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <nav class="sidebar">
+            <ul class="menu">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-list"></i> Quản lý danh mục <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách danh mục</a></li>
+                        <li><a href="#">Thêm mới danh mục</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-tags"></i> Quản lý nhãn hiệu <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách nhãn hiệu</a></li>
+                        <li><a href="#">Thêm mới nhãn hiệu</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-box"></i> Quản lý sản phẩm <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách sản phẩm</a></li>
+                        <li><a href="#">Thêm mới sản phẩm</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-newspaper"></i> Quản lý bài viết <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách bài viết</a></li>
+                        <li><a href="#">Thêm mới bài viết</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-gift"></i> Quản lý khuyến mại <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách khuyến mại</a></li>
+                        <li><a href="#">Thêm mới khuyến mại</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-shopping-cart"></i> Quản lý đơn hàng <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách đơn hàng</a></li>
+                        <li><a href="#">Thêm mới đơn hàng</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-user"></i> Quản lý tài khoản <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách tài khoản</a></li>
+                        <li><a href="#">Thêm mới tài khoản</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+
+
+        <main class="main-content">
+            <div class="category-list">
+                <h2>Danh sách danh mục</h2>
+
+                <div class="actions">
+                    <button class="btn btn-add"><i class="fa-solid fa-plus"></i> Thêm mới danh mục</button>
+                    <button class="btn btn-refresh"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    <button class="btn btn-search"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+                </div>
+
+                <table class="category-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Trạng thái danh mục</th>
+                            <th>Thứ tự danh mục</th>
+                            <th>Ngày tạo danh mục</th>
+                            <th>Ngày sửa danh mục</th>
+                            <th>Thao tác</th>
+                        </tr>
+                        <tr class="filter-row">
+                            <th><input type="text" placeholder="Lọc ID..." /></th>
+                            <th><input type="text" placeholder="Lọc tên..." /></th>
+                            <th>
+                                <select>
+                                    <option value="">Tất cả</option>
+                                    <option value="true">Hoạt động</option>
+                                    <option value="false">Không hoạt động</option>
+                                </select>
+                            </th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>4</td>
+                            <td>Dép Summer</td>
+                            <td class="status-column">
+                                <label class="switch">
+                                    <input type="checkbox" checked />
+                                    <span class="slider round"></span>
+                                </label>
+                            </td>
+
+                            <td>0</td>
+                            <td>27-11-2021 19:07</td>
+                            <td></td>
+                            <td>
+                                 <i class="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                                <i class="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Giày Trẻ em</td>
+                            <td class="status-column">
+                                <label class="switch">
+                                    <input type="checkbox" checked />
+                                    <span class="slider round"></span>
+                                </label>
+                            </td>
+
+                            <td>0</td>
+                            <td>22-08-2021 20:49</td>
+                            <td>27-11-2021 19:07</td>
+                            <td>
+                                <i class="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                                <i class="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Giày Nữ</td>
+                            <td class="status-column">
+                                <label class="switch">
+                                    <input type="checkbox" checked />
+                                    <span class="slider round"></span>
+                                </label>
+                            </td>
+
+                            <td>0</td>
+                            <td>22-08-2021 20:49</td>
+                            <td></td>
+                            <td >
+                                <i class="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                                <i class="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Giày Nam</td>
+                            <td class="status-column">
+                                <label class="switch">
+                                    <input type="checkbox" checked />
+                                    <span class="slider round"></span>
+                                </label>
+                            </td>
+
+                            <td>0</td>
+                            <td>22-08-2021 20:48</td>
+                            <td></td>
+                            <td>
+                                <i class="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                                <i class="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button class="page-btn" disabled><i class="fa-solid fa-angle-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn"><i class="fa-solid fa-angle-right"></i></button>
+                </div>
+            </div>
+        </main>
+
+
+    </div>
+
+</body>
+<script>
+    const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+
+</script>
+
+</html>

@@ -17,16 +17,18 @@ export default function Header_admin() {
         <div className="header-right">
           <input type="text" />
           <div className="relative w-12 h-12 flex items-center justify-center">
-            {/* Vòng sóng 1 */}
-            <span className="pulse-ring absolute w-full h-full rounded-full bg-red-400/40"></span>
-            {/* Vòng sóng 2 (delay để tạo hiệu ứng liên tục) */}
-            <span className="pulse-ring absolute w-full h-full rounded-full bg-red-400/40 animation-delay"></span>
+            {/* Sóng 1 */}
+            <span className="absolute w-full h-full rounded-full bg-red-400/40 animate-[radar-ping_2s_ease-out_infinite] pointer-events-none"></span>
 
-            {/* Icon chuông nằm trên cùng */}
-            <div className="relative z-10 bg-red-500 w-12 h-12 rounded-full flex items-center justify-center text-white animate-bell">
-              <NotificationsIcon />
+            {/* Sóng 2 có delay */}
+            <span className="absolute w-full h-full rounded-full bg-red-400/40 animate-[radar-ping_2s_ease-out_infinite] delay-[1s] pointer-events-none"></span>
+
+            {/* Biểu tượng chuông (chỉ phần này rung) */}
+            <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center text-white bg-red-500 ">
+              <NotificationsIcon className="animate-bell" />
             </div>
           </div>
+
           <div className="user-info">
             <img src="/images/logo/anhdep.jpg" alt="Admin" className="avatar" />
             <div className="email-role">
