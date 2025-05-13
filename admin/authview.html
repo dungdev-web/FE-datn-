@@ -7,186 +7,414 @@
     <link rel="stylesheet" href="/css/css.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <style>
-    /* Reset và thiết lập chung */
-body, html {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f7f8fa;
-  color: #333;
-  line-height: 1.6;
-}
-
-main {
-  display: flex;
-  justify-content: center;
-  padding: 50px 15px;
-}
-
-/* Thẻ chứa thông tin người dùng */
-.user-profile-page {
-  width: 100%;
-  max-width: 960px;
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-}
-
-.user-profile-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.user-profile-avatar {
-  flex-shrink: 0;
-}
-
-.avatar-img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #e0e0e0;
-}
-
-.user-profile-info {
-  margin-left: 20px;
-}
-
-.user-name {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.user-email, .user-phone {
-  font-size: 16px;
-  color: #666;
-}
-
-.user-email span, .user-phone span {
-  font-weight: 500;
-}
-
-/* Thông tin vai trò và trạng thái */
-.user-profile-meta {
-  display: flex;
-  gap: 30px;
-  margin-top: 30px;
-  font-size: 16px;
-  color: #555;
-}
-
-.role, .status {
-  display: flex;
-  align-items: center;
-}
-
-.label {
-  font-weight: 600;
-  margin-right: 5px;
-}
-
-.status-label {
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-
-.status-label.active {
-  background-color: #28a745;
-  color: #fff;
-}
-
-.status-label.inactive {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-/* Các hành động của người dùng */
-.user-profile-actions {
-  margin-top: 40px;
-  display: flex;
-  gap: 20px;
-  justify-content: flex-start;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  gap: 10px;
-}
-
-.action-btn i {
-  font-size: 18px;
-}
-
-.btn-edit {
-  background-color: #007bff;
-}
-
-.btn-edit:hover {
-  background-color: #0056b3;
-  transform: translateY(-2px);
-}
-
-.btn-lock {
-  background-color: #dc3545;
-}
-
-.btn-lock:hover {
-  background-color: #c82333;
-  transform: translateY(-2px);
-}
-
-.btn-back {
-  background-color: #6c757d;
-}
-
-.btn-back:hover {
-  background-color: #5a6268;
-  transform: translateY(-2px);
-}
-
-/* Responsive cho thiết bị di động */
-@media (max-width: 768px) {
-  .user-profile-page {
-    padding: 20px;
+ <style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
-  .user-profile-header {
-    flex-direction: column;
-    align-items: flex-start;
+  body, html {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    line-height: 1.6;
   }
 
-  .user-profile-info {
-    margin-left: 0;
-    margin-top: 15px;
+  /* Wrapper */
+  .user-detail-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 50px 20px;
   }
 
-  .user-profile-meta {
-    flex-direction: column;
-    gap: 15px;
+  /* Card */
+  .user-detail-card {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    padding: 35px;
+    transition: all 0.3s ease-in-out;
   }
 
-  .user-profile-actions {
-    flex-direction: column;
-    gap: 15px;
+  /* Header */
+  .user-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e6e6e6;
+    padding-bottom: 25px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
   }
-}
 
-   </style>
+  .user-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e0e0e0;
+  }
+
+  .user-basic-info {
+    margin-left: 25px;
+    flex: 1;
+  }
+
+  .user-name {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .user-role {
+    color: #777;
+    font-size: 16px;
+  }
+
+  /* Sections */
+  .user-section {
+    margin-bottom: 30px;
+  }
+
+  .user-section h2 {
+    font-size: 20px;
+    color: #444;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+    padding-left: 12px;
+  }
+
+  /* Grid layout */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .info-item {
+    background-color: #f9fafb;
+    border: 1px solid #eee;
+    padding: 15px 20px;
+    border-radius: 10px;
+  }
+
+  .label {
+    font-weight: 600;
+    color: #555;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .value {
+    font-size: 16px;
+    color: #333;
+  }
+
+  /* Trạng thái */
+  .status-label {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: capitalize;
+  }
+
+  .status-label.active {
+    background-color: #28a745;
+    color: #fff;
+  }
+
+  .status-label.inactive {
+    background-color: #dc3545;
+    color: #fff;
+  }
+
+  /* Back button */
+  .action-buttons {
+    margin-left: auto;
+  }
+
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #6c757d;
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn-back:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .user-header {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .user-basic-info {
+      margin-left: 0;
+      margin-top: 15px;
+    }
+
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+      margin: 15px 0 0;
+    }
+  }
+      /* Các style chung */
+        .order-list {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .order-list h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .actions .btn {
+            padding: 8px 12px;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .order-table th {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .order-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .order-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .order-img {
+            width: 60px;
+            height: auto;
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .order-img:hover {
+            transform: scale(1.05);
+        }
+
+        .edit-icon,
+        .delete-icon {
+            cursor: pointer;
+            margin: 0 5px;
+            color: #555;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .edit-icon:hover {
+            color: #28a745;
+        }
+
+        .delete-icon:hover {
+            color: #dc3545;
+        }
+
+        .category-tag {
+            display: block;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .category-tag:hover {
+            background-color: #ddd;
+        }
+
+        .filter-row input,
+        .filter-row select {
+            width: 100%;
+            padding: 6px 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background-color: #021688;
+        }
+
+        .btn-refresh {
+            background-color: cadetblue;
+        }
+
+        .btn-search {
+            background-color: #4bd963;
+        }
+
+        .btn-export {
+            background-color: orange;
+        }
+
+        th select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+            color: #333;
+        }
+
+        th select:focus {
+            border-color: #007bff;
+            outline: none;
+            background-color: #f0f8ff;
+        }
+
+        /* Màu nền cho các hàng lẻ */
+        .order-table tr:nth-child(odd) {
+            background-color: #f2f2f2;
+        }
+
+        /* Màu nền cho các hàng chẵn */
+        .order-table tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 25px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .page-btn:hover {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .page-btn.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+        .page-btn[disabled] {
+            cursor: not-allowed;
+           opacity: 0.5;
+        }
+            .status-label {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+            font-size: 13px;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            /* vàng */
+        }
+
+        .status-confirmed {
+            background-color: #17a2b8;
+            /* xanh dương nhạt */
+        }
+
+        .status-shipping {
+            background-color: #007bff;
+            /* xanh dương */
+        }
+
+        .status-delivered {
+            background-color: #28a745;
+            /* xanh lá */
+        }
+
+        .status-cancelled {
+            background-color: #dc3545;
+            /* đỏ */
+        }
+
+        .status-returned {
+            background-color: #6c757d;
+            /* xám */
+        }
+</style>
+
 
 </head>
 
@@ -287,29 +515,179 @@ main {
                 </li>
             </ul>
         </nav>
-    <main class="main-content">
-  <div class="user-detail-card">
-    <div class="user-header">
-      <img src="https://via.placeholder.com/100" alt="Ảnh đại diện" class="user-avatar" />
-      <div class="user-info">
-        <h2>Nguyễn Văn A</h2>
-        <p class="email"><strong>Email:</strong> a.nguyen@example.com</p>
-        <p class="phone"><strong>Điện thoại:</strong> 0901234567</p>
+<main class="main-content">
+  <section class="user-detail-card">
+    <!-- Phần avatar & tên -->
+  <div class="user-header">
+  <img src="/images/logo/anhdep.jpg" alt="Ảnh đại diện" class="user-avatar" />
+  <div class="user-basic-info">
+    <h1 class="user-name">Nguyễn Văn A</h1>
+    <p class="user-role">Quản trị viên hệ thống</p>
+  </div>
+  <!-- Nút quay lại bên phải -->
+  <div class="action-buttons">
+    <button class="btn-back" onclick="history.back()">
+      <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </button>
+  </div>
+</div>
+
+
+    <!-- Thông tin liên hệ -->
+    <div class="user-section">
+      <h2>Thông tin liên hệ</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Email</span>
+          <span class="value">a.nguyen@example.com</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Điện thoại</span>
+          <span class="value">0901234567</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Địa chỉ</span>
+          <span class="value">123 Đường ABC, Quận 1, TP.HCM</span>
+        </div>
       </div>
     </div>
 
-    <div class="user-meta">
-      <p><strong>Vai trò:</strong> Admin</p>
-      <p><strong>Trạng thái:</strong> <span class="status-label status-active">Hoạt động</span></p>
+    <!-- Thông tin hệ thống -->
+    <div class="user-section">
+      <h2>Thông tin hệ thống</h2>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="label">Vai trò</span>
+          <span class="value">Admin</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Trạng thái</span>
+          <span class="status-label active">Hoạt động</span>
+        </div>
+        <div class="info-item">
+          <span class="label">Ngày tạo</span>
+          <span class="value">10/05/2023</span>
+        </div>
+      </div>
     </div>
 
-    <div class="user-actions">
-      <button class="btn btn-edit"><i class="fa-solid fa-pen"></i> Chỉnh sửa</button>
-      <button class="btn btn-lock"><i class="fa-solid fa-lock"></i> Khóa tài khoản</button>
-      <button class="btn btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
-    </div>
-  </div>
+  
+  </section>
+  <!-- Đơn hàng ở đây -->
+            <div class="order-list">
+                <h2>Danh sách đơn hàng của nguyễn văn A</h2>
+
+                <div class="actions">
+                    <button class="btn btn-search"><i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm</button>
+                    <button class="btn btn-refresh"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+                    <button class="btn btn-export"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</button>
+                </div>
+
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Người nhận</th>
+                            <th>Điện thoại</th>
+                            <th>Trạng thái</th>
+                            <th>Sản phẩm</th>
+                            <th>Ngày đặt</th>
+        
+                        </tr>
+                        <tr class="filter-row">
+                            <th><input type="text" placeholder="Lọc mã đơn..." /></th>
+                            <th></th>
+                            <th></th>
+                            <th>
+                                <select>
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="pending">Chờ xác nhận</option>
+                                    <option value="confirmed">Đã xác nhận</option>
+                                    <option value="shipping">Đang giao hàng</option>
+                                    <option value="delivered">Đã giao</option>
+                                    <option value="cancelled">Đã hủy</option>
+                                    <option value="returned">Hoàn trả</option>
+                                </select>
+                            </th>
+
+                            <th>
+                               <input type="text" placeholder="Lọc sản phẩm..." />
+                            </th>
+                            <th></th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ORD10001</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>0901234567</td>
+                            <td><span class="status-label status-pending">Chờ xác nhận</span></td>
+                            <td><span class="category-tag">Giày thể thao</span></td>
+                            <td>08-05-2025</td>
+                        </tr>
+                        <tr>
+                            <td>ORD10002</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>0912345678</td>
+                            <td><span class="status-label status-confirmed">Đã xác nhận</span></td>
+                            <td><span class="category-tag">Áo hoodie</span></td>
+                            <td>08-05-2025</td>
+                            
+                        </tr>
+                        <tr>
+                            <td>ORD10003</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>0923456789</td>
+                            <td><span class="status-label status-shipping">Đang giao hàng</span></td>
+                            <td><span class="category-tag">Ba lô</span></td>
+                            <td>08-05-2025</td>
+                            
+                        </tr>
+                        <tr>
+                            <td>ORD10004</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>0934567890</td>
+                            <td><span class="status-label status-delivered">Đã giao</span></td>
+                            <td><span class="category-tag">Túi xách</span></td>
+                            <td>08-05-2025</td>
+                            
+                        </tr>
+                        <tr>
+                            <td>ORD10005</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>0945678901</td>
+                            <td><span class="status-label status-cancelled">Đã hủy</span></td>
+                            <td><span class="category-tag">Mũ lưỡi trai</span></td>
+                            <td>08-05-2025</td>
+                            
+                        </tr>
+                        <tr>
+                            <td>ORD10006</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>0956789012</td>
+                            <td><span class="status-label status-returned">Hoàn trả</span></td>
+                            <td><span class="category-tag">Áo thun</span></td>
+                            <td>08-05-2025</td>
+                            
+                        </tr>
+                    </tbody>
+
+
+                </table>
+                <div class="pagination">
+                    <button class="page-btn" disabled><i class="fa-solid fa-angle-left"></i></button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">4</button>
+                    <button class="page-btn">...</button>
+                    <button class="page-btn">10</button>
+                    <button class="page-btn"><i class="fa-solid fa-angle-right"></i></button>
+                </div>
+            </div>
 </main>
+
 
 
 
