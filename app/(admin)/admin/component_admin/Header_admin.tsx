@@ -3,8 +3,9 @@ import "../css/dashboard.css";
 import "../css/css.css";
 import { Settings } from "@mui/icons-material";
 import NotificationsIcon from "@mui/icons-material/Notifications"; // Hoặc NotificationsNone
-
+import ScrollingNotification from "./ThongBao_dashboard";
 export default function Header_admin() {
+ 
   return (
     <>
       <header className="header">
@@ -14,7 +15,7 @@ export default function Header_admin() {
           </div>
         </div>
 
-        <div className="header-right flex gap-[10px] items-center">
+        <div className="header-right flex gap-[10px] items-center !mr-[37px]">
           <input
             type="text"
             className="h-[40px] w-full px-4 rounded-xl border border-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm placeholder-gray-400"
@@ -29,6 +30,10 @@ export default function Header_admin() {
             {/* Biểu tượng chuông (chỉ phần này rung) */}
             <div className="relative z-10 w-12 h-12 rounded-full flex items-center justify-center text-white bg-red-500 ">
               <NotificationsIcon className="animate-bell" />
+              {/* Badge hiển thị số lượng thông báo */}
+              <span className="absolute -top-1 -right-1 bg-white text-red-500 text-xs font-bold rounded-full px-1.5 h-5 min-w-[1.25rem] flex items-center justify-center shadow-md">
+                3
+              </span>
             </div>
           </div>
 
@@ -59,6 +64,7 @@ export default function Header_admin() {
           / <span>Danh sách bài viết</span>
         </div>
       </div>
+      <ScrollingNotification></ScrollingNotification>
     </>
   );
 }
