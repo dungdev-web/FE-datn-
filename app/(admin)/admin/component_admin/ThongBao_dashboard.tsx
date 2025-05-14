@@ -8,54 +8,53 @@ const messages = [
 ];
 
 export default function ScrollingNotification() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [visible, setVisible] = useState(false);
-  const messageRef = useRef<HTMLDivElement | null>(null);
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = messageRef.current;
+    const el = ref.current;
     if (!el) return;
 
-    // Reset vị trí
     el.style.transition = "none";
     el.style.transform = "translateX(100%)";
 
-    // Hiển thị và bắt đầu chạy
-    setVisible(true);
     const start = setTimeout(() => {
       const width = el.scrollWidth;
       el.style.transition = "transform 8s linear";
       el.style.transform = `translateX(-${width}px)`;
     }, 100);
 
-    // Sau khi chạy xong, chuyển thông báo khác
     const end = setTimeout(() => {
       setVisible(false);
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % messages.length);
-      }, 500);
+        setIndex((prev) => (prev + 1) % messages.length);
+        setVisible(true);
+      }, 300);
     }, 8500);
 
     return () => {
       clearTimeout(start);
       clearTimeout(end);
     };
-  }, [currentIndex]);
+  }, [index]);
 
   return (
-    <div className="relative overflow-hidden h-12 bg-yellow-100 text-black px-4 flex items-center">
+    <div className="relative h-12 bg-yellow-100 text-black px-4 flex items-center">
       {visible && (
         <div
-          ref={messageRef}
-          className="whitespace-nowrap font-semibold text-sm"
+          ref={ref}
           style={{
             position: "absolute",
             whiteSpace: "nowrap",
-            zIndex: 10,
-            color: "#dc2626", // red-600
+            zIndex: 100000,
+            left: "690px",
+            bottom: "50px",
+            color: "#dc2626", 
           }}
+          className="absolute whitespace-nowrap font-semibold text-red-600"
         >
-          {messages[currentIndex]}
+          {messages[index]}
         </div>
       )}
     </div>

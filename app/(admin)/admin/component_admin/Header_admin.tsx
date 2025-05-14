@@ -5,7 +5,6 @@ import { Settings } from "@mui/icons-material";
 import NotificationsIcon from "@mui/icons-material/Notifications"; // Hoặc NotificationsNone
 import ScrollingNotification from "./ThongBao_dashboard";
 export default function Header_admin() {
- 
   return (
     <>
       <header className="header">
@@ -64,7 +63,9 @@ export default function Header_admin() {
           / <span>Danh sách bài viết</span>
         </div>
       </div>
-      <ScrollingNotification></ScrollingNotification>
+      <div>
+        <ScrollingNotification />
+      </div>
     </>
   );
 }
