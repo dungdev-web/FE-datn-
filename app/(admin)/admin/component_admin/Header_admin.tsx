@@ -47,13 +47,7 @@ export default function Header_admin() {
       </header>
       <div className="sub-header">
         <div className="sub-header-left">
-          <div className="user-info">
-            <img src="/images/logo/anhdep.jpg" alt="Admin" className="avatar" />
-            <div className="email-role">
-              <div className="email">admin@gmail.com</div>
-              <div className="role">Administrator</div>
-            </div>
-          </div>
+          
           <Settings />
         </div>
         <div className="sub-header-right">
