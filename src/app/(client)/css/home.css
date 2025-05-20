@@ -253,7 +253,7 @@
   opacity: 1;
 }
 
-.product-title {
+.product-title,.product-title-column {
   font-size: 14px;
   font-weight: 600;
   margin: 10px 0 6px 10px;
@@ -264,6 +264,9 @@
 .product-title:hover {
   color: #4bd963; /* Hoặc màu bạn muốn */
   transform: scale(1.05); /* Phóng to nhẹ */
+}
+.product-title-column:hover {
+  color: #4bd963; /* Hoặc màu bạn muốn */
 }
 
 .product-price {
