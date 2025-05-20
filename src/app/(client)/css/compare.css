@@ -1,0 +1,117 @@
+@media (min-width: 992px) {
+  .col-md-12 {
+    width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .col-md-1,
+  .col-md-10,
+  .col-md-11,
+  .col-md-12,
+  .col-md-2,
+  .col-md-3,
+  .col-md-4,
+  .col-md-5,
+  .col-md-6,
+  .col-md-7,
+  .col-md-8,
+  .col-md-9 {
+    float: left;
+  }
+}
+.null-table {
+  text-align: center;
+  margin: 80px 0;
+}
+.d-block {
+  display: block !important;
+}
+.null-table p {
+  font-weight: 700;
+  color: #4bd963;
+}
+
+body,
+p,
+div {
+  font-family: "Quicksand";
+}
+.null-table p.img-empty i {
+  font-size: 80px;
+  color: #4bd963;
+}
+.null-table p {
+  font-weight: 700;
+  color: #4bd963;
+}
+.content-page {
+    margin-bottom: 40px;
+}
+.table-responsive {
+    min-height: .01%;
+    overflow-x: auto;
+}
+.table {
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+table {
+    width: 100%;
+    margin-bottom: 1em;
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+table {
+    background-color: transparent;
+}
+#pageCompare .content-page table tr td:first-child {
+    width: 10% !important;
+    vertical-align: middle;
+    font-weight: 700;
+}
+#pageCompare .content-page table tr td {
+    vertical-align: middle;
+    border: 1px solid #dddddd;
+    padding: 10px;
+    width: calc(90% / 3);
+    min-width: 120px;
+    font-size: 13px;
+    align-items: center;
+    text-align: left;
+    white-space: inherit;
+}
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 8px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    border-top: 1px solid #ddd;
+}
+th, td {
+    text-align: left;
+    padding: 15px;
+    border: 1px solid #e1e1e1;
+    color: #1c1c1c;
+}
+#pageCompare .content-page table tr.title h3 {
+    font-size: 14px;
+    margin: 0;
+}
+#pageCompare .content-page table tr.title h3 a {
+    font-weight: 700;
+}
+#pageCompare .content-page table tr.price td:not(:first-child) {
+    font-size: 12px;
+    color: red;
+    font-weight: 700;
+}
+#pageCompare a.remove-item {
+    background: #4bd963;
+    color: #fff;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 5px;
+    margin-top: 10px;
+    display: inline-block;
+}
