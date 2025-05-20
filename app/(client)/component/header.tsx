@@ -122,7 +122,7 @@ export default function Header() {
         <div className="menu-nav">
           <ul>
             <li>
-              <a href="/index.html">Trang Chủ</a>
+              <a href="/">Trang Chủ</a>
             </li>
             <li>
               <a href="/about.html">Giới thiệu</a>
