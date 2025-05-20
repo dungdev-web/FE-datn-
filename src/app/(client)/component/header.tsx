@@ -11,6 +11,9 @@ export default function Header() {
   const cartPopupRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const menuRef = useRef<HTMLLIElement>(null);
+  const megaMenuRef = useRef<HTMLDivElement>(null);
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
 
   let hideTimeout = null;
   useEffect(() => {
@@ -71,6 +74,39 @@ export default function Header() {
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
+  useEffect(() => {
+    const menu = menuRef.current;
+    const megaMenu = megaMenuRef.current;
+    if (!menu || !megaMenu) return;
+
+    let hideTimeout: ReturnType<typeof setTimeout>;
+
+    const showMegaMenu = () => {
+      clearTimeout(hideTimeout);
+      setIsMegaMenuOpen(true);
+    };
+
+    const hideMegaMenu = () => {
+      hideTimeout = setTimeout(() => {
+        // Nếu megaMenu không đang hover thì đóng
+        if (!menu.matches(":hover") && !megaMenu.matches(":hover")) {
+          setIsMegaMenuOpen(false);
+        }
+      }, 200);
+    };
+
+    menu.addEventListener("mouseenter", showMegaMenu);
+    menu.addEventListener("mouseleave", hideMegaMenu);
+    megaMenu.addEventListener("mouseleave", () => setIsMegaMenuOpen(false));
+
+    return () => {
+      menu.removeEventListener("mouseenter", showMegaMenu);
+      menu.removeEventListener("mouseleave", hideMegaMenu);
+      megaMenu.removeEventListener("mouseleave", () =>
+        setIsMegaMenuOpen(false)
+      );
+    };
+  }, []);
 
   return (
     <div className="header-nav-bg">
@@ -96,7 +132,10 @@ export default function Header() {
         <div className="icon-header">
           <div className="iconuser-header div">
             <div className="login-mini">
-              <i className="fa-solid fa-user cursor-pointer"  onClick={() => setShowLogin(true)}></i>
+              <i
+                className="fa-solid fa-user cursor-pointer"
+                onClick={() => setShowLogin(true)}
+              ></i>
             </div>
           </div>
           <div className="iconheart-header div">
@@ -127,9 +166,13 @@ export default function Header() {
             <li>
               <a href="/about.html">Giới thiệu</a>
             </li>
-            <li className="has-mega-menu">
+            <li className="has-mega-menu" ref={menuRef}>
               <a href="#">Sản phẩm</a>
-              <div className="mega-menu">
+              <div
+                className="mega-menu"
+                ref={megaMenuRef}
+                style={{ display: isMegaMenuOpen ? "block" : "none" }}
+              >
                 <div className="mega-columns-wrapper">
                   <div className="mega-column">
                     <h4>SẢN PHẨM MỚI NHẤT</h4>
@@ -156,6 +199,7 @@ export default function Header() {
                 </div>
               </div>
             </li>
+
             <li>
               <a href="/blog.html">Tin tức</a>
             </li>

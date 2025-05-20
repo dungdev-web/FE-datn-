@@ -1383,4 +1383,7 @@ input[type="submit"] {
   .justify-between {
     justify-content: center;
   }
+  .top-cart-content{
+    display: none !important;
+  }
 }
