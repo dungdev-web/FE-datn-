@@ -1,6 +1,5 @@
 import "../css/product.css";
 import "../css/compare.css";
-
 export default function Compare_product() {
   return (
     <>
