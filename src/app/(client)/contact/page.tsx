@@ -22,14 +22,13 @@ export default function Contact() {
         <div className="contact-left">
           <h3>Liên hệ</h3>
           <p>
-            Địa chỉ: Ladeco Building, 266 Doi Can Street, Ba Dinh District, Ha
-            Noi
+            Địa chỉ: 1371 Phan Văn Trị, Phường 10, Gò Vấp, Hồ Chí Minh
           </p>
           <p>
-            Điện thoại: <span>19006750</span>
+            Điện thoại: <span>0338538203</span>
           </p>
           <p>
-            Email: <span>support@sapo.vn</span>
+            Email: <span>terashose@gmail.com</span>
           </p>
         </div>
 

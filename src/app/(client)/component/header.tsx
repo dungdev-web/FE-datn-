@@ -4,6 +4,7 @@ import Search from "./showsearch";
 import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
 import LoginMenu from "./login_regis_forgot_modal";
+import Link from "next/link";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -139,15 +140,21 @@ export default function Header() {
             </div>
           </div>
           <div className="iconheart-header div">
-            <i className="fa-solid fa-heart"></i>
+            <Link href="/wishlist">
+              <i className="fa-solid fa-heart"></i>
+            </Link>
           </div>
           <div className="iconcompare-header div">
-            <i className="fa fa-exchange"></i>
+            <Link href="/compare_product">
+              <i className="fa fa-exchange"></i>
+            </Link>
           </div>
 
           <div className="cart-wrapper">
             <div className="iconcart-header div">
-              <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              
+                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              
             </div>
           </div>
         </div>
@@ -161,13 +168,13 @@ export default function Header() {
         <div className="menu-nav">
           <ul>
             <li>
-              <a href="/index.html">Trang Chủ</a>
+              <Link href="/">Trang Chủ</Link>
             </li>
             <li>
-              <a href="/about.html">Giới thiệu</a>
+              <Link href="/about">Giới thiệu</Link>
             </li>
             <li className="has-mega-menu" ref={menuRef}>
-              <a href="#">Sản phẩm</a>
+              <Link href="/product">Sản phẩm</Link>
               <div
                 className="mega-menu"
                 ref={megaMenuRef}
@@ -201,13 +208,13 @@ export default function Header() {
             </li>
 
             <li>
-              <a href="/blog.html">Tin tức</a>
+              <Link href="/blog">Tin tức</Link>
             </li>
             <li>
-              <a href="/contact.html">Liên hệ</a>
+              <Link href="/contact">Liên hệ</Link>
             </li>
             <li>
-              <a href="">Hệ thống cửa hàng</a>
+              <Link href="/order_history">Lịch sử đơn hàng</Link>
             </li>
           </ul>
           <div className="seach-nav">

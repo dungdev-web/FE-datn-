@@ -12,9 +12,9 @@ export default function About(){
         <div className="about-us">
             <div className="about-text">
                 <h2>VỀ CHÚNG TÔI</h2>
-                <p>TeRaShoe là một cửa hàng chuyên kinh doanh thời trang thể thao chất lượng cao với mục tiêu mang
+                <p>Tera Shose là một cửa hàng chuyên kinh doanh thời trang thể thao chất lượng cao với mục tiêu mang
                     đến cho khách hàng những sản phẩm đẳng cấp, chất lượng và sự thoải mái khi vận động. Với đội ngũ
-                    nhân viên giàu kinh nghiệm và đam mê về thể thao, HaluShoe cam kết cung cấp những sản phẩm chất
+                    nhân viên giàu kinh nghiệm và đam mê về thể thao, Tera Shose cam kết cung cấp những sản phẩm chất
                     lượng tốt nhất và chăm sóc khách hàng một cách chuyên nghiệp.</p>
             </div>
             <div className="about-image">
