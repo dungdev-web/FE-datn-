@@ -549,3 +549,147 @@ th {
     margin-top: 80px !important;
   }
 }
+/* change pass */
+@media (min-width: 992px) {
+    .col-md-6 {
+        width: 50%;
+    }
+}
+form {
+    margin-bottom: 30px;
+}
+.form-group {
+    margin: 0;
+    padding: 0 0 8px;
+    border: 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+fieldset {
+    border: 1px solid #e1e1e1;
+    padding: 15px;
+}
+input, textarea, select, fieldset {
+    border-radius: 0;
+    max-width: 100%;
+}
+fieldset {
+    min-width: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+fieldset {
+    padding: .35em .625em .75em;
+    margin: 0 2px;
+    border: 1px solid silver;
+}
+label{
+    cursor: pointer;
+}
+
+label, legend {
+    display: block;
+    margin-bottom: 2px;
+}
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+.form-group .form-control {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    padding: .375rem .75rem;
+    font-size: 1em;
+    line-height: 1.5;
+    color: #55595c;
+    background-color: #fff;
+    background-image: none;
+    margin: 0;
+    box-shadow: none;
+    border: 1px solid #EAEBF3;
+    border-radius: 0;
+}
+
+.form-group input, .form-group select {
+    height: 40px;
+}
+.btn.btn-primary {
+    font-weight: 400;
+}
+
+.btn.btn-primary, input.btn-primary[type="submit"] {
+    background: #4bd963;
+}
+.btn.btn-primary, input.btn-primary[type="submit"] {
+    background: #4bd963;
+    color: #fff;
+}
+.btn-primary {
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.btn-primary i {
+    margin-left: 5px;
+}
+/* address */
+@media (min-width: 1200px) {
+    .col-lg-12 {
+        width: 100%;
+    }
+}
+.address_info {
+    display: flex
+;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+}
+.address_info .address-group {
+    width: 75%;
+}
+.address-group {
+    background: #fff;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+}
+.address-group p {
+    color: #595959;
+}
+.address_info .address-group .address-default {
+    color: #27AE60;
+    font-size: 10px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    padding-left: 10px;
+}
+.address_info .address-group .address-default i {
+    padding-right: 3px;
+}
+.address_info .btn-address {
+    width: 25%;
+    text-align: center;
+}
+.btn-row {
+    margin: 0;
+}
+.btn-row .btn-edit {
+    font-size: 14px;
+    background: transparent !important;
+    border: 0 !important;
+    color: #2D9CDB !important;
+}
+.btn-row .btn-delete {
+    color: red !important;
+    background: transparent !important;
+    border: 0 !important;
+    text-transform: uppercase;
+    border-radius: 5px;
+}
