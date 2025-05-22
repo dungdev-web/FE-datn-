@@ -510,6 +510,9 @@ export default function Home() {
           <a href="/index.html" title="Thương hiệu 10"
             ><img src="/images/logo/brand_image4.webp" alt=""
           /></a>
+            <a href="/index.html" title="Thương hiệu 1"
+            ><img src="/images/logo/brand_image1.webp" alt=""
+          /></a>
         </div>
         <div className="comment-main">
           <h1>KHÁCH HÀNG NÓI GÌ</h1>
