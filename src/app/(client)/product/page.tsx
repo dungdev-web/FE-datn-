@@ -42,7 +42,7 @@ export default function Product() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-              <div className="col-lg-3">
+              <div className="col-lg-3 col-test">
                 <aside className="aside-item collection-category">
                   <div className="aside-title">
                     <h2 className="title-head margin-top-0">
