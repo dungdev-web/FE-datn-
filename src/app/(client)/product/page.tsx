@@ -422,7 +422,7 @@ export default function Product() {
                             <div className="hover-icons">
                               <i className="fa-solid fa-eye"></i>
                               <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-shopping-bag position-relative"></i>
+                              <i className="fa fa-exchange"></i>
                             </div>
                           </div>
 
@@ -475,7 +475,7 @@ export default function Product() {
                             <div className="hover-icons">
                               <i className="fa-solid fa-eye"></i>
                               <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-shopping-bag position-relative"></i>
+                             <i className="fa fa-exchange"></i>
                             </div>
                           </div>
 
@@ -528,7 +528,7 @@ export default function Product() {
                             <div className="hover-icons">
                               <i className="fa-solid fa-eye"></i>
                               <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-shopping-bag position-relative"></i>
+                              <i className="fa fa-exchange"></i>
                             </div>
                           </div>
 
@@ -581,7 +581,7 @@ export default function Product() {
                             <div className="hover-icons">
                               <i className="fa-solid fa-eye"></i>
                               <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-shopping-bag position-relative"></i>
+                              <i className="fa fa-exchange"></i>
                             </div>
                           </div>
 
@@ -645,7 +645,7 @@ export default function Product() {
                             <div className="hover-icons">
                               <i className="fa-solid fa-eye"></i>
                               <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-shopping-bag position-relative"></i>
+                              <i className="fa fa-exchange"></i>
                             </div>
                           </div>
                           <div className="product-colors">

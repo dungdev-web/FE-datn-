@@ -3,7 +3,7 @@ import "../../css/detail.css";
 import "../../css/product.css";
 import "../../css/style.css";
 import Show1sanpham from "@/app/(client)/component/product_home";
-import Product4box from "@/app/(client)/component/produtc";
+import Product4box from "@/src/app/(client)/component/product";
 export default function Detail() {
   return (
     <>

@@ -10,7 +10,7 @@ export default function Product4box() {
           <div className="icon-hover-group">
             <i className="fa-solid fa-eye"></i>
             <i className="fa-solid fa-list"></i>
-            <i className="fa fa-shopping-bag"></i>
+            <i className="fa fa-exchange"></i>
           </div>
         </div>
         <span className="tag-discount">-20%</span>
@@ -56,7 +56,7 @@ export default function Product4box() {
           <div className="icon-hover-group">
             <i className="fa-solid fa-eye"></i>
             <i className="fa-solid fa-list"></i>
-            <i className="fa fa-shopping-bag"></i>
+            <i className="fa fa-exchange"></i>
           </div>
         </div>
         <span className="tag-discount">-20%</span>
@@ -102,7 +102,7 @@ export default function Product4box() {
           <div className="icon-hover-group">
             <i className="fa-solid fa-eye"></i>
             <i className="fa-solid fa-list"></i>
-            <i className="fa fa-shopping-bag"></i>
+            <i className="fa fa-exchange"></i>
           </div>
         </div>
         <span className="tag-discount">-20%</span>
@@ -148,7 +148,7 @@ export default function Product4box() {
           <div className="icon-hover-group">
             <i className="fa-solid fa-eye"></i>
             <i className="fa-solid fa-list"></i>
-            <i className="fa fa-shopping-bag"></i>
+            <i className="fa fa-exchange"></i>
           </div>
         </div>
         <span className="tag-discount">-20%</span>
