@@ -214,7 +214,7 @@
   text-decoration: underline;
 }
 
-h3 {
+.form-container h3 {
   text-align: center;
   margin-top: 10px;
 }
@@ -275,7 +275,13 @@ h3 {
   }
 
   .form-container .register-link p {
-    font-size: 12px;
+    font-size: 14px;
+  }
+  .auth-container img {
+    display: none;
+  }
+  .auth-container{
+    margin-bottom: 30px;
   }
 }
 

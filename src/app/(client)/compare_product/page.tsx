@@ -34,15 +34,15 @@ export default function Compare_product() {
  
       <main style={{marginBottom:"600px",marginTop:"30px"}}>
         <div className="container1">
-          <div className="col-xs-12 col-sm-12 col-md-12">
+          {/* <div className="col-xs-12 col-sm-12 col-md-12" id="none">
             <div className="null-table d-block">
               <p className="img-empty">
                 <i className="fa fa-archive" aria-hidden="true"></i>
               </p>
               <p>Bạn chưa có sản phẩm nào để so sánh hãy thêm vào nhé</p>
             </div>
-          </div>
-          {/* <div className="col-xs-12 col-sm-12 col-md-12" id="pageCompare">
+          </div> */}
+          <div className="col-xs-12 col-sm-12 col-md-12" id="pageCompare">
 				<div className="content-page compare-table table-responsive d-block">
 					<table className="table">
 						<tbody>
@@ -91,7 +91,7 @@ export default function Compare_product() {
 						</tbody>
 					</table>
 				</div>
-			</div> */}
+			</div>
         </div>
       </main>
     </>

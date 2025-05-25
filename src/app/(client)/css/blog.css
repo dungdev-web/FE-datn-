@@ -274,3 +274,132 @@ article {
     gap: 15px;
   }
 }
+/* sidebar */
+.mobile-sidebar {
+  display: none;
+}
+
+.toggle-sidebar-btn {
+  display: none;
+  padding: 10px 15px;
+  background: #000;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.close-sidebar-btn {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #000;
+  cursor: pointer;
+}
+
+/* Sidebar mặc định trên desktop */
+aside.mobile-sidebar {
+  display: none; /* ẩn hoàn toàn trên desktop */
+}
+
+/* Sidebar thường (non-mobile-sidebar) vẫn hiển thị trên desktop */
+main > aside:not(.mobile-sidebar) {
+  display: block;
+  width: 25%;
+  padding: 20px;
+}
+@media (max-width: 1024px){
+  .desktop{
+    display: none !important;
+  }
+  /* Hiện nút toggle trên mobile */
+  .toggle-sidebar-btn {
+    display: block;
+  }
+  
+
+  /* Ẩn sidebar desktop khi ở mobile */
+  main > aside:not(.mobile-sidebar) {
+    display: none;
+  }
+
+  /* Sidebar mobile hiện với hiệu ứng */
+  aside.mobile-sidebar {
+    display: block;
+    position: fixed;
+    right: -100%;
+    top: 0;
+    width: 80%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+  }
+
+  /* Khi có class "open", sidebar trượt vào */
+  aside.mobile-sidebar.open {
+    right: 0;
+  }
+
+  /* Hiện nút đóng sidebar */
+  .close-sidebar-btn {
+    display: block;
+  }
+
+  /* Article chiếm toàn bộ chiều ngang */
+  article {
+    width: 100%;
+  }
+}
+/* Mobile styles */
+@media (max-width: 768px) {
+  /* Hiện nút toggle trên mobile */
+  .toggle-sidebar-btn {
+    display: block;
+  }
+  
+
+  /* Ẩn sidebar desktop khi ở mobile */
+  main > aside:not(.mobile-sidebar) {
+    display: none;
+  }
+
+  /* Sidebar mobile hiện với hiệu ứng */
+  aside.mobile-sidebar {
+    display: block;
+    position: fixed;
+    right: -100%;
+    top: 0;
+    width: 80%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+    padding: 20px;
+    overflow-y: auto;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease-in-out;
+  }
+
+  /* Khi có class "open", sidebar trượt vào */
+  aside.mobile-sidebar.open {
+    right: 0;
+  }
+
+  /* Hiện nút đóng sidebar */
+  .close-sidebar-btn {
+    display: block;
+  }
+
+  /* Article chiếm toàn bộ chiều ngang */
+  article {
+    width: 100%;
+  }
+}
