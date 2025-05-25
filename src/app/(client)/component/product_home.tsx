@@ -8,13 +8,13 @@ export default function Show1sanpham() {
   return (
     <Swiper
       modules={[Navigation]}
-      spaceBetween={20}
+      spaceBetween={10}
       slidesPerView={4}
       loop={true}
       navigation
       breakpoints={{
         0: {
-          slidesPerView: 1,
+          slidesPerView: 2,
         },
         576: {
           slidesPerView: 2,

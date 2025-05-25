@@ -13,6 +13,7 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLIFrameElement>(null);
+  const marqueeRef = useRef<HTMLDivElement | null>(null);
 
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
   const handlePlay = () => {
@@ -42,6 +43,39 @@ export default function Home() {
     e.stopPropagation();
     setOpenIndex((prev) => (prev === id ? null : id));
   };
+
+ useEffect(() => {
+ if (!marqueeRef.current) return; 
+
+  const marquee = marqueeRef.current;  
+
+  const content = marquee.querySelector(".marquee-content") as HTMLElement | null;
+  if (!content) return;
+
+  const clone = content.cloneNode(true);
+  marquee.appendChild(clone);
+
+  let x = 0;
+  const speed = 1;
+  const contentWidth = content.offsetWidth;
+
+  function step() {
+    x -= speed;
+    if (Math.abs(x) >= contentWidth) {
+      x = 0;
+    }
+    marquee.style.transform = `translateX(${x}px)`;
+    requestAnimationFrame(step);
+  }
+
+  step();
+
+  return () => {
+    marquee.style.transform = "";
+  };
+}, []);
+
+
   return (
     <div>
       <div className="banner">
@@ -94,15 +128,18 @@ export default function Home() {
           </div>
         </div>
         <div className="marquee-wrapper">
-          <div className="marquee">
-            <span>
-              ⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K ⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH
-              599K ⚡ GIẢM 20% CHO ĐH TỪ 1.500K ⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH
-              599K ⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K ⚡ MIỄN PHÍ VẬN CHUYỂN TỪ
-              ĐH 599K ⚡
-            </span>
+          <div className="marquee" ref={marqueeRef}>
+            <div className="marquee-content">
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K 599K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH</span>
+              <span>⚡ GIẢM 20% CHO ĐH TỪ 1.500K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K</span>
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K ⚡</span>
+            </div>
           </div>
         </div>
+
         <div className="product-dealbox-main">
           <h1>DEAL CỰC HẤP DẪN</h1>
           <div className="product-listdeal-main">
@@ -360,7 +397,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-             <div className="hot-product-card">
+            <div className="hot-product-card">
               <div className="hot-product-image">
                 <img
                   src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -417,7 +454,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-             <div className="hot-product-card">
+            <div className="hot-product-card">
               <div className="hot-product-image">
                 <img
                   src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -474,7 +511,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-             <div className="hot-product-card">
+            <div className="hot-product-card">
               <div className="hot-product-image">
                 <img
                   src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -531,7 +568,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-             <div className="hot-product-card">
+            <div className="hot-product-card">
               <div className="hot-product-image">
                 <img
                   src="/images/products/chaybo/ConverseRunStarMotion.webp"
