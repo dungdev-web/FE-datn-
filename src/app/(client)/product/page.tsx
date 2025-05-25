@@ -448,9 +448,9 @@ export default function Product() {
                           </h4>
                           <div className="product-price">
                             <span className="old-price">
-                              <del>1.500.000đ</del>
+                              <del>1.500.000đ </del>
                             </span>
-                            <span className="new-price">1.200.000đ</span>
+                            <span className="new-price"> 1.200.000đ</span>
                           </div>
 
                           <div className="product-rating">

@@ -61,7 +61,7 @@ export default function Show1sanpham() {
                 <span className="old-price">
                   <del>1.500.000đ</del>
                 </span>
-                <span className="new-price">1.200.000đ</span>
+                <span className="new-price"> 1.200.000đ</span>
               </div>
               <div className="product-progress">
                 <div className="progress-bar">
@@ -115,7 +115,7 @@ export default function Show1sanpham() {
                 <span className="old-price">
                   <del>1.500.000đ</del>
                 </span>
-                <span className="new-price">1.200.000đ</span>
+                <span className="new-price"> 1.200.000đ</span>
               </div>
               <div className="product-progress">
                 <div className="progress-bar">
@@ -167,7 +167,7 @@ export default function Show1sanpham() {
                 <span className="old-price">
                   <del>1.500.000đ</del>
                 </span>
-                <span className="new-price">1.200.000đ</span>
+                <span className="new-price"> 1.200.000đ</span>
               </div>
               <div className="product-progress">
                 <div className="progress-bar">
@@ -219,7 +219,7 @@ export default function Show1sanpham() {
                 <span className="old-price">
                   <del>1.500.000đ</del>
                 </span>
-                <span className="new-price">1.200.000đ</span>
+                <span className="new-price"> 1.200.000đ</span>
               </div>
               <div className="product-progress">
                 <div className="progress-bar">
@@ -272,7 +272,7 @@ export default function Show1sanpham() {
                 <span className="old-price">
                   <del>1.500.000đ</del>
                 </span>
-                <span className="new-price">1.200.000đ</span>
+                <span className="new-price"> 1.200.000đ</span>
               </div>
               <div className="product-progress">
                 <div className="progress-bar">
