@@ -169,4 +169,7 @@ td {
         overflow-y: hidden;
         border: 1px solid #ddd;
     }
+    #pageCompare{
+      display: none;
+    }
 }

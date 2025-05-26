@@ -1209,6 +1209,9 @@ input[type="submit"] {
 }
 /* responsive */
 @media (max-width: 1199px) {
+  .bread-crumb{
+    margin-top:80px !important;
+  }
   .overlay,
   .overlay1 {
     position: fixed;
@@ -1368,4 +1371,7 @@ input[type="submit"] {
   .top-cart-content {
     display: none !important;
   }
+  header.scrolled:before {
+    height: 50px !important;
+}
 }

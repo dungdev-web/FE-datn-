@@ -4,7 +4,7 @@ export default function Compare_product() {
   return (
     <>
       <section
-        className="bread-crumb background-cover"
+        className="bread-crumb background-cover mt-[160px]"
         style={{
           backgroundImage:
             "url(//bizweb.dktcdn.net/100/505/077/themes/934930/assets/section_breadcrumb.jpg?1730865096645)",
@@ -112,6 +112,118 @@ export default function Compare_product() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+            <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mb-4">
+              <div className="flex">
+                {/* Product Image - Left side */}
+                <div className="w-32 h-32 bg-gray-50 flex justify-center items-center flex-shrink-0">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8 text-blue-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Product Details - Right side */}
+                <div className="flex-1 p-3">
+                  <div className="space-y-2">
+                    {/* Product Name */}
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                        Giày Nam Nike Air Max
+                      </h3>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <span className="text-lg font-bold text-red-600">
+                        3.200.000₫
+                      </span>
+                    </div>
+
+                    {/* Status and Category */}
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>Còn hàng</span>
+                      <span>Đang cập nhật...</span>
+                    </div>
+
+                    {/* Supplier */}
+                    <div className="text-xs text-gray-500">
+                      Nhà cung cấp: Đang cập nhật...
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="pt-1">
+                      <button className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-4 rounded transition-colors duration-200">
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex">
+                {/* Product Image - Left side */}
+                <div className="w-32 h-32 bg-gray-50 flex justify-center items-center flex-shrink-0">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
+                    <svg
+                      className="w-8 h-8 text-blue-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Product Details - Right side */}
+                <div className="flex-1 p-3">
+                  <div className="space-y-2">
+                    {/* Product Name */}
+                    <div>
+                      <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                        Giày Nam Nike Air Max
+                      </h3>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <span className="text-lg font-bold text-red-600">
+                        3.200.000₫
+                      </span>
+                    </div>
+
+                    {/* Status and Category */}
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>Còn hàng</span>
+                      <span>Đang cập nhật...</span>
+                    </div>
+
+                    {/* Supplier */}
+                    <div className="text-xs text-gray-500">
+                      Nhà cung cấp: Đang cập nhật...
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="pt-1">
+                      <button className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-4 rounded transition-colors duration-200">
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
