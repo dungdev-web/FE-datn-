@@ -44,41 +44,42 @@ export default function Home() {
     setOpenIndex((prev) => (prev === id ? null : id));
   };
 
- useEffect(() => {
- if (!marqueeRef.current) return; 
+  useEffect(() => {
+    if (!marqueeRef.current) return;
 
-  const marquee = marqueeRef.current;  
+    const marquee = marqueeRef.current;
 
-  const content = marquee.querySelector(".marquee-content") as HTMLElement | null;
-  if (!content) return;
+    const content = marquee.querySelector(
+      ".marquee-content"
+    ) as HTMLElement | null;
+    if (!content) return;
 
-  const clone = content.cloneNode(true);
-  marquee.appendChild(clone);
+    const clone = content.cloneNode(true);
+    marquee.appendChild(clone);
 
-  let x = 0;
-  const speed = 1;
-  const contentWidth = content.offsetWidth;
+    let x = 0;
+    const speed = 1;
+    const contentWidth = content.offsetWidth;
 
-  function step() {
-    x -= speed;
-    if (Math.abs(x) >= contentWidth) {
-      x = 0;
+    function step() {
+      x -= speed;
+      if (Math.abs(x) >= contentWidth) {
+        x = 0;
+      }
+      marquee.style.transform = `translateX(${x}px)`;
+      requestAnimationFrame(step);
     }
-    marquee.style.transform = `translateX(${x}px)`;
-    requestAnimationFrame(step);
-  }
 
-  step();
+    step();
 
-  return () => {
-    marquee.style.transform = "";
-  };
-}, []);
-
+    return () => {
+      marquee.style.transform = "";
+    };
+  }, []);
 
   return (
     <div>
-      <div className="banner">
+      <div className="banner relative">
         <Swiper
           modules={[Autoplay]}
           autoplay={{ delay: 3000 }}
@@ -87,23 +88,28 @@ export default function Home() {
           slidesPerView={1}
         >
           <SwiperSlide>
-            <Image
-              src="/images/banner/slider_1.png"
-              alt="Banner 1"
-              width={1200}
-              height={500}
-            />
+            <div className="relative w-full h-[600px]">
+              <Image
+                src="/images/banner/slider_1.png"
+                alt="Banner 1"
+                fill
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            </div>
           </SwiperSlide>
           <SwiperSlide>
-            <Image
-              src="/images/banner/slider_2.webp"
-              alt="Banner 2"
-              width={1200}
-              height={500}
-            />
+            <div className="relative w-full h-[600px]">
+              <Image
+                src="/images/banner/slider_2.webp"
+                alt="Banner 2"
+                fill
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            </div>
           </SwiperSlide>
         </Swiper>
       </div>
+
       <main>
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>

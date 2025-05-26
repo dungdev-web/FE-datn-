@@ -15,6 +15,12 @@ export default function Header() {
   const menuRef = useRef<HTMLLIElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const navRef = useRef(0);
+  const lastScrollTop = useRef(0);
 
   let hideTimeout = null;
   useEffect(() => {
@@ -50,7 +56,24 @@ export default function Header() {
       cartPopup.removeEventListener("mouseleave", hidePopup);
     };
   }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
 
+      if (currentScroll < lastScrollY) {
+        // Scroll lên
+        setIsScrolledUp(true);
+      } else {
+        // Scroll xuống
+        setIsScrolledUp(false);
+      }
+
+      setLastScrollY(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -108,9 +131,40 @@ export default function Header() {
       );
     };
   }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      console.log(
+        "scrollY:",
+        currentScroll,
+        "lastScrollTop:",
+        lastScrollTop.current
+      );
+
+      if (currentScroll > lastScrollTop.current) {
+        console.log("scrolling down -> hide nav");
+        setShowNav(false);
+      } else {
+        if (currentScroll === 0) {
+          console.log("scrolling up to top -> show nav");
+          setShowNav(true);
+        } else {
+          console.log("scrolling up but not top -> hide nav");
+          setShowNav(false);
+        }
+      }
+
+      lastScrollTop.current = currentScroll <= 0 ? 0 : currentScroll;
+      setIsScrolled(currentScroll > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="header-nav-bg">
+    <div className="header-nav-bg ">
+      {isScrolledUp && <div className="bg-header-layer"></div>}
       <header className={isScrolled ? "scrolled" : ""}>
         <div
           className="icon-left"
@@ -152,9 +206,7 @@ export default function Header() {
 
           <div className="cart-wrapper">
             <div className="iconcart-header div">
-              
-                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
-              
+              <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
             </div>
           </div>
         </div>
@@ -163,8 +215,11 @@ export default function Header() {
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
       <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
-
-      <nav>
+      <nav
+        className={`transition-all duration-300 ${
+          showNav ? "opacity-100" : "opacity-0 translate-y-[-100%]"
+        }`}
+      >
         <div className="menu-nav">
           <ul>
             <li>
