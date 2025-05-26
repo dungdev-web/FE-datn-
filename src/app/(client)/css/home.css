@@ -133,12 +133,6 @@
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-/* Khi hover card thì hiện icon lên */
-.product-card:hover .product-icons .hover-icons {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* Style cho các icon */
 .product-icons i {
   color: #333;
@@ -635,13 +629,9 @@
 
 .hot-product-icons .icon-hover-group {
   display: none;
+  transition: all 3s ease-in;
   flex-direction: column;
   gap: 8px; /* tạo khoảng cách đều nhau giữa các icon */
-}
-
-/* Hiển thị icon group khi hover thẻ chứa */
-.hot-product-card:hover .hot-product-icons .icon-hover-group {
-  display: flex;
 }
 
 .hot-product-icons i {
@@ -1043,7 +1033,6 @@
   margin: 0 auto;
 }
 
-
 .brand-main a {
   flex: 0 0 auto; /* Không co giãn */
 }
@@ -1174,7 +1163,18 @@
 .bg-insta-title {
   display: none;
 }
-
+@media (min-width: 993px) {
+  /* Khi hover card thì hiện icon lên */
+  .product-card:hover .product-icons .hover-icons {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Hiển thị icon group khi hover thẻ chứa */
+  .hot-product-card:hover .hot-product-icons .icon-hover-group {
+    transition: all 3s ease-in;
+    display: flex;
+  }
+}
 @media (max-width: 991px) {
   .banner img {
     object-fit: fill !important;
@@ -1239,7 +1239,7 @@
   .comment-main {
     margin-bottom: 20px;
   }
-   .brand-main {
+  .brand-main {
     overflow-x: auto; /* Hiện thanh cuộn ngang */
     -webkit-overflow-scrolling: touch; /* Mượt khi cuộn trên iOS */
     scrollbar-width: thin; /* Cho Firefox thấy thanh cuộn nhỏ */
@@ -1250,10 +1250,9 @@
     height: 6px;
   }
   .brand-main::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
   }
-
 }
 @media (max-width: 620px) {
   .banner {
