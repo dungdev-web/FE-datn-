@@ -88,9 +88,9 @@ export default function Home() {
           slidesPerView={1}
         >
           <SwiperSlide>
-            <div className="relative w-full h-[600px]">
+            <div className="relative w-full h-[650px]">
               <Image
-                src="/images/banner/slider_1.png"
+                src="/images/banner/slider_1.jpg"
                 alt="Banner 1"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
@@ -98,9 +98,9 @@ export default function Home() {
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="relative w-full h-[600px]">
+            <div className="relative w-full h-[650px]">
               <Image
-                src="/images/banner/slider_2.webp"
+                src="/images/banner/slider_2.jpg"
                 alt="Banner 2"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
