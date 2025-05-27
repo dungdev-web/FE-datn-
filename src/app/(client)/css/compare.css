@@ -141,6 +141,9 @@ td {
   .container1 {
     width: 750px;
   }
+  .mobile{
+    display: none;
+  }
 }
 @media (min-width: 1200px) {
   .container1 {
@@ -171,5 +174,8 @@ td {
     }
     #pageCompare{
       display: none;
+    }
+    .mobile{
+      display: block;
     }
 }
