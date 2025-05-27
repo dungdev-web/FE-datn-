@@ -36,14 +36,14 @@ export default function Address() {
                   </li>
                   <li>
                     <Link
-                      className="title-info active "
+                      className="title-info  "
                       href="/account/change_pass"
                     >
                       Đổi mật khẩu
                     </Link>
                   </li>
                   <li>
-                    <Link className="title-info" href="/account/address">
+                    <Link className="title-info active" href="/account/address">
                       Sổ địa chỉ (1)
                     </Link>
                   </li>

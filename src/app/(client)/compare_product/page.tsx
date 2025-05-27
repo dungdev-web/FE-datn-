@@ -4,7 +4,7 @@ export default function Compare_product() {
   return (
     <>
       <section
-        className="bread-crumb background-cover"
+        className="bread-crumb background-cover mt-[160px]"
         style={{
           backgroundImage:
             "url(//bizweb.dktcdn.net/100/505/077/themes/934930/assets/section_breadcrumb.jpg?1730865096645)",
@@ -112,6 +112,63 @@ export default function Compare_product() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+            <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mb-4 mt-[20px] mobile">
+              <div className="flex">
+                {/* Product Image - Left side */}
+                <div className="w-32 h-32 bg-gray-50 flex justify-center items-center flex-shrink-0">
+                  <div className="w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
+                    <img
+                      className="img-fluid"
+                      src="//bizweb.dktcdn.net/thumb/medium/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
+                      alt="Giày Nam Nike Air Max"
+                    />
+                  </div>
+                </div>
+
+                {/* Product Details - Right side */}
+                <div className="flex-1 !p-[10px]">
+                  <div className="space-y-2">
+                    {/* Product Name */}
+                    <div className="flex items-center !justify-between">
+                      <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                        Giày Nam Nike Air Max
+                      </h3>
+                      {/* Tình trạng */}
+                      <div className="text-xs text-gray-500">
+                        Tình trạng:{" "}
+                        <span className="text-xs text-gray-600">Còn hàng</span>
+                      </div>
+                    </div>
+
+                    {/* Price */}
+                    <div>
+                      <span className="text-lg font-bold text-red-600">
+                        3.200.000₫
+                      </span>
+                    </div>
+
+                    {/* Supplier */}
+                    <div className="text-xs text-gray-500">
+                      Loại:{" "}
+                      <span className="text-xs text-gray-600">Đang cập nhật...</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Nhà cung cấp:  <span className="text-xs text-gray-600">Đang cập nhật...</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      Công dụng nổi b:  <span className="text-xs text-gray-600">Đang cập nhật...</span>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="pt-1">
+                      <button className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-4 rounded transition-colors duration-200 !p-[5px]">
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

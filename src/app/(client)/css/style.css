@@ -90,7 +90,6 @@ header {
   top: 0;
   left: 0;
   z-index: 1001;
-  
 }
 
 /* Nền xanh cho toàn bộ header + nav */
@@ -118,7 +117,7 @@ header:before {
 header.scrolled::before {
   height: 80px;
 }
-header.scrolled{
+header.scrolled {
   height: auto;
 }
 .logo-header img {
@@ -158,7 +157,7 @@ header.scrolled{
   display: flex;
   gap: 20px;
   font-size: 22px;
-  margin-right: 52px;
+  margin-right: 35px;
 }
 
 .icon-header .div {
@@ -166,6 +165,11 @@ header.scrolled{
   border-radius: 50%;
   padding: 10px;
   position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-header .div::after {
@@ -374,15 +378,15 @@ nav {
   /* z-index: 10000; */
   width: 100%;
   height: auto; /* Chiều cao cố định của banner */
-  margin: auto;
+  margin-top: 100px;
   position: relative;
 }
 
 .banner img {
   width: 100%;
-  height: 100px;
-  object-fit: cover; /* Cắt ảnh để vừa khung */
-  object-position: center; /* Canh giữa ảnh (có thể dùng top, bottom nếu muốn lệch) */
+  height: 100%;
+  object-fit: cover;
+  /* object-position: center;  */
   display: block;
 }
 
@@ -1254,7 +1258,15 @@ input[type="submit"] {
 }
 
 /* responsive */
+@media (min-width: 1200px) {
+  .bread-crumb {
+    margin-top: 160px !important;
+  }
+}
 @media (max-width: 1199px) {
+  .bread-crumb {
+    margin-top: 80px !important;
+  }
   .overlay,
   .overlay1 {
     position: fixed;
@@ -1372,7 +1384,7 @@ input[type="submit"] {
   nav,
   .iconuser-header,
   .iconphone-header {
-    display: none;
+    display: none !important;
   }
 
   header::before {
@@ -1418,6 +1430,8 @@ input[type="submit"] {
   }
   .icon-header .div {
     padding: 6px !important;
+    width: 35px;
+    height: 35px;
   }
 
   .logo-header img {
@@ -1441,5 +1455,8 @@ input[type="submit"] {
   }
   .top-cart-content {
     display: none !important;
+  }
+  header.scrolled:before {
+    height: 50px !important;
   }
 }

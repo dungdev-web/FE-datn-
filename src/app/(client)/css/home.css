@@ -1187,8 +1187,14 @@
   .look-book-text {
     margin-bottom: 10px;
   }
+  .bread-crumb{
+    margin-top:80px !important ;
+  }
 }
 @media (max-width: 768px) {
+  .bread-crumb{
+    margin-top:49px !important ;
+  }
   .banner {
     height: 500px !important;
   }

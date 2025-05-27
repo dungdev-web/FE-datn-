@@ -141,6 +141,9 @@ td {
   .container1 {
     width: 750px;
   }
+  .mobile{
+    display: none;
+  }
 }
 @media (min-width: 1200px) {
   .container1 {
@@ -168,5 +171,11 @@ td {
         margin-bottom: 15px;
         overflow-y: hidden;
         border: 1px solid #ddd;
+    }
+    #pageCompare{
+      display: none;
+    }
+    .mobile{
+      display: block;
     }
 }
