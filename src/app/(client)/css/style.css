@@ -1216,6 +1216,9 @@ input[type="submit"] {
   }
 }
 @media (max-width: 1199px) {
+  .banner {
+    margin-top: 80px;
+  }
   .bread-crumb {
     margin-top: 80px !important;
   }
@@ -1349,6 +1352,9 @@ input[type="submit"] {
   }
 }
 @media (max-width: 768px) {
+  .banner {
+    margin-top: 40px;
+  }
   header,
   header.scrolled {
     padding: 0 20px;
