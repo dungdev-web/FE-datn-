@@ -206,7 +206,9 @@ export default function Header() {
 
           <div className="cart-wrapper">
             <div className="iconcart-header div">
+               <Link href="/cart">
               <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              </Link>
             </div>
           </div>
         </div>
