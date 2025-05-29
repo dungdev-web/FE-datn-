@@ -66,6 +66,11 @@
   margin-bottom: 20px;
   font-size: 36px;
 }
+@media (max-width: 768px) {
+  .product-dealbox-main h1 {
+    font-size: 24px;
+  }
+}
 .product-listdeal-main {
   display: flex;
   gap: 11px;
@@ -131,12 +136,6 @@
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-/* Khi hover card thì hiện icon lên */
-.product-card:hover .product-icons .hover-icons {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 /* Style cho các icon */
@@ -369,14 +368,18 @@
 }
 
 .look-book-text h2 {
-  font-size: 25px;
+  font-size: 30px;
   text-align: center;
   color: #2e2e2e;
   margin-bottom: 20px;
   text-transform: uppercase;
   font-family: "Arial", sans-serif;
 }
-
+@media (max-width: 768px) {
+  .look-book-text h2 {
+    font-size: 24px;
+  }
+}
 .look-book-text p {
   font-size: 15px;
   color: #666;
@@ -569,11 +572,16 @@
   margin-bottom: 20px;
   padding: 0 20px; /* tùy chỉnh padding nếu cần */
 }
-
 .hot-products-title {
   font-size: 36px;
   font-weight: bold;
   margin-left: -20px;
+}
+
+@media (max-width: 768px) {
+  .hot-products-title {
+    font-size: 24px;
+  }
 }
 
 .hot-products-header h4 a {
@@ -635,13 +643,9 @@
 
 .hot-product-icons .icon-hover-group {
   display: none;
+  transition: all 3s ease-in;
   flex-direction: column;
   gap: 8px; /* tạo khoảng cách đều nhau giữa các icon */
-}
-
-/* Hiển thị icon group khi hover thẻ chứa */
-.hot-product-card:hover .hot-product-icons .icon-hover-group {
-  display: flex;
 }
 
 .hot-product-icons i {
@@ -935,6 +939,11 @@
   font-size: 36px;
   font-weight: bold;
 }
+@media (max-width: 768px) {
+.blog-title-left {
+    font-size: 24px;
+  }
+}
 
 .blog-subtitle-right {
   font-size: 16px;
@@ -1043,7 +1052,6 @@
   margin: 0 auto;
 }
 
-
 .brand-main a {
   flex: 0 0 auto; /* Không co giãn */
 }
@@ -1072,6 +1080,11 @@
   font-size: 36px;
   font-weight: bold;
   margin-bottom: 50px;
+}
+@media (max-width: 768px) {
+  .comment-main h1 {
+    font-size: 24px;
+  }
 }
 
 .comment-list {
@@ -1174,7 +1187,18 @@
 .bg-insta-title {
   display: none;
 }
-
+@media (min-width: 993px) {
+  /* Khi hover card thì hiện icon lên */
+  .product-card:hover .product-icons .hover-icons {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  /* Hiển thị icon group khi hover thẻ chứa */
+  .hot-product-card:hover .hot-product-icons .icon-hover-group {
+    transition: all 3s ease-in;
+    display: flex;
+  }
+}
 @media (max-width: 991px) {
   .banner img {
     object-fit: fill !important;
@@ -1187,8 +1211,14 @@
   .look-book-text {
     margin-bottom: 10px;
   }
+  .bread-crumb{
+    margin-top:80px !important ;
+  }
 }
 @media (max-width: 768px) {
+  .bread-crumb{
+    margin-top:49px !important ;
+  }
   .banner {
     height: 500px !important;
   }
@@ -1239,7 +1269,7 @@
   .comment-main {
     margin-bottom: 20px;
   }
-   .brand-main {
+  .brand-main {
     overflow-x: auto; /* Hiện thanh cuộn ngang */
     -webkit-overflow-scrolling: touch; /* Mượt khi cuộn trên iOS */
     scrollbar-width: thin; /* Cho Firefox thấy thanh cuộn nhỏ */
@@ -1250,10 +1280,9 @@
     height: 6px;
   }
   .brand-main::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
   }
-
 }
 @media (max-width: 620px) {
   .banner {

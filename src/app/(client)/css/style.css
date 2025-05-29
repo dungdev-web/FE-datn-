@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css");
 
 * {
   box-sizing: border-box;
@@ -92,7 +92,16 @@ header {
   z-index: 1001;
 }
 
-header::before {
+/* Nền xanh cho toàn bộ header + nav */
+.header-nav-bg {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+/* Nền màu */
+header:before {
   content: "";
   position: absolute;
   top: 0;
@@ -101,24 +110,16 @@ header::before {
   height: 160px;
   background-color: #021688;
   z-index: -1;
+  transition: height 0.3s ease;
 }
 
+/* Khi scroll xuống */
 header.scrolled::before {
-  background-color: #021688;
-  /* height: 160px; */
+  height: 80px;
 }
-
 header.scrolled {
-  background-color: #021688;
-  padding: 10px 50px;
-  /* ✅ Giữ nguyên padding như ban đầu */
+  height: auto;
 }
-
-.header-nav-bg {
-  /* margin-bottom: 160px; */
-  position: relative;
-}
-
 .logo-header img {
   width: 200px;
 }
@@ -156,7 +157,7 @@ header.scrolled {
   display: flex;
   gap: 20px;
   font-size: 22px;
-  margin-right: 52px;
+  margin-right: 35px;
 }
 
 .icon-header .div {
@@ -164,6 +165,11 @@ header.scrolled {
   border-radius: 50%;
   padding: 10px;
   position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-header .div::after {
@@ -259,7 +265,7 @@ nav {
   position: absolute;
   top: 40px;
   left: -230px;
-  width: 1300px;
+  width: 1365px;
   background-color: #021688;
   padding: 20px;
   border-radius: 10px;
@@ -367,31 +373,21 @@ nav {
   background-color: #021688;
   transition: background-color 0.3s ease-in-out;
 }
-
 .banner {
-  /* position: relative; */
   overflow: hidden;
-  /* height: 750px; */
-  z-index: 10000;
-  margin-top: 0;
-}
-
-/* ✅ Không đẩy xuống */
-/* styles/globals.css */
-.banner {
+  /* z-index: 10000; */
   width: 100%;
-  /* max-width: 1200px; */
-  margin: auto;
-  /* overflow: hidden; */
+  height: auto; /* Chiều cao cố định của banner */
+  margin-top: 100px;
+  position: relative;
 }
-
 
 .banner img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-
-
+  /* object-position: center;  */
+  display: block;
 }
 
 @keyframes fade {
@@ -434,7 +430,12 @@ nav {
   font-size: 36px;
   margin-bottom: 30px;
 }
-
+@media (max-width: 768px) {
+  .category-main h1 {
+    font-size: 24px;
+     margin-bottom: 5px;
+  }
+}
 .category-main1 {
   flex-grow: 1;
   flex-basis: 200px;
@@ -454,7 +455,6 @@ nav {
   flex-basis: 400px;
   flex-grow: 6;
 }
-
 
 .category-main1-item {
   position: relative;
@@ -489,7 +489,6 @@ nav {
   transition: opacity 0.4s ease;
   backdrop-filter: blur(4px);
 }
-
 
 .category-main1-item:hover h4 {
   opacity: 1;
@@ -527,7 +526,6 @@ nav {
   font-size: 16px;
 }
 
-
 /* footer */
 
 .footer {
@@ -550,7 +548,7 @@ nav {
 }
 
 .footer-column h3 {
-  font-size: 18px;
+  font-size: 24px;
   text-transform: uppercase;
   margin-bottom: 20px;
 }
@@ -1071,7 +1069,6 @@ input[type="submit"] {
 }
 
 .icon-search {
-
   z-index: 1001;
   cursor: pointer;
 }
@@ -1081,7 +1078,7 @@ input[type="submit"] {
   display: flex;
   margin: 10px 0;
   width: 100%;
-  font-family: 'Oswald', sans-serif;
+  font-family: "Oswald", sans-serif;
 }
 
 .modal-content {
@@ -1101,7 +1098,6 @@ input[type="submit"] {
   opacity: 0;
   transition: all 0.3s ease-in-out;
   display: none;
-
 }
 
 .modal-content.active {
@@ -1110,8 +1106,6 @@ input[type="submit"] {
   z-index: 1009;
   display: flex;
   align-items: center;
-
-
 }
 
 .overlay2 {
@@ -1132,7 +1126,6 @@ input[type="submit"] {
   opacity: 1;
   visibility: visible;
   z-index: 100;
-
 }
 
 .side-menu {
@@ -1166,9 +1159,8 @@ input[type="submit"] {
 
 .side-menu a.active {
   font-weight: bold;
-  color: red
+  color: red;
 }
-
 
 .login-form {
   padding: 10px 40px;
@@ -1185,7 +1177,6 @@ input[type="submit"] {
   visibility: visible;
   position: relative;
   transition: all 0.5s ease;
-
 }
 
 .login-form h2 {
@@ -1239,12 +1230,9 @@ input[type="submit"] {
   font-size: 16px;
   font-weight: bold;
 }
-
 .facebook-btn {
   background-color: #3b5998;
-
 }
-
 .google-btn {
   background-color: #db4437;
 }
@@ -1275,8 +1263,18 @@ input[type="submit"] {
 }
 
 /* responsive */
+@media (min-width: 1200px) {
+  .bread-crumb {
+    margin-top: 160px !important;
+  }
+}
 @media (max-width: 1199px) {
-
+  .banner {
+    margin-top: 80px;
+  }
+  .bread-crumb {
+    margin-top: 80px !important;
+  }
   .overlay,
   .overlay1 {
     position: fixed;
@@ -1288,7 +1286,6 @@ input[type="submit"] {
     /* display: none; */
     z-index: 999;
   }
-
   .boc {
     display: block;
   }
@@ -1395,7 +1392,7 @@ input[type="submit"] {
   nav,
   .iconuser-header,
   .iconphone-header {
-    display: none;
+    display: none !important;
   }
 
   header::before {
@@ -1413,7 +1410,6 @@ input[type="submit"] {
   header.scrolled {
     padding: 10px 100px;
   }
-
   .icon-header,
   .icon-left {
     font-size: 18.5px;
@@ -1427,29 +1423,31 @@ input[type="submit"] {
   }
 
   .footer-column h3 {
-    font-size: 29px;
+    font-size: 24px;
   }
 }
 
 @media (max-width: 768px) {
-
+  .banner {
+    margin-top: 40px;
+  }
   header,
   header.scrolled {
     padding: 0 20px;
   }
 
   .icon-header {
-    margin: 8px 0 0 0 ;
+    margin: 0;
   }
-
   .icon-header .div {
     padding: 6px !important;
+    width: 35px;
+    height: 35px;
   }
 
   .logo-header img {
     width: 150px;
   }
-
   header::before {
     height: 50px;
   }
@@ -1466,8 +1464,10 @@ input[type="submit"] {
   .justify-between {
     justify-content: center;
   }
-
   .top-cart-content {
     display: none !important;
+  }
+  header.scrolled:before {
+    height: 50px !important;
   }
 }
