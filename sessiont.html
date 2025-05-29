@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mã Giảm Giá</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            padding: 20px;
+        }
+
+        .coupon-section {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .coupon {
+            width: 300px;
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .coupon::before,
+        .coupon::after {
+            content: "";
+            width: 10px;
+            background: #fff;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 2;
+        }
+
+        .coupon::before {
+            left: 80%;
+            border-left: 1px dashed #ccc;
+        }
+
+        .left-part {
+            width: 80%;
+            padding: 10px;
+        }
+
+        .right-part {
+            width: 20%;
+            background: #4bd963;
+            writing-mode: vertical-rl;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            padding: 10px 15px;
+            letter-spacing: 2px;
+        }
+
+        .code {
+            font-size: 14px;
+            color: #FF0000;
+            margin-bottom: 5px;
+        }
+
+        .discount-box {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .discount-box .title {
+            background: #FF0000;
+            color: white;
+            padding: 5px 5px;
+            font-size: 12px;
+            margin-bottom: 3px;
+            display: inline-block;
+        }
+
+        .discount-box .percent {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .desc {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .apply-link {
+            font-size: 12px;
+            color: #007bff;
+            text-decoration: underline;
+            display: inline-block;
+        }
+
+        .copy-button {
+            background: #021688;
+            border: none;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: white;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            font-size: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: #facc15;
+            border: none;
+            padding: 8px 16px;
+            margin-left: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-btn.copy {
+            background-color: #1d4ed8;
+            color: white;
+        }
+
+        .modal-btn.close {
+            background-color: #e5e7eb;
+        }
+        .action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.action-row .apply-link {
+  flex: 1;
+}
+
+.action-row .copy-button {
+  flex-shrink: 0;
+}
+
+    </style>
+</head>
+
+<body>
+
+    <div class="coupon-section">
+        <!-- Coupon 1 -->
+        <div class="coupon">
+            <div class="left-part">
+                <div class="code">Mã: FISHOES</div>
+                <div class="discount-box">
+                    <div class="title">MÃ GIẢM</div>
+                    <div class="percent">Giảm 10%</div>
+                </div>
+                <div class="desc">Mã giảm 13% khi mua 2 sản phẩm</div>
+                <div class="action-row">
+                    <a href="#" class="apply-link">Điều kiện áp dụng</a>
+                    <button class="copy-button">Sao chép mã</button>
+                </div>
+
+            </div>
+            <div class="right-part">PHIẾU GIẢM GIÁ</div>
+        </div>
+
+        <!-- Coupon 2 -->
+        <div class="coupon">
+            <div class="left-part">
+                <div class="code">Mã: FISHOES2</div>
+                <div class="discount-box">
+                    <div class="title">MÃ GIẢM</div>
+                    <div class="percent">Giảm 13%</div>
+                </div>
+                <div class="desc">Mã giảm 13% khi mua 2 sản phẩm</div>
+                <div class="action-row">
+  <a href="#" class="apply-link">Điều kiện áp dụng</a>
+  <button class="copy-button">Sao chép mã</button>
+</div>
+
+            </div>
+            <div class="right-part">PHIẾU GIẢM GIÁ</div>
+        </div>
+
+        <!-- Coupon 3 -->
+        <div class="coupon">
+            <div class="left-part">
+                <div class="code">Mã: FISHOES3</div>
+                <div class="discount-box">
+                    <div class="title">MÃ GIẢM</div>
+                    <div class="percent">Giảm 18%</div>
+                </div>
+                <div class="desc">Mã giảm 18% khi mua 3 sản phẩm</div>
+                  <div class="action-row">
+                    <a href="#" class="apply-link">Điều kiện áp dụng</a>
+                    <button class="copy-button">Sao chép mã</button>
+                </div>
+            </div>
+            <div class="right-part">PHIẾU GIẢM GIÁ</div>
+        </div>
+
+        <!-- Coupon 4 -->
+        <div class="coupon">
+            <div class="left-part">
+                <div class="code">Mã: FISHOES4</div>
+                <div class="discount-box">
+                    <div class="title">MÃ GIẢM</div>
+                    <div class="percent">Giảm 20%</div>
+                </div>
+                <div class="desc">Mã giảm 20% khi mua 4 sản phẩm</div>
+                  <div class="action-row">
+                    <a href="#" class="apply-link">Điều kiện áp dụng</a>
+                    <button class="copy-button">Sao chép mã</button>
+                </div>
+            </div>
+            <div class="right-part">PHIẾU GIẢM GIÁ</div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div id="modal" style="display:none;" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Mã : <span id="modal-code" style="color: #ff4500;"></span></h2>
+            <p><strong>Mã khuyến mãi:</strong> <span id="modal-code-detail"></span></p>
+            <p><strong>Điều kiện:</strong></p>
+            <p id="modal-desc"></p>
+            <div style="text-align: right; margin-top: 15px;">
+                <button onclick="copyCode()" class="modal-btn copy">Sao chép mã</button>
+                <button onclick="closeModal()" class="modal-btn close">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+<script>
+    const modal = document.getElementById('modal');
+    const modalCode = document.getElementById('modal-code');
+    const modalCodeDetail = document.getElementById('modal-code-detail');
+    const modalDesc = document.getElementById('modal-desc');
+
+    function openModal(code, desc) {
+        modal.style.display = 'flex';
+        modalCode.innerText = code;
+        modalCodeDetail.innerText = code;
+        modalDesc.innerText = desc;
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    function copyCode() {
+        const code = modalCodeDetail.innerText;
+        navigator.clipboard.writeText(code).then(() => {
+            alert("Đã sao chép mã: " + code);
+        });
+    }
+
+    // Gán sự kiện cho các link “Điều kiện áp dụng”
+    document.querySelectorAll('.apply-link').forEach((el, i) => {
+        el.addEventListener('click', (e) => {
+            e.preventDefault();
+            const card = el.closest('.coupon');
+            const code = card.querySelector('.code').innerText.replace('Mã: ', '').trim();
+            const desc = card.querySelector('.desc').innerText.trim();
+            openModal(code, desc + " - Mỗi khách hàng được sử dụng tối đa 1 lần - Số lượng voucher có hạn");
+        });
+    });
+</script>
