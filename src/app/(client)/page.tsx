@@ -8,6 +8,8 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import Show1sanpham from "./component/product_home";
 import BlogHome from "./component/blog_home";
+import CouponApp from "./component/coupon";
+
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -146,6 +148,7 @@ export default function Home() {
           </div>
         </div>
 
+       <CouponApp></CouponApp>
         <div className="product-dealbox-main">
           <h1>DEAL CỰC HẤP DẪN</h1>
           <div className="product-listdeal-main">
