@@ -9,6 +9,8 @@ import { useEffect, useState, useRef } from "react";
 import Show1sanpham from "./component/product_home";
 import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
+import FlashSale from "./component/flash_sale";
+
 
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
@@ -163,6 +165,11 @@ export default function Home() {
             </div>
           </div>
         </div>
+        
+        {/* <FlashSale></FlashSale> */}
+       
+       
+
         <div className="look-book-main">
           <div className="look-book-text">
             <h3>LOOKBOOK</h3>
@@ -644,7 +651,7 @@ export default function Home() {
             </h4>
           </div>
 
-          <div className="hot-products-list">
+         <div className="hot-products-list">
             <div className="hot-product-card">
               <div className="hot-product-image">
                 <img

@@ -160,3 +160,17 @@
 .action-row .copy-button {
   flex-shrink: 0;
 }
+/* Tablet */
+@media (max-width: 992px) {
+  .coupon {
+    width: 45%; /* 2 coupon trên 1 hàng */
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .coupon {
+    width: 90%; /* 1 coupon trên 1 hàng */
+  }
+
+}

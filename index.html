@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Khuyến mãi giày</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-900">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 h-screen">
+        <!-- Left side: Countdown + Button -->
+        <div class="relative flex flex-col justify-center items-center text-white px-4 h-[500px]"
+            style="background-image: url('/public/images/blog/layer-1.webp'); background-size: contain; background-repeat: no-repeat; background-position: center;">
+
+            <!-- Lớp phủ đen -->
+            <div class="absolute inset-0 bg-black opacity-60"></div>
+
+            <!-- Nội dung phía trên lớp phủ -->
+            <div class="relative z-10 p-6">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6 text-center">Ưu đãi lớn sắp kết thúc</h2>
+
+                <div class="grid grid-cols-4 gap-4 bg-white text-black rounded-lg p-4 mb-6 text-center">
+                    <div>
+                        <div class="text-3xl font-bold" id="days">00</div>
+                        <div class="text-sm">Ngày</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold" id="hours">00</div>
+                        <div class="text-sm">Giờ</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold" id="minutes">00</div>
+                        <div class="text-sm">Phút</div>
+                    </div>
+                    <div>
+                        <div class="text-3xl font-bold" id="seconds">00</div>
+                        <div class="text-sm">Giây</div>
+                    </div>
+                </div>
+
+                <button
+                    class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold text-lg">
+                    MUA SẮM NGAY
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Right side: Product -->
+        <div class="flex flex-col justify-center items-center text-center px-6 py-8">
+            <div className="slider-wrapper">
+                <div className="product-slider-track">
+                    <Show1sanpham></Show1sanpham>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const endTime = new Date();
+        endTime.setHours(endTime.getHours() + 72); // Khuyến mãi trong 72h
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            if (distance < 0) {
+                document.getElementById("countdown").innerHTML = "Hết thời gian!";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("days").innerText = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+
+</body>
+
+</html>
