@@ -115,7 +115,7 @@
             z-index: 9999;
         }
 
-        .modal-content {
+        .modal-content-coupon {
             background: white;
             padding: 25px;
             border-radius: 8px;
@@ -124,6 +124,7 @@
             font-size: 14px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             line-height: 1.6;
+            z-index: 100000;
         }
 
         .modal-btn {
