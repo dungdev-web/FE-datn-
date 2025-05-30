@@ -43,7 +43,7 @@ export default function SalePage() {
   }, []);
 
 return (
-    <div className="w-[90%] mx-auto mt-10"> {/* Bọc toàn bộ nội dung */}
+    <div className="w-[90%] mx-auto"> {/* Bọc toàn bộ nội dung */}
       <div className="grid grid-cols-1 md:grid-cols-2 min-h-[50vh]">
         {/* LEFT SIDE */}
         <div className="relative h-full w-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">

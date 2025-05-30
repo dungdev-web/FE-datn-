@@ -165,10 +165,10 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
-        {/* <FlashSale></FlashSale> */}
+{/*         
+        <FlashSale></FlashSale>
        
-       
+        */}
 
         <div className="look-book-main">
           <div className="look-book-text">

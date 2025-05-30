@@ -268,7 +268,7 @@ export default function Header() {
                 <Link href="/contact">Liên hệ</Link>
               </li>
               <li>
-                <Link href="/order_history">Lịch sử đơn hàng</Link>
+                <Link href="/account">Tài khoản</Link>
               </li>
             </ul>
             <div className="seach-nav">
