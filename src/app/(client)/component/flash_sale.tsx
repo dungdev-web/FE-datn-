@@ -61,7 +61,7 @@ export default function SalePage() {
                 </div>
               ))}
             </div>
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold text-lg">
+            <button className="bg-red-500 hover:bg-orange-600 text-white px-24 py-3 rounded-full font-semibold text-lg">
               MUA SẮM NGAY
             </button>
           </div>
