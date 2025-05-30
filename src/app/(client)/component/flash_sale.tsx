@@ -42,17 +42,16 @@ export default function SalePage() {
     return () => clearInterval(interval);
   }, []);
 
-return (
-    <div className="w-[90%] mx-auto mt-10"> {/* Bọc toàn bộ nội dung */}
-      <div className="grid grid-cols-1 md:grid-cols-2 min-h-[50vh]">
-        {/* LEFT SIDE */}
+  return (
+
+
+      <div className="grid grid-cols-1 md:grid-cols-2 min-h-[50vh] w-full">
         <div className="relative h-full w-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
           <div className="relative z-10 text-center px-4 py-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               Ưu đãi lớn sắp kết thúc
             </h2>
             <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg px-6 py-4 mb-6 max-w-md mx-auto">
-              {/* Time left */}
               {["days", "hours", "minutes", "seconds"].map((key, i) => (
                 <div key={i}>
                   <div className="text-3xl font-bold">{timeLeft[key]}</div>
@@ -77,7 +76,6 @@ return (
           </div>
         </div>
       </div>
-    </div>
-  );
 
+  );
 }

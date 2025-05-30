@@ -11,7 +11,6 @@ import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 
-
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -94,7 +93,7 @@ export default function Home() {
           <SwiperSlide>
             <div className="relative w-full h-[650px]">
               <Image
-               src="/images/banner/slider_1.jpg"
+                src="/images/banner/slider_1.jpg"
                 alt="Banner 1"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
@@ -150,7 +149,7 @@ export default function Home() {
           </div>
         </div>
 
-       <CouponApp></CouponApp>
+        <CouponApp></CouponApp>
         <div className="product-dealbox-main">
           <h1>DEAL CỰC HẤP DẪN</h1>
           <div className="product-listdeal-main">
@@ -165,10 +164,9 @@ export default function Home() {
             </div>
           </div>
         </div>
-        
-        {/* <FlashSale></FlashSale> */}
-       
-       
+        <div className="container max-w-7xl mx-auto mt-10">
+          <FlashSale></FlashSale>
+        </div>
 
         <div className="look-book-main">
           <div className="look-book-text">
@@ -651,7 +649,7 @@ export default function Home() {
             </h4>
           </div>
 
-         <div className="hot-products-list">
+          <div className="hot-products-list">
             <div className="hot-product-card">
               <div className="hot-product-image">
                 <img
