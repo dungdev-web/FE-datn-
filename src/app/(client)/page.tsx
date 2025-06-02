@@ -938,6 +938,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        .
         <div className="video-main">
           <img
             className="video-bg"
