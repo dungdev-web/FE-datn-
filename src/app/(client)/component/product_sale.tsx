@@ -23,7 +23,7 @@ export default function ProductSale() {
           slidesPerView: 2,
         },
         992: {
-          slidesPerView: 3,
+          slidesPerView: 4,
         }
       }}
       className="product-slider-track"
