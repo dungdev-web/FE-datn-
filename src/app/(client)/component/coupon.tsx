@@ -68,7 +68,8 @@ function Modal({ visible, code, desc, onClose }: ModalProps) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content2">
+
+      <div className="modal-content-coupon">
         <h2>
           Mã : <span style={{ color: '#ff4500' }}>{code}</span>
         </h2>

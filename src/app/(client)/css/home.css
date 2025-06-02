@@ -1313,3 +1313,9 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+.flash-sale {
+  background-image: url('/public/images/blog/layer-1.webp'); 
+  background-size: contain;          /* Ảnh vừa khung, không bị cắt */
+  background-repeat: no-repeat;      /* Không lặp lại ảnh */
+  background-position: center;       /* Canh giữa ảnh */
+}
