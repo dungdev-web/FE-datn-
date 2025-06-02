@@ -110,13 +110,15 @@
 }
 
 .product-image {
-  position: relative;
+  position: relative !important;
   text-align: center;
+  height: 100%;
 }
 
 .product-image img {
   width: 100%;
   border-radius: 8px;
+  height: 100%;
 }
 .product-icons {
   position: absolute;
@@ -153,9 +155,8 @@
 /* Hover vào icon thì glow + scale lên */
 .product-icons i:hover {
   transform: scale(1.3) rotate(5deg);
- box-shadow: 0 0 12px rgb(2, 22, 136, 0.5);
+  box-shadow: 0 0 12px rgb(2, 22, 136, 0.5);
   color: #021688;
-
 }
 
 .discount-tag {
@@ -172,7 +173,8 @@
 
 .new-tag {
   position: absolute;
-  top: 300px;
+  /* top: 0px; */
+  bottom: 35%;
   left: 10px;
   background: red;
   color: #fff;
@@ -281,9 +283,7 @@
   font-weight: 600;
   margin: 10px 0 6px 10px;
   text-align: left;
- 
 }
-
 
 .old-price {
   color: #999;
@@ -779,7 +779,7 @@
 }
 
 .progress-bar {
-    border: solid 1px #0c2b63;
+  border: solid 1px #0c2b63;
   border-radius: 8px;
   overflow: hidden;
   height: 16px;
@@ -788,7 +788,7 @@
 
 .progress-fill {
   /* background: linear-gradient(90deg, #fa6262, #ff9c9c); */
- color: #0c2b63;
+  color: #0c2b63;
   height: 100%;
   border-radius: 8px 0 0 8px;
   display: flex;
@@ -940,7 +940,7 @@
   font-weight: bold;
 }
 @media (max-width: 768px) {
-.blog-title-left {
+  .blog-title-left {
     font-size: 24px;
   }
 }
@@ -1211,13 +1211,13 @@
   .look-book-text {
     margin-bottom: 10px;
   }
-  .bread-crumb{
-    margin-top:80px !important ;
+  .bread-crumb {
+    margin-top: 80px !important ;
   }
 }
 @media (max-width: 768px) {
-  .bread-crumb{
-    margin-top:49px !important ;
+  .bread-crumb {
+    margin-top: 49px !important ;
   }
   .banner {
     height: 500px !important;
@@ -1296,7 +1296,7 @@
     grid-template-columns: repeat(1, 1fr);
     padding: 5px;
   }
- .category-main1-item {
+  .category-main1-item {
     margin-top: 5px;
   }
   .instagram-list {
