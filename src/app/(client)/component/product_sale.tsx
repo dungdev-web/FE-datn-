@@ -6,6 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 export default function ProductSale() {
   return (
+    <div className="w-full max-w-5xl mx-auto">
     <Swiper
       modules={[Navigation]}
       spaceBetween={10}
@@ -23,7 +24,7 @@ export default function ProductSale() {
           slidesPerView: 2,
         },
         992: {
-          slidesPerView: 4,
+          slidesPerView: 3,
         }
       }}
       className="product-slider-track"
@@ -46,10 +47,7 @@ export default function ProductSale() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -100,10 +98,7 @@ export default function ProductSale() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -152,10 +147,7 @@ export default function ProductSale() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -204,10 +196,7 @@ export default function ProductSale() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -257,10 +246,7 @@ export default function ProductSale() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -293,6 +279,6 @@ export default function ProductSale() {
         </div>
         </SwiperSlide>
     </Swiper>
-    
+    </div>
   );
 }
