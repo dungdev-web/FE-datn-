@@ -537,9 +537,10 @@ nav {
 .footer-container {
   display: flex;
   flex-wrap: wrap;
-  max-width: 1200px;
-  margin: auto;
+  max-width: 1600px;
+  margin: 0 30px;
   gap: 40px;
+  /* grid-template-columns: repeat(4,1fr); */
 }
 
 .footer-column {
@@ -585,7 +586,7 @@ nav {
 
 .subscribe-box input {
   flex: 1;
-  padding: 20px 10px;
+  padding: 12px 10px;
   border: none;
   border-radius: 40px 0 0 40px;
   outline: none;
@@ -634,8 +635,8 @@ nav {
 }
 
 .bottom-container {
-  max-width: 1200px;
-  margin: auto;
+  /* max-width: 1200px; */
+  margin: auto 30px;
 }
 
 .footer-border-top {
