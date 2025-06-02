@@ -661,10 +661,10 @@
 /* Hover vào icon thì glow + scale lên */
 .hot-product-icons i:hover {
   transform: scale(1.3) rotate(5deg);
-  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
-  color: #007bff;
+  box-shadow: 0 0 12px #0c2b63;
+  color: #0c2b63;
 }
-
+ 
 .tag-discount,
 .tag-new {
   position: absolute;
@@ -1312,4 +1312,10 @@
   .hot-products-list {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+.flash-sale {
+  background-image: url('/public/images/blog/layer-1.webp'); 
+  background-size: contain;          /* Ảnh vừa khung, không bị cắt */
+  background-repeat: no-repeat;      /* Không lặp lại ảnh */
+  background-position: center;       /* Canh giữa ảnh */
 }

@@ -206,8 +206,8 @@ export default function Header() {
 
           <div className="cart-wrapper">
             <div className="iconcart-header div">
-               <Link href="/cart">
-              <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              <Link href="/cart">
+                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
               </Link>
             </div>
           </div>
@@ -217,73 +217,71 @@ export default function Header() {
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
       <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
-      <nav
-        className={`transition-all duration-300 ${
-          showNav ? "opacity-100" : "opacity-0 translate-y-[-100%]"
-        }`}
-      >
-        <div className="menu-nav">
-          <ul>
-            <li>
-              <Link href="/">Trang Chủ</Link>
-            </li>
-            <li>
-              <Link href="/about">Giới thiệu</Link>
-            </li>
-            <li className="has-mega-menu" ref={menuRef}>
-              <Link href="/product">Sản phẩm</Link>
-              <div
-                className="mega-menu"
-                ref={megaMenuRef}
-                style={{ display: isMegaMenuOpen ? "block" : "none" }}
-              >
-                <div className="mega-columns-wrapper">
-                  <div className="mega-column">
-                    <h4>SẢN PHẨM MỚI NHẤT</h4>
-                    <a href="#">Giày chạy bộ</a>
-                    <a href="#">Giày Nike</a>
-                    <a href="#">Giày Adidas</a>
-                    <a href="#">Giày thể thao</a>
+      {showNav && (
+        <nav className="transition-all duration-300">
+          <div className="menu-nav">
+            <ul>
+              <li>
+                <Link href="/">Trang Chủ</Link>
+              </li>
+              <li>
+                <Link href="/about">Giới thiệu</Link>
+              </li>
+              <li className="has-mega-menu" ref={menuRef}>
+                <Link href="/product">Sản phẩm</Link>
+                <div
+                  className="mega-menu"
+                  ref={megaMenuRef}
+                  style={{ display: isMegaMenuOpen ? "block" : "none" }}
+                >
+                  <div className="mega-columns-wrapper">
+                    <div className="mega-column">
+                      <h4>SẢN PHẨM MỚI NHẤT</h4>
+                      <a href="#">Giày chạy bộ</a>
+                      <a href="#">Giày Nike</a>
+                      <a href="#">Giày Adidas</a>
+                      <a href="#">Giày thể thao</a>
+                    </div>
+                    <div className="mega-column">
+                      <h4>SẢN PHẨM NỔI BẬT</h4>
+                      <a href="#">Giày cho nam</a>
+                      <a href="#">Giày cho nữ</a>
+                    </div>
+                    <div className="mega-column">
+                      <h4>SẢN PHẨM BÁN CHẠY</h4>
+                      <a href="#">Giày Puma</a>
+                      <a href="#">Nike Air</a>
+                    </div>
                   </div>
-                  <div className="mega-column">
-                    <h4>SẢN PHẨM NỔI BẬT</h4>
-                    <a href="#">Giày cho nam</a>
-                    <a href="#">Giày cho nữ</a>
-                  </div>
-                  <div className="mega-column">
-                    <h4>SẢN PHẨM BÁN CHẠY</h4>
-                    <a href="#">Giày Puma</a>
-                    <a href="#">Nike Air</a>
+
+                  <div className="mega-images">
+                    <img src="/images/banner/mega-menu-images1.webp" alt="" />
+                    <img src="/images/banner/mega-menu-images2.webp" alt="" />
                   </div>
                 </div>
+              </li>
 
-                <div className="mega-images">
-                  <img src="/images/banner/mega-menu-images1.webp" alt="" />
-                  <img src="/images/banner/mega-menu-images2.webp" alt="" />
-                </div>
-              </div>
-            </li>
-
-            <li>
-              <Link href="/blog">Tin tức</Link>
-            </li>
-            <li>
-              <Link href="/contact">Liên hệ</Link>
-            </li>
-            <li>
-              <Link href="/order_history">Lịch sử đơn hàng</Link>
-            </li>
-          </ul>
-          <div className="seach-nav">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm"
-              className="input-search-nav !text-black"
-            />
-            <i className="fa-solid fa-magnifying-glass"></i>
+              <li>
+                <Link href="/blog">Tin tức</Link>
+              </li>
+              <li>
+                <Link href="/contact">Liên hệ</Link>
+              </li>
+              <li>
+                <Link href="/account">Tài khoản</Link>
+              </li>
+            </ul>
+            <div className="seach-nav">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm"
+                className="input-search-nav !text-black"
+              />
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
     </div>
   );
 }

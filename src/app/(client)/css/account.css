@@ -96,24 +96,27 @@
 }
 .col-left-ac .block-account p {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   font-family: "Roboto", sans-serif;
   line-height: 16px;
   margin-bottom: 18px;
   color: #212b25;
   position: relative;
+  font-family: "Oswald", sans-serif;
+
 }
 .col-left-ac .block-account ul {
   padding: 0;
   margin: 0;
 }
 .col-left-ac .block-account ul .title-info {
-  font-weight: 400;
-  font-size: 14px;
-  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  /* font-family: "Roboto", sans-serif; */
   color: #212b25;
   margin-bottom: 12px;
   display: block;
+  font-family: "Oswald", sans-serif;
 }
 .col-left-ac .block-account ul .title-info:hover,
 .col-left-ac .block-account ul .title-info.active {

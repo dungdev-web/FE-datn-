@@ -33,11 +33,11 @@ function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
         <div className="code">Mã: {code}</div>
         <div className="discount-box">
           <div className="title">MÃ GIẢM</div>
-          <div className="percent">{discount}</div>
+         <div className="percent">{discount}</div>
         </div>
         <div className="desc">{desc}</div>
         <div className="action-row">
-          <a href="#" className="apply-link" onClick={(e) => onApplyClick(e, code, desc)}>
+          <a className="apply-link" onClick={(e) => onApplyClick(e, code, desc)}>
             Điều kiện áp dụng
           </a>
           <button className="copy-button" onClick={handleCopy}>
@@ -68,7 +68,7 @@ function Modal({ visible, code, desc, onClose }: ModalProps) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content">
+      <div className="modal-content-coupon">
         <h2>
           Mã : <span style={{ color: '#ff4500' }}>{code}</span>
         </h2>
@@ -97,16 +97,14 @@ export default function CouponApp() {
   const [selectedCode, setSelectedCode] = useState('');
   const [selectedDesc, setSelectedDesc] = useState('');
 
-  const handleApplyClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    code: string,
-    desc: string
-  ) => {
-    e.preventDefault();
-    setSelectedCode(code);
-    setSelectedDesc(desc);
-    setModalVisible(true);
-  };
+const handleApplyClick = (e: React.MouseEvent<HTMLAnchorElement>, code: string, desc: string) => {
+  e.preventDefault();
+  console.log('Click mã:', code);
+  setSelectedCode(code);
+  setSelectedDesc(desc);
+  setModalVisible(true);
+};
+
 
   return (
     <>

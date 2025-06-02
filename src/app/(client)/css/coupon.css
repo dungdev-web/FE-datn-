@@ -112,10 +112,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 9999;
         }
 
-        .modal-content {
+        .modal-content-coupon {
             background: white;
             padding: 25px;
             border-radius: 8px;
@@ -124,6 +124,7 @@
             font-size: 14px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
             line-height: 1.6;
+            z-index: 100000;
         }
 
         .modal-btn {
@@ -158,4 +159,18 @@
 
 .action-row .copy-button {
   flex-shrink: 0;
+}
+/* Tablet */
+@media (max-width: 992px) {
+  .coupon {
+    width: 45%; /* 2 coupon trên 1 hàng */
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .coupon {
+    width: 90%; /* 1 coupon trên 1 hàng */
+  }
+
 }
