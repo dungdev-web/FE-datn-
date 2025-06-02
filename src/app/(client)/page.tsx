@@ -8,11 +8,16 @@ import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import Show1sanpham from "./component/product_home";
 import BlogHome from "./component/blog_home";
+import CouponApp from "./component/coupon";
+import FlashSale from "./component/flash_sale";
+
+
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLIFrameElement>(null);
+  const marqueeRef = useRef<HTMLDivElement | null>(null);
 
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
   const handlePlay = () => {
@@ -42,9 +47,43 @@ export default function Home() {
     e.stopPropagation();
     setOpenIndex((prev) => (prev === id ? null : id));
   };
+
+  useEffect(() => {
+    if (!marqueeRef.current) return;
+
+    const marquee = marqueeRef.current;
+
+    const content = marquee.querySelector(
+      ".marquee-content"
+    ) as HTMLElement | null;
+    if (!content) return;
+
+    const clone = content.cloneNode(true);
+    marquee.appendChild(clone);
+
+    let x = 0;
+    const speed = 1;
+    const contentWidth = content.offsetWidth;
+
+    function step() {
+      x -= speed;
+      if (Math.abs(x) >= contentWidth) {
+        x = 0;
+      }
+      marquee.style.transform = `translateX(${x}px)`;
+      requestAnimationFrame(step);
+    }
+
+    step();
+
+    return () => {
+      marquee.style.transform = "";
+    };
+  }, []);
+
   return (
     <div>
-      <div className="banner">
+      <div className="banner relative">
         <Swiper
           modules={[Autoplay]}
           autoplay={{ delay: 3000 }}
@@ -53,23 +92,28 @@ export default function Home() {
           slidesPerView={1}
         >
           <SwiperSlide>
-            <Image
-              src="/images/banner/slider_1.png"
-              alt="Banner 1"
-              width={1200}
-              height={500}
-            />
+            <div className="relative w-full h-[650px]">
+              <Image
+               src="/images/banner/slider_1.jpg"
+                alt="Banner 1"
+                fill
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            </div>
           </SwiperSlide>
           <SwiperSlide>
-            <Image
-              src="/images/banner/slider_2.webp"
-              alt="Banner 2"
-              width={1200}
-              height={500}
-            />
+            <div className="relative w-full h-[650px]">
+              <Image
+                src="/images/banner/slider_2.jpg"
+                alt="Banner 2"
+                fill
+                style={{ objectFit: "cover", objectPosition: "center" }}
+              />
+            </div>
           </SwiperSlide>
         </Swiper>
       </div>
+
       <main>
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
@@ -94,15 +138,19 @@ export default function Home() {
           </div>
         </div>
         <div className="marquee-wrapper">
-          <div className="marquee">
-            <span>
-              ⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K ⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH
-              599K ⚡ GIẢM 20% CHO ĐH TỪ 1.500K ⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH
-              599K ⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K ⚡ MIỄN PHÍ VẬN CHUYỂN TỪ
-              ĐH 599K ⚡
-            </span>
+          <div className="marquee" ref={marqueeRef}>
+            <div className="marquee-content">
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K 599K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH</span>
+              <span>⚡ GIẢM 20% CHO ĐH TỪ 1.500K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K</span>
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K ⚡</span>
+            </div>
           </div>
         </div>
+
+       <CouponApp></CouponApp>
         <div className="product-dealbox-main">
           <h1>DEAL CỰC HẤP DẪN</h1>
           <div className="product-listdeal-main">
@@ -111,16 +159,17 @@ export default function Home() {
               <h1>NHANH TAY KẺO LỠ</h1>
             </div>
             <div className="slider-wrapper">
-            
-
               <div className="product-slider-track">
                 <Show1sanpham></Show1sanpham>
               </div>
-
-        
             </div>
           </div>
         </div>
+{/*         
+        <FlashSale></FlashSale>
+       
+        */}
+
         <div className="look-book-main">
           <div className="look-book-text">
             <h3>LOOKBOOK</h3>
@@ -318,7 +367,235 @@ export default function Home() {
                   <div className="icon-hover-group">
                     <i className="fa-solid fa-eye"></i>
                     <i className="fa-solid fa-list"></i>
-                    <i className="fa fa-shopping-bag"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
@@ -374,7 +651,7 @@ export default function Home() {
             </h4>
           </div>
 
-          <div className="hot-products-list">
+         <div className="hot-products-list">
             <div className="hot-product-card">
               <div className="hot-product-image">
                 <img
@@ -386,7 +663,235 @@ export default function Home() {
                   <div className="icon-hover-group">
                     <i className="fa-solid fa-eye"></i>
                     <i className="fa-solid fa-list"></i>
-                    <i className="fa fa-shopping-bag"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
+                  </div>
+                </div>
+                <span className="tag-discount">-20%</span>
+                <span className="tag-new">
+                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                  Mới
+                </span>
+              </div>
+              <div className="hot-product-content">
+                <div className="hot-product-colors">
+                  <span
+                    className="color-item blue"
+                    data-color="Xanh dương"
+                  ></span>
+                  <span
+                    className="color-item green"
+                    data-color="Xanh lá"
+                  ></span>
+                  <span className="color-item pink" data-color="Hồng"></span>
+                </div>
+                <h4 className="hot-product-title">
+                  Giày Converse Run Star Motion
+                </h4>
+                <div className="hot-product-price">
+                  <span className="price-old">
+                    <del>1.500.000đ</del>
+                  </span>
+                  <span className="price-new">1.200.000đ</span>
+                </div>
+                <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hot-product-rating">
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-solid fa-star"></i>
+                  <i className="fa-regular fa-star"></i>
+                </div>
+              </div>
+            </div>
+            <div className="hot-product-card">
+              <div className="hot-product-image">
+                <img
+                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  alt=""
+                />
+                <div className="hot-product-icons">
+                  <i className="fa-solid fa-heart icon-favorite"></i>
+                  <div className="icon-hover-group">
+                    <i className="fa-solid fa-eye"></i>
+                    <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-exchange"></i>
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
@@ -480,36 +985,39 @@ export default function Home() {
         </div>
         <hr className="hr-line" />
         <div className="brand-main">
-          <a href="/index.html" title="Thương hiệu 1"
-            ><img src="/images/logo/brand_image1.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 2"
-            ><img src="/images/logo/brand_image2.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 3"
-            ><img src="/images/logo/brand_image3.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 4"
-            ><img src="/images/logo/brand_image4.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 5"
-            ><img src="/images/logo/brand_image5.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 6"
-            ><img src="/images/logo/brand_image6.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 7"
-            ><img src="/images/logo/brand_image1.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 8"
-            ><img src="/images/logo/brand_image2.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 9"
-            ><img src="/images/logo/brand_image3.webp" alt=""
-          /></a>
-          <a href="/index.html" title="Thương hiệu 10"
-            ><img src="/images/logo/brand_image4.webp" alt=""
-          /></a>
+          <a href="/index.html" title="Thương hiệu 1">
+            <img src="/images/logo/brand_image1.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 2">
+            <img src="/images/logo/brand_image2.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 3">
+            <img src="/images/logo/brand_image3.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 4">
+            <img src="/images/logo/brand_image4.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 5">
+            <img src="/images/logo/brand_image5.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 6">
+            <img src="/images/logo/brand_image6.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 7">
+            <img src="/images/logo/brand_image1.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 8">
+            <img src="/images/logo/brand_image2.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 9">
+            <img src="/images/logo/brand_image3.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 10">
+            <img src="/images/logo/brand_image4.webp" alt="" />
+          </a>
+          <a href="/index.html" title="Thương hiệu 1">
+            <img src="/images/logo/brand_image1.webp" alt="" />
+          </a>
         </div>
         <div className="comment-main">
           <h1>KHÁCH HÀNG NÓI GÌ</h1>
@@ -587,7 +1095,13 @@ export default function Home() {
           </div>
         </div>
         <div className="instagram-main">
-          <div className="bg-insta-title" style={{backgroundImage: "url(https://bizweb.dktcdn.net/100/430/436/files/bg-insta.jpg?v=1701307661793)"}}>
+          <div
+            className="bg-insta-title"
+            style={{
+              backgroundImage:
+                "url(https://bizweb.dktcdn.net/100/430/436/files/bg-insta.jpg?v=1701307661793)",
+            }}
+          >
             <h2>Theo dõi Instagram của chúng tôi</h2>
           </div>
           <div className="instagram-list">

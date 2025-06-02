@@ -1,13 +1,28 @@
-@media (min-width: 992px) {
-  .col-md-12 {
+
+.container1 {
+    max-width: 1320px;
     width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
   }
+.row {
+  margin-right: -15px;
+  margin-left: -15px;
+}
+.row::after {
+  clear: both;
+}
+.row:after,
+.row:before {
+  display: table;
+  content: " ";
 }
 @media (min-width: 992px) {
   .col-md-1,
   .col-md-10,
   .col-md-11,
-  .col-md-12,
   .col-md-2,
   .col-md-3,
   .col-md-4,
@@ -45,73 +60,122 @@ div {
   color: #4bd963;
 }
 .content-page {
-    margin-bottom: 40px;
+  margin-bottom: 40px;
 }
 .table-responsive {
-    min-height: .01%;
-    overflow-x: auto;
+  min-height: 0.01%;
+  overflow-x: auto;
 }
 .table {
-    width: 100%;
-    max-width: 100%;
-    margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 20px;
 }
 table {
-    width: 100%;
-    margin-bottom: 1em;
-    border-collapse: collapse;
-    border-spacing: 0;
+  width: 100%;
+  margin-bottom: 1em;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 table {
-    background-color: transparent;
+  background-color: transparent;
 }
 #pageCompare .content-page table tr td:first-child {
-    width: 10% !important;
-    vertical-align: middle;
-    font-weight: 700;
+  width: 10% !important;
+  vertical-align: middle;
+  font-weight: 700;
 }
 #pageCompare .content-page table tr td {
-    vertical-align: middle;
-    border: 1px solid #dddddd;
-    padding: 10px;
-    width: calc(90% / 3);
-    min-width: 120px;
-    font-size: 13px;
-    align-items: center;
-    text-align: left;
-    white-space: inherit;
+  vertical-align: middle;
+  border: 1px solid #dddddd;
+  padding: 10px;
+  width: calc(90% / 3);
+  min-width: 120px;
+  font-size: 13px;
+  align-items: center;
+  text-align: left;
+  white-space: inherit;
 }
-.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
-    padding: 8px;
-    line-height: 1.42857143;
-    vertical-align: top;
-    border-top: 1px solid #ddd;
+.table > tbody > tr > td,
+.table > tbody > tr > th,
+.table > tfoot > tr > td,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > thead > tr > th {
+  padding: 8px;
+  line-height: 1.42857143;
+  vertical-align: top;
+  border-top: 1px solid #ddd;
 }
-th, td {
-    text-align: left;
-    padding: 15px;
-    border: 1px solid #e1e1e1;
-    color: #1c1c1c;
+th,
+td {
+  text-align: left;
+  padding: 15px;
+  border: 1px solid #e1e1e1;
+  color: #1c1c1c;
 }
 #pageCompare .content-page table tr.title h3 {
-    font-size: 14px;
-    margin: 0;
+  font-size: 14px;
+  margin: 0;
 }
 #pageCompare .content-page table tr.title h3 a {
-    font-weight: 700;
+  font-weight: 700;
 }
 #pageCompare .content-page table tr.price td:not(:first-child) {
-    font-size: 12px;
-    color: red;
-    font-weight: 700;
+  font-size: 12px;
+  color: red;
+  font-weight: 700;
 }
 #pageCompare a.remove-item {
-    background: #4bd963;
-    color: #fff;
-    font-weight: 700;
-    padding: 6px 20px;
-    border-radius: 5px;
-    margin-top: 10px;
-    display: inline-block;
+  background: #4bd963;
+  color: #fff;
+  font-weight: 700;
+  padding: 6px 20px;
+  border-radius: 5px;
+  margin-top: 10px;
+  display: inline-block;
+}
+/*   */
+@media (min-width: 768px) {
+  .container1 {
+    width: 750px;
+  }
+  .mobile{
+    display: none;
+  }
+}
+@media (min-width: 1200px) {
+  .container1 {
+    max-width: 1320px;
+    width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .col-md-12 {
+    width: 100%;
+  }
+  .container1 {
+    width: 970px;
+  }
+}
+@media (min-width: 1200px) {
+    .container1 {
+        max-width: 1320px;
+        width: 100%;
+    }
+}
+@media screen and (max-width: 767px) {
+    .table-responsive {
+        width: 100%;
+        margin-bottom: 15px;
+        overflow-y: hidden;
+        border: 1px solid #ddd;
+    }
+    #pageCompare{
+      display: none;
+    }
+    .mobile{
+      display: block;
+    }
 }

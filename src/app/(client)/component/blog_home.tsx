@@ -13,10 +13,10 @@ export default function BlogHome() {
       navigation
       breakpoints={{
         0: {
-          slidesPerView: 1,
+          slidesPerView: 2,
         },
         576: {
-          slidesPerView: 2,
+          slidesPerView: 3,
         },
         768: {
           slidesPerView: 3,

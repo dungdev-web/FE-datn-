@@ -4,6 +4,7 @@ import Search from "./showsearch";
 import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
 import LoginMenu from "./login_regis_forgot_modal";
+import Link from "next/link";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -14,6 +15,12 @@ export default function Header() {
   const menuRef = useRef<HTMLLIElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const navRef = useRef(0);
+  const lastScrollTop = useRef(0);
 
   let hideTimeout = null;
   useEffect(() => {
@@ -49,7 +56,24 @@ export default function Header() {
       cartPopup.removeEventListener("mouseleave", hidePopup);
     };
   }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
 
+      if (currentScroll < lastScrollY) {
+        // Scroll lên
+        setIsScrolledUp(true);
+      } else {
+        // Scroll xuống
+        setIsScrolledUp(false);
+      }
+
+      setLastScrollY(currentScroll);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -107,9 +131,40 @@ export default function Header() {
       );
     };
   }, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      console.log(
+        "scrollY:",
+        currentScroll,
+        "lastScrollTop:",
+        lastScrollTop.current
+      );
+
+      if (currentScroll > lastScrollTop.current) {
+        console.log("scrolling down -> hide nav");
+        setShowNav(false);
+      } else {
+        if (currentScroll === 0) {
+          console.log("scrolling up to top -> show nav");
+          setShowNav(true);
+        } else {
+          console.log("scrolling up but not top -> hide nav");
+          setShowNav(false);
+        }
+      }
+
+      lastScrollTop.current = currentScroll <= 0 ? 0 : currentScroll;
+      setIsScrolled(currentScroll > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <div className="header-nav-bg">
+    <div className="header-nav-bg ">
+      {isScrolledUp && <div className="bg-header-layer"></div>}
       <header className={isScrolled ? "scrolled" : ""}>
         <div
           className="icon-left"
@@ -139,15 +194,21 @@ export default function Header() {
             </div>
           </div>
           <div className="iconheart-header div">
-            <i className="fa-solid fa-heart"></i>
+            <Link href="/wishlist">
+              <i className="fa-solid fa-heart"></i>
+            </Link>
           </div>
           <div className="iconcompare-header div">
-            <i className="fa fa-exchange"></i>
+            <Link href="/compare_product">
+              <i className="fa fa-exchange"></i>
+            </Link>
           </div>
 
           <div className="cart-wrapper">
             <div className="iconcart-header div">
-              <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              <Link href="/cart">
+                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              </Link>
             </div>
           </div>
         </div>
@@ -156,70 +217,71 @@ export default function Header() {
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
       <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
+      {showNav && (
+        <nav className="transition-all duration-300">
+          <div className="menu-nav">
+            <ul>
+              <li>
+                <Link href="/">Trang Chủ</Link>
+              </li>
+              <li>
+                <Link href="/about">Giới thiệu</Link>
+              </li>
+              <li className="has-mega-menu" ref={menuRef}>
+                <Link href="/product">Sản phẩm</Link>
+                <div
+                  className="mega-menu"
+                  ref={megaMenuRef}
+                  style={{ display: isMegaMenuOpen ? "block" : "none" }}
+                >
+                  <div className="mega-columns-wrapper">
+                    <div className="mega-column">
+                      <h4>SẢN PHẨM MỚI NHẤT</h4>
+                      <a href="#">Giày chạy bộ</a>
+                      <a href="#">Giày Nike</a>
+                      <a href="#">Giày Adidas</a>
+                      <a href="#">Giày thể thao</a>
+                    </div>
+                    <div className="mega-column">
+                      <h4>SẢN PHẨM NỔI BẬT</h4>
+                      <a href="#">Giày cho nam</a>
+                      <a href="#">Giày cho nữ</a>
+                    </div>
+                    <div className="mega-column">
+                      <h4>SẢN PHẨM BÁN CHẠY</h4>
+                      <a href="#">Giày Puma</a>
+                      <a href="#">Nike Air</a>
+                    </div>
+                  </div>
 
-      <nav>
-        <div className="menu-nav">
-          <ul>
-            <li>
-              <a href="/">Trang Chủ</a>
-            </li>
-            <li>
-              <a href="/about.html">Giới thiệu</a>
-            </li>
-            <li className="has-mega-menu" ref={menuRef}>
-              <a href="#">Sản phẩm</a>
-              <div
-                className="mega-menu"
-                ref={megaMenuRef}
-                style={{ display: isMegaMenuOpen ? "block" : "none" }}
-              >
-                <div className="mega-columns-wrapper">
-                  <div className="mega-column">
-                    <h4>SẢN PHẨM MỚI NHẤT</h4>
-                    <a href="#">Giày chạy bộ</a>
-                    <a href="#">Giày Nike</a>
-                    <a href="#">Giày Adidas</a>
-                    <a href="#">Giày thể thao</a>
-                  </div>
-                  <div className="mega-column">
-                    <h4>SẢN PHẨM NỔI BẬT</h4>
-                    <a href="#">Giày cho nam</a>
-                    <a href="#">Giày cho nữ</a>
-                  </div>
-                  <div className="mega-column">
-                    <h4>SẢN PHẨM BÁN CHẠY</h4>
-                    <a href="#">Giày Puma</a>
-                    <a href="#">Nike Air</a>
+                  <div className="mega-images">
+                    <img src="/images/banner/mega-menu-images1.webp" alt="" />
+                    <img src="/images/banner/mega-menu-images2.webp" alt="" />
                   </div>
                 </div>
+              </li>
 
-                <div className="mega-images">
-                  <img src="/images/banner/mega-menu-images1.webp" alt="" />
-                  <img src="/images/banner/mega-menu-images2.webp" alt="" />
-                </div>
-              </div>
-            </li>
-
-            <li>
-              <a href="/blog.html">Tin tức</a>
-            </li>
-            <li>
-              <a href="/contact.html">Liên hệ</a>
-            </li>
-            <li>
-              <a href="">Hệ thống cửa hàng</a>
-            </li>
-          </ul>
-          <div className="seach-nav">
-            <input
-              type="text"
-              placeholder="Tìm kiếm sản phẩm"
-              className="input-search-nav !text-black"
-            />
-            <i className="fa-solid fa-magnifying-glass"></i>
+              <li>
+                <Link href="/blog">Tin tức</Link>
+              </li>
+              <li>
+                <Link href="/contact">Liên hệ</Link>
+              </li>
+              <li>
+                <Link href="/account">Tài khoản</Link>
+              </li>
+            </ul>
+            <div className="seach-nav">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm"
+                className="input-search-nav !text-black"
+              />
+              <i className="fa-solid fa-magnifying-glass"></i>
+            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
+      )}
     </div>
   );
 }

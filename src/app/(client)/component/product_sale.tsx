@@ -4,12 +4,12 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
-export default function Show1sanpham() {
+export default function ProductSale() {
   return (
     <Swiper
       modules={[Navigation]}
       spaceBetween={10}
-      slidesPerView={4}
+      slidesPerView={2}
       loop={true}
       navigation
       breakpoints={{
@@ -20,10 +20,10 @@ export default function Show1sanpham() {
           slidesPerView: 2,
         },
         768: {
-          slidesPerView: 3,
+          slidesPerView: 2,
         },
         992: {
-          slidesPerView: 4,
+          slidesPerView: 2,
         }
       }}
       className="product-slider-track"

@@ -10,6 +10,9 @@ import ArticleIcon from "@mui/icons-material/Article";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import CommentIcon from "@mui/icons-material/Comment";
+import RateReviewIcon from "@mui/icons-material/RateReview";
+
 import { DocumentScannerTwoTone } from "@mui/icons-material";
 import { Help } from "@mui/icons-material";
 import { Settings } from "@mui/icons-material";
@@ -29,7 +32,22 @@ export default function SideBar() {
             Dashboard
           </a>
         </li>
-
+        <li
+          className={`has-submenu ${openMenuKey === "taikhoan" ? "open" : ""}`}
+        >
+          <a href="#" onClick={() => toggleMenu("taikhoan")}>
+            <AccountCircleIcon /> Quản lý tài khoản{" "}
+            <i className="fa-solid fa-chevron-down submenu-icon"></i>
+          </a>
+          <ul className="submenu">
+            <li>
+              <a href="#">Danh sách tài khoản</a>
+            </li>
+            <li>
+              <a href="#">Thêm mới tài khoản</a>
+            </li>
+          </ul>
+        </li>
         <li
           className={`has-submenu ${openMenuKey === "danhmuc" ? "open" : ""}`}
         >
@@ -80,24 +98,6 @@ export default function SideBar() {
             </li>
           </ul>
         </li>
-
-        <li
-          className={`has-submenu ${openMenuKey === "baiviet" ? "open" : ""}`}
-        >
-          <a href="#" onClick={() => toggleMenu("baiviet")}>
-            <ArticleIcon /> Quản lý bài viết{" "}
-            <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
-          <ul className="submenu">
-            <li>
-              <a href="#">Danh sách bài viết</a>
-            </li>
-            <li>
-              <a href="#">Thêm mới bài viết</a>
-            </li>
-          </ul>
-        </li>
-
         <li
           className={`has-submenu ${openMenuKey === "khuyenmai" ? "open" : ""}`}
         >
@@ -131,36 +131,69 @@ export default function SideBar() {
             </li>
           </ul>
         </li>
-
         <li
-          className={`has-submenu ${openMenuKey === "taikhoan" ? "open" : ""}`}
+          className={`has-submenu ${openMenuKey === "baiviet" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("taikhoan")}>
-            <AccountCircleIcon /> Quản lý tài khoản{" "}
+          <a href="#" onClick={() => toggleMenu("baiviet")}>
+            <ArticleIcon /> Quản lý bài viết{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
           </a>
           <ul className="submenu">
             <li>
-              <a href="#">Danh sách tài khoản</a>
+              <a href="#">Danh sách bài viết</a>
             </li>
             <li>
-              <a href="#">Thêm mới tài khoản</a>
+              <a href="#">Thêm mới bài viết</a>
             </li>
           </ul>
         </li>
+        <li
+          className={`has-submenu ${openMenuKey === "binhluan" ? "open" : ""}`}
+        >
+          <a href="#" onClick={() => toggleMenu("binhluan")}>
+            <CommentIcon /> Quản lý bình luận{" "}
+            <i className="fa-solid fa-chevron-down submenu-icon"></i>
+          </a>
+          <ul className="submenu">
+            <li>
+              <a href="#">Danh sách bình luận</a>
+            </li>
+            <li>
+              <a href="#">Bình luận ...</a>
+            </li>
+          </ul>
+        </li>
+
+        <li
+          className={`has-submenu ${openMenuKey === "danhgia" ? "open" : ""}`}
+        >
+          <a href="#" onClick={() => toggleMenu("danhgia")}>
+            <RateReviewIcon /> Quản lý đánh giá sản phẩm{" "}
+            <i className="fa-solid fa-chevron-down submenu-icon"></i>
+          </a>
+          <ul className="submenu">
+            <li>
+              <a href="#">Danh sách đánh giá sản phẩm</a>
+            </li>
+            <li>
+              <a href="#">Đánh giá sản phẩm ...</a>
+            </li>
+          </ul>
+        </li>
+
         <li className="w-full custom-after-border relative !mt-[10px]"></li>
         <li className="!mt-[20px]">
-        <a href="#">
+          <a href="#">
             <DocumentScannerTwoTone /> Tài liệu{" "}
           </a>
         </li>
         <li>
-        <a href="#">
+          <a href="#">
             <Help /> Help{" "}
           </a>
         </li>
         <li>
-        <a href="#">
+          <a href="#">
             <Settings /> Cài đặt{" "}
           </a>
         </li>

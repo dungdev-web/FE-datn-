@@ -1,5 +1,7 @@
 "use client";
+import Link from "next/link";
 import React, { useState } from "react";
+import { FaChevronDown } from "react-icons/fa";
 
 interface MenuRightProps {
   isMenuOpen: boolean;
@@ -34,62 +36,79 @@ export default function MenuRight({ isMenuOpen, closeMenu }: MenuRightProps) {
         </div>
         <ul>
           <li>
-            <a href="#">TRANG CHỦ</a>
+            <Link href="/">TRANG CHỦ</Link>
           </li>
           <li>
-            <a href="#">GIỚI THIỆU</a>
+            <Link href="/about">GIỚI THIỆU</Link>
           </li>
 
           {/* SẢN PHẨM */}
           <li>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                toggleSubmenu(1);
-              }}
-            >
-              SẢN PHẨM <span className="arrow">▼</span>
-            </a>
+            <Link href="/product">
+              SẢN PHẨM{" "}
+              <span
+                className="arrow"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleSubmenu(1);
+                }}
+              >
+                <FaChevronDown
+                  className={`ml-1 transition-transform duration-300 ${
+                    isSubmenuActive[1] ? "rotate-180" : ""
+                  }`}
+                />
+              </span>
+            </Link>
             <div
               className={`submenu transition-max-height duration-300 ease-in-out overflow-hidden ${
                 isSubmenuActive[1] ? "max-h-40" : "max-h-0"
               }`}
             >
-              <a href="#">Giày Nam</a>
-              <a href="#">Giày Nữ</a>
+              <Link href="/product">Giày Nam</Link>
+              <Link href="/product">Giày Nữ</Link>
             </div>
           </li>
 
           {/* TIN TỨC */}
           <li>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                toggleSubmenu(2);
-              }}
-            >
-              TIN TỨC <span className="arrow">▼</span>
-            </a>
+            <Link href="/contact">
+              TIN TỨC{" "}
+              <span
+                className="arrow"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toggleSubmenu(2);
+                }}
+              >
+                <FaChevronDown
+                  className={`ml-1 transition-transform duration-300 ${
+                    isSubmenuActive[1] ? "rotate-180" : ""
+                  }`}
+                />
+              </span>
+            </Link>
             <div
               className={`submenu transition-max-height duration-300 ease-in-out overflow-hidden ${
                 isSubmenuActive[2] ? "max-h-40" : "max-h-0"
               }`}
             >
-              <a href="#">Bài viết</a>
-              <a href="#">Khuyến mãi</a>
+              <Link href="/blog">Bài viết</Link>
+              <Link href="/contact">Khuyến mãi</Link>
             </div>
           </li>
 
           <li>
-            <a href="#">LIÊN HỆ</a>
+            <Link href="/contact">LIÊN HỆ</Link>
           </li>
           <li>
-            <a href="#">HỆ THỐNG CỬA HÀNG</a>
+            <Link href="/login">TÀI KHOẢN</Link>
           </li>
           <li>
-            <a href="#">TÀI KHOẢN</a>
+            <Link href="/register">ĐĂNG KÍ</Link>
+          </li>
+          <li>
+            <Link href="/login">ĐĂNG NHẬP</Link>
           </li>
         </ul>
       </div>

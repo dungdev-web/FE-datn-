@@ -54,7 +54,7 @@ export default function Header_admin() {
           <span className="home-icon">
             <i className="fa-solid fa-house"></i>
           </span>{" "}
-          / <span>Danh sách bài viết</span>
+          / <span> Trang dashboard</span>
         </div>
       </div>
       <div>

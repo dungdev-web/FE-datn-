@@ -435,7 +435,6 @@ input[type="radio"] {
   .col-md-1,
   .col-md-10,
   .col-md-11,
-  .col-md-12,
   .col-md-2,
   .col-md-3,
   .col-md-4,
@@ -675,7 +674,7 @@ input[type="submit"] {
   .main_container {
     padding: 10px 110px;
   }
-  .col-lg-3 {
+  .col-test{
     display: none;
   }
 
