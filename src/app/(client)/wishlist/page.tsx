@@ -35,7 +35,7 @@ export default function Wishlist() {
         <div className="container1">
             <div className="row">
                 <div className="product-grid-wishlist">
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -88,7 +88,7 @@ export default function Wishlist() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -141,7 +141,7 @@ export default function Wishlist() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -194,7 +194,7 @@ export default function Wishlist() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
