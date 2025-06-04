@@ -47,10 +47,10 @@ export default function SalePage() {
       {/* LEFT SIDE */}
       <div className="relative w-full h-[40vh] md:h-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
         <div className="relative z-10 text-center px-4 py-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold !mb-6">
             Ưu đãi lớn sắp kết thúc
           </h2>
-          <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg px-6 py-4 mb-6 max-w-md mx-auto">
+          <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg !px-6 !py-2 !mb-3 max-w-md mx-auto">
             {["days", "hours", "minutes", "seconds"].map((key, i) => (
               <div key={i}>
                 <div className="text-3xl font-bold">{timeLeft[key]}</div>
@@ -60,7 +60,7 @@ export default function SalePage() {
               </div>
             ))}
           </div>
-          <button className="bg-red-500 hover:bg-orange-600 text-white px-6 py-3 font-semibold">
+          <button className="bg-[#007aff] hover:bg-[#007aff] text-white !px-12 !py-1 font-semibold">
             MUA SẮM NGAY
           </button>
         </div>
