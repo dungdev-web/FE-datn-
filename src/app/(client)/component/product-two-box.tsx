@@ -62,10 +62,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -120,10 +117,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -178,10 +172,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -236,10 +227,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -294,10 +282,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -340,7 +325,7 @@ export default function Show2sanpham() {
       <div className="w-[47%] float-left box-container">
         <div className="content">
           <h3>Hàng order</h3>
-          <p>Xem tất cả </p>
+          <p>Xem tất cả <i className="fa-solid fa-angles-right"></i></p>
         </div>
         <div className="flex  w-[100%]  ">
           <div className="images">
@@ -350,12 +335,12 @@ export default function Show2sanpham() {
             />
           </div>
           <Swiper
-            modules={[Navigation]}
+            modules={[Navigation,Pagination]}
             spaceBetween={3}
             slidesPerView={2}
             loop={true}
             navigation
-            pagination={{ clickable: true }}
+            pagination={{ clickable: true,dynamicBullets: true  }}
             breakpoints={{
               0: {
                 slidesPerView: 2,
@@ -390,10 +375,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -448,10 +430,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -506,10 +485,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -564,10 +540,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"
@@ -622,10 +595,7 @@ export default function Show2sanpham() {
                     </div>
 
                     <span className="discount-tag">-20%</span>
-                    <span className="new-tag">
-                      <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                      Mới
-                    </span>
+                    
                     <div className="product-colors">
                       <span
                         className="color blue"

@@ -14,10 +14,6 @@ export default function Product4box() {
           </div>
         </div>
         <span className="tag-discount">-20%</span>
-        <span className="tag-new">
-          <img src="/images/logo/title_image_1_tag.webp" alt="" />
-          Mới
-        </span>
       </div>
       <div className="hot-product-content">
         <div className="hot-product-colors">
@@ -60,10 +56,6 @@ export default function Product4box() {
           </div>
         </div>
         <span className="tag-discount">-20%</span>
-        <span className="tag-new">
-          <img src="/images/logo/title_image_1_tag.webp" alt="" />
-          Mới
-        </span>
       </div>
       <div className="hot-product-content">
         <div className="hot-product-colors">
@@ -106,10 +98,6 @@ export default function Product4box() {
           </div>
         </div>
         <span className="tag-discount">-20%</span>
-        <span className="tag-new">
-          <img src="/images/logo/title_image_1_tag.webp" alt="" />
-          Mới
-        </span>
       </div>
       <div className="hot-product-content">
         <div className="hot-product-colors">
@@ -152,10 +140,6 @@ export default function Product4box() {
           </div>
         </div>
         <span className="tag-discount">-20%</span>
-        <span className="tag-new">
-          <img src="/images/logo/title_image_1_tag.webp" alt="" />
-          Mới
-        </span>
       </div>
       <div className="hot-product-content">
         <div className="hot-product-colors">
