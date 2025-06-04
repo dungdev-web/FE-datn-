@@ -1,5 +1,5 @@
 "use client";
-// import "../css/product.css";
+import "../css/product.css";
 import { useState } from "react";
 export default function Product() {
   const [isActive, setIsActive] = useState(false);
@@ -410,7 +410,7 @@ export default function Product() {
                 </div>
                 {viewMode === "grid" && (
                   <div className="product-grid">
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                      <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -463,7 +463,7 @@ export default function Product() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -516,7 +516,7 @@ export default function Product() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -569,7 +569,7 @@ export default function Product() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
+                    <div className="product-itemlist-main !block">
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
