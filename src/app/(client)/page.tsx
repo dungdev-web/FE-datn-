@@ -901,19 +901,8 @@ export default function Home() {
            </div>
           </div>
         </div>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        <div className="product-two-box-container flex gap-[75px]">
-          <Show2sanpham></Show2sanpham>
-=======
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
+
         <div className="product-two-box-container flex gap-[75px] flex-wrap">
           <div className="w-[47%] float-left box-container">
             <div className="content">
@@ -2041,26 +2030,9 @@ export default function Home() {
             </div>
           </div>{" "}
           
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
         </div>
-          <div className="product-two-box-container flex gap-[75px]">
-          <img src="/images/banner/session_cate.jpg" alt="" />
-        </div>
-          <div className="product-two-box-container flex gap-[75px]">
-          <Show2sanpham></Show2sanpham>
-        </div>
-          <div className="product-two-box-container flex gap-[75px]">
-          <Show2sanpham></Show2sanpham>
-        </div>
+     
         
        
         <div className="video-main">
