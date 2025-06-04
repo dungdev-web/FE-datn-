@@ -166,10 +166,9 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="container max-w-7xl mx-auto mt-10">
+        <div className="container max-w-7xl mx-auto">
           <FlashSale></FlashSale>
+        </div>
         </div>
 
         <div className="look-book-main">

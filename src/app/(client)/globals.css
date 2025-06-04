@@ -5,7 +5,7 @@
 @import "tailwindcss";
 .bg-flash-sale {
   background-image: url('/images/blog/layer-1.webp');
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 }
