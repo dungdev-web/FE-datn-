@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import "../css/dashboard.css";
 import "../css/css.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import LabelIcon from "@mui/icons-material/Label";

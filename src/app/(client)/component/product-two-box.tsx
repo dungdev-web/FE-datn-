@@ -1,3 +1,4 @@
+"use client";
 import "../css/product.css";
 import "../css/home.css";
 import { Swiper, SwiperSlide } from "swiper/react";
