@@ -48,7 +48,6 @@ export default function SalePage() {
       <div className="flex flex-col md:grid md:grid-cols-2 min-h-[50vh] w-full">
   {/* LEFT SIDE */}
   <div className="relative w-full h-[40vh] md:h-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
-    <div className="absolute inset-0 bg-black/30 z-0"></div>
     <div className="relative z-10 text-center px-4 py-8">
       <h2 className="text-3xl md:text-4xl font-bold mb-6">
         Ưu đãi lớn sắp kết thúc
