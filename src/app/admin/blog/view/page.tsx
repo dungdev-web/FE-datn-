@@ -61,42 +61,42 @@ export default function Blog_View() {
   return (
     <main className="main-content">
       <form className="form-add-post">
-        <div className="form-header d-flex justify-content-between align-items-center mb-4">
+        <div className="form-header flex justify-between items-center !mb-[24px]">
           <h2 className="form-title">Thêm bài viết mới</h2>
-          <div className="action-buttons d-flex gap-2">
-            <button type="button" className="btn btn-back">
+          <div className="action-buttons flex !gap-[8px]">
+            <button type="button" className="btn btn-back cursor-pointer">
               <i className="fa-solid fa-arrow-left"></i> Trở về
             </button>
-            <button type="submit" className="btn btn-success">
+            <button type="submit" className="btn bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded">
               <i className="fa-solid fa-plus"></i> Thêm bài viết
             </button>
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-md-6">
-            <div className="mb-3">
-              <label className="form-label">Tên bài viết</label>
+        <div className="flex !flex-row gap-[20px]">
+          <div className="w-1/2">
+            <div className="!mb-[12px]">
+              <label className="form-labels !mb-[8px] !inline-block ">Tên bài viết</label>
               <input
                 type="text"
                 id="title"
-                className="form-control"
+                className="form-controls !w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Nhập tiêu đề bài viết"
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Slug</label>
+              <label className="form-labels  !mb-[8px] !inline-block">Slug</label>
               <input
                 type="text"
                 id="slug"
-                className="form-control"
+                className="form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Slug tự sinh hoặc chỉnh sửa"
               />
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Danh mục</label>
+              <label className="form-labels  !mb-[8px] !inline-block">Danh mục</label>
               <select className="form-select">
                 <option value="">-- Chọn danh mục --</option>
                 <option value="tech">Công nghệ</option>
@@ -106,11 +106,11 @@ export default function Blog_View() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label">Tags</label>
+              <label className="form-labels  !mb-[8px] !inline-block">Tags</label>
               <input
                 type="text"
                 id="tags"
-                className="form-control"
+                className="form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Nhập các tag, phân cách bằng dấu phẩy"
               />
             </div>
@@ -125,7 +125,7 @@ export default function Blog_View() {
             </div>
           </div>
 
-          <div className="col-md-6">
+          <div className="w-1/2">
             <div className="mb-3">
               <label className="form-label">Tóm tắt</label>
               <textarea
