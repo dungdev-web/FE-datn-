@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import "../css/dashboard.css";
 import "../css/css.css";
+import 'bootstrap/dist/css/bootstrap.min.css';
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import LabelIcon from "@mui/icons-material/Label";
@@ -12,7 +13,6 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CommentIcon from "@mui/icons-material/Comment";
 import RateReviewIcon from "@mui/icons-material/RateReview";
-
 import { DocumentScannerTwoTone } from "@mui/icons-material";
 import { Help } from "@mui/icons-material";
 import { Settings } from "@mui/icons-material";
