@@ -644,7 +644,16 @@
   color: #0c2b63;
 }
  
-
+.tag-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border: solid 1px #ff000f;
+  color: #ff000f;
+  padding: 3px 6px;
+  font-size: 16px;
+  border-radius: 4px;
+}
 
 .hot-product-content {
   padding: 10px 15px;
