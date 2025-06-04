@@ -43,41 +43,37 @@ export default function SalePage() {
   }, []);
 
   return (
-
-
-      <div className="flex flex-col md:grid md:grid-cols-2 min-h-[50vh] w-full">
-  {/* LEFT SIDE */}
-  <div className="relative w-full h-[40vh] md:h-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
-    <div className="relative z-10 text-center px-4 py-8">
-      <h2 className="text-3xl md:text-4xl font-bold mb-6">
-        Ưu đãi lớn sắp kết thúc
-      </h2>
-      <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg px-6 py-4 mb-6 max-w-md mx-auto">
-        {["days", "hours", "minutes", "seconds"].map((key, i) => (
-          <div key={i}>
-            <div className="text-3xl font-bold">{timeLeft[key]}</div>
-            <div className="text-sm">
-              {["Ngày", "Giờ", "Phút", "Giây"][i]}
-            </div>
+    <div className="flex flex-col md:grid md:grid-cols-2 min-h-[50vh] w-full">
+      {/* LEFT SIDE */}
+      <div className="relative w-full h-[40vh] md:h-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
+        <div className="relative z-10 text-center px-4 py-8">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Ưu đãi lớn sắp kết thúc
+          </h2>
+          <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg px-6 py-4 mb-6 max-w-md mx-auto">
+            {["days", "hours", "minutes", "seconds"].map((key, i) => (
+              <div key={i}>
+                <div className="text-3xl font-bold">{timeLeft[key]}</div>
+                <div className="text-sm">
+                  {["Ngày", "Giờ", "Phút", "Giây"][i]}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+          <button className="bg-red-500 hover:bg-orange-600 text-white px-6 py-3 font-semibold">
+            MUA SẮM NGAY
+          </button>
+        </div>
       </div>
-      <button className="bg-red-500 hover:bg-orange-600 text-white px-6 py-3 font-semibold">
-        MUA SẮM NGAY
-      </button>
-    </div>
-  </div>
 
-  {/* RIGHT SIDE */}
-  <div className="flex flex-col justify-center items-center text-center px-6 py-8">
-    <div className="slider-wrapper">
-      <div className="product-slider-track">
-        <ProductSale />
+      {/* RIGHT SIDE */}
+      <div className="flex flex-col justify-center items-center text-center px-6 py-8">
+        <div className="slider-wrapper">
+          <div className="product-slider-track">
+            <ProductSale />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-
-
   );
 }
