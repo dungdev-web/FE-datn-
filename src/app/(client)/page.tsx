@@ -904,9 +904,12 @@ export default function Home() {
           </div>
         </div>
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         <div className="product-two-box-container flex gap-[75px]">
           <Show2sanpham></Show2sanpham>
 =======
+=======
+>>>>>>> Stashed changes
         <div className="product-two-box-container flex gap-[75px] flex-wrap">
           <div className="w-[47%] float-left box-container">
             <div className="content">
@@ -2034,6 +2037,9 @@ export default function Home() {
             </div>
           </div>{" "}
           
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         </div>
           <div className="product-two-box-container flex gap-[75px]">
