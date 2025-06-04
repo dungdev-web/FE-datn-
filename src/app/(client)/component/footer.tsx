@@ -6,7 +6,9 @@ export default function Footer() {
       <div className="footer-container">
         <div className="footer-column">
           <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
-          <h3>(Đây là slogancccccccccccccccccc cccccdssssssssss)</h3>
+          <h2 className="text-center text-xl font-bold text-white mt-2">
+            “Đẹp từng bước, chất từng centimet”
+          </h2>
         </div>
         <div className="footer-column">
           <h3>Hệ thống cửa hàng toàn quốc</h3>
@@ -26,7 +28,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="footer-column">
-          <h3>Chính sách</h3>
+          <h3>Liên kết nhanh</h3>
           <ul>
             <li>
               <Link href="/">Trang chủ</Link>
@@ -70,7 +72,7 @@ export default function Footer() {
             </button>
           </div>
 
-          <div className="social-icons" style={{width:"322px"}}>
+          <div className="social-icons" style={{ width: "322px" }}>
             <a href="#">
               <i className="fab fa-twitter"></i>
             </a>
@@ -147,7 +149,6 @@ export default function Footer() {
             </ul>
             <p className="text-center">
               © Bản quyền thuộc về <strong>Tera Shose</strong>
-            
             </p>
           </div>
         </div>
