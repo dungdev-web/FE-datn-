@@ -10,11 +10,9 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import Show1sanpham from "./component/product_home";
-import Show2sanpham from "./component/product-two-box";
 import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
-import Show2sanpham from "./component/product-two-box";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
