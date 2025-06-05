@@ -30,7 +30,7 @@ export default function ProductSale() {
     >
       <SwiperSlide>
         <div className="product-itemlist-main">
-          <div className="product-card">
+          <div className="product-card11">
             <div className="product-image">
               <img
                 src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -84,7 +84,7 @@ export default function ProductSale() {
 
         <SwiperSlide>
         <div className="product-itemlist-main">
-          <div className="product-card">
+          <div className="product-card11">
             <div className="product-image">
               <img
                 src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -136,7 +136,7 @@ export default function ProductSale() {
         </div>
         </SwiperSlide> <SwiperSlide>
         <div className="product-itemlist-main">
-          <div className="product-card">
+          <div className="product-card11">
             <div className="product-image">
               <img
                 src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -188,7 +188,7 @@ export default function ProductSale() {
         </div>
         </SwiperSlide> <SwiperSlide>
         <div className="product-itemlist-main">
-          <div className="product-card">
+          <div className="product-card11">
             <div className="product-image">
               <img
                 src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -241,7 +241,7 @@ export default function ProductSale() {
         </SwiperSlide>
         <SwiperSlide>
         <div className="product-itemlist-main">
-          <div className="product-card">
+          <div className="product-card11">
             <div className="product-image">
               <img
                 src="/images/products/chaybo/ConverseRunStarMotion.webp"
