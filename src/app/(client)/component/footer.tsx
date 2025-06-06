@@ -5,6 +5,12 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-column">
+          <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
+          <h2 className="text-center text-xl font-bold text-white mt-2">
+            “Đẹp từng bước, chất từng centimet”
+          </h2>
+        </div>
+        <div className="footer-column">
           <h3>Hệ thống cửa hàng toàn quốc</h3>
           <div className="store">
             <p>
@@ -21,9 +27,8 @@ export default function Footer() {
             <p>Hotline: 0363545849</p>
           </div>
         </div>
-
         <div className="footer-column">
-          <h3>Chính sách</h3>
+          <h3>Liên kết nhanh</h3>
           <ul>
             <li>
               <Link href="/">Trang chủ</Link>
@@ -67,7 +72,7 @@ export default function Footer() {
             </button>
           </div>
 
-          <div className="social-icons">
+          <div className="social-icons" style={{ width: "322px" }}>
             <a href="#">
               <i className="fab fa-twitter"></i>
             </a>
@@ -144,16 +149,6 @@ export default function Footer() {
             </ul>
             <p className="text-center">
               © Bản quyền thuộc về <strong>Tera Shose</strong>
-              <span className="nc hidden-xs">|</span>
-              <span className="cungcap">
-                Cung cấp bởi{" "}
-                <a
-                  href="https://www.sapo.vn/"
-                  rel="nofollow"
-                  style={{ color: "white", textDecoration: "none" }}
-                  title="Sapo"
-                ></a>
-              </span>
             </p>
           </div>
         </div>
