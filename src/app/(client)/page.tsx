@@ -4,13 +4,16 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/autoplay";
 import { Autoplay } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import Show1sanpham from "./component/product_home";
 import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
-
+import Show2sanpham from "./component/product-two-box";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -369,10 +372,7 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
+    
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -426,10 +426,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -483,10 +479,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -540,10 +532,7 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
+
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -597,10 +586,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -665,10 +650,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -722,10 +703,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -779,10 +756,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -836,10 +809,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -893,10 +862,6 @@ export default function Home() {
                   </div>
                 </div>
                 <span className="tag-discount">-20%</span>
-                <span className="tag-new">
-                  <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                  Mới
-                </span>
               </div>
               <div className="hot-product-content">
                 <div className="hot-product-colors">
@@ -934,9 +899,24 @@ export default function Home() {
                   <i className="fa-regular fa-star"></i>
                 </div>
               </div>
-            </div>
+           </div>
           </div>
         </div>
+
+        <div className="product-two-box-container flex gap-[75px]">
+          <Show2sanpham></Show2sanpham>
+          </div>
+          <div className="product-two-box-container flex gap-[75px]">
+          <img src="/images/banner/session_cate.jpg" alt="" />
+        </div>
+          <div className="product-two-box-container flex gap-[75px]">
+          <Show2sanpham></Show2sanpham>
+        </div>
+          <div className="product-two-box-container flex gap-[75px]">
+          <Show2sanpham></Show2sanpham>
+        </div>
+        
+       
         <div className="video-main">
           <img
             className="video-bg"
