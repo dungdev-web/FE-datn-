@@ -902,7 +902,6 @@ export default function Home() {
            </div>
           </div>
         </div>
-
         <div className="product-two-box-container flex gap-[75px]">
           <Show2sanpham></Show2sanpham>
           </div>
@@ -915,8 +914,6 @@ export default function Home() {
           <div className="product-two-box-container flex gap-[75px]">
           <Show2sanpham></Show2sanpham>
         </div>
-        
-       
         <div className="video-main">
           <img
             className="video-bg"
