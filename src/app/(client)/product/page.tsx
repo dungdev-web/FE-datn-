@@ -411,6 +411,7 @@ export default function Product() {
                 {viewMode === "grid" && (
                   <div className="product-grid">
                     <div className="product-itemlist-main !block">
+
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -984,8 +985,8 @@ export default function Product() {
             <a href="#" title="Thời trang nam">
               <img
                 className="img-responsive center-block"
-                src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
-                data-lazyload="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
+                src="/images/banner/aside_banner.webp"
+                data-lazyload="/images/banner/aside_banner.webp"
                 alt="Thời trang nam"
               />
             </a>

@@ -13,6 +13,7 @@ import Show1sanpham from "./component/product_home";
 import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
+import Show2sanpham from "./component/product-two-box";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -165,9 +166,10 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="container max-w-7xl mx-auto">
-            <FlashSale></FlashSale>
-          </div>
+
+        <div className="container max-w-7xl mx-auto !mt-6">
+          <FlashSale></FlashSale>
+        </div>
         </div>
 
         <div className="look-book-main">
@@ -1553,6 +1555,8 @@ export default function Home() {
               </div>
             </div>
           </div>{" "}
+            <img src="/images/banner/session_cate.jpg" alt="" />
+
            <div className="w-[47%] float-left box-container">
             <div className="content">
               <h3>Hàng order</h3>
@@ -1881,6 +1885,7 @@ export default function Home() {
           </div>{" "}
          
         </div>
+
 
         <div className="video-main">
           <img

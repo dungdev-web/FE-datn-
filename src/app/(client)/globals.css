@@ -3,9 +3,19 @@
   }
 
 @import "tailwindcss";
-.bg-flash-sale {
+ .bg-flash-sale {
+  position: relative;
   background-image: url('/images/blog/layer-1.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  z-index: 0;
+}
+
+.bg-flash-sale::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }

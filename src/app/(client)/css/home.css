@@ -59,6 +59,7 @@
   font-family: Arial, sans-serif;
   width: 90%;
   margin: 40px auto 0;
+
 }
 .product-dealbox-main h1 {
   font-weight: bold;
@@ -648,10 +649,10 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  background: red;
-  color: #fff;
+  border: solid 1px #ff000f;
+  color: #ff000f;
   padding: 3px 6px;
-  font-size: 11px;
+  font-size: 16px;
   border-radius: 4px;
 }
 
