@@ -166,7 +166,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        <div className="container max-w-7xl mx-auto">
+        <div className="container max-w-7xl mx-auto !mt-6">
           <FlashSale></FlashSale>
         </div>
         </div>
