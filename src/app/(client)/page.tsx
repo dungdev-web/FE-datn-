@@ -101,6 +101,11 @@ export default function Home() {
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
               />
+              <div className="absolute bottom-32 left-32">
+                <button className="border border-white text-white text-xl font-bold !px-12 !py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
+                  Mua ngay
+                </button>
+              </div>
             </div>
           </SwiperSlide>
           <SwiperSlide>
@@ -111,6 +116,11 @@ export default function Home() {
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
               />
+              <div className="absolute bottom-44 right-44">
+                <button className="border border-white text-white text-xl font-bold !px-12 !py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
+                  Mua ngay
+                </button>
+              </div>
             </div>
           </SwiperSlide>
         </Swiper>
@@ -167,9 +177,9 @@ export default function Home() {
             </div>
           </div>
 
-        <div className="container max-w-7xl mx-auto !mt-6">
-          <FlashSale></FlashSale>
-        </div>
+          <div className="container max-w-7xl mx-auto !mt-6">
+            <FlashSale></FlashSale>
+          </div>
         </div>
 
         <div className="look-book-main">
@@ -441,7 +451,7 @@ export default function Home() {
                 </div>
                 <h4 className="hot-product-title">
                   Giày Converse Run Star Motion
-               </h4>
+                </h4>
                 <div className="hot-product-price">
                   <span className="price-old">
                     <del>1.500.000đ</del>
@@ -932,12 +942,12 @@ export default function Home() {
                     576: {
                       slidesPerView: 3,
                     },
-                    768: {  
+                    768: {
                       slidesPerView: 2,
                     },
                     1024: {
                       slidesPerView: 2,
-                    }
+                    },
                   }}
                   className="product-two-box"
                 >
@@ -1012,7 +1022,7 @@ export default function Home() {
                       </div>
                     </div>
                   </SwiperSlide>
-             <SwiperSlide>
+                  <SwiperSlide>
                     <div className="product-itemlist-main">
                       <div className="product-card">
                         <div className="product-image">
@@ -1229,7 +1239,7 @@ export default function Home() {
               </div>
             </div>
           </div>{" "}
-           <div className="w-[47%] float-left box-container">
+          <div className="w-[47%] float-left box-container">
             <div className="content">
               <h3>Hàng order</h3>
               <p>
@@ -1263,7 +1273,7 @@ export default function Home() {
                     },
                     1024: {
                       slidesPerView: 2,
-                    }
+                    },
                   }}
                   className="product-two-box"
                 >
@@ -1338,7 +1348,7 @@ export default function Home() {
                       </div>
                     </div>
                   </SwiperSlide>
-             <SwiperSlide>
+                  <SwiperSlide>
                     <div className="product-itemlist-main">
                       <div className="product-card">
                         <div className="product-image">
@@ -1555,9 +1565,8 @@ export default function Home() {
               </div>
             </div>
           </div>{" "}
-            <img src="/images/banner/session_cate.jpg" alt="" />
-
-           <div className="w-[47%] float-left box-container">
+          <img src="/images/banner/session_cate.jpg" alt="" />
+          <div className="w-[47%] float-left box-container">
             <div className="content">
               <h3>Hàng order</h3>
               <p>
@@ -1591,7 +1600,7 @@ export default function Home() {
                     },
                     1024: {
                       slidesPerView: 2,
-                    }
+                    },
                   }}
                   className="product-two-box"
                 >
@@ -1666,7 +1675,7 @@ export default function Home() {
                       </div>
                     </div>
                   </SwiperSlide>
-             <SwiperSlide>
+                  <SwiperSlide>
                     <div className="product-itemlist-main">
                       <div className="product-card">
                         <div className="product-image">
@@ -1883,9 +1892,7 @@ export default function Home() {
               </div>
             </div>
           </div>{" "}
-         
         </div>
-
 
         <div className="video-main">
           <img
