@@ -106,7 +106,7 @@ export default function Home() {
           <SwiperSlide>
             <div className="relative w-full h-[650px]">
               <Image
-                src="/images/banner/slider_2.jpg"
+                src="/images/banner/slider_2.png"
                 alt="Banner 2"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}

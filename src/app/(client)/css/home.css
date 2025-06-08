@@ -1168,7 +1168,7 @@
 @media (max-width: 991px) {
   .banner img {
     object-fit: fill !important;
-    margin-top: 0px;
+    /* margin-top: 0px; */
     top: -7px !important;
   }
   .look-book-main {
