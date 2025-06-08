@@ -57,7 +57,7 @@ textarea {
 }
 
 .checkout-right button {
-    background-color: #007bff;
+    background-color: #021688;
     color: white;
     border: none;
     cursor: pointer;
@@ -70,7 +70,7 @@ textarea {
 }
 
 .checkout-right button:hover {
-    background-color: #0056b3;
+    background-color: #021371;
 }
 
 .order-item {
