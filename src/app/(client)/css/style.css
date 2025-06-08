@@ -1162,12 +1162,12 @@ input[type="submit"] {
 }
 
 .side-menu a:hover {
-  color: red;
+  color: #0a0;
 }
 
 .side-menu a.active {
   font-weight: bold;
-  color: red;
+  color: #0a0;
 }
 
 .login-form {
@@ -1213,7 +1213,7 @@ input[type="submit"] {
 .form-group button {
   width: 100%;
   padding: 10px;
-  background-color: #333;
+  background-color: #021688;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -1240,18 +1240,18 @@ input[type="submit"] {
 }
 
 .facebook-btn {
-  background-color: #3b5998;
+  background-color: #021688;
 }
 
 .google-btn {
-  background-color: #db4437;
+  background-color: #4bd963;
 }
 
 .facebook-test i,
 .google-test i {
   border-right: 1px solid white;
   font-size: 18px;
-  background-color: #3b5998;
+  background-color: #021688;
   padding: 10px 20px;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
@@ -1262,7 +1262,7 @@ input[type="submit"] {
 }
 
 .google-test i {
-  background-color: #db4437 !important;
+  background-color: #4bd963 !important;
 }
 
 .facebook-test,
