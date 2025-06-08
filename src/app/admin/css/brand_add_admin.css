@@ -1,0 +1,136 @@
+
+    /* Base style */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f1f3f9;
+  margin: 0;
+  padding: 0;
+}
+
+.main-content {
+  padding: 40px 20px;
+}
+
+/* Container */
+.brand-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px 30px;
+  background: linear-gradient(145deg, #ffffff, #f0f3f7);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.brand-container:hover {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+}
+.btn-back {
+  background-color: #6c757d;
+  color: #fff;
+  gap: 10px;
+}
+
+.btn-back:hover {
+  background-color: #5a6268;
+   color: #fff;
+}
+/* Heading */
+.brand-container h2 {
+  text-align: center;
+  font-size: 26px;
+  color: #222;
+  margin-bottom: 30px;
+  font-weight: 600;
+  position: relative;
+}
+
+.brand-container h2::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background-color: #007bff;
+  margin: 10px auto 0;
+  border-radius: 10px;
+}
+
+/* Form layout */
+.brand-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.required {
+  color: #e74c3c;
+}
+
+/* Input fields */
+.input-field {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccd2dc;
+  font-size: 15px;
+  transition: 0.2s border ease;
+  background-color: #fff;
+}
+
+.input-field:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+/* Readonly style */
+.readonly input {
+  background-color: #f1f1f1;
+  color: #888;
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+/* Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.submit-btn {
+  padding: 12px 28px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.25);
+}
+
+.submit-btn:hover {
+  background-color: #218838;
+  box-shadow: 0 6px 18px rgba(40, 167, 69, 0.35);
+}
