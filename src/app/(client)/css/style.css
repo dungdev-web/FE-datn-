@@ -346,7 +346,7 @@ nav {
   align-items: center;
   gap: 10px;
   background-color: #ffffff;
-  padding: 5px 10px !important;
+  padding: 3px 10px !important;
   border-radius: 25px;
   width: 500px;
   /* hoặc để auto nếu nằm trong khung tự co giãn */
