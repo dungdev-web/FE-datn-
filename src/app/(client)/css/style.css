@@ -84,7 +84,7 @@ header {
   align-items: center;
   padding: 10px 50px;
   /* ✅ Duy nhất một padding cố định */
-  background-color: transparent;
+  background-color: #021688;
   width: 100%;
   position: fixed;
   top: 0;
@@ -102,6 +102,7 @@ header {
 
 /* Nền màu */
 header:before {
+  background-color: #021688;
   content: "";
   position: absolute;
   top: 0;
@@ -375,11 +376,14 @@ nav {
   transition: background-color 0.3s ease-in-out;
 }
 .banner {
+  margin-top: 80px;
   overflow: hidden;
   /* z-index: 10000; */
   width: 100%;
   height: auto; /* Chiều cao cố định của banner */
   position: relative;
+  margin-top: 40px;
+
 }
 
 .banner img {
