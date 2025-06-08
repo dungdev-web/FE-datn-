@@ -3,34 +3,39 @@ import "../css/compare.css";
 export default function Compare_product() {
   return (
     <>
-      <section
-        className="bread-crumb background-cover mt-[160px]"
-        style={{
-          backgroundImage:
-            "url(//bizweb.dktcdn.net/100/505/077/themes/934930/assets/section_breadcrumb.jpg?1730865096645)",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="breadcrumb-container">
-          <div className="title-page">
-            <h2>So sánh sản phẩm</h2>
-          </div>
-          <ul className="breadcrumb">
-            <li className="home">
-              <a href="/" title="Trang chủ">
-                <span>Trang chủ</span>
-              </a>
-              <i className="fa fa-angle-right" aria-hidden="true"></i>
-            </li>
-            <li>
-              <strong>
-                <span>So sánh sản phẩm</span>
-              </strong>
-            </li>
-            <li></li>
-          </ul>
-        </div>
-      </section>
+     <section
+  className="bread-crumb background-cover relative"
+  style={{
+    backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+    backgroundPosition: "center",
+    backgroundSize: "cover",
+  }}
+>
+  {/* Lớp phủ làm mờ nền */}
+<div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+
+  {/* Nội dung chính */}
+  <div className="breadcrumb-container relative z-10 text-white">
+    <div className="title-page">
+      <h2>So sánh sản phẩm</h2>
+    </div>
+    <ul className="breadcrumb">
+      <li className="home">
+        <a href="/" title="Trang chủ">
+          <span>Trang chủ</span>
+        </a>
+        <i className="fa fa-angle-right" aria-hidden="true"></i>
+      </li>
+      <li>
+        <strong>
+          <span>So sánh sản phẩm</span>
+        </strong>
+      </li>
+      <li></li>
+    </ul>
+  </div>
+</section>
 
       <main style={{ marginTop: "30px" }} className="main">
         <div className="container1">

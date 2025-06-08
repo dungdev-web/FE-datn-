@@ -441,7 +441,7 @@ export default function Home() {
                 </div>
                 <h4 className="hot-product-title">
                   Giày Converse Run Star Motion
-                </h4>
+               </h4>
                 <div className="hot-product-price">
                   <span className="price-old">
                     <del>1.500.000đ</del>

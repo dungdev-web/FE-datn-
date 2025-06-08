@@ -1,21 +1,45 @@
 "use client";
 import "../css/blog.css";
+import "../css/product.css";
 import { useState } from "react";
 
 export default function Blog() {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <>
-      <div className="intro-banner">
-        <div className="intro-content">
-          <h1>Tin tức</h1>
-          <p>
-            <a href="/index.html">Trang chủ</a> • Liên hệ
-          </p>
+      <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2> Trang tin tức </h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <a href="/" title="Trang chủ">
+                <span>Trang chủ</span>
+              </a>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Tin tức</span>
+              </strong>
+            </li>
+            <li></li>
+          </ul>
         </div>
-      </div>
-       {/* Nút mở sidebar (chỉ hiển thị trên mobile) */}
+      </section>
+      {/* Nút mở sidebar (chỉ hiển thị trên mobile) */}
       <button
         className="toggle-sidebar-btn"
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -24,8 +48,11 @@ export default function Blog() {
       </button>
 
       <main>
-        <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`} >
-           <button className="close-sidebar-btn" onClick={() => setSidebarOpen(false)}>
+        <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`}>
+          <button
+            className="close-sidebar-btn"
+            onClick={() => setSidebarOpen(false)}
+          >
             ×
           </button>
           <div className="category-blog">
@@ -68,7 +95,7 @@ export default function Blog() {
             <img src="/images/banner/aside_banner.webp" alt="" />
           </div>
         </aside>
-        <aside className="desktop" >
+        <aside className="desktop">
           <div className="category-blog">
             <h2>DANH MỤC BÀI VIẾT</h2>
             <ul>

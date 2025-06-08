@@ -382,7 +382,7 @@ nav {
   width: 100%;
   height: auto;
   /* Chiều cao cố định của banner */
-  <<<<<<< HEAD=======>>>>>>>origin/hntt position: relative;
+ 
 }
 
 .banner img {
@@ -1283,7 +1283,7 @@ input[type="submit"] {
 }
 
 @media (max-width: 1199px) {
-  <<<<<<< HEAD=======>>>>>>>origin/hntt .bread-crumb {
+.bread-crumb {
     margin-top: 80px !important;
   }
 
@@ -1463,7 +1463,7 @@ input[type="submit"] {
 
 @media (max-width: 768px) {
 
-  <<<<<<< HEAD=======>>>>>>>origin/hntt header,
+  header,
   header.scrolled {
     padding: 0 20px;
   }

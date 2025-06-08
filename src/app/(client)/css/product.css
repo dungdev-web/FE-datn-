@@ -95,14 +95,13 @@ span {
   /* từ 200 đến 700 */
   font-style: normal;
 }
-.breadcrumb-container {
-  position: relative;
+main{
+  margin: 10px auto;
 }
 
 .breadcrumb-container {
-  padding: 50px 10px;
-  margin-bottom: 0;
-  margin: 0;
+  padding: 150px 10px;
+  margin-top: -200px;
   color: #fff;
   text-align: center;
   background-size: auto auto;
@@ -112,12 +111,11 @@ span {
 .breadcrumb-container .title-page {
   z-index: 9;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  top: 80px;
   color: #000;
 }
 
 .breadcrumb-container .title-page {
-  color: #fff;
   position: relative;
   font-weight: 600;
   font-size: 24px;
@@ -128,18 +126,15 @@ span {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 30px;
 }
 
 .title-page h2 {
   color: #000;
   display: inline-block;
   position: relative;
-  padding-bottom: 0px;
   margin-bottom: 15px;
   font: 700 30px / 33px "Oswald";
   text-transform: capitalize;
-  margin-top: 0px;
   text-transform: uppercase;
 }
 
@@ -166,7 +161,7 @@ span {
 
 .breadcrumb {
   padding: 8px 15px;
-  margin-bottom: 20px;
+  margin-top: 80px;
   list-style: none;
   /* background-color: #f5f5f5; */
   border-radius: 4px;
@@ -224,9 +219,11 @@ a,
   font-weight: bold;
 }
 
-.breadcrumb li span {
-  color: #888;
+.breadcrumb li strong span {
+  color: #03177e;
+  text-decoration: underline;
 }
+
 .space-30 {
   margin-bottom: 30px !important;
 }
