@@ -1,16 +1,41 @@
 import "../css/style.css";
 import "../css/cart.css";
+import "../css/product.css";
+import Link from "next/link";
 export default function Cart() {
   return (
-    <div>
-      <div className="intro-banner">
-        <div className="intro-content">
-          <h1>Giỏ hàng</h1>
-          <p>
-            <a href="/index.html">Trang chủ</a> • Giỏ hàng
-          </p>
+    <>
+      <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Giỏ hàng của bạn</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <Link href="/" title="Trang chủ">
+                <span>Trang chủ</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Giỏ hàng</span>
+              </strong>
+            </li>
+            <li></li>
+          </ul>
         </div>
-      </div>
+      </section>
       <main>
         <div className="cart-container">
           <div className="cart-items">
@@ -148,6 +173,6 @@ export default function Cart() {
           </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }

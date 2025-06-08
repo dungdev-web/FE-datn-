@@ -18,12 +18,18 @@ export default function ButtonToTop() {
     <button
       onClick={scrollToTop}
       aria-label="Scroll to top"
-      className={`fixed bottom-8 right-8 z-50 transition-all duration-300 transform
-        ${visible ? "opacity-100 scale-100" : "opacity-0 scale-0"}
-        bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-indigo-700 hover:to-purple-700
-        text-white !p-5 rounded-full shadow-2xl hover:scale-110 active:scale-95
-        focus:outline-none text-2xl`}
       title="Lên đầu trang"
+      className={`
+        fixed bottom-8 right-8 z-50
+        transition-all duration-300 transform
+        ${visible ? "opacity-100 scale-100" : "opacity-0 scale-0"}
+        bg-[#021688]
+        text-white
+        !p-5 rounded-full shadow-2xl
+        hover:scale-110 active:scale-50
+        focus:outline-none
+        text-2xl
+      `}
     >
       <i className="fa fa-level-up" />
     </button>

@@ -6,7 +6,37 @@ import Link from "next/link";
 export default function Account() {
   return (
     <>
-      <main style={{ marginTop: "182px", marginBottom: "20px" }}>
+      <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Thôn tin tài khoản</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <Link href="/" title="Trang chủ">
+                <span>Trang chủ</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Thôn tin tài khoản</span>
+              </strong>
+            </li>
+            <li></li>
+          </ul>
+        </div>
+      </section>
+      <main style={{ marginBottom: "20px" }}>
         <div className="container1">
           <div className="row">
             <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">

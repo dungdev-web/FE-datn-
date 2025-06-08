@@ -1,73 +1,4 @@
-.intro-banner {
-  position: relative;
-  background: url("/images/banner/mega-menu-images2.webp") no-repeat center
-    center/cover;
-  height: 460px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  text-align: center;
-  margin: 100px auto 0 auto; /* thêm 50px khoảng cách top */
-}
 
-/* Nội dung chính giữa */
-.intro-content {
-  z-index: 2;
-}
-
-.intro-content h1 {
-  font-size: 40px;
-  font-weight: bold;
-  margin: 0 auto;
-}
-
-.intro-content p {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #555;
-}
-.intro-content p a {
-  color: #080808;
-  text-decoration: none;
-  font-weight: 700; /* hoặc bold */
-}
-
-/* Icon bên phải */
-.intro-icon {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 2;
-}
-
-.icon-btn {
-  background: white;
-  border: 2px solid black;
-  border-radius: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-btn i {
-  font-size: 20px;
-  color: black;
-}
-
-/* Background overlay mờ nhẹ nếu cần */
-.intro-banner::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.4);
-  z-index: 1;
-}
 .about-us {
   display: flex;
   align-items: flex-start;
@@ -118,7 +49,7 @@
   top: 0;
   bottom: 0;
   width: 6px;
-  background: linear-gradient(to bottom, #00aeef, #00aeef);
+  background: linear-gradient(to bottom, #021688, #021688);
   transform: translateX(-50%);
   border-radius: 3px;
 }
@@ -147,7 +78,7 @@
   width: 20px;
   height: 20px;
   background: #fff;
-  border: 5px solid #00aeef;
+  border: 5px solid #021688;
   border-radius: 50%;
   z-index: 2;
 }
@@ -192,7 +123,7 @@
 .timeline-year {
   font-size: 22px;
   font-weight: 900;
-  color: #00aeef;
+  color: #021688;
   margin-bottom: 12px;
   position: relative;
 }
@@ -205,7 +136,7 @@
   transform: translateX(-50%);
   width: 40px;
   height: 3px;
-  background: #00aeef;
+  background: #021688;
   border-radius: 2px;
 }
 

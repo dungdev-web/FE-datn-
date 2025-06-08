@@ -16,6 +16,7 @@ import RateReviewIcon from "@mui/icons-material/RateReview";
 import { DocumentScannerTwoTone } from "@mui/icons-material";
 import { Help } from "@mui/icons-material";
 import { Settings } from "@mui/icons-material";
+import Link from "next/link";
 export default function SideBar() {
   const [openMenuKey, setOpenMenuKey] = useState<string | null>(null);
 
@@ -49,39 +50,37 @@ export default function SideBar() {
           </ul>
         </li>
         <li
-          className={`has-submenu ${openMenuKey === "danhmuc" ? "open" : ""}`}
-        >
-          <a href="#" onClick={() => toggleMenu("danhmuc")}>
-            <Inventory2Icon /> Quản lý danh mục{" "}
-            <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
-          <ul className="submenu">
-            <li>
-              <a href="#">Danh sách danh mục</a>
-            </li>
-            <li>
-              <a href="#">Thêm mới danh mục</a>
-            </li>
-          </ul>
-        </li>
-
-        <li
           className={`has-submenu ${openMenuKey === "nhanhieu" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("nhanhieu")}>
+          <Link href={'/admin/brands'} onClick={() => toggleMenu("nhanhieu")}>
             <LabelIcon /> Quản lý nhãn hiệu{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
+          </Link>
           <ul className="submenu">
             <li>
-              <a href="#">Danh sách nhãn hiệu</a>
+              <Link href={'/admin/brands'} >Danh sách nhãn hiệu</Link>
             </li>
             <li>
-              <a href="#">Thêm mới nhãn hiệu</a>
+             <Link href={'/admin/brands/add'} >Thêm mới nhãn hiệu</Link>
             </li>
           </ul>
         </li>
-
+        <li
+          className={`has-submenu ${openMenuKey === "danhmuc" ? "open" : ""}`}
+        >
+          <Link href={'/admin/categories'} onClick={() => toggleMenu("danhmuc")}>
+            <Inventory2Icon /> Quản lý danh mục{" "}
+            <i className="fa-solid fa-chevron-down submenu-icon"></i>
+          </Link>
+          <ul className="submenu">
+            <li>
+              <Link href={'/admin/categories'}>Danh sách danh mục</Link>
+            </li>
+            <li>
+              <Link href={'/admin/categories/add'}>Thêm mới danh mục</Link>
+            </li>
+          </ul>
+        </li>
         <li
           className={`has-submenu ${openMenuKey === "sanpham" ? "open" : ""}`}
         >
@@ -101,16 +100,16 @@ export default function SideBar() {
         <li
           className={`has-submenu ${openMenuKey === "khuyenmai" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("khuyenmai")}>
+          <Link href={'/admin/voucher'} onClick={() => toggleMenu("khuyenmai")}>
             <LocalOfferIcon /> Quản lý khuyến mại{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
+          </Link>
           <ul className="submenu">
             <li>
-              <a href="#">Danh sách khuyến mại</a>
+              <Link href={'/admin/voucher'}>Danh sách khuyến mại</Link>
             </li>
             <li>
-              <a href="#">Thêm mới khuyến mại</a>
+              <Link href={'/admin/voucher/add'}>Thêm mới khuyến mại</Link>
             </li>
           </ul>
         </li>

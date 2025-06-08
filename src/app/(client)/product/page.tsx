@@ -11,13 +11,16 @@ export default function Product() {
   return (
     <>
       <section
-        className="bread-crumb background-cover"
+        className="bread-crumb background-cover relative"
         style={{
-          backgroundImage:
-            "url(//bizweb.dktcdn.net/100/505/077/themes/934930/assets/section_breadcrumb.jpg?1730865096645)",
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
           backgroundPosition: "center",
+          backgroundSize: "cover",
         }}
       >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
         <div className="breadcrumb-container">
           <div className="title-page">
             <h2>Tất cả sản phẩm</h2>
@@ -411,7 +414,6 @@ export default function Product() {
                 {viewMode === "grid" && (
                   <div className="product-grid">
                     <div className="product-itemlist-main !block">
-
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
                           <img
@@ -476,7 +478,7 @@ export default function Product() {
                             <div className="hover-icons">
                               <i className="fa-solid fa-eye"></i>
                               <i className="fa-solid fa-list"></i>
-                             <i className="fa fa-exchange"></i>
+                              <i className="fa fa-exchange"></i>
                             </div>
                           </div>
 
