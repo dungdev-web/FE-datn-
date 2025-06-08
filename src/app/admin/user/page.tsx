@@ -1,4 +1,5 @@
 "use client";
+import "../css/auth_admin.css";
 import { useState } from "react";
 import "../css/css.css";
 import "../css/dashboard.css";
@@ -6,6 +7,8 @@ import "../css/dashboard.css";
 export default function ListUser() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUserName, setModalUserName] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   const openModal = (userName) => {
     setModalUserName(userName);
@@ -24,9 +27,29 @@ export default function ListUser() {
           <h2>Danh sách người dùng</h2>
 
           <div className="actions">
-            <button className="btn btn-search">
-              <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-            </button>
+            <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+              {isSearching ? (
+                <input
+                  type="text"
+                  className="search-input"
+                  autoFocus
+                  placeholder="Nhập từ khóa..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onBlur={() => {
+                    if (searchText === "") setIsSearching(false); 
+                  }}
+                />
+              ) : (
+                <button
+                  className="btn btn-search"
+                  onClick={() => setIsSearching(true)}
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+                </button>
+              )}
+            </div>
+
             <button className="btn btn-refresh">
               <i className="fa-solid fa-rotate-right"></i> Làm mới
             </button>
@@ -130,13 +153,13 @@ export default function ListUser() {
         </div>
       </main>
 
-      {/* MODAL chỉ hiển thị khi isModalOpen === true */}
       {isModalOpen && (
         <div className="modal-overlay" id="statusModal">
           <div className="modal-box">
             <div className="modal-header">
               <h3>
-                <i className="fa-solid fa-user-pen"></i> Cập nhật tài khoản người dùng
+                <i className="fa-solid fa-user-pen"></i> Cập nhật tài khoản
+                người dùng
               </h3>
               <span className="modal-close" onClick={closeModal}>
                 &times;

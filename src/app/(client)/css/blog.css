@@ -226,6 +226,11 @@ article {
     margin-top: 30px;
   }
 }
+@media (min-width: 1200px) {
+    .col-lg-12 {
+        width: 100%;
+    }
+}
 /* --- Responsive Tablet --- */
 @media (max-width: 1024px) {
   main {
@@ -402,4 +407,219 @@ main > aside:not(.mobile-sidebar) {
   article {
     width: 100%;
   }
+}
+/* detail blog */
+.breadcrumb {
+    z-index: 9;
+    position: relative;
+    font-family: "Quicksand";
+}
+.breadcrumb {
+    margin: 0;
+    font-size: 1em;
+    padding: 4px 0;
+    background-color: initial;
+    border-radius: 0;
+}
+
+.breadcrumb {
+    /* padding: 8px 15px; */
+    margin-bottom: 20px;
+    list-style: none;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+.breadcrumb li {
+    display: inline;
+    color: #111;
+}
+.breadcrumb li>a {
+    color: #999;
+}
+.breadcrumb li>a>span {
+    color: #111 !important;
+}
+.breadcrumb li span {
+    color: #888 !important;
+}
+.breadcrumb li span {
+    display: inline;
+    color: #d91e1e;
+    font-weight: bold;
+}
+.title-head {
+    font-size: 1.14286em;
+    font-weight: 700;
+    color: #555;
+    text-decoration: none;
+    margin-top: 0;
+    display: inline-block;
+    width: 100%;
+}
+.article-main .postby {
+    font-size: 1em;
+    line-height: 1.71429em;
+    color: #676767;
+    margin-bottom: 10px;
+}
+.article-main .article-content {
+    font-size: 1em;
+}
+.wrap-title-toc {
+    border: 1px solid #08c;
+    border-radius: 5px;
+    padding: 15px 15px 20px;
+    background: #dcedfc;
+    margin-bottom: 20px;
+    max-width: 600px;
+}
+.wrap-title-toc h2 {
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: 700;
+    padding-left: 0px;
+    border-bottom: 1px dashed #08c;
+    padding-bottom: 12px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.wrap-title-toc ol {
+    list-style-position: inside;
+    padding-left: 10px;
+}
+ol {
+    list-style: decimal;
+}
+.wrap-title-toc #toc>ol>li {
+    font-weight: 700;
+}
+.wrap-title-toc #toc>ol>li li {
+    font-weight: 400;
+}
+.rte h2 {
+    margin-top: 5px;
+    font-size: 22px;
+}
+a:hover {
+    color: #4bd963;
+}
+b, strong {
+    font-weight: 500;
+}
+.rte li {
+    list-style-position: inside;
+}
+.rte li::marker{
+      unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+    text-transform: none;
+    text-indent: 0px !important;
+    text-align: start !important;
+    text-align-last: auto !important;
+}
+.rte ul {
+    padding-left: 0px;
+    color: #555;
+}
+
+ul.disc, .rte ul {
+    list-style: disc outside;
+}
+ul {
+    list-style: none outside;
+}
+ul, ol {
+    margin: 0;
+    padding: 0;
+}
+.social-media {
+    font-size: 1em;
+    float: left;
+    width: 100%;
+    margin-bottom: 30px;
+}
+.social-media label {
+    display: inline-block;
+    margin-right: 7px;
+}
+.social-media .share-facebook {
+    background: #2f6cdc;
+}
+.social-media a {
+    margin-right: 7px;
+    width: 30px;
+    display: inline-block;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    color: #fff;
+    border-radius: 5px;
+}
+.social-media .share-twitter {
+    background: #4cadf8;
+}
+.social-media .share-pinterest {
+    background: #ec623d;
+}
+.social-media .share-google {
+    background: #ef3218;
+}
+.space-30 {
+    margin-bottom: 30px !important;
+}
+.title-text {
+    margin-bottom: 30px;
+}
+.related-blog-title {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+.title-text h2 {
+    font-size: 36px !important;
+    font-weight: 700;
+    margin-bottom: 10px;
+    line-height: 40px;
+}
+.related-blog-title h2 {
+    text-transform: uppercase;
+    font-size: 20px;
+    display: inline-block;
+    margin-bottom: -1px;
+}
+.related-blogs .blog-item1 {
+    margin-bottom: 8px !important;
+}
+.list-blogs .blog-item1 {
+    margin-bottom: 25px;
+}
+
+.blog-item1 {
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+.related-blogs .blog-item-name {
+    padding-left: 10px;
+    position: relative;
+}
+.blog-item-name {
+    font-weight: 700;
+    position: relative;
+    font-size: 1em;
+    margin: 0;
+}
+.related-blogs .blog-item-name i.fa {
+    top: 4px;
+    font-size: 14px;
+    color: #555;
+}
+.blog-item-name .fa {
+    position: absolute;
+    left: 0;
+    top: 9px;
+    font-size: 11px;
+    color: #4bd963;
+}
+.related-blogs a {
+    color: #333;
 }
