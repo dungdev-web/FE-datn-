@@ -97,6 +97,7 @@ span {
 }
 .breadcrumb-container {
   position: relative;
+  
 }
 
 .breadcrumb-container {
@@ -225,7 +226,7 @@ a,
 }
 
 .breadcrumb li span {
-  color: #888;
+  color: #03177e;
 }
 .space-30 {
   margin-bottom: 30px !important;

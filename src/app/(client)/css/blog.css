@@ -72,10 +72,9 @@ main {
   width: 90%;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f9f9f9;
   display: flex;
   flex-wrap: wrap; /* thêm wrap để tự xuống dòng */
-  gap: 20px; /* thêm khoảng cách giữa các cột */
+  gap: 10px; /* thêm khoảng cách giữa các cột */
 }
 
 aside {
@@ -100,7 +99,7 @@ article {
 
 .category-blog h2,
 .relate-blog h2 {
-  background-color: #002bb8;
+  background-color: #021688;
   color: #fff;
   padding: 15px;
   font-size: 18px;
