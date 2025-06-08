@@ -48,7 +48,7 @@ export default function SalePage() {
       <div className="relative w-full h-[40vh] md:h-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
         <div className="relative z-10 text-center px-4 py-8">
           <h2 className="text-3xl md:text-4xl font-bold !mb-1">
-            Ưu đãi sắp kết thúc
+            Ưu đãi sắp diễn ra
           </h2>
           <p className="!mb-3">Mua sắm ngay tại Tera Shoes</p>
           <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg !px-6 !py-2 !mb-3 max-w-md mx-auto">

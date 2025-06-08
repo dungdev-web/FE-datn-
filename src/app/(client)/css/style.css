@@ -115,7 +115,8 @@ header:before {
 /* Khi scroll xuống */
 header.scrolled::before {
   height: 80px;
-   background-color: #021688;
+  background-color: #021688;
+
 }
 header.scrolled {
   height: auto;
@@ -378,7 +379,6 @@ nav {
   /* z-index: 10000; */
   width: 100%;
   height: auto; /* Chiều cao cố định của banner */
- 
   position: relative;
 }
 
@@ -1446,7 +1446,6 @@ input[type="submit"] {
 }
 
 @media (max-width: 768px) {
-
   header,
   header.scrolled {
     padding: 0 20px;
