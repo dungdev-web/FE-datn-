@@ -752,6 +752,9 @@ input[type="submit"] {
   .header-nav-bg {
     margin-bottom: 50px !important;
   }
+  header:before{
+    background-color: #021688;
+  }
 }
 /* @media (max-width:620px){
   .header-nav-bg {

@@ -72,7 +72,7 @@ export default function MenuRight({ isMenuOpen, closeMenu }: MenuRightProps) {
 
           {/* TIN TỨC */}
           <li>
-            <Link href="/contact">
+            <Link href="/blog">
               TIN TỨC{" "}
               <span
                 className="arrow"
@@ -94,7 +94,7 @@ export default function MenuRight({ isMenuOpen, closeMenu }: MenuRightProps) {
               }`}
             >
               <Link href="/blog">Bài viết</Link>
-              <Link href="/contact">Khuyến mãi</Link>
+              <Link href="/blog">Khuyến mãi</Link>
             </div>
           </li>
 
