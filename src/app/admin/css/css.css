@@ -1291,3 +1291,27 @@ th select:focus {
   background-color: #6c757d;
   /* Riêng tư */
 }
+.marquee-wrapper {
+  position: relative;
+  width: 666px;
+  overflow: hidden;
+}
+
+.marquee {
+  display: flex;
+  white-space: nowrap;
+  animation: marqueeScroll 20s linear infinite;
+}
+
+.marquee-content span {
+  padding-right: 60px; /* khoảng cách giữa các phần tử */
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}

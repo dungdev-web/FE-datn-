@@ -58,7 +58,8 @@
   background: #fff;
   font-family: Arial, sans-serif;
   width: 90%;
-  margin: 40px auto 0; /* tạo khoảng cách phía trên */
+  margin: 40px auto 0;
+
 }
 .product-dealbox-main h1 {
   font-weight: bold;
@@ -643,7 +644,7 @@
   box-shadow: 0 0 12px #0c2b63;
   color: #0c2b63;
 }
- 
+
 .tag-discount {
   position: absolute;
   top: 10px;
@@ -950,7 +951,7 @@
 
 .swiper-slide img {
   /* width: 100%; */
-  height: auto;
+  height: 255px;
   display: block;
   object-fit: cover;
 }
@@ -1248,6 +1249,22 @@
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
   }
+  .product-price {
+    flex-wrap: wrap;
+    gap: 0 !important;
+  }
+  .box-container {
+    width: 100% !important;
+  }
+  .product-two-box-container {
+    margin: 30px 43px !important;
+  }
+  .product-card {
+    padding: 0;
+  }
+  .swiper-slide img {
+    height: 138px !important;
+  }
 }
 @media (max-width: 620px) {
   .banner {
@@ -1286,7 +1303,7 @@
 }
 /* session mới */
 .product-two-box-container {
-  margin: 30px 95px;
+  margin: 30px 85px;
 }
 
 .content {
@@ -1304,10 +1321,22 @@
   padding-left: 12px;
   border-left: 3px solid;
 }
-.images img{
+.images img {
   width: 100%;
-  height: 400px;
+  height: 340px;
 }
-.new-tag{
+.new-tag {
   display: none;
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  display: none !important;
+}
+.swiper-pagination {
+  bottom: 15px !important; /* đẩy pagination xuống sâu hơn */
+}
+.product-two-box {
+  padding-bottom: 17px !important; /* hoặc 50px nếu pagination vẫn còn bị dính */
+  position: relative;
 }

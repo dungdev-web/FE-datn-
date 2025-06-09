@@ -13,7 +13,9 @@ export default function Header_admin() {
             <img src="/images/logo/logo-den.png" alt="Logo" className="logo" />
           </div>
         </div>
-
+       <div className="hi !ml-[300px]">
+          <ScrollingNotification />
+        </div>
         <div className="header-right flex gap-[10px] items-center !mr-[37px]">
           <input
             type="text"
@@ -47,18 +49,16 @@ export default function Header_admin() {
       </header>
       <div className="sub-header">
         <div className="sub-header-left">
-          
           <Settings />
         </div>
+         
         <div className="sub-header-right">
+          
           <span className="home-icon">
             <i className="fa-solid fa-house"></i>
           </span>{" "}
           / <span> Trang dashboard</span>
         </div>
-      </div>
-      <div>
-        <ScrollingNotification />
       </div>
     </>
   );

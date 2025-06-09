@@ -1,62 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
-
-const messages = [
-  "🎉 Chào mừng bạn đến với trang quản trị!",
-  "🚀 Tính năng mới đã ra mắt!",
-  "🛠️ Hệ thống sẽ bảo trì lúc 22h hôm nay!",
-  "📢 Đừng quên kiểm tra các bài viết mới!",
-];
+"use client";
+import React, { useEffect, useRef } from "react";
 
 export default function ScrollingNotification() {
-  const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
-  const ref = useRef<HTMLDivElement | null>(null);
+  const marqueeRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = ref.current;
+    const el = marqueeRef.current;
     if (!el) return;
 
-    el.style.transition = "none";
-    el.style.transform = "translateX(100%)";
-
-    const start = setTimeout(() => {
-      const width = el.scrollWidth;
-      el.style.transition = "transform 8s linear";
-      el.style.transform = `translateX(-${width}px)`;
-    }, 100);
-
-    const end = setTimeout(() => {
-      setVisible(false);
-      setTimeout(() => {
-        setIndex((prev) => (prev + 1) % messages.length);
-        setVisible(true);
-      }, 300);
-    }, 8500);
-
-    return () => {
-      clearTimeout(start);
-      clearTimeout(end);
-    };
-  }, [index]);
+    const clone = el.innerHTML;
+    el.innerHTML += clone; // Lặp lại nội dung để tạo hiệu ứng vô hạn
+  }, []);
 
   return (
-    <div className="relative h-12 bg-yellow-100 text-black px-4 flex items-center">
-      {visible && (
-        <div
-          ref={ref}
-          style={{
-            position: "absolute",
-            whiteSpace: "nowrap",
-            zIndex: 100000,
-            left: "690px",
-            bottom: "50px",
-            color: "#dc2626", 
-          }}
-          className="absolute whitespace-nowrap font-semibold text-red-600"
-        >
-          {messages[index]}
+    <div className="marquee-wrapper bg-yellow-100 h-12 flex items-center ">
+      <div className="marquee" ref={marqueeRef}>
+        <div className="marquee-content font-semibold text-red-600">
+          <span className="mx-4">⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K</span>
+          <span className="mx-4">⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH</span>
+          <span className="mx-4">⚡ GIẢM 20% CHO ĐH TỪ 1.500K</span>
+          <span className="mx-4">⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K</span>
+          <span className="mx-4">⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K</span>
+          <span className="mx-4">⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K ⚡</span>
         </div>
-      )}
+      </div>
     </div>
   );
 }
