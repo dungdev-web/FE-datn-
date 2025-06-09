@@ -98,7 +98,9 @@ span {
 main{
   margin: 10px auto;
 }
-
+.bread-crumb {
+  height: 350px;
+}
 .breadcrumb-container {
   padding: 150px 10px;
   margin-top: -200px;

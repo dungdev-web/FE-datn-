@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import "../../css/blog.css";
 import { useState } from "react";
 
@@ -6,8 +7,44 @@ export default function Detail_blog() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <>
-     
-      <main className="!mt-[150px]">
+      <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Chi tiết bài viết</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <Link href={'/'} title="Trang chủ">
+                <span>Trang chủ</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+             <li className="home">
+              <Link href={'/'} title="Tài khoản">
+                <span>Tin tức</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Chi tiết tin tức</span>
+              </strong>
+            </li>
+            <li></li>
+          </ul>
+        </div>
+      </section>
+      <main>
 		 <button
         className="toggle-sidebar-btn"
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -105,28 +142,6 @@ export default function Detail_blog() {
         <article className="article-main">
           <div className="row">
             <div className="col-lg-12">
-              <ul className="breadcrumb" style={{ marginBottom: "10px" }}>
-                <li className="home">
-                  <a href="/" title="Trang chủ">
-                    <span>Trang chủ</span>
-                  </a>
-                  <i className="fa fa-angle-right" aria-hidden="true"></i>
-                </li>
-
-                <li>
-                  <a href="/tin-tuc" title="Tin tức">
-                    <span>Tin tức</span>
-                  </a>
-                  <i className="fa fa-angle-right" aria-hidden="true"></i>
-                </li>
-                <li>
-                  <strong>
-                    <span>
-                      TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023
-                    </span>
-                  </strong>
-                </li>
-              </ul>
               <h1 className="title-head">
                 TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023
               </h1>
