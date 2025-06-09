@@ -1467,6 +1467,7 @@ input[type="submit"] {
 
   .icon-header {
     margin: 0;
+    gap: 5px;
   }
 
   .icon-header .div {
