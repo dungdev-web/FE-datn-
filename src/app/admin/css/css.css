@@ -251,12 +251,6 @@ body {
   display: block;
 }
 
-/* Main content */
-.main-content {
-  margin-left: 250px; /* né phần sidebar */
-  padding: 20px;
-  width: 83.5%;
-}
 /* dashboard */
 .chart-container {
   background-color: #fff;
