@@ -421,17 +421,11 @@ th {
 @media (max-width: 1199px) {
   .col-left-ac .block-account {
     margin-bottom: 15px;
-  }
-  .row {
-    margin-left: 60px;
-    margin-right: 60px;
-  }
-  main {
-    margin-top: 100px !important;
-  }
-  .col-lg-9 .row {
-    margin-right: -10px !important;
-    margin-left: -10px !important;
+  } 
+  
+  .container1 .row {
+    margin-right: 20px !important;
+    margin-left: 20px !important;
   }
 }
 .no-padding {
@@ -550,11 +544,7 @@ th {
     padding-top: 30px;
   }
 }
-@media (max-width: 768px) {
-  main {
-    margin-top: 80px !important;
-  }
-}
+
 /* change pass */
 @media (min-width: 992px) {
   .col-md-6 {
