@@ -101,16 +101,26 @@ export default function Home() {
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
               />
+              <div className="absolute bottom-32 left-32">
+                <button className="border border-white text-white text-xl font-bold !px-12 !py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
+                  Mua ngay
+                </button>
+              </div>
             </div>
           </SwiperSlide>
           <SwiperSlide>
             <div className="relative w-full h-[650px]">
               <Image
-                src="/images/banner/slider_2.jpg"
+                src="/images/banner/slider_2.png"
                 alt="Banner 2"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
               />
+              <div className="absolute bottom-44 right-44">
+                <button className="border border-white text-white text-xl font-bold !px-12 !py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
+                  Mua ngay
+                </button>
+              </div>
             </div>
           </SwiperSlide>
         </Swiper>
