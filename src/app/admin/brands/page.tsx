@@ -1,7 +1,11 @@
 "use client";
 import "@/src/app/admin/css/brands_admin.css";
 import Link from "next/link";
+import { useState } from "react";
+
 export default function Brands() {
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
   return (
     <main className="main-content">
       <div className="brand-list">
@@ -14,9 +18,28 @@ export default function Brands() {
           <button className="btn btn-refresh">
             <i className="fa-solid fa-rotate-right"></i> Refresh
           </button>
-          <button className="btn btn-search">
-            <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-          </button>
+          <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+            {isSearching ? (
+              <input
+                type="text"
+                className="search-input"
+                autoFocus
+                placeholder="Nhập từ khóa..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onBlur={() => {
+                  if (searchText === "") setIsSearching(false);
+                }}
+              />
+            ) : (
+              <button
+                className="btn btn-search"
+                onClick={() => setIsSearching(true)}
+              >
+                <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+              </button>
+            )}
+          </div>
         </div>
 
         <table className="brand-table">
@@ -70,8 +93,8 @@ export default function Brands() {
               <td>22-08-2021 20:50</td>
               <td>27-11-2021 19:08</td>
               <td>
-                  <Link href={'/admin/brands/edit'}>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                <Link href={"/admin/brands/edit"}>
+                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
                 </Link>
                 <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
               </td>
@@ -95,8 +118,8 @@ export default function Brands() {
               <td>22-08-2021 20:50</td>
               <td>27-11-2021 19:08</td>
               <td>
-                <Link href={'/admin/brands/edit'}>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                <Link href={"/admin/brands/edit"}>
+                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
                 </Link>
                 <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
               </td>
@@ -120,8 +143,8 @@ export default function Brands() {
               <td>22-08-2021 20:50</td>
               <td>27-11-2021 19:08</td>
               <td>
-                  <Link href={'/admin/brands/edit'}>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                <Link href={"/admin/brands/edit"}>
+                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
                 </Link>
                 <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
               </td>

@@ -1251,7 +1251,6 @@
   }
   .product-price {
     flex-wrap: wrap;
-    gap: 0 !important;
   }
   .box-container {
     width: 100% !important;
