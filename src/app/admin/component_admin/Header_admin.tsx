@@ -13,7 +13,7 @@ export default function Header_admin() {
             <img src="/images/logo/logo-den.png" alt="Logo" className="logo" />
           </div>
         </div>
-       <div className="hi !ml-[300px]">
+       <div className="thongbao !ml-[210px]">
           <ScrollingNotification />
         </div>
         <div className="header-right flex gap-[10px] items-center !mr-[37px]">

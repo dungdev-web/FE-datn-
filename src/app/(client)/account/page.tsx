@@ -43,7 +43,7 @@ export default function Account() {
               <div className="block-account">
                 <h5 className="title-account">Trang tài khoản</h5>
                 <p>
-                  Xin chào, <span>cccc</span>&nbsp;!
+                  Xin chào, <span>Lê Chí Bảo</span>&nbsp;!
                 </p>
                 <ul>
                   <li>
@@ -110,7 +110,7 @@ export default function Account() {
                     }}
                   />
                   <div>
-                    <h3 style={{ margin: "0 0 5px 0", color: "#333" }}>cccc</h3>
+                    <h3 style={{ margin: "0 0 5px 0", color: "#333" }}>Lê Chí Bảo</h3>
                     <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>
                       dungldps41484@gmail.com
                     </p>
@@ -182,7 +182,7 @@ export default function Account() {
 
                 <div style={{ marginBottom: "15px" }}>
                   <strong style={{ color: "#555" }}>Họ tên:</strong>
-                  <span style={{ marginLeft: "10px" }}>cccc</span>
+                  <span style={{ marginLeft: "10px" }}>Lê Chí Bảo</span>
                 </div>
 
                 <div style={{ marginBottom: "15px" }}>

@@ -1315,3 +1315,26 @@ th select:focus {
     transform: translateX(-100%);
   }
 }
+.search-toggle {
+  position: relative;
+  display: inline-block;
+  transition: all 0.7s ease-in;
+}
+
+.search-input {
+  width: 0;
+  opacity: 0;
+  transform: translateX(-20px) scaleX(0.8);
+  transition: width 0.4s ease, opacity 0.4s ease, transform 0.4s ease;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-toggle.active .search-input {
+  width: 200px;
+  opacity: 1;
+  transform: translateX(0) scaleX(1);
+}
