@@ -1,3 +1,4 @@
+import Link from "next/link";
 import "../../css/auth_admin.css";
 import "../../css/css.css";
 import "../../css/dashboard.css";
@@ -17,9 +18,9 @@ export default function ViewUser() {
               <p className="user-role">Quản trị viên hệ thống</p>
             </div>
             <div className="action-buttons">
-              <button className="btn-back">
+              <Link href={'/admin/user'} className="btn-back">
                 <i className="fa-solid fa-arrow-left"></i> Quay lại
-              </button>
+              </Link>
             </div>
           </div>
 

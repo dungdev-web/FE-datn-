@@ -3,7 +3,7 @@ import "../css/auth_admin.css";
 import { useState } from "react";
 import "../css/css.css";
 import "../css/dashboard.css";
-
+import Link from "next/link";
 export default function ListUser() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUserName, setModalUserName] = useState("");
@@ -110,7 +110,7 @@ export default function ListUser() {
                   <span className="status-label status-active">Hoạt động</span>
                 </td>
                 <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
+                <Link href={'/admin/user/view'}> <i className="fa-solid fa-eye view-icon" title="Xem"></i></Link> 
                   <i
                     className="fa-solid fa-user-pen view-status-icon"
                     title="Chỉnh sửa"

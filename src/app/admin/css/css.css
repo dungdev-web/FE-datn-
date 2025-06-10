@@ -368,19 +368,6 @@ body {
   text-decoration: none;
 }
 
-/* Các style chung */
-.order-list {
-  margin-top: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.order-list h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-}
 
 .actions {
   display: flex;
