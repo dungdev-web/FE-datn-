@@ -1,6 +1,11 @@
+"use client";
 import "@/src/app/admin/css/order_admin.css";
+import { useState } from "react";
 
 export default function Order() {
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   return (
     <>
       <main className="main-content">
@@ -8,9 +13,28 @@ export default function Order() {
           <h2>Danh sách đơn hàng</h2>
 
           <div className="actions">
-            <button className="btn btn-search">
-              <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-            </button>
+            <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+              {isSearching ? (
+                <input
+                  type="text"
+                  className="search-input"
+                  autoFocus
+                  placeholder="Nhập từ khóa..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onBlur={() => {
+                    if (searchText === "") setIsSearching(false);
+                  }}
+                />
+              ) : (
+                <button
+                  className="btn btn-search"
+                  onClick={() => setIsSearching(true)}
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+                </button>
+              )}
+            </div>
             <button className="btn btn-refresh">
               <i className="fa-solid fa-rotate-right"></i> Refresh
             </button>
