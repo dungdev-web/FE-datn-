@@ -1,40 +1,38 @@
 "use client";
-import "@/src/app/admin/css/order_admin.css";
-import { useState } from "react";
 
-export default function Order() {
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchText, setSearchText] = useState("");
+import { useState, useEffect } from "react";
+import "../css/order_admin.css";
+
+export default function OrderPage() {
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [orderStatus, setOrderStatus] = useState("Chờ xác nhận");
+
+  const handleCloseModal = (modal) => {
+    if (modal === "view") setIsViewModalOpen(false);
+    if (modal === "update") setIsUpdateModalOpen(false);
+  };
+
+  const handleOpenModal = (modal) => {
+    if (modal === "view") setIsViewModalOpen(true);
+    if (modal === "update") setIsUpdateModalOpen(true);
+  };
+
+  const updateOrderStatus = () => {
+    alert("Trạng thái đơn hàng đã cập nhật thành: " + orderStatus);
+    handleCloseModal("update");
+  };
 
   return (
-    <>
+    <div>
       <main className="main-content">
         <div className="order-list">
           <h2>Danh sách đơn hàng</h2>
 
           <div className="actions">
-            <div className={`search-toggle ${isSearching ? "active" : ""}`}>
-              {isSearching ? (
-                <input
-                  type="text"
-                  className="search-input"
-                  autoFocus
-                  placeholder="Nhập từ khóa..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  onBlur={() => {
-                    if (searchText === "") setIsSearching(false);
-                  }}
-                />
-              ) : (
-                <button
-                  className="btn btn-search"
-                  onClick={() => setIsSearching(true)}
-                >
-                  <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-                </button>
-              )}
-            </div>
+            <button className="btn btn-search">
+              <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+            </button>
             <button className="btn btn-refresh">
               <i className="fa-solid fa-rotate-right"></i> Refresh
             </button>
@@ -75,7 +73,6 @@ export default function Order() {
                     <option value="returned">Hoàn trả</option>
                   </select>
                 </th>
-
                 <th>
                   <select>
                     <option value="">Tất cả</option>
@@ -103,114 +100,149 @@ export default function Order() {
                 </td>
                 <td>08-05-2025</td>
                 <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
+                  <i
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view")}
+                  ></i>
                   <i
                     className="fa-solid fa-rotate view-status-icon"
                     title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update")}
                   ></i>
                 </td>
               </tr>
               <tr>
-                <td>ORD10002</td>
-                <td>Trần Thị B</td>
-                <td>0912345678</td>
+                <td>ORD10001</td>
+                <td>Nguyễn Văn A</td>
+                <td>0901234567</td>
                 <td>
                   <span className="status-label status-confirmed">
                     Đã xác nhận
                   </span>
                 </td>
                 <td>
-                  <span className="category-tag">Áo hoodie</span>
+                  <span className="category-tag">Giày thể thao</span>
                 </td>
                 <td>08-05-2025</td>
                 <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
+                  <i
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view")}
+                  ></i>
                   <i
                     className="fa-solid fa-rotate view-status-icon"
                     title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update")}
                   ></i>
                 </td>
               </tr>
               <tr>
-                <td>ORD10003</td>
-                <td>Lê Văn C</td>
-                <td>0923456789</td>
+                <td>ORD10001</td>
+                <td>Nguyễn Văn A</td>
+                <td>0901234567</td>
+                <td>
+                  <span className="status-label status-delivered">
+                  Đã hoàn thành
+                  </span>
+                </td>
+                <td>
+                  <span className="category-tag">Giày thể thao</span>
+                </td>
+                <td>08-05-2025</td>
+                <td>
+                  <i
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view")}
+                  ></i>
+                  <i
+                    className="fa-solid fa-rotate view-status-icon"
+                    title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update")}
+                  ></i>
+                </td>
+              </tr>
+              <tr>
+                <td>ORD10001</td>
+                <td>Nguyễn Văn A</td>
+                <td>0901234567</td>
                 <td>
                   <span className="status-label status-shipping">
                     Đang giao hàng
                   </span>
                 </td>
                 <td>
-                  <span className="category-tag">Ba lô</span>
+                  <span className="category-tag">Giày thể thao</span>
                 </td>
                 <td>08-05-2025</td>
                 <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
+                  <i
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view")}
+                  ></i>
                   <i
                     className="fa-solid fa-rotate view-status-icon"
                     title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update")}
                   ></i>
                 </td>
               </tr>
               <tr>
-                <td>ORD10004</td>
-                <td>Phạm Thị D</td>
-                <td>0934567890</td>
+                <td>ORD10001</td>
+                <td>Nguyễn Văn A</td>
+                <td>0901234567</td>
                 <td>
-                  <span className="status-label status-delivered">Đã giao</span>
+                  <span className="status-label status-cancelled">Đã Hủy</span>
                 </td>
                 <td>
-                  <span className="category-tag">Túi xách</span>
+                  <span className="category-tag">Giày thể thao</span>
                 </td>
                 <td>08-05-2025</td>
                 <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
+                  <i
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view")}
+                  ></i>
                   <i
                     className="fa-solid fa-rotate view-status-icon"
                     title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update")}
                   ></i>
                 </td>
               </tr>
-              <tr>
-                <td>ORD10005</td>
-                <td>Đỗ Văn E</td>
-                <td>0945678901</td>
+                <tr>
+                <td>ORD10001</td>
+                <td>Nguyễn Văn A</td>
+                <td>0901234567</td>
                 <td>
-                  <span className="status-label status-cancelled">Đã hủy</span>
+                  <span className="status-label status-returned">
+                    Hoàn trả
+                  </span>
                 </td>
                 <td>
-                  <span className="category-tag">Mũ lưỡi trai</span>
+                  <span className="category-tag">Giày thể thao</span>
                 </td>
                 <td>08-05-2025</td>
                 <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
                   <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view")}
                   ></i>
-                </td>
-              </tr>
-              <tr>
-                <td>ORD10006</td>
-                <td>Vũ Thị F</td>
-                <td>0956789012</td>
-                <td>
-                  <span className="status-label status-returned">Hoàn trả</span>
-                </td>
-                <td>
-                  <span className="category-tag">Áo thun</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
                   <i
                     className="fa-solid fa-rotate view-status-icon"
                     title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update")}
                   ></i>
                 </td>
               </tr>
             </tbody>
           </table>
+
           <div className="pagination">
             <button className="page-btn" disabled>
               <i className="fa-solid fa-angle-left"></i>
@@ -227,6 +259,111 @@ export default function Order() {
           </div>
         </div>
       </main>
-    </>
+
+      {isViewModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-box slide-in">
+            <div className="modal-header">
+              <h3>Chi tiết đơn hàng</h3>
+              <span
+                className="close-icon"
+                onClick={() => handleCloseModal("view")}
+              >
+                &times;
+              </span>
+            </div>
+            <div className="modal-body">
+              <ul className="order-detail-list">
+                <li>
+                  <strong>Mã đơn hàng:</strong> <span>ORD10001</span>
+                </li>
+                <li>
+                  <strong>Người nhận:</strong> <span>Nguyễn Văn A</span>
+                </li>
+                <li>
+                  <strong>Điện thoại:</strong> <span>0901234567</span>
+                </li>
+                <li>
+                  <strong>Sản phẩm:</strong> <span>Giày thể thao </span>{" "}
+                  <span>(Size 42)</span>
+                </li>
+                <li>
+                  <strong>Màu:</strong> <span>Đen</span>
+                </li>
+                <li>
+                  <strong>Số Lượng - Giá:</strong> <span>2</span>{" "}
+                  <span>700.000 VNĐ</span>
+                </li>
+                <li>
+                  <strong>Ngày đặt:</strong> <span>08-05-2025</span>
+                </li>
+                <li>
+                  <strong>Địa chỉ giao hàng:</strong>{" "}
+                  <span>123 Lý Thường Kiệt, Q.10, TP.HCM</span>
+                </li>
+                <li>
+                  <strong>Ghi chú:</strong>{" "}
+                  <span>Giao hàng trong giờ hành chính</span>
+                </li>
+                <li>
+                  <strong>Thanh toán:</strong>{" "}
+                  <span>COD (Thanh toán khi nhận hàng)</span>
+                </li>
+                <li>
+                  <strong>Trạng thái:</strong>{" "}
+                  <span className="badge badge-warning">Chờ xác nhận</span>
+                </li>
+              </ul>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="btn btn-close"
+                onClick={() => handleCloseModal("view")}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isUpdateModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-box slide-in">
+            <div className="modal-header">
+              <h3>Cập nhật trạng thái</h3>
+              <span
+                className="close-icon"
+                onClick={() => handleCloseModal("update")}
+              >
+                &times;
+              </span>
+            </div>
+            <div className="modal-body">
+              <label htmlFor="orderStatus">
+                <strong>Trạng thái đơn hàng:</strong>
+              </label>
+              <select
+                id="orderStatus"
+                value={orderStatus}
+                onChange={(e) => setOrderStatus(e.target.value)}
+              >
+                <option value="Chờ xác nhận">Chờ xác nhận</option>
+                <option value="Đã xác nhận">Đã xác nhận</option>
+                <option value="Đang giao hàng">Đang giao hàng</option>
+                <option value="Đã giao">Đã giao</option>
+                <option value="Đã hủy">Đã hủy</option>
+                <option value="Hoàn trả">Hoàn trả</option>
+              </select>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-close" onClick={updateOrderStatus}>
+                Cập nhật
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
