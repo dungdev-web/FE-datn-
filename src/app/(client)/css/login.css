@@ -238,10 +238,9 @@
 /* Medium-sized devices (e.g., tablets) */
 @media (max-width: 768px) {
   .auth-container {
-    margin-left: 10%;
-    margin-top: 100px;
     padding: 20px;
     flex-direction: column; /* Stack image and form vertically */
+    margin: 80px auto;
   }
   .intro-banner{
     display: none;
@@ -282,6 +281,9 @@
   }
   .auth-container{
     margin-bottom: 30px;
+  }
+  header:before{
+   background-color: #021688;
   }
 }
 

@@ -4,14 +4,51 @@ import Link from "next/link";
 export default function Address() {
   return (
     <>
-      <main style={{ marginTop: "182px", marginBottom: "20px" }}>
+     <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Địa chỉ của bạn</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <Link href={'/'} title="Trang chủ">
+                <span>Trang chủ</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+             <li className="home">
+              <Link href={'/account'} title="Tài khoản">
+                <span>Tài khoản</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Địa chỉ của bạn</span>
+              </strong>
+            </li>
+            <li></li>
+          </ul>
+        </div>
+      </section>
+      <main>
         <div className="container1">
           <div className="row">
             <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">
               <div className="block-account">
                 <h5 className="title-account">Trang tài khoản</h5>
                 <p>
-                  Xin chào, <span>cccc</span>&nbsp;!
+                  Xin chào, <span>Lê Chí Bảo</span>&nbsp;!
                 </p>
                 <ul>
                   <li>
@@ -76,7 +113,7 @@ export default function Address() {
                     <div className="address-group">
                       <div className="address form-signup">
                         <p>
-                          <strong>Họ tên: </strong> cccc
+                          <strong>Họ tên: </strong> Lê Chí Bảo
                           <span className="address-default">
                             <i className="far fa-check-circle"></i>Địa chỉ mặc
                             định
@@ -124,7 +161,7 @@ export default function Address() {
 							<div className="form_address">
 								<div className="field">
 									<fieldset className="form-group">
-										<input type="text" name="FullName" className="form-control has-content" required="" value=" cccc" autocapitalize="words">
+										<input type="text" name="FullName" className="form-control has-content" required="" value=" Lê Chí Bảo" autocapitalize="words">
 										<label>Họ tên</label>
 									</fieldset>
 									<p className="error-msg"></p>
