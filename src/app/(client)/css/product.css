@@ -755,6 +755,9 @@ input[type="submit"] {
   header:before{
     background-color: #021688;
   }
+  .product-card{
+    width: 220px !important;
+  }
 }
 /* @media (max-width:620px){
   .header-nav-bg {

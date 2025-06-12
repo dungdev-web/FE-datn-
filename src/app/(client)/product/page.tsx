@@ -414,7 +414,7 @@ export default function Product() {
                 {viewMode === "grid" && (
                   <div className="product-grid">
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -473,7 +473,7 @@ export default function Product() {
                       </div>
                     </div>
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -532,7 +532,7 @@ export default function Product() {
                       </div>
                     </div>
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -591,7 +591,7 @@ export default function Product() {
                       </div>
                     </div>
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
