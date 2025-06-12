@@ -101,6 +101,26 @@ main{
 .bread-crumb {
   height: 280px;
 }
+@media (max-width: 768px) {
+  .bread-crumb {
+  height: 120px;
+}
+.breadcrumb-container .title-page{
+  top: 60px !important;
+  font-size: 18px !important ;
+}
+.breadcrumb-container .title-page h2{
+  
+  font-size: 16px !important ;
+}
+
+.breadcrumb-container .breadcrumb{
+  z-index: 10;
+  top: 45px !important;
+  margin: 0 auto;
+  font-size: 12px;
+}
+}
 .breadcrumb-container {
  
   
@@ -755,9 +775,7 @@ input[type="submit"] {
   header:before{
     background-color: #021688;
   }
-  .product-card{
-    width: 220px !important;
-  }
+ 
 }
 /* @media (max-width:620px){
   .header-nav-bg {
