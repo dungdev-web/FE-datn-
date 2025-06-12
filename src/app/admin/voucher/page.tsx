@@ -23,30 +23,31 @@ export default function Voucher() {
           <thead>
             <tr>
               <th>Mã khuyến mãi</th>
-              <th>Tên khuyến mãi</th>
               <th>Loại</th>
-              <th>Trạng thái</th>
-              <th>Giá trị</th>
+              <th>Giá trị (%)</th>
+              <th>Ngày bắt đầu</th>
               <th>Ngày hết hạn</th>
+              <th>Giới hạn</th>
+              <th>Đã dùng</th>
               <th>Thao tác</th>
             </tr>
             <tr className="promotion-filter-row">
               <th><input type="text" placeholder="Lọc mã..." /></th>
-              <th><input type="text" placeholder="Lọc tên..." /></th>
-              <th>
-                <select>
-                  <option value="">Tất cả</option>
-                  <option value="public">Công khai</option>
-                  <option value="private">Riêng tư</option>
-                </select>
-              </th>
-              <th>
+              <th><input type="text" placeholder="Lọc loại..." /></th>
+               <th>
                 <select>
                   <option value="">Tất cả</option>
                   <option value="true">Kích hoạt</option>
                   <option value="false">Vô hiệu</option>
                 </select>
               </th>
+              <th>
+                <input type="date" name="" id="" />
+              </th>
+              <th>
+                <input type="date" name="" id="" />
+              </th>
+             
               <th></th>
               <th></th>
               <th></th>
@@ -56,35 +57,17 @@ export default function Voucher() {
             <tr>
               <td>BLA01</td>
               <td>BLACK FRIDAY</td>
-              <td className="status-column">
-                <span className="badge badge-public">Công khai</span>
-              </td>
-              <td className="status-column">
-                <span className="badge badge-success">Kích hoạt</span>
-              </td>
-              <td>50000 đ</td>
+              <td>30%</td>
               <td>11-12-2021</td>
+              <td>11-12-2021</td>
+              <td>5</td>
+              <td>5</td>
               <td>
                 <Link href={'/admin/voucher/edit'}><i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i></Link>
                 <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
               </td>
             </tr>
-            <tr>
-              <td>KH123</td>
-              <td>2/9</td>
-              <td className="status-column">
-                <span className="badge badge-public">Công khai</span>
-              </td>
-              <td className="status-column">
-                <span className="badge badge-success">Kích hoạt</span>
-              </td>
-              <td>30%</td>
-              <td>06-09-2021</td>
-              <td>
-               <Link href={'/admin/voucher/edit'}><i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i></Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
+            
           </tbody>
         </table>
 

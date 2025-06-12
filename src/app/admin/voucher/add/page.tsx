@@ -48,17 +48,19 @@ export default function VoucherAdd() {
           {/* Loại giảm giá và mức giảm */}
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="promo-type">Khuyến mãi theo</label>
-              <select id="promo-type" className="input-field">
-                <option value="percent">Phần trăm (%)</option>
-                <option value="amount">Số tiền (VNĐ)</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="discount-amount">Mức giảm</label>
+              <label htmlFor="discount-amount">Khuyến mãi (%)</label>
               <input
                 type="number"
                 id="discount-amount"
+                className="input-field"
+                placeholder="Nhập % khuyến mãi"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="discount-quantity">Số lượng</label>
+              <input
+                type="number"
+                id="discount-quantity"
                 className="input-field"
                 placeholder="Nhập mức giảm"
               />

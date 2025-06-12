@@ -1,6 +1,6 @@
-"use client"
-import '@/src/app/admin/css/voucher_add_admin.css'
-import Link from 'next/link';
+"use client";
+import "@/src/app/admin/css/voucher_add_admin.css";
+import Link from "next/link";
 export default function VoucherEdit() {
   return (
     <main className="main-content">
@@ -8,12 +8,10 @@ export default function VoucherEdit() {
         <h2>Chỉnh sửa mã giảm giá</h2>
 
         <div className="promotion-actions">
-          <Link href={'/admin/voucher'} className="btn btn-back">
+          <Link href={"/admin/voucher"} className="btn btn-back">
             <i className="fa-solid fa-arrow-left"></i> Trở về
           </Link>
-          <button className="btn btn-add">
-             Cập nhật
-          </button>
+          <button className="btn btn-add">Cập nhật</button>
         </div>
 
         <form className="promotion-form">
@@ -48,19 +46,21 @@ export default function VoucherEdit() {
           {/* Loại giảm giá và mức giảm */}
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="promo-type">Khuyến mãi theo</label>
-              <select id="promo-type" className="input-field">
-                <option value="percent">Phần trăm (%)</option>
-                <option value="amount">Số tiền (VNĐ)</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="discount-amount">Mức giảm</label>
+              <label htmlFor="discount-amount">Khuyến mãi (%)</label>
               <input
                 type="number"
                 id="discount-amount"
                 className="input-field"
-                placeholder="Nhập mức giảm"
+                placeholder="Nhập % khuyến mãi"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="discount-quantity">Số lượng</label>
+              <input
+                type="number"
+                id="discount-quantity"
+                className="input-field"
+                placeholder="Nhập số lượng"
               />
             </div>
           </div>
