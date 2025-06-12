@@ -110,19 +110,6 @@ span {
   background-size: cover;
 }
 
-.breadcrumb-container .title-page {
-  z-index: 9;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  color: #000;
-}
-
-.breadcrumb-container .title-page {
-  color: #fff;
-  position: relative;
-  font-weight: 600;
-  font-size: 24px;
-}
 
 .title-page {
   display: flex;

@@ -10,7 +10,7 @@ export default function Product() {
   };
   return (
     <>
-      <section
+         <section
         className="bread-crumb background-cover relative"
         style={{
           backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
