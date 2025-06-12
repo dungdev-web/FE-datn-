@@ -455,7 +455,13 @@ export default function Product() {
                             </span>
                             <span className="new-price"> 1.200.000đ</span>
                           </div>
-
+                           <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -508,7 +514,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                           <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -561,7 +573,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                              <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -614,7 +632,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                              <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -705,7 +729,7 @@ export default function Product() {
               </div>
             </div>
           </div>
-        </div>
+       </div>
       </main>
       <div
         id="open-filters"
