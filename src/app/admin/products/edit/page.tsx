@@ -7,7 +7,7 @@ const CKEditor = dynamic(() => import("@ckeditor/ckeditor5-react").then(mod => m
   ssr: false,
 });
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-export default function Add_pro() {
+export default function Edit_pro() {
   const editorRef = useRef<any>(null);
 
   useEffect(() => {
