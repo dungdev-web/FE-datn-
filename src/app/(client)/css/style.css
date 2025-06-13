@@ -1274,9 +1274,7 @@ input[type="submit"] {
 
 /* responsive */
 @media (min-width: 1200px) {
-  .bread-crumb {
-    margin-top: 160px !important;
-  }
+ 
 
   .slider-wrapper:hover .swiper-button-prev,
   .slider-wrapper:hover .swiper-button-next {

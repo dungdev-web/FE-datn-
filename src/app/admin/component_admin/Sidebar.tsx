@@ -28,18 +28,18 @@ export default function SideBar() {
     <nav className="sidebar">
       <ul className="menu">
         <li>
-          <a href="#">
+          <Link href={'/admin'} className="flex items-center">
             <SpaceDashboardIcon />
             Dashboard
-          </a>
+          </Link>
         </li>
         <li
           className={`has-submenu ${openMenuKey === "taikhoan" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("taikhoan")}>
+          <Link href={'/admin/user'} onClick={() => toggleMenu("taikhoan")}>
             <AccountCircleIcon /> Quản lý tài khoản{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
+          </Link>
           <ul className="submenu">
             <li>
               <a href="#">Danh sách tài khoản</a>
@@ -84,16 +84,16 @@ export default function SideBar() {
         <li
           className={`has-submenu ${openMenuKey === "sanpham" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("sanpham")}>
+          <Link href={'/admin/products'} onClick={() => toggleMenu("sanpham")}>
             <StorefrontIcon /> Quản lý sản phẩm{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
+          </Link>
           <ul className="submenu">
             <li>
-              <a href="#">Danh sách sản phẩm</a>
+              <Link href={'/admin/products/' }>Danh sách sản phẩm</Link>
             </li>
             <li>
-              <a href="#">Thêm mới sản phẩm</a>
+              <Link href={'/admin/products/add'}>Thêm mới sản phẩm</Link>
             </li>
           </ul>
         </li>
@@ -117,16 +117,13 @@ export default function SideBar() {
         <li
           className={`has-submenu ${openMenuKey === "donhang" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("donhang")}>
+          <Link href={'/admin/order'} onClick={() => toggleMenu("donhang")}>
             <ReceiptLongIcon /> Quản lý đơn hàng{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
+          </Link>
           <ul className="submenu">
             <li>
-              <a href="#">Danh sách đơn hàng</a>
-            </li>
-            <li>
-              <a href="#">Thêm mới đơn hàng</a>
+              <Link href={"/admin/order"}>Danh sách đơn hàng</Link>
             </li>
           </ul>
         </li>
@@ -149,13 +146,13 @@ export default function SideBar() {
         <li
           className={`has-submenu ${openMenuKey === "binhluan" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("binhluan")}>
+          <Link href={'/admin/comment'} onClick={() => toggleMenu("binhluan")}>
             <CommentIcon /> Quản lý bình luận{" "}
             <i className="fa-solid fa-chevron-down submenu-icon"></i>
-          </a>
+          </Link>
           <ul className="submenu">
             <li>
-              <a href="#">Danh sách bình luận</a>
+              <Link href={'admin/comment'}>Danh sách bình luận</Link>
             </li>
             <li>
               <a href="#">Bình luận ...</a>

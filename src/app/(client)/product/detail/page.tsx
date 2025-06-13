@@ -1,6 +1,5 @@
 "use client";
 import "../../css/detail.css";
-import "../../css/product.css";
 import "../../css/style.css";
 
 import Product4box from "@/src/app/(client)/component/product";

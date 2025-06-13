@@ -10,7 +10,7 @@ export default function Product() {
   };
   return (
     <>
-      <section
+         <section
         className="bread-crumb background-cover relative"
         style={{
           backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
@@ -414,7 +414,7 @@ export default function Product() {
                 {viewMode === "grid" && (
                   <div className="product-grid">
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -455,7 +455,13 @@ export default function Product() {
                             </span>
                             <span className="new-price"> 1.200.000đ</span>
                           </div>
-
+                           <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -467,7 +473,7 @@ export default function Product() {
                       </div>
                     </div>
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -508,7 +514,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                           <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -520,7 +532,7 @@ export default function Product() {
                       </div>
                     </div>
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -561,7 +573,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                              <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -573,7 +591,7 @@ export default function Product() {
                       </div>
                     </div>
                     <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -614,7 +632,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                              <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -705,7 +729,7 @@ export default function Product() {
               </div>
             </div>
           </div>
-        </div>
+       </div>
       </main>
       <div
         id="open-filters"

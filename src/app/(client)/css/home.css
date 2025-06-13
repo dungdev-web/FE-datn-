@@ -117,9 +117,9 @@
 }
 
 .product-image img {
-  width: 100%;
+  width: 90%;
   border-radius: 8px;
-  height: 100%;
+ 
 }
 .product-icons {
   position: absolute;
@@ -1177,14 +1177,10 @@
   .look-book-text {
     margin-bottom: 10px;
   }
-  .bread-crumb {
-    margin-top: 80px !important ;
-  }
+
 }
 @media (max-width: 768px) {
-  .bread-crumb {
-    margin-top: 49px !important ;
-  }
+
   .banner {
     height: 500px !important;
   }
