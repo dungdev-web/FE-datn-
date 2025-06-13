@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import "quill/dist/quill.snow.css";
 import "filepond/dist/filepond.min.css";
 import "@yaireo/tagify/dist/tagify.css";
-import "../../css/css.css";
-import "../../css/dashboard.css";
 import "../../css/blog_add.css";
 
 export default function Blog_View() {
@@ -97,7 +95,7 @@ export default function Blog_View() {
 
             <div className="!mb-[12px]">
               <label className="block text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">Danh mục</label>
-              <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm bg-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm text-gray-500 bg-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Chọn danh mục --</option>
                 <option value="tech">Công nghệ</option>
                 <option value="life">Đời sống</option>
@@ -118,7 +116,7 @@ export default function Blog_View() {
 
 <div className="!mb-[12px]">
   <label className="block text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">Trạng thái</label>
-  <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm bg-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
+  <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-500 text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
     <option value="public">Công khai</option>
     <option value="draft">Nháp</option>
     <option value="pending">Chờ duyệt</option>

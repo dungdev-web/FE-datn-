@@ -1,5 +1,6 @@
 import "../css/css.css";
 import "../css/dashboard.css";
+import "../css/blog_add.css";
 export default function Blog() {
   return (
     <>
