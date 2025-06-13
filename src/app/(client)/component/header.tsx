@@ -176,7 +176,10 @@ export default function Header() {
           </div>
         </div>
         <div className="logo-header">
-          <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
+          <Link href={'/'}>
+            <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
+          </Link>
+        
         </div>
         <div className="iconphone-header">
           <div className="iconphon-header1">

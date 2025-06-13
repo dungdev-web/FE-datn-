@@ -5,7 +5,6 @@ import { useState } from "react";
 
 export default function Blog() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
     <>
       <section
