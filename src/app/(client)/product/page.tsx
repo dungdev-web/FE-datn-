@@ -10,14 +10,17 @@ export default function Product() {
   };
   return (
     <>
-      <section
-        className="bread-crumb background-cover"
+         <section
+        className="bread-crumb background-cover relative"
         style={{
-          backgroundImage:
-            "url(//bizweb.dktcdn.net/100/505/077/themes/934930/assets/section_breadcrumb.jpg?1730865096645)",
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
           backgroundPosition: "center",
+          backgroundSize: "cover",
         }}
       >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
         <div className="breadcrumb-container">
           <div className="title-page">
             <h2>Tất cả sản phẩm</h2>
@@ -410,8 +413,8 @@ export default function Product() {
                 </div>
                 {viewMode === "grid" && (
                   <div className="product-grid">
-                    <div className="product-itemlist-main">
-                      <div className="product-card" style={{ width: "238px" }}>
+                    <div className="product-itemlist-main !block">
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -452,7 +455,13 @@ export default function Product() {
                             </span>
                             <span className="new-price"> 1.200.000đ</span>
                           </div>
-
+                           <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -463,61 +472,8 @@ export default function Product() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
-                      <div className="product-card" style={{ width: "238px" }}>
-                        <div className="product-image">
-                          <img
-                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                            alt=""
-                          />
-                          <div className="product-icons">
-                            <i className="fa-solid fa-heart always-show"></i>
-                            <div className="hover-icons">
-                              <i className="fa-solid fa-eye"></i>
-                              <i className="fa-solid fa-list"></i>
-                             <i className="fa fa-exchange"></i>
-                            </div>
-                          </div>
-
-                          <span className="discount-tag">-20%</span>
-
-                          <div className="product-colors">
-                            <span
-                              className="color blue"
-                              data-color="Xanh dương"
-                            ></span>
-                            <span
-                              className="color green"
-                              data-color="Xanh lá"
-                            ></span>
-                            <span
-                              className="color pink"
-                              data-color="Hồng"
-                            ></span>
-                          </div>
-
-                          <h4 className="product-title">
-                            Giày Converse Run Star Motion
-                          </h4>
-                          <div className="product-price">
-                            <span className="old-price">
-                              <del>1.500.000đ</del>
-                            </span>
-                            <span className="new-price">1.200.000đ</span>
-                          </div>
-
-                          <div className="product-rating">
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-regular fa-star"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="product-itemlist-main">
-                      <div className="product-card" style={{ width: "238px" }}>
+                    <div className="product-itemlist-main !block">
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -558,7 +514,13 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
-
+                           <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -569,8 +531,8 @@ export default function Product() {
                         </div>
                       </div>
                     </div>
-                    <div className="product-itemlist-main">
-                      <div className="product-card" style={{ width: "238px" }}>
+                    <div className="product-itemlist-main !block">
+                      <div className="product-card" style={{ width: "230px" }}>
                         <div className="product-image">
                           <img
                             src="/images/products/chaybo/ConverseRunStarMotion.webp"
@@ -611,7 +573,72 @@ export default function Product() {
                             </span>
                             <span className="new-price">1.200.000đ</span>
                           </div>
+                              <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
+                          <div className="product-rating">
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-regular fa-star"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="product-itemlist-main !block">
+                      <div className="product-card" style={{ width: "230px" }}>
+                        <div className="product-image">
+                          <img
+                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                            alt=""
+                          />
+                          <div className="product-icons">
+                            <i className="fa-solid fa-heart always-show"></i>
+                            <div className="hover-icons">
+                              <i className="fa-solid fa-eye"></i>
+                              <i className="fa-solid fa-list"></i>
+                              <i className="fa fa-exchange"></i>
+                            </div>
+                          </div>
 
+                          <span className="discount-tag">-20%</span>
+
+                          <div className="product-colors">
+                            <span
+                              className="color blue"
+                              data-color="Xanh dương"
+                            ></span>
+                            <span
+                              className="color green"
+                              data-color="Xanh lá"
+                            ></span>
+                            <span
+                              className="color pink"
+                              data-color="Hồng"
+                            ></span>
+                          </div>
+
+                          <h4 className="product-title">
+                            Giày Converse Run Star Motion
+                          </h4>
+                          <div className="product-price">
+                            <span className="old-price">
+                              <del>1.500.000đ</del>
+                            </span>
+                            <span className="new-price">1.200.000đ</span>
+                          </div>
+                              <div className="hot-product-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: "87%" }}>
+                      <span className="sold-info">Đã bán 87 sản phẩm</span>
+                    </div>
+                  </div>
+                </div>
                           <div className="product-rating">
                             <i className="fa-solid fa-star"></i>
                             <i className="fa-solid fa-star"></i>
@@ -702,7 +729,7 @@ export default function Product() {
               </div>
             </div>
           </div>
-        </div>
+       </div>
       </main>
       <div
         id="open-filters"
@@ -984,8 +1011,8 @@ export default function Product() {
             <a href="#" title="Thời trang nam">
               <img
                 className="img-responsive center-block"
-                src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
-                data-lazyload="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
+                src="/images/banner/aside_banner.webp"
+                data-lazyload="/images/banner/aside_banner.webp"
                 alt="Thời trang nam"
               />
             </a>

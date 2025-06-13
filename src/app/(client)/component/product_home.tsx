@@ -46,10 +46,7 @@ export default function Show1sanpham() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -100,10 +97,7 @@ export default function Show1sanpham() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+            
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -152,10 +146,7 @@ export default function Show1sanpham() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -204,10 +195,7 @@ export default function Show1sanpham() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>
@@ -257,10 +245,7 @@ export default function Show1sanpham() {
               </div>
 
               <span className="discount-tag">-20%</span>
-              <span className="new-tag">
-                <img src="/images/logo/title_image_1_tag.webp" alt="" />
-                Mới
-              </span>
+              
               <div className="product-colors">
                 <span className="color blue" data-color="Xanh dương"></span>
                 <span className="color green" data-color="Xanh lá"></span>

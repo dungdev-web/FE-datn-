@@ -1,0 +1,542 @@
+/* Các style chung */
+.order-list {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.order-list h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.actions .btn {
+  padding: 8px 12px;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.actions .btn:hover {
+  background-color: #0056b3;
+}
+
+.order-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.order-table th {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.order-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+
+  vertical-align: middle;
+  font-size: 14px;
+}
+
+.order-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.order-img {
+  width: 60px;
+  height: auto;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.order-img:hover {
+  transform: scale(1.05);
+}
+
+.edit-icon,
+.delete-icon {
+  cursor: pointer;
+  margin: 0 5px;
+  color: #555;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.edit-icon:hover {
+  color: #28a745;
+}
+
+.delete-icon:hover {
+  color: #dc3545;
+}
+
+.category-tag {
+  display: block;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+}
+
+.category-tag:hover {
+  background-color: #ddd;
+}
+
+.filter-row input,
+.filter-row select {
+  width: 100%;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.btn-add {
+  background-color: #021688;
+}
+
+.btn-refresh {
+  background-color: cadetblue;
+}
+
+.btn-search {
+  background-color: #4bd963;
+}
+
+.btn-export {
+  background-color: orange;
+}
+
+th select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+}
+
+th select:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #f0f8ff;
+}
+
+/* Màu nền cho các hàng lẻ */
+.order-table tr:nth-child(odd) {
+  background-color: #f2f2f2;
+}
+
+/* Màu nền cho các hàng chẵn */
+.order-table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Pagination styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+  color: #333;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+.page-btn.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  font-weight: bold;
+}
+
+.page-btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Tooltip styles */
+.tooltip-ellipsis {
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+  cursor: pointer;
+}
+
+.tooltip-ellipsis:hover::after {
+  content: attr(data-fulltext);
+  position: absolute;
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 4px;
+  top: 100%;
+  left: 0;
+  white-space: normal;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s 0.3s;
+}
+
+.tooltip-ellipsis:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+.view-icon,
+.view-status-icon {
+  cursor: pointer;
+  margin: 0 5px;
+  color: #555;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.view-icon:hover {
+  color: #17a2b8;
+  /* xanh dương nhẹ */
+}
+
+.view-status-icon:hover {
+  color: #ffc107;
+  /* vàng */
+}
+
+.status-label {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+  font-size: 13px;
+  color: white;
+}
+
+.status-pending {
+  background-color: #ffc107;
+  /* vàng */
+}
+
+.status-confirmed {
+  background-color: #17a2b8;
+  /* xanh dương nhạt */
+}
+
+.status-shipping {
+  background-color: #007bff;
+  /* xanh dương */
+}
+
+.status-delivered {
+  background-color: #28a745;
+  /* xanh lá */
+}
+
+.status-cancelled {
+  background-color: #dc3545;
+  /* đỏ */
+}
+
+.status-returned {
+  background-color: #6c757d;
+  /* xám */
+}
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 2rem;
+  overflow-y: auto; /* Thêm phần cuộn dọc nếu modal quá dài */
+}
+
+/* Ẩn modal khi không hiển thị */
+.modal-overlay.hidden {
+  display: none;
+}
+
+/* Cập nhật modal box */
+.modal-box {
+  background: #fff;
+  width: 100%;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+  font-family: "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Ẩn overflow */
+  position: relative;
+  max-height: 90vh; /* Cho phép modal mở rộng tối đa theo chiều cao màn hình */
+  z-index: 10000; /* Đảm bảo modal luôn ở trên cùng */
+}
+
+/* Slide up animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal header */
+.modal-header {
+  background-color: #007bff;
+  color: #fff;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.modal-header .icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+/* Modal body */
+.modal-body {
+  padding: 1.25rem 1.5rem;
+  color: #333;
+  font-size: 15px;
+  flex-grow: 1; /* Cho phép modal-body mở rộng */
+  overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
+  min-height: 330px; /* Đảm bảo modal body có chiều cao tối thiểu */
+  max-height: 70vh; /* Giới hạn chiều cao của modal body */
+}
+
+/* Modal footer */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #eee;
+}
+
+/* Order detail list */
+.order-detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.order-detail-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Badge styles */
+.badge {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+}
+
+.badge-info {
+  background-color: #17a2b8;
+}
+
+/* Button styles */
+.btn {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-close {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-close:hover {
+  background-color: #5a6268;
+}
+
+.btn-update {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-update:hover {
+  background-color: #218838;
+}
+
+/* Status select dropdown */
+.status-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  margin-top: 8px;
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+.status-select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Custom select dropdown */
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.custom-select {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  z-index: 10000;
+}
+
+.custom-select ul {
+  max-height: 330px; /* Cập nhật chiều cao cho select */
+  overflow-y: auto;
+}
+
+.custom-select .selected {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-select .selected i {
+  font-size: 18px;
+}
+
+.select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.select-options li {
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.select-options li:hover {
+  background-color: #f1f1f1;
+}
+
+.select-options li i {
+  font-size: 18px;
+}
+
+.select-options.hidden {
+  display: none;
+}
+
+/* Media query for mobile */
+@media (max-width: 768px) {
+  .modal-box {
+    width: 100%;
+    margin: 0 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+}

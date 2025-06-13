@@ -97,6 +97,7 @@ span {
 }
 .breadcrumb-container {
   position: relative;
+  
 }
 
 .breadcrumb-container {
@@ -109,19 +110,6 @@ span {
   background-size: cover;
 }
 
-.breadcrumb-container .title-page {
-  z-index: 9;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  color: #000;
-}
-
-.breadcrumb-container .title-page {
-  color: #fff;
-  position: relative;
-  font-weight: 600;
-  font-size: 24px;
-}
 
 .title-page {
   display: flex;
@@ -225,7 +213,7 @@ a,
 }
 
 .breadcrumb li span {
-  color: #888;
+  color: #03177e;
 }
 .space-30 {
   margin-bottom: 30px !important;
@@ -742,6 +730,7 @@ input[type="submit"] {
   .main_container {
     padding: 10px 30px;
   }
+
   #open-filters {
     font-size: 16px;
   }

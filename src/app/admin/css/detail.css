@@ -164,7 +164,6 @@ select {
 }
 
 .breadcrumb-container .title-page {
-  color: #fff;
   position: relative;
   font-weight: 600;
   font-size: 24px;
@@ -272,7 +271,7 @@ a,
 }
 
 .breadcrumb li span {
-  color: #888;
+  color: white;
 }
 
 .tns-outer {

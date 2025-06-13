@@ -42,42 +42,38 @@ export default function SalePage() {
     return () => clearInterval(interval);
   }, []);
 
-return (
-    <div className="w-[90%] mx-auto"> {/* Bọc toàn bộ nội dung */}
-      <div className="grid grid-cols-1 md:grid-cols-2 min-h-[50vh]">
-        {/* LEFT SIDE */}
-        <div className="relative h-full w-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
-          <div className="relative z-10 text-center px-4 py-8">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ưu đãi lớn sắp kết thúc
-            </h2>
-            <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg px-6 py-4 mb-6 max-w-md mx-auto">
-              {/* Time left */}
-              {["days", "hours", "minutes", "seconds"].map((key, i) => (
-                <div key={i}>
-                  <div className="text-3xl font-bold">{timeLeft[key]}</div>
-                  <div className="text-sm">
-                    {["Ngày", "Giờ", "Phút", "Giây"][i]}
-                  </div>
+  return (
+    <div className="flex flex-col md:grid md:grid-cols-2 min-h-[50vh] w-full">
+      {/* LEFT SIDE */}
+      <div className="relative w-full h-[40vh] md:h-full flex items-center justify-center text-white bg-cover bg-center bg-no-repeat bg-flash-sale">
+        <div className="relative z-10 text-center px-4 py-8">
+          <h2 className="text-3xl md:text-4xl font-bold !mb-1">
+            Ưu đãi sắp diễn ra
+          </h2>
+          <p className="!mb-3">Mua sắm ngay tại Tera Shoes</p>
+          <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg !px-6 !py-2 !mb-3 max-w-md mx-auto">
+            {["days", "hours", "minutes", "seconds"].map((key, i) => (
+              <div key={i}>
+                <div className="text-3xl font-bold">{timeLeft[key]}</div>
+                <div className="text-sm">
+                  {["Ngày", "Giờ", "Phút", "Giây"][i]}
                 </div>
-              ))}
-            </div>
-            <button className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold text-lg">
-              MUA SẮM NGAY
-            </button>
+              </div>
+            ))}
           </div>
+          <button className="bg-[#021688] hover:bg-[#021688]/80 text-white !px-12 !py-1 font-semibold">
+            MUA SẮM NGAY
+          </button>
         </div>
-
-        {/* RIGHT SIDE */}
-        <div className="flex flex-col justify-center items-center text-center px-6 py-8">
-          <div className="slider-wrapper">
-            <div className="product-slider-track">
-              <ProductSale />
-            </div>
+      </div>
+      {/* RIGHT SIDE */}
+      <div className="flex flex-col justify-center items-center text-center px-6 py-8">
+        <div className="slider-wrapper">
+          <div className="product-slider-track">
+            <ProductSale />
           </div>
         </div>
       </div>
     </div>
   );
-
 }

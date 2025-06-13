@@ -1,20 +1,22 @@
 "use client";
 import "../../css/detail.css";
-import "../../css/product.css";
 import "../../css/style.css";
-import Show1sanpham from "@/app/(client)/component/product_home";
+
 import Product4box from "@/src/app/(client)/component/product";
 export default function Detail() {
   return (
     <>
       <section
-        className="bread-crumb background-cover"
+        className="bread-crumb background-cover relative"
         style={{
-          backgroundImage:
-            "url(//bizweb.dktcdn.net/100/505/077/themes/934930/assets/section_breadcrumb.jpg?1730865096645)",
-          backgroundPosition: "center;",
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
         }}
       >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
         <div className="breadcrumb-container">
           <div className="title-page">
             <h2>Giày Nam Men's Air Jordan 2 Retro</h2>
@@ -344,7 +346,7 @@ export default function Detail() {
                   </div>
                 </div>
                 <div className="product-grid slider-wrapper">
-                        <Product4box></Product4box>
+                  <Product4box></Product4box>
                 </div>
               </div>
               <div className="sidebar left left-content col-lg-3 col-md-3">

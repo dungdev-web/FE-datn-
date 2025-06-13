@@ -6,14 +6,44 @@ import Link from "next/link";
 export default function Account() {
   return (
     <>
-      <main style={{ marginTop: "182px", marginBottom: "20px" }}>
+      <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Thôn tin tài khoản</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <Link href="/" title="Trang chủ">
+                <span>Trang chủ</span>
+              </Link>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Thôn tin tài khoản</span>
+              </strong>
+            </li>
+            <li></li>
+          </ul>
+        </div>
+      </section>
+      <main style={{ marginBottom: "20px" }}>
         <div className="container1">
           <div className="row">
             <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">
               <div className="block-account">
                 <h5 className="title-account">Trang tài khoản</h5>
                 <p>
-                  Xin chào, <span>cccc</span>&nbsp;!
+                  Xin chào, <span>Lê Chí Bảo</span>&nbsp;!
                 </p>
                 <ul>
                   <li>
@@ -80,7 +110,7 @@ export default function Account() {
                     }}
                   />
                   <div>
-                    <h3 style={{ margin: "0 0 5px 0", color: "#333" }}>cccc</h3>
+                    <h3 style={{ margin: "0 0 5px 0", color: "#333" }}>Lê Chí Bảo</h3>
                     <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>
                       dungldps41484@gmail.com
                     </p>
@@ -152,7 +182,7 @@ export default function Account() {
 
                 <div style={{ marginBottom: "15px" }}>
                   <strong style={{ color: "#555" }}>Họ tên:</strong>
-                  <span style={{ marginLeft: "10px" }}>cccc</span>
+                  <span style={{ marginLeft: "10px" }}>Lê Chí Bảo</span>
                 </div>
 
                 <div style={{ marginBottom: "15px" }}>
