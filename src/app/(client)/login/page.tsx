@@ -1,8 +1,22 @@
+"use client";
 import "../css/login.css";
-export default function Login(){
-    return(
-        <>
-        <div className="intro-banner"></div>
+import { loginUser } from "@/services/authService";
+import { useState } from "react";
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      const res = await loginUser({ email, password });
+      alert("Đăng nhập thành công: " + res.user.username);
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+  return (
+    <>
+      <div className="intro-banner"></div>
       <main>
         <div className="auth-container">
           <img
@@ -16,19 +30,31 @@ export default function Login(){
               <p>Hãy đăng nhập để được hưởng đặc quyền riêng dành cho bạn</p>
             </div>
             <form action="" id="formLogin">
-              <input type="email" placeholder="Tài Khoản" id="email" required />
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                placeholder="Tài Khoản"
+                id="email"
+                required
+              />
 
               <input
                 type="password"
                 placeholder="Mật Khẩu"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
 
               <div className="remember-me">
-                <input type="checkbox" />Lưu tài khoản
+                <input type="checkbox" />
+                Lưu tài khoản
               </div>
-              <button type="submit">Đăng nhập ngay</button>
+              <button onClick={handleLogin} type="submit">
+                Đăng nhập ngay
+              </button>
             </form>
             <br />
             <h5>Quên mật khẩu?</h5>
@@ -46,6 +72,6 @@ export default function Login(){
           </div>
         </div>
       </main>
-      </>
-    )
+    </>
+  );
 }
