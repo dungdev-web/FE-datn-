@@ -85,7 +85,7 @@ export default function Home() {
 
   return (
     <div>
-      <div className="banner relative">
+      <div className="banner-home relative">
         <Swiper
           modules={[Autoplay]}
           autoplay={{ delay: 3000 }}
@@ -94,30 +94,30 @@ export default function Home() {
           slidesPerView={1}
         >
           <SwiperSlide>
-            <div className="relative w-full h-[650px]">
+            <div className="banner-slider relative w-full h-[650px]">
               <Image
                 src="/images/banner/slider_1.png"
                 alt="Banner 1"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
               />
-              <div className="absolute bottom-32 left-32">
-                <button className="border border-white text-white text-xl font-bold !px-12 !py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
+              <div className="button-banner-left absolute bottom-32 left-32">
+                <button className="border border-white text-white text-xl font-bold px-12 py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
                   Mua ngay
                 </button>
               </div>
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="relative w-full h-[650px]">
+            <div className="banner-slider relative w-full h-[650px]">
               <Image
                 src="/images/banner/slider_2.png"
-                alt="Banner 2"
+               alt="Banner 2"
                 fill
                 style={{ objectFit: "cover", objectPosition: "center" }}
               />
-              <div className="absolute bottom-44 right-44">
-                <button className="border border-white text-white text-xl font-bold !px-12 !py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
+              <div className="button-banner-right absolute bottom-44 right-44">
+                <button className="border border-white text-white text-xl font-bold px-12 py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
                   Mua ngay
                 </button>
               </div>

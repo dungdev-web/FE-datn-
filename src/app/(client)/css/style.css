@@ -377,7 +377,7 @@ nav {
   transition: background-color 0.3s ease-in-out;
 }
 
-.banner {
+.banner{
   /* margin-top: 80px; */
   overflow: hidden;
   /* z-index: 10000; */
@@ -1274,9 +1274,7 @@ input[type="submit"] {
 
 /* responsive */
 @media (min-width: 1200px) {
-  .bread-crumb {
-    margin-top: 160px !important;
-  }
+ 
 
   .slider-wrapper:hover .swiper-button-prev,
   .slider-wrapper:hover .swiper-button-next {

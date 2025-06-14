@@ -695,3 +695,8 @@ input.btn-primary[type="submit"] {
   text-transform: uppercase;
   border-radius: 5px;
 }
+@media (min-width: 768px) {
+  p {
+    margin: 0 0 5px 0;
+  }
+}
