@@ -10,6 +10,7 @@ export default function Login() {
     try {
       const res = await loginUser({ email, password });
       alert("Đăng nhập thành công: " + res.user.username);
+      localStorage.setItem("userId", res.user.userId.toString());
     } catch (err: any) {
       alert(err.message);
     }
