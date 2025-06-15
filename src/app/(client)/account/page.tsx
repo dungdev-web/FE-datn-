@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getInfoUser } from "@/services/authService";
 import { IUser } from "@/types/user";
+import LogoutLink from "../component/log_out";
 export default function Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,13 +74,7 @@ export default function Account() {
                     </p>
                     <ul>
                       <li>
-                        <a
-                          className="title-info"
-                          href="/account/logout"
-                          title="Đăng xuất"
-                        >
-                          Đăng xuất
-                        </a>
+                       <LogoutLink></LogoutLink>
                       </li>
                       <li>
                         <Link className="title-info active " href="/account">

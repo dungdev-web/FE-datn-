@@ -2,15 +2,17 @@
 import "../css/login.css";
 import { loginUser } from "@/services/authService";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-
+  const router = useRouter();
   const handleLogin = async () => {
     try {
-      const res = await loginUser({ email, password });
+      const res = await loginUser({ identifier, password });
       alert("Đăng nhập thành công: " + res.user.username);
       localStorage.setItem("userId", res.user.userId.toString());
+      router.push('/account');
     } catch (err: any) {
       alert(err.message);
     }
@@ -32,9 +34,9 @@ export default function Login() {
             </div>
             <form action="" id="formLogin">
               <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                type="text"
                 placeholder="Tài Khoản"
                 id="email"
                 required

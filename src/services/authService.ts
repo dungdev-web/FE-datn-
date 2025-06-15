@@ -1,8 +1,8 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockUsers, saveMockUsers } from "@/mock/mockUser";
 import { IUser } from "@/types/user";
-import { LoginCredentials } from "@/types/LoginCredentials";
-import { RegisterCredentials } from "@/types/RegisterCredentials";
+import { LoginCredentials } from "@/types/auth";
+import { RegisterCredentials } from "@/types/auth";
 
 
 // --------- LOGIN ---------
@@ -10,10 +10,16 @@ export async function loginUser(credentials: LoginCredentials): Promise<{ token:
   if (IS_MOCK) {
     const users = getMockUsers();
     
-    const user = users.find((u) => u.email === credentials.email);
+    const user = users.find(
+      (u) =>
+        u.email === credentials.identifier ||
+        u.username === credentials.identifier
+    );
+
     if (!user) {
-      throw new Error("Email không tồn tại trong hệ thống");
+      throw new Error("Tài khoản không tồn tại trong hệ thống");
     }
+
 
     if (user.password_hash !== credentials.password) {
       throw new Error("Mật khẩu không đúng");

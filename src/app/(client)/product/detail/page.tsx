@@ -2,7 +2,7 @@
 import "../../css/detail.css";
 import "../../css/style.css";
 
-import Product4box from "@/src/app/(client)/component/product";
+import Product4box from "@/app/(client)/component/product";
 export default function Detail() {
   return (
     <>
