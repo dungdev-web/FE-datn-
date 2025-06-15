@@ -5,7 +5,9 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-column">
+          <Link href={'/'}>
           <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
+          </Link>
           <h2 className="text-center text-xl font-bold text-white mt-2">
             “Đẹp từng bước, chất từng centimet”
           </h2>
