@@ -1,0 +1,328 @@
+import { IS_MOCK, API_BASE_URL } from "@/config/env";
+import { IProduct } from "@/types/product";
+import { getMockProducts, saveMockProducts } from "@/mock/mockProduct";
+type ProductIdentifier = { id: number } | { slug: string };
+
+// Lấy tất cả sản phẩm
+export async function getAllProducts(
+  page = 1,
+  limit = 20
+): Promise<{ data: IProduct[]; total: number }> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    const start = (page - 1) * limit;
+    const pagedData = all.slice(start, start + limit);
+
+    return {
+      data: pagedData,
+      total: all.length,
+    };
+  }
+
+  const res = await fetch(
+    `${API_BASE_URL}/products?page=${page}&limit=${limit}`
+  );
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm từ server.");
+  }
+
+  const json = await res.json();
+  return {
+    data: json.products,
+    total: json.total,
+  };
+}
+//lấy chi tiết sản phẩm = id hoặc slug
+export const getProductDetail = async (
+  identifier: ProductIdentifier
+): Promise<IProduct | undefined> => {
+  if (IS_MOCK) {
+    const products = getMockProducts();
+
+    if ("id" in identifier) {
+      return products.find((p) => p.products_id === identifier.id);
+    }
+
+    if ("slug" in identifier) {
+      return products.find((p) => p.slug === identifier.slug);
+    }
+
+    return undefined;
+  }
+
+  try {
+    let url = "";
+
+    if ("id" in identifier) {
+      url = `${API_BASE_URL}/products/${identifier.id}`;
+    } else if ("slug" in identifier) {
+      url = `${API_BASE_URL}/products/slug/${identifier.slug}`;
+    }
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error("Không thể lấy chi tiết sản phẩm.");
+    }
+
+    const data: IProduct = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi lấy chi tiết sản phẩm:", error);
+    return undefined;
+  }
+};
+
+// Lấy sản phẩm theo slug
+export async function getProductBySlug(
+  slug: string
+): Promise<IProduct | undefined> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.find((p) => p.slug === slug);
+  }
+
+  // Nếu sau này dùng API thật, có thể sửa endpoint như sau:
+  const res = await fetch(`${API_BASE_URL}/products/slug/${slug}`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy sản phẩm theo slug.");
+  }
+
+  return await res.json();
+}
+// Lấy sản phẩm mới nhất
+export async function getNewestProducts(): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.sort((a, b) => b.products_id - a.products_id);
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm.");
+  }
+
+  const data: IProduct[] = await res.json();
+  return data.sort((a, b) => b.products_id - a.products_id);
+}
+// Lấy sản phẩm nổi bật
+export async function getFeaturedProducts(): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+
+    return all.filter((product) => {
+      const reviews = product.reviews || [];
+      const avgRating =
+        product.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+        product.reviews.length;
+
+      return reviews.length >= 5 && avgRating >= 4;
+    });
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm.");
+  }
+
+  const data: IProduct[] = await res.json();
+
+  return data.filter((product) => {
+    const reviews = product.reviews || [];
+    const avgRating =
+      product.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+      product.reviews.length;
+
+    return reviews.length >= 5 && avgRating >= 4;
+  });
+}
+//Lấy sản phẩm theo giới tính nam
+export async function getMenShoes(): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+
+    return all.filter((product) => {
+      const gender = product.gender.name?.toLowerCase();
+      const categoryName = product.category?.name?.toLowerCase();
+
+      return (
+        gender === "male" ||
+        gender === "unisex" ||
+        categoryName?.includes("nam")
+      );
+    });
+  }
+
+  // Nếu dùng API thật
+  const res = await fetch(`${API_BASE_URL}/products?gender=male_or_unisex`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách giày nam.");
+  }
+
+  const data: IProduct[] = await res.json();
+  return data;
+}
+//lấy sản phẩm theo giới tính nữ
+export async function getFemaleProducts(): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.filter(
+      (product) =>
+        product.category?.name?.toLowerCase().includes("nữ") ||
+        product.category?.slug?.toLowerCase().includes("nu")
+    );
+  }
+
+  // API thực tế (nếu dùng sau)
+  const res = await fetch(`${API_BASE_URL}/products`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm.");
+  }
+  const data: IProduct[] = await res.json();
+  return data.filter(
+    (product) =>
+      product.category?.name?.toLowerCase().includes("nữ") ||
+      product.category?.slug?.toLowerCase().includes("nu")
+  );
+}
+
+//Lấy sản phẩm theo catename
+export async function getProductsByCategory(
+  categoryName: string
+): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.filter(
+      (product) =>
+        product.category?.name?.toLowerCase() === categoryName.toLowerCase() ||
+        product.category?.slug?.toLowerCase() === categoryName.toLowerCase()
+    );
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm.");
+  }
+  const data: IProduct[] = await res.json();
+  return data.filter(
+    (product) =>
+      product.category?.name?.toLowerCase() === categoryName.toLowerCase() ||
+      product.category?.slug?.toLowerCase() === categoryName.toLowerCase()
+  );
+}
+
+// Lấy sản phẩm có deal
+export async function getDealProducts(): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.filter((p) => p.sale_price < p.price && p.sale_price > 0);
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products?deal=true`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy sản phẩm đang deal.");
+  }
+
+  const data: IProduct[] = await res.json();
+  return data;
+}
+// Lấy tất cả sản phẩm thuộc cùng category
+export async function getRelatedProducts(
+  categoryId: number
+): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.filter((p) => p.category.categories_id === categoryId);
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products?category=${categoryId}`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy sản phẩm cùng loại.");
+  }
+
+  const data: IProduct[] = await res.json();
+  return data;
+}
+
+// Thêm sản phẩm mới
+export async function addProduct(newProduct: IProduct): Promise<IProduct> {
+  if (IS_MOCK) {
+    const current = getMockProducts();
+    const updated = [...current, newProduct];
+    saveMockProducts(updated);
+    return newProduct;
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newProduct),
+  });
+
+  if (!res.ok) {
+    throw new Error("Không thể thêm sản phẩm.");
+  }
+
+  return await res.json();
+}
+
+// Lấy 1 sản phẩm theo ID
+export async function getProductById(
+  id: number
+): Promise<IProduct | undefined> {
+  if (IS_MOCK) {
+    const all = getMockProducts();
+    return all.find((p) => p.products_id === id);
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products/${id}`);
+  if (!res.ok) {
+    throw new Error("Không thể lấy sản phẩm.");
+  }
+
+  return await res.json();
+}
+
+// Cập nhật sản phẩm
+export async function updateProduct(
+  id: number,
+  updated: Partial<IProduct>
+): Promise<IProduct> {
+  if (IS_MOCK) {
+    const current = getMockProducts();
+    const index = current.findIndex((p) => p.products_id === id);
+    if (index === -1) throw new Error("Sản phẩm không tồn tại.");
+    current[index] = { ...current[index], ...updated };
+    saveMockProducts(current);
+    return current[index];
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updated),
+  });
+
+  if (!res.ok) {
+    throw new Error("Không thể cập nhật sản phẩm.");
+  }
+
+  return await res.json();
+}
+
+// Xoá sản phẩm
+export async function deleteProduct(id: number): Promise<void> {
+  if (IS_MOCK) {
+    const current = getMockProducts().filter((p) => p.products_id !== id);
+    saveMockProducts(current);
+    return;
+  }
+
+  const res = await fetch(`${API_BASE_URL}/products/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    throw new Error("Không thể xoá sản phẩm.");
+  }
+}
