@@ -1,0 +1,56 @@
+export interface IProduct {
+  products_id: number;
+  name: string;
+  slug: string;
+  description: string;
+  short_desc: string;
+  price: number;
+  sale_price: number;
+  status: string;
+
+  category: {
+    categories_id: number;
+    name: string;
+    slug: string;
+  };
+
+  brand: {
+    brand_id: number;
+    name: string;
+    slug: string;
+    logo_url: string;
+  };
+
+  gender: {
+    id: number;
+    name: string;
+  };
+
+  images: {
+    images_id: number;
+    url: string;
+    alt_text: string;
+    type: string;
+  }[];
+  reviews: {
+    product_reviews_id: number;
+    rating:string;
+    content:string;
+  }[];
+  variants: {
+    product_variants_id: number;
+    sku: string;
+    image: string;
+    stock_quantity: number;
+    sale_price: number;
+    color: {
+      id: number;
+      code_color: string;
+      name_color: string;
+    };
+    size: {
+      id: number;
+      number_size: string;
+    };
+  }[];
+}
