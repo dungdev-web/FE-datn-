@@ -554,7 +554,9 @@ nav {
   flex: 1;
   min-width: 300px;
 }
-
+.logo-footer{
+ margin: auto;
+}
 .footer-column h3 {
   font-size: 24px;
   text-transform: uppercase;
