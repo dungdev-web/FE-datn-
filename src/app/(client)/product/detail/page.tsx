@@ -1,10 +1,22 @@
 "use client";
 import "../../css/detail.css";
-import "../../css/product.css";
 import "../../css/style.css";
-
-import Product4box from "@/src/app/(client)/component/product";
+import { IProduct } from "@/types/product";
+import RelatedProductList from "../../component/RelatedProductList";
+import { useState,useEffect } from "react";
+import { useParams } from "next/navigation";
+import { getMockProducts } from "@/mock/mockProduct";
 export default function Detail() {
+  const [product, setProduct] = useState<IProduct | null>(null);
+  const { slug } = useParams();
+
+  useEffect(() => {
+    const all = getMockProducts();
+    const found = all.find((p) => p.slug === slug);
+    setProduct(found || null);
+  }, [slug]);
+    console.log("product in detail page", product);
+
   return (
     <>
       <section
@@ -346,9 +358,10 @@ export default function Detail() {
                     </h2>
                   </div>
                 </div>
-                <div className="product-grid slider-wrapper">
-                  <Product4box></Product4box>
-                </div>
+                
+              <RelatedProductList categoryId={10} />
+
+
               </div>
               <div className="sidebar left left-content col-lg-3 col-md-3">
                 <div className="khuyen-mai">

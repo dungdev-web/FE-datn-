@@ -823,7 +823,6 @@
     </div>
   </div>
 </div>
-
 <div id="updateStatusModal" class="modal-overlay hidden">
   <div class="modal-box slide-in">
     <div class="modal-header">
@@ -868,25 +867,8 @@
     </div>
   </div>
 </div>
-
-
-
-
     </div>
-
 </body>
-<script>
-    const submenuToggles = document.querySelectorAll('.has-submenu > a');
-
-    submenuToggles.forEach(toggle => {
-        toggle.addEventListener('click', function (e) {
-            e.preventDefault();
-            const parent = this.parentElement;
-            parent.classList.toggle('open');
-        });
-    });
-
-</script>
 <script>
     function openModal(id) {
         document.getElementById(id).classList.remove("hidden");
@@ -942,5 +924,16 @@
     });
   });
 </script>
+<script>
+    const submenuToggles = document.querySelectorAll('.has-submenu > a');
 
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+
+</script>
 </html>

@@ -1,0 +1,278 @@
+.product-list {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .product-list h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+            /* Căn giữa tiêu đề */
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .actions .btn {
+            padding: 8px 12px;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .product-table th {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            /* Căn giữa cho các ô trong bảng */
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .product-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        .product-table td,
+        .product-table th {
+            white-space: nowrap;
+            /* Không cho xuống dòng */
+            overflow: hidden;
+            /* Ẩn phần dư */
+            text-overflow: ellipsis;
+            /* Hiện dấu ... */
+            max-width: 150px;
+            /* Tuỳ chỉnh theo ý bạn */
+        }
+
+        .product-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .product-img {
+            width: 60px;
+            height: auto;
+            border-radius: 4px;
+            transition: transform 0.3s ease;
+            /* Không căn giữa ảnh */
+        }
+
+        .product-img:hover {
+            transform: scale(1.05);
+        }
+
+        .edit-icon,
+        .delete-icon {
+            cursor: pointer;
+            margin: 0 5px;
+            color: #555;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .category-tag {
+            display: block;
+            /* Chuyển từ inline-block sang block để hiển thị theo cột */
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            margin: 5px 0;
+            /* Giảm khoảng cách ngang, chỉ giữ khoảng cách dọc */
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            text-align: center;
+            /* Căn giữa chữ ngang */
+            line-height: 24px;
+            /* Căn giữa chữ theo chiều dọc */
+        }
+
+        .category-tag:hover {
+            background-color: #ddd;
+        }
+
+
+        .edit-icon:hover {
+            color: #28a745;
+        }
+
+        .delete-icon:hover {
+            color: #dc3545;
+        }
+
+        .filter-row input,
+        .filter-row select {
+            width: 100%;
+            padding: 6px 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn-add {
+            background-color: #021688;
+        }
+
+        .btn-refresh {
+            background-color: cadetblue;
+        }
+
+        .btn-search {
+            background-color: #4bd963;
+        }
+
+        .btn-export {
+            background-color: orange;
+        }
+
+        th select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+            color: #333;
+            box-sizing: border-box;
+        }
+
+        th select:focus {
+            border-color: #007bff;
+            outline: none;
+            background-color: #f0f8ff;
+        }
+
+        /* Màu nền cho các hàng lẻ */
+        .product-table tr:nth-child(odd) {
+            background-color: #f2f2f2;
+            /* Màu nền cho hàng lẻ */
+        }
+
+        /* Màu nền cho các hàng chẵn */
+        .product-table tr:nth-child(even) {
+            background-color: #ffffff;
+            /* Màu nền cho hàng chẵn */
+        }
+
+        /* Màu nền khi hover vào hàng */    
+
+
+        @media (max-width: 768px) {
+            .product-list {
+                padding: 15px;
+            }
+
+            .product-table th,
+            .product-table td {
+                font-size: 12px;
+                padding: 6px;
+            }
+
+            .product-img {
+                width: 40px;
+            }
+        }
+
+        /* Pagination styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 25px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .page-btn.active {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+        .page-btn[disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Tooltip styles */
+        .tooltip-ellipsis {
+            position: relative;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+            /* Tuỳ chỉnh theo ý bạn */
+            cursor: pointer;
+        }
+
+        /* Tooltip hiển thị khi hover */
+        .tooltip-ellipsis:hover::after {
+            content: attr(data-fulltext);
+            position: absolute;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            top: 100%;
+            left: 0;
+            white-space: normal;
+            z-index: 1000;
+            width: max-content;
+            max-width: 300px;
+            /* Điều chỉnh chiều rộng theo nhu cầu */
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+            /* Hiệu ứng mờ dần */
+        }
+
+        .tooltip-ellipsis:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.3s ease, visibility 0s;
+            /* Hiệu ứng mờ dần khi hover */
+        }

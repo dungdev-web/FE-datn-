@@ -283,7 +283,7 @@ h3 {
 @media (max-width: 480px) {
   .auth-container {
     margin-left: 10%;
-    margin-top: 100px;
+    margin-top: 80px;
     padding: 15px;
   }
 
@@ -309,5 +309,6 @@ h3 {
 
   .form-container .register-link p {
     font-size: 11px;
+    padding: 5px;
   }
 }
