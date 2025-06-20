@@ -1,6 +1,6 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { IProduct } from "@/types/product";
-import { getMockProducts, saveMockProducts } from "@/mock/mockProduct";
+import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 type ProductIdentifier = { id: number } | { slug: string };
 
 // Lấy tất cả sản phẩm
@@ -57,6 +57,8 @@ export const getProductDetail = async (
       url = `${API_BASE_URL}/products/${identifier.id}`;
     } else if ("slug" in identifier) {
       url = `${API_BASE_URL}/products/slug/${identifier.slug}`;
+    } else {
+      throw new Error("Thiếu thông tin identifier");
     }
 
     const res = await fetch(url);
@@ -72,6 +74,7 @@ export const getProductDetail = async (
     return undefined;
   }
 };
+
 
 // Lấy sản phẩm theo slug
 export async function getProductBySlug(

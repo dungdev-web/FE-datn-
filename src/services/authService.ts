@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { getMockUsers, saveMockUsers } from "@/mock/mockUser";
+import { getMockUsers, saveMockUsers } from "@/mocks/mockUser";
 import { IUser } from "@/types/user";
 import { LoginCredentials } from "@/types/auth";
 import { RegisterCredentials } from "@/types/auth";

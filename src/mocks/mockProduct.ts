@@ -281,7 +281,7 @@ const defaultProducts: IProduct[] = [
 function normalizeProduct(p: any): IProduct {
   return {
     ...p,
-    id: p.id ?? p.productId ?? Math.random(), // đảm bảo có id
+    id: p.id ?? p.productId ?? Math.random(),
     name: p.name,
     price: p.price,
     sale_price: p.sale_price,

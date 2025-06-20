@@ -2,20 +2,57 @@
 import "../../css/detail.css";
 import "../../css/style.css";
 import { IProduct } from "@/types/product";
-import RelatedProductList from "../../component/RelatedProductList";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getMockProducts } from "@/mock/mockProduct";
+import { getProductDetail } from "@/services/productService";
+import RelatedProductList from "../../component/RelatedProductList";
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
-  const { slug } = useParams();
+  const [loading, setLoading] = useState(true);
+  const params = useParams();
 
   useEffect(() => {
-    const all = getMockProducts();
-    const found = all.find((p) => p.slug === slug);
-    setProduct(found || null);
-  }, [slug]);
-    console.log("product in detail page", product);
+    const param = params.param;
+
+    if (!param) return;
+
+    // param có thể là string hoặc string[]
+    const paramStr = Array.isArray(param) ? param[0] : param;
+
+    if (typeof paramStr !== "string") return;
+
+    const [idStr, ...slugParts] = paramStr.split("-");
+    const id = Number(idStr);
+    const slug = slugParts.join("-");
+
+    if (isNaN(id) || !slug) {
+      console.warn("URL không hợp lệ:", paramStr);
+      setProduct(null);
+      setLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      const found = await getProductDetail({ id, slug });
+      setProduct(found || null);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [params]);
+
+  if (loading) {
+    return <div className="text-center py-10">Đang tải sản phẩm...</div>;
+  }
+
+  if (!product) {
+    return (
+      <div className="text-center py-10 text-red-500">
+        Không tìm thấy sản phẩm.
+      </div>
+    );
+  }
 
   return (
     <>
@@ -83,8 +120,11 @@ export default function Detail() {
                               <img
                                 id="zoom_01"
                                 className="img-responsive center-block"
-                                src="//bizweb.dktcdn.net/thumb/grande/100/505/077/products/layer12137b41646ee49b99d29fc01.jpg"
-                                alt="giay-nam-men-s-air-jordan-2-retro"
+                                src={
+                                  product.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={product.name}
                                 style={{ position: "absolute" }}
                               />
                             </div>
@@ -358,10 +398,8 @@ export default function Detail() {
                     </h2>
                   </div>
                 </div>
-                
-              <RelatedProductList categoryId={10} />
 
-
+                <RelatedProductList categoryId={10} />
               </div>
               <div className="sidebar left left-content col-lg-3 col-md-3">
                 <div className="khuyen-mai">
@@ -383,7 +421,9 @@ export default function Detail() {
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai1.png?1730865096645"
                           alt="Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng."
                         />
-                        Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
+                        <p>
+                          Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
+                        </p>
                       </li>
                       <li>
                         <img
