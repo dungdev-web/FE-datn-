@@ -3,6 +3,7 @@ import "../css/login.css";
 import { loginUser } from "@/services/authService";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -69,7 +70,7 @@ export default function Login() {
             <div className="register-link">
               <p>
                 Bạn chưa có tài khoản the light?
-                <a href="/register.html">Đăng ký ngay</a>
+                <Link href="/register.html">Đăng ký ngay</Link>
               </p>
             </div>
           </div>
