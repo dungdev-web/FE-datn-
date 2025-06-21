@@ -40,7 +40,19 @@ const defaultProducts: IProduct[] = [
       },
       {
         images_id: 102,
-        url: "/images/products/chaybo/ConverseRunStarMotion_side.webp",
+        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        alt_text: "Converse Run Star Motion bên hông",
+        type: "gallery",
+      },
+      {
+        images_id: 103,
+        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        alt_text: "Converse Run Star Motion bên hông",
+        type: "gallery",
+      },
+      {
+        images_id: 104,
+        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
         alt_text: "Converse Run Star Motion bên hông",
         type: "gallery",
       },

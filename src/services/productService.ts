@@ -74,7 +74,21 @@ export const getProductDetail = async (
     return undefined;
   }
 };
+// Lấy sản phẩm bán chạy dựa trên số lượng review hoặc random sold_count
+export function getBestSellingMockProducts(top = 3): IProduct[] {
+  const products = getMockProducts();
 
+  // Giả lập sold_count từ số lượng review hoặc random nếu không có review
+  const productsWithSold = products.map(p => ({
+    ...p,
+    sold_count: (p.reviews?.length || 0) * 10 + Math.floor(Math.random() * 20)
+  }));
+
+  // Sắp xếp giảm dần theo sold_count
+  return productsWithSold
+    .sort((a, b) => b.sold_count - a.sold_count)
+    .slice(0, top);
+}
 
 // Lấy sản phẩm theo slug
 export async function getProductBySlug(
