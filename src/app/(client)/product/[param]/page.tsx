@@ -4,13 +4,17 @@ import "../../css/style.css";
 import { IProduct } from "@/types/product";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getProductDetail } from "@/services/productService";
+import {
+  getProductDetail,
+  getBestSellingMockProducts,
+} from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const [activeTab, setActiveTab] = useState("tab-1");
+  const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
     const param = params.param;
@@ -42,6 +46,11 @@ export default function Detail() {
 
     fetchData();
   }, [params]);
+  useEffect(() => {
+    // Gọi mock function và set state
+    const data = getBestSellingMockProducts(5);
+    setBestSellProducts(data);
+  }, []);
 
   if (loading) {
     return <div className="text-center py-10">Đang tải sản phẩm...</div>;
@@ -714,274 +723,58 @@ export default function Detail() {
                   </div>
 
                   <div className="list-product-slidebar">
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 29% </span>
-                        </div>
-                        <a
-                          href="/giay-nam-jordan-max-aura"
-                          title="Giày Nam Jordan Max Aura"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer18cde9e508ba14790a6210491.jpg?v=1702350243257"
-                            alt="Giày Nam Jordan Max Aura"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
+                    {bestsellproducts.map((product) => (
+                      <div className="list-item" key={product.products_id}>
+                        <div className="thumb-imagtes">
+                          <div className="sale-flash">
+                            <span>
+                              -{Math.round(
+                                100 - (product.sale_price / product.price) * 100
+                              )}
+                              %
+                            </span>
+                          </div>
                           <a
-                            href="/giay-nam-jordan-max-aura"
-                            title="Giày Nam Jordan Max Aura"
+                            href={`/san-pham/${product.slug}`}
+                            title={product.name}
                           >
-                            Giày Nam Jordan Max Aura
+                            <img
+                              src={product.images?.[0]?.url || "/default.jpg"}
+                              alt={
+                                product.images?.[0]?.alt_text || product.name
+                              }
+                            />
                           </a>
-                        </h3>
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              3.200.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              4.500.000₫
-                            </span>
-                          </div>
                         </div>
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845406"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 29% </span>
-                        </div>
-                        <a
-                          href="/giay-nam-nike-air-max"
-                          title="Giày Nam Nike Air Max"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                            alt="Giày Nam Nike Air Max"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/giay-nam-nike-air-max"
-                            title="Giày Nam Nike Air Max"
-                          >
-                            Giày Nam Nike Air Max
-                          </a>
-                        </h3>
+                        <div className="product-info-text">
+                          <h3 className="product-name">
+                            <a
+                              href={`/san-pham/${product.slug}`}
+                              title={product.name}
+                            >
+                              {product.name}
+                            </a>
+                          </h3>
+                          <div className="price-box clearfix">
+                            <div className="special-price f-left">
+                              <span className="price product-price">
+                                {product.sale_price.toLocaleString()}₫
+                              </span>
+                            </div>
 
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              3.200.000₫
-                            </span>
+                            <div className="old-price">
+                              <span className="price product-price-old">
+                                {product.price.toLocaleString()}₫
+                              </span>
+                            </div>
                           </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              4.500.000₫
-                            </span>
-                          </div>
+                          <div
+                            className="bizweb-product-reviews-badge"
+                            data-id={product.products_id}
+                          ></div>
                         </div>
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845403"
-                        ></div>
                       </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 33% </span>
-                        </div>
-                        <a
-                          href="/nike-air-max-97-se"
-                          title="Nike Air Max 97 SE"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer112344afd2dbe4842b4562af5.jpg?v=1702350247140"
-                            alt="Nike Air Max 97 SE"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/nike-air-max-97-se"
-                            title="Nike Air Max 97 SE"
-                          >
-                            Nike Air Max 97 SE
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              2.800.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              4.200.000₫
-                            </span>
-                          </div>
-                        </div>
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845409"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 49% </span>
-                        </div>
-
-                        <a
-                          href="/neumel-graybrown-snow"
-                          title="Neumel GRAYBROWN Snow"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer16fd25363242141afa734215a.jpg?v=1702350246057"
-                            alt="Neumel GRAYBROWN Snow"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/neumel-graybrown-snow"
-                            title="Neumel GRAYBROWN Snow"
-                          >
-                            Neumel GRAYBROWN Snow
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              1.800.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              3.500.000₫
-                            </span>
-                          </div>
-                        </div>
-
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845408"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 31% </span>
-                        </div>
-                        <a
-                          href="/luka-doncic-x-air-jordan"
-                          title="Luka Doncic X Air Jordan"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer151495a72fe124744a7784900.jpg?v=1702350244227"
-                            alt="Luka Doncic X Air Jordan"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/luka-doncic-x-air-jordan"
-                            title="Luka Doncic X Air Jordan"
-                          >
-                            Luka Doncic X Air Jordan
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              3.800.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              5.500.000₫
-                            </span>
-                          </div>
-                        </div>
-
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845407"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 24% </span>
-                        </div>
-
-                        <a
-                          href="/converse-run-star-motion"
-                          title="Converse Run Star Motion"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer14b0efb7df8bd4723b20e7237.jpg?v=1702350242283"
-                            alt="Converse Run Star Motion"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/converse-run-star-motion"
-                            title="Converse Run Star Motion"
-                          >
-                            Converse Run Star Motion
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              4.200.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              5.500.000₫
-                            </span>
-                          </div>
-                        </div>
-
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845404"
-                        ></div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
