@@ -137,7 +137,7 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
     });
   }
 
-  const res = await fetch(`${API_BASE_URL}/products`);
+  const res = await fetch(`${API_BASE_URL}/products/featured`);
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm.");
   }
