@@ -225,7 +225,7 @@ export default function Home({ product }: { product: IProduct }) {
 
         <div className="look-book-main">
           <div className="look-book-text">
-            <h3>LOOKBOOK</h3>
+           
             <h2>GIÀY CHẠY BỘ BÁN NHIỀU NHẤT</h2>
             <p>
               Bước vào thế giới của sự thoải mái và phong cách vô song với những
