@@ -1,22 +1,46 @@
-"use client"
-import '@/src/app/admin/css/voucher_admin.css'
-import Link from 'next/link';
+"use client";
+import "@/src/app/admin/css/voucher_admin.css";
+import Link from "next/link";
+import { useState } from "react";
+
 export default function Voucher() {
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   return (
     <main className="main-content">
       <div className="promotion-list">
         <h2>Danh sách mã giảm giá</h2>
 
         <div className="promotion-actions">
-          <Link href={'/admin/voucher/add'} className="btn btn-add">
+          <Link href={"/admin/voucher/add"} className="btn btn-add">
             <i className="fa-solid fa-plus"></i> Thêm mới mã giảm giá
           </Link>
           <button className="btn btn-refresh">
             <i className="fa-solid fa-rotate-right"></i> Refresh
           </button>
-          <button className="btn btn-search">
-            <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-          </button>
+          <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+            {isSearching ? (
+              <input
+                type="text"
+                className="search-input"
+                autoFocus
+                placeholder="Nhập từ khóa..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onBlur={() => {
+                  if (searchText === "") setIsSearching(false);
+                }}
+              />
+            ) : (
+              <button
+                className="btn btn-search"
+                onClick={() => setIsSearching(true)}
+              >
+                <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+              </button>
+            )}
+          </div>
         </div>
 
         <table className="promotion-table">
@@ -35,6 +59,7 @@ export default function Voucher() {
               <th><input type="text" placeholder="Lọc mã..." /></th>
               <th><input type="text" placeholder="Lọc loại..." /></th>
                <th>
+
                 <select>
                   <option value="">Tất cả</option>
                   <option value="true">Kích hoạt</option>
@@ -63,11 +88,12 @@ export default function Voucher() {
               <td>5</td>
               <td>5</td>
               <td>
-                <Link href={'/admin/voucher/edit'}><i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i></Link>
+                <Link href={"/admin/voucher/edit"}>
+                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                </Link>
                 <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
               </td>
             </tr>
-            
           </tbody>
         </table>
 

@@ -7,6 +7,8 @@ export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [orderStatus, setOrderStatus] = useState("Chờ xác nhận");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
 
   const handleCloseModal = (modal) => {
     if (modal === "view") setIsViewModalOpen(false);
@@ -30,9 +32,28 @@ export default function OrderPage() {
           <h2>Danh sách đơn hàng</h2>
 
           <div className="actions">
-            <button className="btn btn-search">
-              <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-            </button>
+            <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+              {isSearching ? (
+                <input
+                  type="text"
+                  className="search-input"
+                  autoFocus
+                  placeholder="Nhập từ khóa..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onBlur={() => {
+                    if (searchText === "") setIsSearching(false);
+                  }}
+                />
+              ) : (
+                <button
+                  className="btn btn-search"
+                  onClick={() => setIsSearching(true)}
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+                </button>
+              )}
+            </div>
             <button className="btn btn-refresh">
               <i className="fa-solid fa-rotate-right"></i> Refresh
             </button>
@@ -144,7 +165,7 @@ export default function OrderPage() {
                 <td>0901234567</td>
                 <td>
                   <span className="status-label status-delivered">
-                  Đã hoàn thành
+                    Đã hoàn thành
                   </span>
                 </td>
                 <td>
@@ -214,14 +235,12 @@ export default function OrderPage() {
                   ></i>
                 </td>
               </tr>
-                <tr>
+              <tr>
                 <td>ORD10001</td>
                 <td>Nguyễn Văn A</td>
                 <td>0901234567</td>
                 <td>
-                  <span className="status-label status-returned">
-                    Hoàn trả
-                  </span>
+                  <span className="status-label status-returned">Hoàn trả</span>
                 </td>
                 <td>
                   <span className="category-tag">Giày thể thao</span>

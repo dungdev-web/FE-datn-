@@ -1,7 +1,12 @@
 "use client";
 import "@/src/app/admin/css/product_admin.css";
 import Link from "next/link";
+import { useState } from "react";
+
 export default function Products() {
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   return (
     <main className="main-content">
       {/* sản phẩm ở đây */}
@@ -9,12 +14,32 @@ export default function Products() {
         <h2>Danh sách sản phẩm</h2>
 
         <div className="actions">
-          <Link href={'/admin/products/add'} className="btn btn-add">
+          <Link href={"/admin/products/add"} className="btn btn-add">
             <i className="fa-solid fa-plus"></i> Thêm mới sản phẩm
           </Link>
-          <button className="btn btn-search">
-            <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-          </button>
+          <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+            {isSearching ? (
+              <input
+                type="text"
+                className="search-input"
+                autoFocus
+                placeholder="Nhập từ khóa..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                onBlur={() => {
+                  if (searchText === "") setIsSearching(false);
+                }}
+              />
+            ) : (
+              <button
+                className="btn btn-search"
+                onClick={() => setIsSearching(true)}
+              >
+                <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+              </button>
+            )}
+          </div>
+
           <button className="btn btn-refresh">
             <i className="fa-solid fa-rotate-right"></i> Refresh
           </button>
@@ -39,8 +64,12 @@ export default function Products() {
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">
-              <th><input type="text" placeholder="Lọc mã..." /></th>
-              <th><input type="text" placeholder="Lọc tên..." /></th>
+              <th>
+                <input type="text" placeholder="Lọc mã..." />
+              </th>
+              <th>
+                <input type="text" placeholder="Lọc tên..." />
+              </th>
               <th></th>
               <th>
                 <select>
