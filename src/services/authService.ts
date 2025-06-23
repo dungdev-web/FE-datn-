@@ -6,23 +6,23 @@ import { RegisterCredentials } from "@/types/auth";
 
 // --------- LOGIN ---------
 export async function loginUser(
-  credentials: LoginCredentials
+  credentialss: LoginCredentials
 ): Promise<{ token: string; user: IUser }> {
   if (IS_MOCK) {
     const users = getMockUsers();
 
     const user = users.find(
       (u) =>
-        u.email === credentials.usernameOrEmail ||
-        u.name === credentials.usernameOrEmail
+        u.email === credentialss.usernameOrEmail ||
+        u.name === credentialss.usernameOrEmail
     );
 
     if (!user) {
       throw new Error("Tài khoản không tồn tại trong hệ thống");
     }
-    console.log("usernameOrEmail nhận được:", credentials.usernameOrEmail);
+    console.log("usernameOrEmail nhận được:", credentialss.usernameOrEmail);
 
-    if (user.password_hash !== credentials.password) {
+    if (user.password_hash !== credentialss.password) {
       throw new Error("Mật khẩu không đúng");
     }
 
@@ -31,7 +31,7 @@ export async function loginUser(
   const res = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentials),
+    body: JSON.stringify(credentialss),
     credentials: 'include' 
   });
   const data = await res.json();
@@ -43,6 +43,22 @@ export async function loginUser(
 
   return data;
 }
+export async function checkToken(): Promise<{ user: IUser } | null> {
+  const res = await fetch(`${API_BASE_URL}/check-token`, {
+    method: 'GET',
+    credentials: 'include'
+  });
+
+  if (!res.ok) {
+    console.error("Token không hợp lệ hoặc lỗi");
+    return null;
+  }
+
+  const data = await res.json();
+  return data;
+}
+
+
 // --------- REGISTER ---------
 export async function registerUser(
   formData: RegisterCredentials

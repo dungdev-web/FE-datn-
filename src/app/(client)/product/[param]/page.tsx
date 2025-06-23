@@ -41,11 +41,13 @@ export default function Detail() {
 
     fetchData();
   }, [params]);
-
   useEffect(() => {
-    // Gọi mock function và set state
-    const data = getBestSellingMockProducts(5);
-    setBestSellProducts(data);
+    const fetchData = async () => {
+      const data = await getBestSellingMockProducts(5);
+      setBestSellProducts(data);
+    };
+
+    fetchData();
   }, []);
 
   if (loading) {
@@ -592,8 +594,9 @@ export default function Detail() {
                   </div>
                   <div className="content">
                     <ul>
-                      <li>
+                      <li className="!flex gap-[10px]">
                         <img
+                          className="!h-[20px]"
                           width="20"
                           height="20"
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai1.png?1730865096645"
@@ -603,8 +606,9 @@ export default function Detail() {
                           Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
                         </p>
                       </li>
-                      <li>
+                      <li className="!flex gap-[10px]">
                         <img
+                          className="!h-[20px]"
                           width="20"
                           height="20"
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai2.png?1730865096645"
@@ -612,8 +616,9 @@ export default function Detail() {
                         />
                         Giảm giá 10% khi mua từ 5 sản phẩm trở lên.
                       </li>
-                      <li>
+                      <li className="!flex gap-[10px]">
                         <img
+                          className="!h-[20px]"
                           width="20"
                           height="20"
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai3.png?1730865096645"
