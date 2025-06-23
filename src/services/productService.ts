@@ -39,22 +39,26 @@ export const getProductDetail = async (
   if (IS_MOCK) {
     const products = getMockProducts();
 
-    if ("id" in identifier && "slug" in identifier) {
-      return products.find(
-        (p) => p.products_id === identifier.id && p.slug === identifier.slug
-      );
+    if ("id" in identifier) {
+      return products.find(p => p.products_id === identifier.id);
+    }
+    if ("slug" in identifier) {
+      return products.find(p => p.slug === identifier.slug);
     }
 
     return undefined;
   }
 
   try {
-    if (!("id" in identifier) || !("slug" in identifier)) {
-      throw new Error("Thiếu thông tin identifier");
+    let url = "";
+    
+    if ("id" in identifier && identifier.id) {
+      url = `${API_BASE_URL}/product/products/${identifier.id}`;
+    } else if ("slug" in identifier && identifier.slug) {
+      url = `${API_BASE_URL}/product/products/slug/${identifier.slug}`;
+    } else {
+      throw new Error("Thiếu id hoặc slug");
     }
-
-    // 👉 Gọi API đúng với backend route hiện tại
-    const url = `${API_BASE_URL}/product/products/${identifier.id}-${identifier.slug}`;
 
     const res = await fetch(url);
 
@@ -64,11 +68,13 @@ export const getProductDetail = async (
 
     const data: IProduct = await res.json();
     return data;
+
   } catch (error) {
     console.error("Lỗi khi lấy chi tiết sản phẩm:", error);
     return undefined;
   }
 };
+
 
 // Lấy sản phẩm bán chạy dựa trên số lượng review hoặc random sold_count
 export function getBestSellingMockProducts(top = 3): IProduct[] {

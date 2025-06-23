@@ -5,6 +5,7 @@ import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
 import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
+import LinkWithLoader from "./LinkContext";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -225,13 +226,13 @@ export default function Header() {
           <div className="menu-nav">
             <ul>
               <li>
-                <Link href="/">Trang Chủ</Link>
+                <LinkWithLoader href="/">Trang Chủ</LinkWithLoader>
               </li>
               <li>
-                <Link href="/about">Giới thiệu</Link>
+                <LinkWithLoader href="/about">Giới thiệu</LinkWithLoader>
               </li>
               <li className="has-mega-menu" ref={menuRef}>
-                <Link href="/product">Sản phẩm</Link>
+                <LinkWithLoader href="/product">Sản phẩm</LinkWithLoader>
                 <div
                   className="mega-menu"
                   ref={megaMenuRef}
@@ -265,13 +266,13 @@ export default function Header() {
               </li>
 
               <li>
-                <Link href="/blog">Tin tức</Link>
+                <LinkWithLoader href="/blog">Tin tức</LinkWithLoader>
               </li>
               <li>
-                <Link href="/contact">Liên hệ</Link>
+                <LinkWithLoader href="/contact">Liên hệ</LinkWithLoader>
               </li>
               <li>
-                <Link href="/account">Tài khoản</Link>
+                <LinkWithLoader href="/account">Tài khoản</LinkWithLoader>
               </li>
             </ul>
             <div className="seach-nav">

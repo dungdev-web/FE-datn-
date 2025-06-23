@@ -18,34 +18,30 @@ export default function Detail() {
 
   useEffect(() => {
     const param = params.param;
-
     if (!param) return;
-
-    // param có thể là string hoặc string[]
     const paramStr = Array.isArray(param) ? param[0] : param;
-
     if (typeof paramStr !== "string") return;
-
-    const [idStr, ...slugParts] = paramStr.split("-");
-    const id = Number(idStr);
-    const slug = slugParts.join("-");
-
-    if (isNaN(id) || !slug) {
-      console.warn("URL không hợp lệ:", paramStr);
-      setProduct(null);
-      setLoading(false);
-      return;
-    }
 
     const fetchData = async () => {
       setLoading(true);
-      const found = await getProductDetail({ id, slug });
+
+      let found = null;
+
+      if (!isNaN(Number(paramStr))) {
+        // URL dạng id
+        found = await getProductDetail({ id: Number(paramStr) });
+      } else {
+        // URL dạng slug
+        found = await getProductDetail({ slug: paramStr });
+      }
+
       setProduct(found || null);
       setLoading(false);
     };
 
     fetchData();
   }, [params]);
+
   useEffect(() => {
     // Gọi mock function và set state
     const data = getBestSellingMockProducts(5);
@@ -728,7 +724,8 @@ export default function Detail() {
                         <div className="thumb-imagtes">
                           <div className="sale-flash">
                             <span>
-                              -{Math.round(
+                              -
+                              {Math.round(
                                 100 - (product.sale_price / product.price) * 100
                               )}
                               %
