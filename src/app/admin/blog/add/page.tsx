@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import "quill/dist/quill.snow.css";
 import "filepond/dist/filepond.min.css";
 import "@yaireo/tagify/dist/tagify.css";
-import "../../css/css.css";
-import "../../css/dashboard.css";
 import "../../css/blog_add.css";
 
 export default function Blog_View() {
@@ -76,7 +74,7 @@ export default function Blog_View() {
         <div className="flex !flex-row gap-[20px]">
           <div className="w-1/2">
             <div className="!mb-[12px]">
-              <label className="form-labels !mb-[8px] !inline-block ">Tên bài viết</label>
+              <label className="block text-lg/6 font-medium text-gray-900 !mb-[8px] !inline-block ">Tên bài viết</label>
               <input
                 type="text"
                 id="title"
@@ -85,19 +83,19 @@ export default function Blog_View() {
               />
             </div>
 
-            <div className="mb-3">
-              <label className="form-labels  !mb-[8px] !inline-block">Slug</label>
+            <div className="!mb-[12px]">
+              <label className="block text-lg/6 font-medium text-gray-900  !mb-[8px] !inline-block">Slug</label>
               <input
                 type="text"
                 id="slug"
-                className="form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-controls !w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Slug tự sinh hoặc chỉnh sửa"
               />
             </div>
 
-            <div className="mb-3">
-              <label className="form-labels  !mb-[8px] !inline-block">Danh mục</label>
-              <select className="form-select">
+            <div className="!mb-[12px]">
+              <label className="block text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">Danh mục</label>
+              <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm text-gray-500 bg-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">-- Chọn danh mục --</option>
                 <option value="tech">Công nghệ</option>
                 <option value="life">Đời sống</option>
@@ -105,8 +103,9 @@ export default function Blog_View() {
               </select>
             </div>
 
-            <div className="mb-3">
-              <label className="form-labels  !mb-[8px] !inline-block">Tags</label>
+
+            <div className="!mb-[12px]">
+              <label className="block text-lg/6 font-medium text-gray-900  !mb-[8px] !inline-block">Tags</label>
               <input
                 type="text"
                 id="tags"
@@ -115,36 +114,38 @@ export default function Blog_View() {
               />
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Trạng thái</label>
-              <select className="form-select">
-                <option value="public">Công khai</option>
-                <option value="draft">Nháp</option>
-                <option value="pending">Chờ duyệt</option>
-              </select>
-            </div>
+<div className="!mb-[12px]">
+  <label className="block text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">Trạng thái</label>
+  <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md shadow-sm bg-white text-gray-500 text-base focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <option value="public">Công khai</option>
+    <option value="draft">Nháp</option>
+    <option value="pending">Chờ duyệt</option>
+  </select>
+</div>
           </div>
 
           <div className="w-1/2">
-            <div className="mb-3">
-              <label className="form-label">Tóm tắt</label>
-              <textarea
-                className="form-control"
-                rows={5}
-                placeholder="Tóm tắt ngắn gọn nội dung bài viết"
-              ></textarea>
-            </div>
+<div className="!mb-[12px]">
+  <label className="block text-lg/6 font-medium text-gray-900 !mb-[8px] !inline-block">Tóm tắt</label>
+  <textarea 
+    name="about" 
+    id="about" 
+    rows={5}
+    placeholder="Tóm tắt ngắn gọn nội dung bài viết"
+    className="w-full !px-4 !py-3 border border-gray-300 rounded-md shadow-sm bg-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
+  ></textarea>
+</div>
 
-            <div className="mb-3">
-              <label className="form-label">Ảnh đại diện</label>
+            <div className="!mb-[12px]">
+              <label className="block text-lg/6 font-medium text-gray-900">Ảnh đại diện</label>
               <input type="file" className="filepond" name="image" />
             </div>
           </div>
         </div>
 
-        <div className="mb-3">
-          <label className="form-label">Nội dung bài viết</label>
-          <div id="editor" className="quill-editor"></div>
+        <div className="!mb-[12px]">
+          <label className="block text-lg/6 font-medium text-gray-900">Nội dung bài viết</label>
+          <div id="editor" className="min-h-[300px] border border-gray-300 rounded-md p-4 bg-white"></div>
         </div>
       </form>
     </main>
