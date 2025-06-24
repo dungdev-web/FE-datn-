@@ -1,36 +1,38 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { getMockUsers, saveMockUsers } from "@/mock/mockUser";
+import { getMockUsers, saveMockUsers } from "@/mocks/mockUser";
 import { IUser } from "@/types/user";
 import { LoginCredentials } from "@/types/auth";
 import { RegisterCredentials } from "@/types/auth";
 
-
 // --------- LOGIN ---------
-export async function loginUser(credentials: LoginCredentials): Promise<{ token: string; user: IUser }> {
+export async function loginUser(
+  credentialss: LoginCredentials
+): Promise<{ token: string; user: IUser }> {
   if (IS_MOCK) {
     const users = getMockUsers();
-    
+
     const user = users.find(
       (u) =>
-        u.email === credentials.identifier ||
-        u.username === credentials.identifier
+        u.email === credentialss.usernameOrEmail ||
+        u.name === credentialss.usernameOrEmail
     );
 
     if (!user) {
       throw new Error("Tài khoản không tồn tại trong hệ thống");
     }
+    console.log("usernameOrEmail nhận được:", credentialss.usernameOrEmail);
 
-
-    if (user.password_hash !== credentials.password) {
+    if (user.password_hash !== credentialss.password) {
       throw new Error("Mật khẩu không đúng");
     }
 
     return { token: "mock-token-123", user };
   }
-  const res = await fetch(`${API_BASE_URL}/user/login`, {
+  const res = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentials),
+    body: JSON.stringify(credentialss),
+    credentials: 'include' 
   });
   const data = await res.json();
 
@@ -41,39 +43,72 @@ export async function loginUser(credentials: LoginCredentials): Promise<{ token:
 
   return data;
 }
+// --------- CHECKTOKEN ---------
+export async function checkToken(): Promise<{ user: IUser } | null> {
+  const res = await fetch(`${API_BASE_URL}/check-token`, {
+    method: 'GET',
+    credentials: 'include'
+  });
+
+  if (!res.ok) {
+    console.error("Token không hợp lệ hoặc lỗi");
+    return null;
+  }
+
+  const data = await res.json();
+  return data;
+}
+// --------- CHECKTOKEN ---------
+export async function logoutUser(): Promise<{ message: string }> {
+  if (IS_MOCK) {
+    // Giả lập logout thành công
+    return { message: "Đăng xuất mock thành công" };
+  }
+
+  const res = await fetch(`${API_BASE_URL}/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    const errorMessage = data.error || data.message || "Đăng xuất thất bại";
+    throw new Error(errorMessage);
+  }
+
+  const data = await res.json();
+  return data;
+}
+
 // --------- REGISTER ---------
-export async function registerUser(formData: RegisterCredentials): Promise<{ message: string; user: IUser }> {
+export async function registerUser(
+  formData: RegisterCredentials
+): Promise<{ message: string; user: IUser }> {
   if (IS_MOCK) {
     const users = getMockUsers();
     const existingUser = users.find(
-      (u) => u.email === formData.email || u.username === formData.username
+      (u) => u.email === formData.email || u.name === formData.name
     );
     if (existingUser) throw new Error("Email hoặc tên người dùng đã tồn tại");
 
     const newUser: IUser = {
-      userId: users.length + 1,
-      username: formData.username,
+      id: users.length + 1,
+      name: formData.name,
       email: formData.email,
       password_hash: formData.password,
-      phoneNumber: formData.phoneNumber,
-      fullName: formData.fullName,  
-      avatar_url: null,
+      phone: formData.phone,
+      avatar: null,
       address: "",
-      city: null,
-      country: null,
-      last_login_at: null,
-      login_count: 0,
-      email_verified: false,
-      email_verified_at: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      role: "user",
+      created_at: new Date(),
+      updated_at: new Date(),
     };
 
     saveMockUsers([...users, newUser]);
     return { message: "Đăng ký thành công", user: newUser };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/register`, {
+  const res = await fetch(`${API_BASE_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
@@ -86,25 +121,28 @@ export async function registerUser(formData: RegisterCredentials): Promise<{ mes
 }
 
 // --------- GET USER INFO ---------
-export async function getInfoUser(userId: number | string): Promise<IUser> {
+export async function getInfoUser(id: number | string): Promise<IUser> {
   if (IS_MOCK) {
     const users = getMockUsers();
-    const user = users.find((u) => u.userId === Number(userId));
+    const user = users.find((u) => u.id === Number(id));
     if (!user) throw new Error("Không tìm thấy người dùng");
     return user;
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/${userId}`);
+  const res = await fetch(`${API_BASE_URL}/user/${id}`);
   if (!res.ok) throw new Error("Lỗi khi lấy thông tin người dùng");
   const data = await res.json();
   return data.user;
 }
 
 // --------- UPDATE USER INFO ---------
-export async function updateInfoUser(userId: number, updateData: any): Promise<IUser> {
+export async function updateInfoUser(
+  id: number,
+  updateData: any
+): Promise<IUser> {
   if (IS_MOCK) {
     const users = getMockUsers();
-    const index = users.findIndex((u) => u.userId === userId);
+    const index = users.findIndex((u) => u.id === id);
     if (index === -1) throw new Error("Không tìm thấy người dùng");
 
     const updatedUser = {
@@ -126,27 +164,27 @@ export async function updateInfoUser(userId: number, updateData: any): Promise<I
   if (updateData.avatar) {
     formData.append("avatar_file", updateData.avatar);
   } else {
-
-    formData.append("avatar_url", updateData.avatar_url); 
+    formData.append("avatar_url", updateData.avatar_url);
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/update-user-infor/${userId}`, {
+  const res = await fetch(`${API_BASE_URL}/user/update-user-infor/${id}`, {
     method: "PATCH",
     body: formData,
   });
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error|| "Cập nhật thất bại");
+    throw new Error(errorData.error || "Cập nhật thất bại");
   }
 
   const data = await res.json();
   return data.user;
 }
 
-
 // --------- SEND RESET PASSWORD ---------
-export async function sendResetPassword(email: string): Promise<{ message: string; otp?: string }> {
+export async function sendResetPassword(
+  email: string
+): Promise<{ message: string; otp?: string }> {
   if (IS_MOCK) {
     const users = getMockUsers();
     const user = users.find((u) => u.email === email);
@@ -155,7 +193,7 @@ export async function sendResetPassword(email: string): Promise<{ message: strin
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.reset_otp = otp;
     user.otp_created_at = new Date().toISOString();
-     alert("Mã OTP: " + otp);
+    alert("Mã OTP: " + otp);
     saveMockUsers(users);
     return { message: "Đã gửi mã OTP đến email", otp };
   }
@@ -172,12 +210,16 @@ export async function sendResetPassword(email: string): Promise<{ message: strin
 }
 
 // --------- RESET PASSWORD ---------
-export async function resetPassword(email: string, otp: string, newPassword: string): Promise<{ message: string }> {
+export async function resetPassword(
+  email: string,
+  otp: string,
+  newPassword: string
+): Promise<{ message: string }> {
   if (IS_MOCK) {
     const users = getMockUsers();
     const index = users.findIndex((u) => u.email === email);
     if (index === -1) throw new Error("Không tìm thấy người dùng");
-    
+
     const user = users[index];
     if (!user.reset_otp || user.reset_otp !== otp) {
       throw new Error("Mã OTP không chính xác hoặc đã hết hạn");

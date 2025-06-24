@@ -3,32 +3,45 @@ import "../css/product.css";
 import "../css/account.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getInfoUser } from "@/services/authService";
+import { getInfoUser,checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import LogoutLink from "../component/log_out";
+import CheckTokenGuard from "@/store/CheckTokenGuard";
 export default function Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        if (!userId) throw new Error("Chưa đăng nhập");
+useEffect(() => {
+  const fetchUser = async () => {
+    try {
+      const tokenData = await checkToken();  // Gọi API check-token
 
-        const userInfo = await getInfoUser(userId);
-        setUser(userInfo);
-      } catch (error) {
-        console.error("Lỗi lấy thông tin người dùng:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
 
-    fetchUser();
-  }, []);
+      // Nếu backend đã trả đủ thông tin user
+      setUser(tokenData.user);
+
+      // Nếu bạn muốn load thêm info từ DB (KHÔNG CẦN nếu tokenData.user đã đủ):
+      // const userInfo = await getInfoUser(tokenData.user.id);
+      // console.log(tokenData.user.id);
+      
+      // setUser(userInfo);
+
+    } catch (error) {
+      console.error("Lỗi lấy thông tin người dùng:", error);
+      // Ví dụ: có thể redirect về trang login nếu cần
+      // router.push("/login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUser();
+}, []);
+
   return (
     <>
+    <CheckTokenGuard>
       {loading ? (
         <p>Đang tải thông tin...</p>
       ) : user ? (
@@ -70,7 +83,7 @@ export default function Account() {
                   <div className="block-account">
                     <h5 className="title-account">Trang tài khoản</h5>
                     <p>
-                      Xin chào, <span>{user.fullName}</span>&nbsp;!
+                      Xin chào, <span>{user.name}</span>&nbsp;!
                     </p>
                     <ul>
                       <li>
@@ -137,7 +150,7 @@ export default function Account() {
                       />
                       <div>
                         <h3 style={{ margin: "0 0 5px 0", color: "#333" }}>
-                          {user.fullName}
+                          {user.name}
                         </h3>
                         <p
                           style={{
@@ -216,7 +229,7 @@ export default function Account() {
 
                     <div style={{ marginBottom: "15px" }}>
                       <strong style={{ color: "#555" }}>Họ tên:</strong>
-                      <span style={{ marginLeft: "10px" }}>{user.fullName}</span>
+                      <span style={{ marginLeft: "10px" }}>{user.name}</span>
                     </div>
 
                     <div style={{ marginBottom: "15px" }}>
@@ -228,7 +241,7 @@ export default function Account() {
 
                     <div style={{ marginBottom: "15px" }}>
                       <strong style={{ color: "#555" }}>Điện thoại:</strong>
-                      <span style={{ marginLeft: "10px" }}>+84{user.phoneNumber}</span>
+                      <span style={{ marginLeft: "10px" }}>+84{user.phone}</span>
                     </div>
 
                     <div style={{ marginBottom: "0" }}>
@@ -244,8 +257,9 @@ export default function Account() {
           </main>
         </>
       ) : (
-        <p>Không tìm thấy thông tin người dùng</p>
+        <p>404: không tìm thấy người dùng</p>
       )}
+      </CheckTokenGuard>
     </>
   );
 }

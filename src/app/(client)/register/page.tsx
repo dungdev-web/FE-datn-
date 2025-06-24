@@ -1,11 +1,41 @@
+"use client";
+import { useState } from "react";
+import { registerUser } from "@/services/authService";
+import toast from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+
 import "../css/login.css";
-export default function Register(){
-    return(
-        <>
-         <div className="intro-banner">
+export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const formData = {
+        name: name,
+        email,
+        password,
+        phone: "",
+      };
+      const res = await registerUser(formData);
+      setMessage(res.message);
+      toast.success(res.message);
+    } catch (err: any) {
+      setMessage(err.message);
+      toast.error(err.message);
+    }
+  };
+  return (
+    <>
+      <div className="intro-banner">
         <div className="intro-content">
           <h1>Giỏ hàng</h1>
-          <p><a href="/index.html">Trang chủ</a> • Giỏ hàng</p>
+          <p>
+            <a href="/index.html">Trang chủ</a> • Giỏ hàng
+          </p>
         </div>
       </div>
       <main>
@@ -17,23 +47,34 @@ export default function Register(){
 
           <div className="form-container">
             <h2>Đăng Ký email</h2>
-            <div  className="register-link">
+            <div className="register-link">
               <p>
                 Hãy đăng ký để được hưởng nhiều đặc quyền riêng dành cho bạn
               </p>
             </div>
-            <form action="" id="formRegister">
+            <form action="" id="formRegister" onSubmit={handleSubmit}>
               <input
                 type="text"
                 placeholder="Tài Khoản"
                 id="fullName"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
-              <input type="email" placeholder="Email" id="email" required />
+              <input
+                type="email"
+                placeholder="Email"
+                id="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
               <input
                 type="password"
                 placeholder="Mật Khẩu"
                 id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
 
@@ -45,6 +86,7 @@ export default function Register(){
               </div>
               <button type="submit">Đăng kí ngay</button>
             </form>
+            <Toaster position="bottom-right" />
 
             <h3>Hoặc</h3>
 
@@ -60,6 +102,6 @@ export default function Register(){
           </div>
         </div>
       </main>
-        </>
-    )
+    </>
+  );
 }

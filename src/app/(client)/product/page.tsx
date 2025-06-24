@@ -3,6 +3,7 @@ import "../css/product.css";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import { getAllProducts } from "@/services/productService";
+import Link from "next/link";
 export default function Product() {
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
@@ -17,7 +18,7 @@ export default function Product() {
   };
   const changeViewMode = (mode: "grid" | "list") => {
     setViewMode(mode);
-    setPage(1); // 🔁 reset về trang 1 khi đổi chế độ
+    setPage(1);
   };
 
   useEffect(() => {
@@ -448,12 +449,18 @@ export default function Product() {
                           style={{ width: "230px" }}
                         >
                           <div className="product-image">
-                            <img
-                              src={
-                                sp.images?.[0]?.url || "/images/placeholder.png"
-                              }
-                              alt={sp.name}
-                            />
+                            <Link
+                              href={`/product/${sp.products_id}-${sp.slug}`}
+                            >
+                              <img
+                                src={
+                                  sp.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={sp.name}
+                              />
+                            </Link>
+
                             <div className="product-icons">
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
