@@ -43,6 +43,7 @@ export async function loginUser(
 
   return data;
 }
+// --------- CHECKTOKEN ---------
 export async function checkToken(): Promise<{ user: IUser } | null> {
   const res = await fetch(`${API_BASE_URL}/check-token`, {
     method: 'GET',
@@ -57,7 +58,27 @@ export async function checkToken(): Promise<{ user: IUser } | null> {
   const data = await res.json();
   return data;
 }
+// --------- CHECKTOKEN ---------
+export async function logoutUser(): Promise<{ message: string }> {
+  if (IS_MOCK) {
+    // Giả lập logout thành công
+    return { message: "Đăng xuất mock thành công" };
+  }
 
+  const res = await fetch(`${API_BASE_URL}/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    const errorMessage = data.error || data.message || "Đăng xuất thất bại";
+    throw new Error(errorMessage);
+  }
+
+  const data = await res.json();
+  return data;
+}
 
 // --------- REGISTER ---------
 export async function registerUser(

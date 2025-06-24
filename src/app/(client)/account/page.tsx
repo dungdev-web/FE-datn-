@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { getInfoUser,checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import LogoutLink from "../component/log_out";
+import CheckTokenGuard from "@/store/CheckTokenGuard";
 export default function Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +23,8 @@ useEffect(() => {
 
       // Nếu bạn muốn load thêm info từ DB (KHÔNG CẦN nếu tokenData.user đã đủ):
       // const userInfo = await getInfoUser(tokenData.user.id);
+      // console.log(tokenData.user.id);
+      
       // setUser(userInfo);
 
     } catch (error) {
@@ -38,6 +41,7 @@ useEffect(() => {
 
   return (
     <>
+    <CheckTokenGuard>
       {loading ? (
         <p>Đang tải thông tin...</p>
       ) : user ? (
@@ -237,7 +241,7 @@ useEffect(() => {
 
                     <div style={{ marginBottom: "15px" }}>
                       <strong style={{ color: "#555" }}>Điện thoại:</strong>
-                      <span style={{ marginLeft: "10px" }}>+84{user.name}</span>
+                      <span style={{ marginLeft: "10px" }}>+84{user.phone}</span>
                     </div>
 
                     <div style={{ marginBottom: "0" }}>
@@ -253,8 +257,9 @@ useEffect(() => {
           </main>
         </>
       ) : (
-        <p>Không tìm thấy thông tin người dùng</p>
+        <p>404: không tìm thấy người dùng</p>
       )}
+      </CheckTokenGuard>
     </>
   );
 }
