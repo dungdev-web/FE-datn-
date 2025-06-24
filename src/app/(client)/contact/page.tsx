@@ -62,12 +62,7 @@ export default function Contact() {
             </form>
           </div>
         </div>
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4729.4347453037235!2d106.61900967576885!3d10.869555057467553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752b0d50ab7919%3A0xb2050cb861c0ada0!2sC%C3%B4ng%20ty%20Thi%C3%AAn%20Kim%20Corp!5e1!3m2!1svi!2s!4v1744968552576!5m2!1svi!2s"
-          allowFullScreen
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        ></iframe>
+  
       </main>
     </>
   );

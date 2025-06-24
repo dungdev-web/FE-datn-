@@ -377,7 +377,7 @@ nav {
   transition: background-color 0.3s ease-in-out;
 }
 
-.banner {
+.banner{
   /* margin-top: 80px; */
   overflow: hidden;
   /* z-index: 10000; */
@@ -554,7 +554,9 @@ nav {
   flex: 1;
   min-width: 300px;
 }
-
+.logo-footer{
+ margin: auto;
+}
 .footer-column h3 {
   font-size: 24px;
   text-transform: uppercase;

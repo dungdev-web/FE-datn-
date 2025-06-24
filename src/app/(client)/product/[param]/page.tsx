@@ -1,9 +1,67 @@
 "use client";
 import "../../css/detail.css";
 import "../../css/style.css";
-
-import Product4box from "@/src/app/(client)/component/product";
+import { IProduct } from "@/types/product";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import {
+  getProductDetail,
+  getBestSellingMockProducts,
+} from "@/services/productService";
+import RelatedProductList from "../../component/RelatedProductList";
 export default function Detail() {
+  const [product, setProduct] = useState<IProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+  const params = useParams();
+  const [activeTab, setActiveTab] = useState("tab-1");
+  const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
+
+  useEffect(() => {
+    const param = params.param;
+    if (!param) return;
+    const paramStr = Array.isArray(param) ? param[0] : param;
+    if (typeof paramStr !== "string") return;
+
+    const fetchData = async () => {
+      setLoading(true);
+
+      let found = null;
+
+      if (!isNaN(Number(paramStr))) {
+        // URL dạng id
+        found = await getProductDetail({ id: Number(paramStr) });
+      } else {
+        // URL dạng slug
+        found = await getProductDetail({ slug: paramStr });
+      }
+
+      setProduct(found || null);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [params]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getBestSellingMockProducts(5);
+      setBestSellProducts(data);
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-10">Đang tải sản phẩm...</div>;
+  }
+
+  if (!product) {
+    return (
+      <div className="text-center py-10 text-red-500">
+        Không tìm thấy sản phẩm.
+      </div>
+    );
+  }
+
   return (
     <>
       <section
@@ -19,7 +77,7 @@ export default function Detail() {
 
         <div className="breadcrumb-container">
           <div className="title-page">
-            <h2>Giày Nam Men's Air Jordan 2 Retro</h2>
+            <h2>{product.name}</h2>
           </div>
           <ul className="breadcrumb">
             <li className="home">
@@ -38,7 +96,7 @@ export default function Detail() {
 
             <li>
               <strong>
-                <span>Giày Nam Men's Air Jordan 2 Retro</span>
+                <span>{product.name}</span>
               </strong>
             </li>
             <li></li>
@@ -69,9 +127,12 @@ export default function Detail() {
                             >
                               <img
                                 id="zoom_01"
-                                className="img-responsive center-block"
-                                src="//bizweb.dktcdn.net/thumb/grande/100/505/077/products/layer12137b41646ee49b99d29fc01.jpg"
-                                alt="giay-nam-men-s-air-jordan-2-retro"
+                                className="img-responsive center-block !w-full !h-full"
+                                src={
+                                  product.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={product.name}
                                 style={{ position: "absolute" }}
                               />
                             </div>
@@ -81,42 +142,20 @@ export default function Detail() {
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            <div className="space-item-tsn tns-item tns-slide-active">
-                              <div className="item">
-                                <img
-                                  src="//bizweb.dktcdn.net/thumb/medium/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                                  className="img-responsive"
-                                  alt="giay-nam-nike-air-max"
-                                />
+                            {product.images?.map((img, index) => (
+                              <div
+                                key={index}
+                                className="space-item-tsn tns-item tns-slide-active"
+                              >
+                                <div className="item">
+                                  <img
+                                    src={img.url}
+                                    className="img-responsive"
+                                    alt={img.alt_text || product.name}
+                                  />
+                                </div>
                               </div>
-                            </div>
-                            <div className="space-item-tsn tns-item tns-slide-active">
-                              <div className="item">
-                                <img
-                                  src="//bizweb.dktcdn.net/thumb/medium/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                                  className="img-responsive"
-                                  alt="giay-nam-nike-air-max"
-                                />
-                              </div>
-                            </div>
-                            <div className="space-item-tsn tns-item tns-slide-active">
-                              <div className="item">
-                                <img
-                                  src="//bizweb.dktcdn.net/thumb/medium/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                                  className="img-responsive"
-                                  alt="giay-nam-nike-air-max"
-                                />
-                              </div>
-                            </div>
-                            <div className="space-item-tsn tns-item tns-slide-active">
-                              <div className="item">
-                                <img
-                                  src="//bizweb.dktcdn.net/thumb/medium/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                                  className="img-responsive"
-                                  alt="giay-nam-nike-air-max"
-                                />
-                              </div>
-                            </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -145,27 +184,30 @@ export default function Detail() {
                         EXPIRED
                       </div>
                     </div>
-                    <h1 className="title-head">Neumel GRAYBROWN Snow</h1>
+                    <h1 className="title-head">{product.name}</h1>
                     <div>
                       <link href="http://schema.org/InStock" />
 
                       <div className="information">
                         <p>
-                          <span>Thương hiệu:</span> Puma
+                          <span>Thương hiệu:</span> {product.brand?.name}
                         </p>
                         <p className="inventory_quantity">
-                          <span className="a-stock">Tình trạng:</span> Còn hàng
+                          <span className="a-stock">Tình trạng:</span>{" "}
+                          {product.status === "active"
+                            ? "Còn hàng"
+                            : "Hết hàng"}
                         </p>
                       </div>
                       <div className="price-box clearfix">
                         <span className="special-price">
                           <span className="price product-price">
-                            1.800.000₫
+                            {product.sale_price?.toLocaleString()}₫
                           </span>
                         </span>
                         <span className="old-price">
                           <del className="price product-price-old">
-                            3.500.000₫
+                            {product.price?.toLocaleString()}₫
                           </del>
                         </span>
                       </div>
@@ -174,18 +216,23 @@ export default function Detail() {
                       <div className="swatch-color swatch clearfix">
                         <div className="header posintion-fixed">Màu sắc</div>
                         <div className="color-options">
-                          <div
-                            className="color-circle selected"
-                            style={{ backgroundColor: "#a4ccff" }}
-                          ></div>
-                          <div
-                            className="color-circle"
-                            style={{ backgroundColor: "#f57f7f" }}
-                          ></div>
-                          <div
-                            className="color-circle"
-                            style={{ backgroundColor: "#eeeb56" }}
-                          ></div>
+                          {[
+                            ...new Map(
+                              product.variants.map((v) => [v.color.id, v.color])
+                            ).values(),
+                          ].map((color) => (
+                            <div
+                              key={color.id}
+                              className="color-circle"
+                              style={{
+                                backgroundColor: color.code_color,
+                                width: 24,
+                                height: 24,
+                                borderRadius: "50%",
+                                border: "1px solid #ccc",
+                              }}
+                            ></div>
+                          ))}
                         </div>
                       </div>
 
@@ -258,24 +305,44 @@ export default function Detail() {
                   <div className="col-xs-12 col-lg-12 col-md-12 margin-top-40 margin-bottom-10">
                     <div className="product-tab e-tabs space-30">
                       <ul className="tabs tabs-title clearfix">
-                        <li className="tab-link current" data-tab="tab-1">
+                        <li
+                          className={`tab-link ${
+                            activeTab === "tab-1" ? "current" : ""
+                          }`}
+                          onClick={() => setActiveTab("tab-1")}
+                        >
                           <h3>
                             <span>Thông tin sản phẩm</span>
                           </h3>
                         </li>
-                        <li className="tab-link" data-tab="tab-2">
+                        <li
+                          className={`tab-link ${
+                            activeTab === "tab-2" ? "current" : ""
+                          }`}
+                          onClick={() => setActiveTab("tab-2")}
+                        >
                           <h3>
                             <span>Chính sách đổi trả</span>
                           </h3>
                         </li>
-                        <li className="tab-link" data-tab="tab-3">
+                        <li
+                          className={`tab-link ${
+                            activeTab === "tab-3" ? "current" : ""
+                          }`}
+                          onClick={() => setActiveTab("tab-3")}
+                        >
                           <h3>
                             <span>Đánh giá sản phẩm</span>
                           </h3>
                         </li>
                       </ul>
 
-                      <div id="tab-1" className="tab-content current">
+                      <div
+                        id="tab-1"
+                        className={`tab-content ${
+                          activeTab === "tab-1" ? "current" : ""
+                        }`}
+                      >
                         <div className="rte">
                           <p>
                             Giới thiệu đôi giày Nike Air Jordan 14 Retro - sự
@@ -314,25 +381,191 @@ export default function Detail() {
                         </div>
                       </div>
 
-                      {/* <div id="tab-2" className="tab-content">
-                                            + Sản phẩm lỗi, hỏng do quá trình sản xuất hoặc vận chuyện<br>
-                                            + Nằm trong chính sách đổi trả sản phẩm của Bean<br>
-                                            + Sản phẩm còn nguyên tem mác không bị rớt vỡ, vô nước<br>
-                                            + Thời gian đổi trả nhỏ hơn 15 ngày kể từ ngày nhận hàng<br>
-                                            + Chi phí bảo hành về sản phẩm, vận chuyển khách hàng chịu chi phí<br>
-                                            <b>Điều kiện đổi trả hàng</b><br>
-                                            Điều kiện về thời gian đổi trả: trong vòng 07 ngày kể từ khi nhận được hàng
-                                            và phải liên hệ gọi ngay cho chúng tôi theo số điện thoại trên để được xác
-                                            nhận đổi trả hàng.<br>
-                                            <b>Điều kiện đổi trả hàng:</b><br>
-                                            - Sản phẩm gửi lại phải còn nguyên đai nguyên kiện<br>
-                                            - Phiếu bảo hành (nếu có) và tem của công ty trên sản phẩm còn nguyên
-                                            vẹn.<br>
-                                            - Sản phẩm đổi/ trả phải còn đầy đủ hộp, giấy hướng dẫn sử dụng và không bị
-                                            trầy xước, bể.<br>
-                                            - Quý khách chịu chi phí vận chuyển, đóng gói, thu hộ tiền, chi phí liên lạc
-                                            tối đa tương đương 10% giá trị đơn hàng.
-                                        </div>  */}
+                      <div
+                        id="tab-2"
+                        className={`tab-content ${
+                          activeTab === "tab-2" ? "current" : ""
+                        }`}
+                      >
+                        + Sản phẩm lỗi, hỏng do quá trình sản xuất hoặc vận
+                        chuyện
+                        <br />
+                        + Nằm trong chính sách đổi trả sản phẩm của Bean
+                        <br />
+                        + Sản phẩm còn nguyên tem mác không bị rớt vỡ, vô nước
+                        <br />
+                        + Thời gian đổi trả nhỏ hơn 15 ngày kể từ ngày nhận hàng
+                        <br />
+                        + Chi phí bảo hành về sản phẩm, vận chuyển khách hàng
+                        chịu chi phí
+                        <br />
+                        <b>Điều kiện đổi trả hàng</b>
+                        <br />
+                        Điều kiện về thời gian đổi trả: trong vòng 07 ngày kể từ
+                        khi nhận được hàng và phải liên hệ gọi ngay cho chúng
+                        tôi theo số điện thoại trên để được xác nhận đổi trả
+                        hàng.
+                        <br />
+                        <b>Điều kiện đổi trả hàng:</b>
+                        <br />
+                        - Sản phẩm gửi lại phải còn nguyên đai nguyên kiện
+                        <br />
+                        - Phiếu bảo hành (nếu có) và tem của công ty trên sản
+                        phẩm còn nguyên vẹn.
+                        <br />
+                        - Sản phẩm đổi/ trả phải còn đầy đủ hộp, giấy hướng dẫn
+                        sử dụng và không bị trầy xước, bể.
+                        <br />- Quý khách chịu chi phí vận chuyển, đóng gói, thu
+                        hộ tiền, chi phí liên lạc tối đa tương đương 10% giá trị
+                        đơn hàng.
+                      </div>
+                      <div
+                        id="tab-3"
+                        className={`tab-content ${
+                          activeTab === "tab-3" ? "current" : ""
+                        }`}
+                      >
+                        {/* <div className="rte">
+                          <p>
+                            Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá
+                            sản phẩm này!
+                          </p>
+                        </div> */}
+                        <div className="rte">
+                          <h4 className="text-lg font-semibold !mb-2">
+                            Đánh giá trung bình
+                          </h4>
+
+                          <div className="flex items-center gap-2 !mb-4">
+                            {[...Array(5)].map((_, i) => (
+                              <svg
+                                key={i}
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                fill={i < 4 ? "#facc15" : "#d1d5db"}
+                                viewBox="0 0 16 16"
+                              >
+                                <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                              </svg>
+                            ))}
+                            <span className="text-sm text-gray-500">
+                              (4.0 / 5)
+                            </span>
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="!p-3 border rounded shadow-sm bg-white !mb-[15px]">
+                              <div className="flex items-center gap-2 !mb-1">
+                                <strong className="text-sm">
+                                  Nguyễn Văn A
+                                </strong>
+                                <div className="flex gap-0.5">
+                                  {[...Array(5)].map((_, i) => (
+                                    <svg
+                                      key={i}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="14"
+                                      height="14"
+                                      fill="#facc15"
+                                      viewBox="0 0 16 16"
+                                    >
+                                      <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                                    </svg>
+                                  ))}
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-700">
+                                Giày đẹp, mang êm, đóng gói chắc chắn. Sẽ ủng hộ
+                                tiếp!
+                              </p>
+                            </div>
+
+                            <div className="!p-3 border rounded shadow-sm bg-white !mb-[15px]">
+                              <div className="flex items-center gap-2 !mb-1">
+                                <strong className="text-sm">Trần Thị B</strong>
+                                <div className="flex gap-0.5">
+                                  {[...Array(4)].map((_, i) => (
+                                    <svg
+                                      key={i}
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      width="14"
+                                      height="14"
+                                      fill="#facc15"
+                                      viewBox="0 0 16 16"
+                                    >
+                                      <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                                    </svg>
+                                  ))}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="14"
+                                    height="14"
+                                    fill="#d1d5db"
+                                    viewBox="0 0 16 16"
+                                  >
+                                    <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                                  </svg>
+                                </div>
+                              </div>
+                              <p className="text-sm text-gray-700">
+                                Hàng đẹp nhưng giao hơi chậm. Chất lượng ổn áp.
+                              </p>
+                            </div>
+                          </div>
+                          <div className="!mt-6 !p-4 border rounded-lg bg-white shadow-sm space-y-3">
+                            <h4 className="text-lg font-semibold mb-2">
+                              Viết đánh giá của bạn
+                            </h4>
+
+                            <div>
+                              <label className="block text-sm font-medium !mb-1">
+                                Tên của bạn
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Nhập tên..."
+                                className="!w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium !mb-1">
+                                Số sao
+                              </label>
+                              <div className="flex gap-1">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    className="text-yellow-400 text-xl hover:scale-110 transition-transform"
+                                    onClick={() =>
+                                      console.log(`Chọn sao: ${star}`)
+                                    }
+                                  >
+                                    ★
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium mb-1">
+                                Nội dung đánh giá
+                              </label>
+                              <textarea
+                                placeholder="Nhận xét của bạn..."
+                                rows={4}
+                                className="!w-full border border-gray-300 rounded !px-3 !py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 !mb-[15px]"
+                              ></textarea>
+                            </div>
+
+                            <button className="!px-4 !py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                              Gửi đánh giá
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -345,9 +578,8 @@ export default function Detail() {
                     </h2>
                   </div>
                 </div>
-                <div className="product-grid slider-wrapper">
-                  <Product4box></Product4box>
-                </div>
+
+                <RelatedProductList categoryId={10} />
               </div>
               <div className="sidebar left left-content col-lg-3 col-md-3">
                 <div className="khuyen-mai">
@@ -362,17 +594,21 @@ export default function Detail() {
                   </div>
                   <div className="content">
                     <ul>
-                      <li>
+                      <li className="!flex gap-[10px]">
                         <img
+                          className="!h-[20px]"
                           width="20"
                           height="20"
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai1.png?1730865096645"
                           alt="Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng."
                         />
-                        Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
+                        <p>
+                          Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
+                        </p>
                       </li>
-                      <li>
+                      <li className="!flex gap-[10px]">
                         <img
+                          className="!h-[20px]"
                           width="20"
                           height="20"
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai2.png?1730865096645"
@@ -380,8 +616,9 @@ export default function Detail() {
                         />
                         Giảm giá 10% khi mua từ 5 sản phẩm trở lên.
                       </li>
-                      <li>
+                      <li className="!flex gap-[10px]">
                         <img
+                          className="!h-[20px]"
                           width="20"
                           height="20"
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai3.png?1730865096645"
@@ -487,274 +724,59 @@ export default function Detail() {
                   </div>
 
                   <div className="list-product-slidebar">
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 29% </span>
-                        </div>
-                        <a
-                          href="/giay-nam-jordan-max-aura"
-                          title="Giày Nam Jordan Max Aura"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer18cde9e508ba14790a6210491.jpg?v=1702350243257"
-                            alt="Giày Nam Jordan Max Aura"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
+                    {bestsellproducts.map((product) => (
+                      <div className="list-item" key={product.products_id}>
+                        <div className="thumb-imagtes">
+                          <div className="sale-flash">
+                            <span>
+                              -
+                              {Math.round(
+                                100 - (product.sale_price / product.price) * 100
+                              )}
+                              %
+                            </span>
+                          </div>
                           <a
-                            href="/giay-nam-jordan-max-aura"
-                            title="Giày Nam Jordan Max Aura"
+                            href={`/san-pham/${product.slug}`}
+                            title={product.name}
                           >
-                            Giày Nam Jordan Max Aura
+                            <img
+                              src={product.images?.[0]?.url || "/default.jpg"}
+                              alt={
+                                product.images?.[0]?.alt_text || product.name
+                              }
+                            />
                           </a>
-                        </h3>
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              3.200.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              4.500.000₫
-                            </span>
-                          </div>
                         </div>
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845406"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 29% </span>
-                        </div>
-                        <a
-                          href="/giay-nam-nike-air-max"
-                          title="Giày Nam Nike Air Max"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                            alt="Giày Nam Nike Air Max"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/giay-nam-nike-air-max"
-                            title="Giày Nam Nike Air Max"
-                          >
-                            Giày Nam Nike Air Max
-                          </a>
-                        </h3>
+                        <div className="product-info-text">
+                          <h3 className="product-name">
+                            <a
+                              href={`/san-pham/${product.slug}`}
+                              title={product.name}
+                            >
+                              {product.name}
+                            </a>
+                          </h3>
+                          <div className="price-box clearfix">
+                            <div className="special-price f-left">
+                              <span className="price product-price">
+                                {product.sale_price.toLocaleString()}₫
+                              </span>
+                            </div>
 
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              3.200.000₫
-                            </span>
+                            <div className="old-price">
+                              <span className="price product-price-old">
+                                {product.price.toLocaleString()}₫
+                              </span>
+                            </div>
                           </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              4.500.000₫
-                            </span>
-                          </div>
+                          <div
+                            className="bizweb-product-reviews-badge"
+                            data-id={product.products_id}
+                          ></div>
                         </div>
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845403"
-                        ></div>
                       </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 33% </span>
-                        </div>
-                        <a
-                          href="/nike-air-max-97-se"
-                          title="Nike Air Max 97 SE"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer112344afd2dbe4842b4562af5.jpg?v=1702350247140"
-                            alt="Nike Air Max 97 SE"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/nike-air-max-97-se"
-                            title="Nike Air Max 97 SE"
-                          >
-                            Nike Air Max 97 SE
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              2.800.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              4.200.000₫
-                            </span>
-                          </div>
-                        </div>
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845409"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 49% </span>
-                        </div>
-
-                        <a
-                          href="/neumel-graybrown-snow"
-                          title="Neumel GRAYBROWN Snow"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer16fd25363242141afa734215a.jpg?v=1702350246057"
-                            alt="Neumel GRAYBROWN Snow"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/neumel-graybrown-snow"
-                            title="Neumel GRAYBROWN Snow"
-                          >
-                            Neumel GRAYBROWN Snow
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              1.800.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              3.500.000₫
-                            </span>
-                          </div>
-                        </div>
-
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845408"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 31% </span>
-                        </div>
-                        <a
-                          href="/luka-doncic-x-air-jordan"
-                          title="Luka Doncic X Air Jordan"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer151495a72fe124744a7784900.jpg?v=1702350244227"
-                            alt="Luka Doncic X Air Jordan"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/luka-doncic-x-air-jordan"
-                            title="Luka Doncic X Air Jordan"
-                          >
-                            Luka Doncic X Air Jordan
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              3.800.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              5.500.000₫
-                            </span>
-                          </div>
-                        </div>
-
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845407"
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="list-item">
-                      <div className="thumb-imagtes">
-                        <div className="sale-flash">
-                          <span> 24% </span>
-                        </div>
-
-                        <a
-                          href="/converse-run-star-motion"
-                          title="Converse Run Star Motion"
-                        >
-                          <img
-                            src="//bizweb.dktcdn.net/thumb/large/100/505/077/products/layer14b0efb7df8bd4723b20e7237.jpg?v=1702350242283"
-                            alt="Converse Run Star Motion"
-                          />
-                        </a>
-                      </div>
-                      <div className="product-info-text">
-                        <h3 className="product-name">
-                          <a
-                            href="/converse-run-star-motion"
-                            title="Converse Run Star Motion"
-                          >
-                            Converse Run Star Motion
-                          </a>
-                        </h3>
-
-                        <div className="price-box clearfix">
-                          <div className="special-price f-left">
-                            <span className="price product-price">
-                              4.200.000₫
-                            </span>
-                          </div>
-
-                          <div className="old-price">
-                            <span className="price product-price-old">
-                              5.500.000₫
-                            </span>
-                          </div>
-                        </div>
-
-                        <div
-                          className="bizweb-product-reviews-badge"
-                          data-id="33845404"
-                        ></div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>

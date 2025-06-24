@@ -378,7 +378,7 @@
 }
 
 .btn-lookbook {
-  background-color: #000;
+  background-color: #021688;
   color: #fff;
   padding: 12px 25px;
   font-size: 16px;
@@ -951,7 +951,7 @@
 
 .swiper-slide img {
   /* width: 100%; */
-  height: 255px;
+ 
   display: block;
   object-fit: cover;
 }
@@ -1164,6 +1164,7 @@
     transition: all 3s ease-in;
     display: flex;
   }
+  
 }
 @media (max-width: 991px) {
   .banner img {
@@ -1177,7 +1178,30 @@
   .look-book-text {
     margin-bottom: 10px;
   }
+ .banner-slider {
+    height: 250px !important;
+  }
 
+  .button-banner-left {
+    bottom: 30px !important;
+    left: 5% !important;
+    top: auto !important;
+    text-align: center;
+  }
+
+  .button-banner-right {
+    bottom: 40px !important;
+    right: 5% !important;
+    top: auto !important;
+   
+    text-align: center;
+  }
+
+  .button-banner-left button,
+  .button-banner-right button {
+    font-size: 10px !important;
+    padding: 4px 16px !important;
+  }
 }
 @media (max-width: 768px) {
 
@@ -1257,13 +1281,35 @@
   .product-card {
     padding: 0;
   }
-  .swiper-slide img {
-    height: 138px !important;
+
+  .banner-slider {
+    height: 250px !important;
+  }
+
+  .button-banner-left {
+    bottom: 60px !important;
+    left: 5% !important;
+    top: auto !important;
+    text-align: center;
+  }
+
+  .button-banner-right {
+    bottom: 60px !important;
+    right: 5% !important;
+    top: auto !important;
+   
+    text-align: center;
+  }
+
+  .button-banner-left button,
+  .button-banner-right button {
+    font-size: 10px !important;
+    padding: 4px 16px !important;
   }
 }
 @media (max-width: 620px) {
   .banner {
-    height: 300px !important;
+    height: 300px;
   }
   .banner img {
     height: 300px !important;
@@ -1289,6 +1335,7 @@
   .hot-products-list {
     grid-template-columns: repeat(2, 1fr);
   }
+  
 }
 .flash-sale {
   background-image: url("/public/images/blog/layer-1.webp");
@@ -1334,4 +1381,57 @@
 .product-two-box {
   padding-bottom: 17px !important; /* hoặc 50px nếu pagination vẫn còn bị dính */
   position: relative;
+}
+@media (max-width: 1024px) {
+ 
+
+  /* Vị trí button bên trái */
+  .button-banner-left {
+    bottom: 70px ;
+    left: 5% ;
+    right: auto ;
+    top: auto ;
+    text-align: center;
+    transform: none ;
+  }
+
+  /* Vị trí button bên phải */
+  .button-banner-right {
+    bottom: 70px ;
+    right: 5% ;
+    left: auto ;
+    top: auto;
+    text-align: center;
+    transform: none ;
+  }
+
+  /* Kích thước nút cho thiết bị nhỏ */
+  .button-banner-left button,
+  .button-banner-right button {
+    font-size: 14px;
+    padding: 8px 24px;
+  }
+}
+.banner-slider {
+  height: 650px;
+}
+
+.button-banner-left {
+  position: absolute;
+  bottom: 128px; /* bottom-32 */
+  left: 90px;   /* left-32 */
+  text-align: left;
+}
+
+.button-banner-right {
+  position: absolute;
+  bottom: 150px; /* bottom-44 */
+  right: 90px;  /* right-44 */
+  text-align: right;
+}
+
+.button-banner-left button,
+.button-banner-right button {
+  font-size: 20px;
+  padding: 8px 48px;
 }

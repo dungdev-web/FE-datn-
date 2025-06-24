@@ -1,16 +1,42 @@
 "use client";
 import "../css/product.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { IProduct } from "@/types/product";
+import { getAllProducts } from "@/services/productService";
+import Link from "next/link";
 export default function Product() {
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const productsPerPage = viewMode === "grid" ? 12 : 6;
 
+  const totalPages = Math.ceil(total / productsPerPage);
   const toggleSidebar = () => {
     setIsActive(!isActive);
   };
+  const changeViewMode = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    setPage(1);
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await getAllProducts(page, productsPerPage);
+        setProducts(res.data);
+        setTotal(res.total);
+      } catch (err) {
+        console.error("Lỗi lấy sản phẩm:", err);
+      }
+    };
+
+    fetchProducts();
+  }, [page, viewMode]);
   return (
     <>
-         <section
+      <section
         className="bread-crumb background-cover relative"
         style={{
           backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
@@ -337,7 +363,7 @@ export default function Product() {
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              setViewMode("grid");
+                              changeViewMode("grid");
                             }}
                           >
                             <span
@@ -352,7 +378,7 @@ export default function Product() {
                             href="#"
                             onClick={(e) => {
                               e.preventDefault();
-                              setViewMode("list");
+                              changeViewMode("list");
                             }}
                           >
                             <span
@@ -413,323 +439,247 @@ export default function Product() {
                 </div>
                 {viewMode === "grid" && (
                   <div className="product-grid">
-                    <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "230px" }}>
-                        <div className="product-image">
-                          <img
-                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                            alt=""
-                          />
-                          <div className="product-icons">
-                            <i className="fa-solid fa-heart always-show"></i>
-                            <div className="hover-icons">
-                              <i className="fa-solid fa-eye"></i>
-                              <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-exchange"></i>
+                    {products.map((sp) => (
+                      <div
+                        className="product-itemlist-main !block"
+                        key={sp.products_id}
+                      >
+                        <div
+                          className="product-card"
+                          style={{ width: "230px" }}
+                        >
+                          <div className="product-image">
+                            <Link
+                              href={`/product/${sp.products_id}-${sp.slug}`}
+                            >
+                              <img
+                                src={
+                                  sp.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={sp.name}
+                              />
+                            </Link>
+
+                            <div className="product-icons">
+                              <i className="fa-solid fa-heart always-show"></i>
+                              <div className="hover-icons">
+                                <i className="fa-solid fa-eye"></i>
+                                <i className="fa-solid fa-list"></i>
+                                <i className="fa fa-exchange"></i>
+                              </div>
                             </div>
-                          </div>
 
-                          <span className="discount-tag">-20%</span>
-
-                          <div className="product-colors">
-                            <span
-                              className="color blue"
-                              data-color="Xanh dương"
-                            ></span>
-                            <span
-                              className="color green"
-                              data-color="Xanh lá"
-                            ></span>
-                            <span
-                              className="color pink"
-                              data-color="Hồng"
-                            ></span>
-                          </div>
-
-                          <h4 className="product-title">
-                            Giày Converse Run Star Motion
-                          </h4>
-                          <div className="product-price">
-                            <span className="old-price">
-                              <del>1.500.000đ </del>
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((sp.price - sp.sale_price) / sp.price) * 100
+                              )}
+                              %
                             </span>
-                            <span className="new-price"> 1.200.000đ</span>
-                          </div>
-                           <div className="hot-product-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: "87%" }}>
-                      <span className="sold-info">Đã bán 87 sản phẩm</span>
-                    </div>
-                  </div>
-                </div>
-                          <div className="product-rating">
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-regular fa-star"></i>
+
+                            <div className="product-colors">
+                              {[
+                                ...new Map(
+                                  sp.variants.map((v) => [v.color.id, v.color])
+                                ).values(),
+                              ].map((color) => (
+                                <span
+                                  key={color.id}
+                                  className="color"
+                                  data-color={color.name_color}
+                                  style={{ backgroundColor: color.code_color }}
+                                ></span>
+                              ))}
+                            </div>
+
+                            <h4 className="product-title">{sp.name}</h4>
+                            <div className="product-price">
+                              <span className="old-price">
+                                <del>{sp.price.toLocaleString("vi")}đ</del>
+                              </span>
+                              <span className="new-price">
+                                {sp.sale_price.toLocaleString("vi")}đ
+                              </span>
+                            </div>
+
+                            <div className="hot-product-progress">
+                              <div className="progress-bar">
+                                <div
+                                  className="progress-fill"
+                                  style={{
+                                    width: "87%",
+                                  }}
+                                >
+                                  <span className="sold-info">
+                                    Đã bán{" "}
+                                    {sp.variants.reduce(
+                                      (sum, v) => sum + v.stock_quantity,
+                                      0
+                                    )}{" "}
+                                    sản phẩm
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="product-rating">
+                              {Array.from({ length: 5 }, (_, i) =>
+                                i <
+                                (sp.reviews?.length
+                                  ? Math.round(
+                                      sp.reviews.reduce(
+                                        (s, r) => s + Number(r.rating),
+                                        0
+                                      ) / sp.reviews.length
+                                    )
+                                  : 0) ? (
+                                  <i key={i} className="fa-solid fa-star"></i>
+                                ) : (
+                                  <i key={i} className="fa-regular fa-star"></i>
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "230px" }}>
-                        <div className="product-image">
-                          <img
-                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                            alt=""
-                          />
-                          <div className="product-icons">
-                            <i className="fa-solid fa-heart always-show"></i>
-                            <div className="hover-icons">
-                              <i className="fa-solid fa-eye"></i>
-                              <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-exchange"></i>
-                            </div>
-                          </div>
-
-                          <span className="discount-tag">-20%</span>
-
-                          <div className="product-colors">
-                            <span
-                              className="color blue"
-                              data-color="Xanh dương"
-                            ></span>
-                            <span
-                              className="color green"
-                              data-color="Xanh lá"
-                            ></span>
-                            <span
-                              className="color pink"
-                              data-color="Hồng"
-                            ></span>
-                          </div>
-
-                          <h4 className="product-title">
-                            Giày Converse Run Star Motion
-                          </h4>
-                          <div className="product-price">
-                            <span className="old-price">
-                              <del>1.500.000đ</del>
-                            </span>
-                            <span className="new-price">1.200.000đ</span>
-                          </div>
-                           <div className="hot-product-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: "87%" }}>
-                      <span className="sold-info">Đã bán 87 sản phẩm</span>
-                    </div>
-                  </div>
-                </div>
-                          <div className="product-rating">
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-regular fa-star"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "230px" }}>
-                        <div className="product-image">
-                          <img
-                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                            alt=""
-                          />
-                          <div className="product-icons">
-                            <i className="fa-solid fa-heart always-show"></i>
-                            <div className="hover-icons">
-                              <i className="fa-solid fa-eye"></i>
-                              <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-exchange"></i>
-                            </div>
-                          </div>
-
-                          <span className="discount-tag">-20%</span>
-
-                          <div className="product-colors">
-                            <span
-                              className="color blue"
-                              data-color="Xanh dương"
-                            ></span>
-                            <span
-                              className="color green"
-                              data-color="Xanh lá"
-                            ></span>
-                            <span
-                              className="color pink"
-                              data-color="Hồng"
-                            ></span>
-                          </div>
-
-                          <h4 className="product-title">
-                            Giày Converse Run Star Motion
-                          </h4>
-                          <div className="product-price">
-                            <span className="old-price">
-                              <del>1.500.000đ</del>
-                            </span>
-                            <span className="new-price">1.200.000đ</span>
-                          </div>
-                              <div className="hot-product-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: "87%" }}>
-                      <span className="sold-info">Đã bán 87 sản phẩm</span>
-                    </div>
-                  </div>
-                </div>
-                          <div className="product-rating">
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-regular fa-star"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="product-itemlist-main !block">
-                      <div className="product-card" style={{ width: "230px" }}>
-                        <div className="product-image">
-                          <img
-                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                            alt=""
-                          />
-                          <div className="product-icons">
-                            <i className="fa-solid fa-heart always-show"></i>
-                            <div className="hover-icons">
-                              <i className="fa-solid fa-eye"></i>
-                              <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-exchange"></i>
-                            </div>
-                          </div>
-
-                          <span className="discount-tag">-20%</span>
-
-                          <div className="product-colors">
-                            <span
-                              className="color blue"
-                              data-color="Xanh dương"
-                            ></span>
-                            <span
-                              className="color green"
-                              data-color="Xanh lá"
-                            ></span>
-                            <span
-                              className="color pink"
-                              data-color="Hồng"
-                            ></span>
-                          </div>
-
-                          <h4 className="product-title">
-                            Giày Converse Run Star Motion
-                          </h4>
-                          <div className="product-price">
-                            <span className="old-price">
-                              <del>1.500.000đ</del>
-                            </span>
-                            <span className="new-price">1.200.000đ</span>
-                          </div>
-                              <div className="hot-product-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: "87%" }}>
-                      <span className="sold-info">Đã bán 87 sản phẩm</span>
-                    </div>
-                  </div>
-                </div>
-                          <div className="product-rating">
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-regular fa-star"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 )}
                 {viewMode === "list" && (
                   <div className="product-grid-column">
-                    <div className="product-itemlist-main">
+                    {products.map((sp) => (
                       <div
-                        className="product-card"
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          background: "none",
-                        }}
+                        className="product-itemlist-main"
+                        key={sp.products_id}
                       >
-                        <div className="product-image">
-                          <img
-                            src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                            alt=""
-                          />
-                          <div className="product-icons">
-                            <i className="fa-solid fa-heart always-show"></i>
-                            <div className="hover-icons">
-                              <i className="fa-solid fa-eye"></i>
-                              <i className="fa-solid fa-list"></i>
-                              <i className="fa fa-exchange"></i>
+                        <div
+                          className="product-card"
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            background: "none",
+                          }}
+                        >
+                          <div className="product-image">
+                            <img
+                              src={
+                                sp.images?.[0]?.url || "/images/placeholder.png"
+                              }
+                              alt={sp.name}
+                            />
+                            <div className="product-icons">
+                              <i className="fa-solid fa-heart always-show"></i>
+                              <div className="hover-icons">
+                                <i className="fa-solid fa-eye"></i>
+                                <i className="fa-solid fa-list"></i>
+                                <i className="fa fa-exchange"></i>
+                              </div>
+                            </div>
+                            <div className="product-colors">
+                              {[
+                                ...new Map(
+                                  sp.variants.map((v) => [v.color.id, v.color])
+                                ).values(),
+                              ].map((color) => (
+                                <span
+                                  key={color.id}
+                                  className="color"
+                                  data-color={color.name_color}
+                                  style={{ backgroundColor: color.code_color }}
+                                ></span>
+                              ))}
                             </div>
                           </div>
-                          <div className="product-colors">
-                            <span
-                              className="color blue"
-                              data-color="Xanh dương"
-                            ></span>
-                            <span
-                              className="color green"
-                              data-color="Xanh lá"
-                            ></span>
-                            <span
-                              className="color pink"
-                              data-color="Hồng"
-                            ></span>
-                          </div>
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="discount-tag">-20%</span>
-
-                          <h4
-                            className="product-title-column"
-                            style={{ fontSize: "larger" }}
-                          >
-                            Giày Converse Run Star Motion
-                          </h4>
-                          <div className="product-price">
-                            <span className="old-price">
-                              <del>1.500.000đ</del>
+                          <div className="flex flex-col">
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((sp.price - sp.sale_price) / sp.price) * 100
+                              )}
+                              %
                             </span>
-                            <span className="new-price">1.200.000đ</span>
-                          </div>
-                          <p
-                            style={{
-                              margin: "10px 0 6px 10px",
-                              fontSize: "14px",
-                            }}
-                          >
-                            Giới thiệu đôi giày Nike Air Jordan 14 Retro - sự
-                            kết hợp hoàn hảo giữa tốc độ vượt trội...
-                          </p>
-                          <div className="product-rating">
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-solid fa-star"></i>
-                            <i className="fa-regular fa-star"></i>
+
+                            <h4
+                              className="product-title-column"
+                              style={{ fontSize: "larger" }}
+                            >
+                              {sp.name}
+                            </h4>
+                            <div className="product-price">
+                              <span className="old-price">
+                                <del>{sp.price.toLocaleString("vi")}đ</del>
+                              </span>
+                              <span className="new-price">
+                                {sp.sale_price.toLocaleString("vi")}đ
+                              </span>
+                            </div>
+                            <p
+                              style={{
+                                margin: "10px 0 6px 10px",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {sp.short_desc}...
+                            </p>
+                            <div className="product-rating">
+                              {Array.from({ length: 5 }, (_, i) =>
+                                i <
+                                (sp.reviews?.length
+                                  ? Math.round(
+                                      sp.reviews.reduce(
+                                        (s, r) => s + Number(r.rating),
+                                        0
+                                      ) / sp.reviews.length
+                                    )
+                                  : 0) ? (
+                                  <i key={i} className="fa-solid fa-star"></i>
+                                ) : (
+                                  <i key={i} className="fa-regular fa-star"></i>
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 )}
+                <div className="flex justify-center items-center gap-2 mt-6">
+                  <button
+                    onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    disabled={page === 1}
+                  >
+                    <i className="fa-solid fa-chevron-left"></i>
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => setPage(i + 1)}
+                      className={`!p-[7px]  rounded ${
+                        page === i + 1
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 hover:bg-gray-300"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    disabled={page === totalPages}
+                  >
+                    <i className="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-       </div>
+        </div>
       </main>
       <div
         id="open-filters"
