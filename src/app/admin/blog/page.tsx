@@ -2,6 +2,7 @@
 import "../css/css.css";
 import { useState } from "react";
 import "../css/dashboard.css";
+import "../css/blog_add.css";
 export default function Blog() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");

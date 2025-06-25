@@ -3,7 +3,7 @@
 import { IUser } from "@/types/user";
 const defaultUsers: IUser[] = [
   {
-    userId: 1,
+    id: 1,
     username: "bao",
     email: "baolcps41487@gmail.com",
     password_hash: "123456",
@@ -24,7 +24,7 @@ const defaultUsers: IUser[] = [
     otp_created_at: undefined,
   },
   {
-    userId: 2,
+    id: 2,
     username: "thanhnha",
     email: "bao@gmail.com",
     password_hash: "123456",
@@ -44,7 +44,7 @@ const defaultUsers: IUser[] = [
     otp_created_at: undefined,
   },
   {
-    userId: 6,
+    id: 6,
     username: "baole",
     email: "baolc@gmail.com",
     password_hash: "",

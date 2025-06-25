@@ -40,7 +40,19 @@ const defaultProducts: IProduct[] = [
       },
       {
         images_id: 102,
-        url: "/images/products/chaybo/ConverseRunStarMotion_side.webp",
+        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        alt_text: "Converse Run Star Motion bên hông",
+        type: "gallery",
+      },
+      {
+        images_id: 103,
+        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        alt_text: "Converse Run Star Motion bên hông",
+        type: "gallery",
+      },
+      {
+        images_id: 104,
+        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
         alt_text: "Converse Run Star Motion bên hông",
         type: "gallery",
       },
@@ -281,7 +293,7 @@ const defaultProducts: IProduct[] = [
 function normalizeProduct(p: any): IProduct {
   return {
     ...p,
-    id: p.id ?? p.productId ?? Math.random(), // đảm bảo có id
+    id: p.id ?? p.productId ?? Math.random(),
     name: p.name,
     price: p.price,
     sale_price: p.sale_price,

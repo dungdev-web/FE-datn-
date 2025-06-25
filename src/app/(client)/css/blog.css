@@ -373,6 +373,7 @@ main > aside:not(.mobile-sidebar) {
     display: block;
     position: relative;
     z-index: 1000 !important;
+   left: 18px ;
   }
   
 
@@ -409,7 +410,8 @@ main > aside:not(.mobile-sidebar) {
 
   /* Article chiếm toàn bộ chiều ngang */
   article {
-    width: 100%;
+   width: 100%;
+   padding: 0;
   }
 }
 .bread-crumb {

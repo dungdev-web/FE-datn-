@@ -1,8 +1,28 @@
+"use client";
 import "../css/style.css";
 import "../css/cart.css";
 import "../css/product.css";
 import Link from "next/link";
+import { getMockCartByUser } from "@/services/cartService";
+import { useEffect, useState } from "react";
+import { ICart, ICartItem } from "@/types/cart";
+
 export default function Cart() {
+  const [cart, setCart] = useState<ICart | null>(null);
+
+  useEffect(() => {
+    // Giả định userId lấy từ localStorage (hoặc từ context nếu bạn có)
+    const userIdStr = localStorage.getItem("userId");
+    if (userIdStr) {
+      const userId = parseInt(userIdStr);
+      const cartData = getMockCartByUser(userId);
+      setCart(cartData);
+    }
+  }, []);
+
+  if (!cart) {
+    return <div>Không có sản phẩm trong giỏ hàng</div>;
+  }
   return (
     <>
       <section
@@ -46,57 +66,38 @@ export default function Cart() {
               <div className="header-total">Thành tiền</div>
             </div>
 
-            <div className="cart-item">
-              <div className="product-info">
-                <img
-                  src="/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp"
-                  alt="Sản phẩm 1"
-                />
-                <div className="product-details">
-                  <div className="product-name">
-                    Abyss & Habidecor Super Pile Washcloth
+            {cart.items.map((item: ICartItem) => (
+              <div className="cart-item" key={item.cart_items_id}>
+                <div className="product-info">
+                  <img
+                    src="/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp"
+                    alt={`Sản phẩm ${item.variant_id}`}
+                  />
+                  <div className="product-details">
+                    <div className="product-name">
+                      Tên sản phẩm {item.variant_id}
+                    </div>
+                    <div className="product-desc">
+                      Mã biến thể: {item.variant_id}
+                    </div>
                   </div>
-                  <div className="product-desc">Màu sắc: xanh lam</div>
+                </div>
+                <div className="cart-item-price">
+                  {item.price?.toLocaleString()}₫
+                </div>
+                <div className="quantity-control">
+                  <button>-</button>
+                  <input type="text" value={item.quantity} readOnly />
+                  <button>+</button>
+                </div>
+                <div className="cart-item-total">
+                  {(item.price! * item.quantity).toLocaleString()}₫
+                  <span className="remove-btn">
+                    <i className="fa-solid fa-trash"></i>
+                  </span>
                 </div>
               </div>
-              <div className="cart-item-price">1,220,000₫</div>
-              <div className="quantity-control">
-                <button>-</button>
-                <input type="text" defaultValue="1" />
-                <button>+</button>
-              </div>
-              <div className="cart-item-total">
-                1,220,000₫
-                <span className="remove-btn">
-                  <i className="fa-solid fa-trash"></i>
-                </span>
-              </div>
-            </div>
-
-            <div className="cart-item">
-              <div className="product-info">
-                <img
-                  src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
-                  alt="Sản phẩm 2"
-                />
-                <div className="product-details">
-                  <div className="product-name">Cell phone Silver</div>
-                  <div className="product-desc">Màu sắc: Black</div>
-                </div>
-              </div>
-              <div className="cart-item-price">5,850,000₫</div>
-              <div className="quantity-control">
-                <button>-</button>
-                <input type="text" defaultValue="1" />
-                <button>+</button>
-              </div>
-              <div className="cart-item-total">
-                5,850,000₫
-                <span className="remove-btn">
-                  <i className="fa-solid fa-trash"></i>
-                </span>
-              </div>
-            </div>
+            ))}
 
             <div className="cart-actions">
               <a href="#" className="continue-shopping">
