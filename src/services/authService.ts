@@ -43,6 +43,36 @@ export async function loginUser(
 
   return data;
 }
+// --------- LOGIN GOOGLE -------
+export async function loginWithGoogle(): Promise<{ message: string; user: IUser }> {
+  const users = getMockUsers();
+
+  // Giả lập thông tin Google trả về
+  const googleEmail = "user.google@gmail.com";
+  const googleName = "Google User";
+
+  let user = users.find(u => u.email === googleEmail);
+
+  if (!user) {
+    // Nếu chưa có, tạo mới user
+    user = {
+      id: users.length + 1,
+      name: googleName,
+      email: googleEmail,
+      password_hash: "", // không có password
+      phone: "",
+      avatar: null,
+      address: "",
+      role: "user",
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
+    saveMockUsers([...users, user]);
+  }
+
+  return { message: "Đăng nhập Google thành công", user };
+}
 // --------- CHECKTOKEN ---------
 export async function checkToken(): Promise<{ user: IUser } | null> {
   const res = await fetch(`${API_BASE_URL}/check-token`, {

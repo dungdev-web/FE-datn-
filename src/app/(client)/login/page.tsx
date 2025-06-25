@@ -1,10 +1,11 @@
 "use client";
 import "../css/login.css";
-import { loginUser } from "@/services/authService";
+import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
+import { API_BASE_URL } from "@/config/env";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -26,6 +27,28 @@ export default function Login() {
     } catch (err: any) {
       toast.error(err.message);
     }
+  };
+  const handleGoogleLogin = async () => {
+    try {
+      const res = await loginWithGoogle();
+      localStorage.setItem("userIdG", res.user.id.toString());
+      toast.success(res.message);
+      router.push("/account");
+    } catch (err: any) {
+      toast.error(err.message || "Đăng nhập Google thất bại");
+    }
+  };
+  const googleLogin = () => {
+    const clientId = "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
+    const redirectUri = encodeURIComponent(
+      `http://localhost:3001/google/callback`
+    );
+    const scope = encodeURIComponent("profile email");
+    const responseType = "code";
+    console.log(clientId);
+    
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
+    window.location.href = url;
   };
 
   useEffect(() => {
@@ -94,9 +117,9 @@ export default function Login() {
             <br />
             <h5>Quên mật khẩu?</h5>
 
-            <div className="google-login">
+            <button className="google-login" onClick={googleLogin}>
               <i className="fab fa-google"></i> Đăng nhập bằng Google
-            </div>
+            </button>
 
             <div className="register-link">
               <p>

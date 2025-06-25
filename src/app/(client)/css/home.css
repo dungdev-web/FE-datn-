@@ -1428,7 +1428,7 @@
 }
 
 .swiper-slide img {
-  height: 650px;
+  /* height: 650px; */
   object-fit: cover;
   object-position: center;
 }
