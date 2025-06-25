@@ -13,6 +13,7 @@ export default async function handler(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code }),
+    credentials: "include",
   });
 
   const data = await backendRes.json();

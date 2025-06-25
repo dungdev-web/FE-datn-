@@ -15,11 +15,12 @@ export default function GoogleCallback() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
+        credentials: "include",
       })
         .then((res) => res.json())
         .then((data) => {
           localStorage.setItem("token", data.token);
-          // router.push("/account");
+          router.push("/account");
         })
         .catch((err) => console.error("Login error", err));
     }
