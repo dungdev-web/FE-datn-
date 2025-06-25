@@ -2,7 +2,10 @@
 import { API_BASE_URL } from "@/config/env";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   if (req.method !== "POST") return res.status(405).end();
 
   const { code } = req.body;
@@ -11,13 +14,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code }),
+    credentials: "include",
   });
 
   const data = await backendRes.json();
 
   if (backendRes.ok && data.token) {
     // Set cookie từ Next.js API route trả về browser
-    res.setHeader("Set-Cookie", `auth_token=${data.token}; HttpOnly; Path=/; Max-Age=3600; SameSite=Lax`);
+    res.setHeader(
+      "Set-Cookie",
+      `auth_token=${data.token}; HttpOnly; Path=/; Max-Age=3600; SameSite=Lax`
+    );
   }
 
   res.status(backendRes.status).json(data);
