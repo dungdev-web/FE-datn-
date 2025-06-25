@@ -83,13 +83,16 @@ export async function logoutUser(): Promise<{ message: string }> {
 // --------- REGISTER ---------
 export async function registerUser(
   formData: RegisterCredentials
-): Promise<{ message: string; user: IUser }> {
+): Promise<{ message: string; user: IUser; otp: string }> {
   if (IS_MOCK) {
     const users = getMockUsers();
     const existingUser = users.find(
       (u) => u.email === formData.email || u.name === formData.name
     );
     if (existingUser) throw new Error("Email hoặc tên người dùng đã tồn tại");
+
+    // Tạo OTP ngẫu nhiên 6 chữ số
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const newUser: IUser = {
       id: users.length + 1,
@@ -102,10 +105,14 @@ export async function registerUser(
       role: "user",
       created_at: new Date(),
       updated_at: new Date(),
+      reset_otp: otp,
+      otp_created_at: new Date(),
     };
 
     saveMockUsers([...users, newUser]);
-    return { message: "Đăng ký thành công", user: newUser };
+
+    // Trả về OTP để frontend hiển thị hoặc kiểm tra
+    return { message: "OTP đã gửi. Vui lòng xác thực.", user: newUser, otp };
   }
 
   const res = await fetch(`${API_BASE_URL}/register`, {
