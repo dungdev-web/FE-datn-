@@ -35,7 +35,7 @@ export async function loginUser(
     credentials: 'include' 
   });
   const data = await res.json();
-
+  localStorage.setItem("token",data.token);
   if (!res.ok) {
     const errorMessage = data.error || data.message || "Đăng nhập thất bại";
     throw new Error(errorMessage);
@@ -73,11 +73,13 @@ export async function loginWithGoogle(): Promise<{ message: string; user: IUser 
 
   return { message: "Đăng nhập Google thành công", user };
 }
-// --------- CHECKTOKEN ---------
-export async function checkToken(): Promise<{ user: IUser } | null> {
+export async function checkToken(token: string): Promise<{ user: IUser } | null> {
   const res = await fetch(`${API_BASE_URL}/check-token`, {
-    method: 'GET',
-    credentials: 'include'
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token }),
   });
 
   if (!res.ok) {
@@ -88,7 +90,7 @@ export async function checkToken(): Promise<{ user: IUser } | null> {
   const data = await res.json();
   return data;
 }
-// --------- CHECKTOKEN ---------
+
 export async function logoutUser(): Promise<{ message: string }> {
   if (IS_MOCK) {
     // Giả lập logout thành công
@@ -105,7 +107,7 @@ export async function logoutUser(): Promise<{ message: string }> {
     const errorMessage = data.error || data.message || "Đăng xuất thất bại";
     throw new Error(errorMessage);
   }
-
+  localStorage.removeItem("token")
   const data = await res.json();
   return data;
 }
