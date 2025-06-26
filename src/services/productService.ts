@@ -39,22 +39,26 @@ export const getProductDetail = async (
   if (IS_MOCK) {
     const products = getMockProducts();
 
-    if ("id" in identifier && "slug" in identifier) {
-      return products.find(
-        (p) => p.products_id === identifier.id && p.slug === identifier.slug
-      );
+    if ("id" in identifier) {
+      return products.find(p => p.products_id === identifier.id);
+    }
+    if ("slug" in identifier) {
+      return products.find(p => p.slug === identifier.slug);
     }
 
     return undefined;
   }
 
   try {
-    if (!("id" in identifier) || !("slug" in identifier)) {
-      throw new Error("Thiếu thông tin identifier");
+    let url = "";
+    
+    if ("id" in identifier && identifier.id) {
+      url = `${API_BASE_URL}/product/products/${identifier.id}`;
+    } else if ("slug" in identifier && identifier.slug) {
+      url = `${API_BASE_URL}/product/products/slug/${identifier.slug}`;
+    } else {
+      throw new Error("Thiếu id hoặc slug");
     }
-
-    // 👉 Gọi API đúng với backend route hiện tại
-    const url = `${API_BASE_URL}/product/products/${identifier.id}-${identifier.slug}`;
 
     const res = await fetch(url);
 
@@ -64,26 +68,80 @@ export const getProductDetail = async (
 
     const data: IProduct = await res.json();
     return data;
+
   } catch (error) {
     console.error("Lỗi khi lấy chi tiết sản phẩm:", error);
     return undefined;
   }
 };
 
+// lấy filter theo giá 
+export async function getFilterPrice(min?: number, max?: number): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const products = getMockProducts();
+
+    const filtered = products.filter((product) => {
+      const price = product.sale_price > 0 ? product.sale_price : product.price;
+
+      if (min !== undefined && max !== undefined) {
+        return price >= min && price < max;
+      }
+
+      if (min !== undefined) {
+        return price >= min;
+      }
+
+      if (max !== undefined) {
+        return price < max;
+      }
+
+      return true; // Không lọc nếu không có min/max
+    });
+
+    return filtered;
+  }
+
+  // Gọi API khi không mock
+  const queryParams: string[] = [];
+  if (min !== undefined) queryParams.push(`min=${min}`);
+  if (max !== undefined) queryParams.push(`max=${max}`);
+  const queryStr = queryParams.length ? `?${queryParams.join("&")}` : "";
+
+  const res = await fetch(`${API_BASE_URL}/product/products/filter${queryStr}`);
+
+  if (!res.ok) {
+    throw new Error("Không thể lấy sản phẩm theo khoảng giá.");
+  }
+
+  const data: IProduct[] = await res.json();
+  return data;
+}
 // Lấy sản phẩm bán chạy dựa trên số lượng review hoặc random sold_count
-export function getBestSellingMockProducts(top = 3): IProduct[] {
-  const products = getMockProducts();
+export async function getBestSellingMockProducts(top = 5): Promise<IProduct[]> {
+  if (IS_MOCK) {
+    const products = getMockProducts();
 
-  // Giả lập sold_count từ số lượng review hoặc random nếu không có review
-  const productsWithSold = products.map((p) => ({
-    ...p,
-    sold_count: (p.reviews?.length || 0) * 10 + Math.floor(Math.random() * 20),
-  }));
+    // Giả lập sold_count từ số lượng review hoặc random
+    const productsWithSold = products.map((p) => ({
+      ...p,
+      sold_count: (p.reviews?.length || 0) * 10 + Math.floor(Math.random() * 20),
+    }));
 
-  // Sắp xếp giảm dần theo sold_count
-  return productsWithSold
-    .sort((a, b) => b.sold_count - a.sold_count)
-    .slice(0, top);
+    // Sắp xếp và lấy top sản phẩm bán chạy nhất
+    return productsWithSold
+      .sort((a, b) => (b.sold_count || 0) - (a.sold_count || 0))
+      .slice(0, top);
+  }
+
+  // Nếu không mock → gọi API thực
+  const res = await fetch(`${API_BASE_URL}/product/products/best-selling?page=1&limit=${top}`);
+
+  if (!res.ok) {
+    throw new Error("Không thể lấy sản phẩm bán chạy.");
+  }
+
+  const data: IProduct[] = await res.json();
+  return data;
 }
 
 // Lấy sản phẩm theo slug

@@ -1,20 +1,13 @@
 export interface IUser {
-  userId: number;
-  username?: string;
+  id: number;
+  name?: string;
   email?: string;
   password_hash: string;
-  fullName: string;
-  avatar_url: string | null;
-  phoneNumber: string | null;
+  avatar: string | null;
+  picture: string | null;
+  phone: string | null;
   address: string | null;
-  city: string | null;
-  country: string | null;
-  last_login_at: string;
-  login_count: number;
-  email_verified: boolean;
-  email_verified_at: string | null;
-  created_at: string;
-  updated_at: string;
-  reset_otp?: string;
-  otp_created_at?: string;
+  role: string | "customer" | "admin";
+  created_at: Date;
+  updated_at: Date;
 }

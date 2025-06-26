@@ -1416,6 +1416,12 @@
   height: 650px;
 }
 
+.swiper-slide img {
+  /* height: 650px; */
+  object-fit: cover;
+  object-position: center;
+}
+
 .button-banner-left {
   position: absolute;
   bottom: 128px; /* bottom-32 */
