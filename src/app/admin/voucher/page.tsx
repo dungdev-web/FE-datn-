@@ -1,5 +1,5 @@
 "use client";
-import "@/src/app/admin/css/voucher_admin.css";
+import "../css/voucher_admin.css";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -56,10 +56,13 @@ export default function Voucher() {
               <th>Thao tác</th>
             </tr>
             <tr className="promotion-filter-row">
-              <th><input type="text" placeholder="Lọc mã..." /></th>
-              <th><input type="text" placeholder="Lọc loại..." /></th>
-               <th>
-
+              <th>
+                <input type="text" placeholder="Lọc mã..." />
+              </th>
+              <th>
+                <input type="text" placeholder="Lọc loại..." />
+              </th>
+              <th>
                 <select>
                   <option value="">Tất cả</option>
                   <option value="true">Kích hoạt</option>
@@ -72,7 +75,7 @@ export default function Voucher() {
               <th>
                 <input type="date" name="" id="" />
               </th>
-             
+
               <th></th>
               <th></th>
               <th></th>

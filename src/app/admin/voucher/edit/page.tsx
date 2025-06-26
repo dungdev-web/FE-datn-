@@ -1,5 +1,5 @@
 "use client";
-import "@/src/app/admin/css/voucher_add_admin.css";
+import "../css/voucher_add_admin.css";
 import Link from "next/link";
 export default function VoucherEdit() {
   return (

@@ -1,6 +1,6 @@
-"use client"
-import '@/src/app/admin/css/voucher_add_admin.css'
-import Link from 'next/link';
+"use client";
+import "../../css/voucher_add_admin.css";
+import Link from "next/link";
 export default function VoucherAdd() {
   return (
     <main className="main-content">
@@ -8,12 +8,10 @@ export default function VoucherAdd() {
         <h2>Tạo mã giảm giá</h2>
 
         <div className="promotion-actions">
-          <Link href={'/admin/voucher'} className="btn btn-back">
+          <Link href={"/admin/voucher"} className="btn btn-back">
             <i className="fa-solid fa-arrow-left"></i> Trở về
           </Link>
-          <button className="btn btn-add">
-             Tạo mã giảm giá
-          </button>
+          <button className="btn btn-add">Tạo mã giảm giá</button>
         </div>
 
         <form className="promotion-form">
