@@ -19,7 +19,7 @@ export default function Account() {
           console.error("Token không tồn tại");
           return;
         }
-        const tokenData = await checkToken(token); 
+        const tokenData = await checkToken(token);
 
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
 
@@ -139,7 +139,13 @@ export default function Account() {
                     >
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <img
-                          src="/images/default.png"
+                          src={
+                            user.picture // Nếu đăng nhập Google có ảnh
+                              ? user.picture
+                              : user.avatar // Nếu đăng nhập thường có ảnh
+                              ? user.avatar
+                              : "/images/default.png" // Nếu không có ảnh
+                          }
                           alt="Avatar"
                           style={{
                             width: "80px",
