@@ -62,6 +62,7 @@ export async function loginWithGoogle(): Promise<{ message: string; user: IUser 
       password_hash: "", // không có password
       phone: "",
       avatar: null,
+      picture: null,
       address: "",
       role: "user",
       created_at: new Date(),
@@ -133,12 +134,11 @@ export async function registerUser(
       password_hash: formData.password,
       phone: formData.phone,
       avatar: null,
+      picture: null,
       address: "",
       role: "user",
       created_at: new Date(),
       updated_at: new Date(),
-      reset_otp: otp,
-      otp_created_at: new Date(),
     };
 
     saveMockUsers([...users, newUser]);
