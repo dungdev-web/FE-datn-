@@ -1,0 +1,183 @@
+
+/* Container chính */
+.contact-us {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 50px auto;
+  padding: 20px;
+  gap: 50px;
+}
+
+/* Bên trái */
+.contact-left {
+  flex: 1;
+  min-width: 280px;
+}
+
+.contact-left h3 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.contact-left p {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.contact-left span {
+  font-weight: bold;
+  color: black;
+}
+
+.contact-left span:hover {
+  color: #4bd963;
+}
+
+/* Bên phải */
+.contact-right {
+  flex: 2;
+  min-width: 280px;
+}
+
+.contact-right h3 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.contact-right form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row input {
+  flex: 1;
+}
+
+.contact-right input,
+.contact-right textarea {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.contact-right textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.contact-right button {
+  width: 150px;
+  padding: 12px;
+  background-color: #021688;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.contact-right button:hover {
+  background-color: #0cbb29;
+}
+.header-nav-bg {
+  margin-bottom: 160px;
+}
+
+/* --- Responsive --- */
+@media (max-width:1198px){
+  .header-nav-bg {
+    margin-bottom: 0px !important;
+  }
+  .intro-banner{
+    margin-top: 30px;
+}
+}
+/* Tablet (dưới 1024px) */
+@media (max-width: 1024px) {
+  .intro-content h1 {
+    font-size: 32px;
+  }
+
+  .contact-us {
+    padding: 15px;
+    gap: 30px;
+  }
+
+  iframe {
+    height: 350px;
+  }
+  .intro-banner{
+    margin-top: 30px;
+}
+}
+
+/* Mobile lớn (dưới 768px) */
+@media (max-width: 768px) {
+  /* .intro-banner {
+    height: 250px;
+    margin-top: 80px;
+  } */
+
+  .intro-content h1 {
+    font-size: 28px;
+  }
+
+  .contact-us {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .form-row {
+    flex-direction: column;
+  }
+
+  iframe {
+    height: 300px;
+  }
+}
+
+/* Mobile nhỏ (dưới 480px) */
+@media (max-width: 480px) {
+  .intro-banner {
+    height: 200px;
+    margin-top: 60px;
+    padding: 0 10px;
+  }
+
+  .intro-content h1 {
+    font-size: 24px;
+  }
+
+  .intro-content p {
+    font-size: 14px;
+  }
+
+  .contact-left h3,
+  .contact-right h3 {
+    font-size: 20px;
+  }
+
+  .contact-right button {
+    width: 100%;
+  }
+
+  iframe {
+    height: 250px;
+  }
+}

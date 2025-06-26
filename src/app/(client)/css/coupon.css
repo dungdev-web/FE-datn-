@@ -1,0 +1,177 @@
+       .coupon-section {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .coupon {
+            width: 21%;
+            background: white;
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .coupon::before,
+        .coupon::after {
+            content: "";
+            width: 10px;
+            background: #fff;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            z-index: 2;
+        }
+
+        .coupon::before {
+            left: 80%;
+            border-left: 1px dashed #ccc;
+        }
+
+        .left-part {
+            width: 80%;
+            padding: 10px;
+        }
+
+        .right-part {
+            width: 20%;
+            background: #4bd963;
+            writing-mode: vertical-rl;
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            padding: 10px 15px;
+            letter-spacing: 2px;
+        }
+
+        .code {
+            font-size: 14px;
+            color: #FF0000;
+            margin-bottom: 5px;
+        }
+
+        .discount-box {
+            border: 1px solid #ccc;
+            padding: 6px;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .discount-box .title {
+            background: #FF0000;
+            color: white;
+            padding: 5px 5px;
+            font-size: 12px;
+            margin-bottom: 3px;
+            display: inline-block;
+        }
+
+        .discount-box .percent {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .desc {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .apply-link {
+            font-size: 12px;
+            color: #007bff;
+            text-decoration: underline;
+            display: inline-block;
+        }
+
+        .copy-button {
+            background: #021688;
+            border: none;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            color: white;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+
+        .modal-content-coupon {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 450px;
+            font-size: 14px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            line-height: 1.6;
+            z-index: 100000;
+        }
+
+        .modal-btn {
+            background: #facc15;
+            border: none;
+            padding: 8px 16px;
+            margin-left: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-btn.copy {
+            background-color: #1d4ed8;
+            color: white;
+        }
+
+        .modal-btn.close {
+            background-color: #e5e7eb;
+        }
+        .action-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.action-row .apply-link {
+  flex: 1;
+}
+
+.action-row .copy-button {
+  flex-shrink: 0;
+}
+/* Tablet */
+@media (max-width: 992px) {
+  .coupon {
+    width: 45%; /* 2 coupon trên 1 hàng */
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .coupon {
+    width: 90%; /* 1 coupon trên 1 hàng */
+  }
+
+}
