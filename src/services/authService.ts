@@ -35,7 +35,7 @@ export async function loginUser(
     credentials: 'include' 
   });
   const data = await res.json();
-  localStorage.setItem("token",data.token);
+  // localStorage.setItem("token",data.token);
   if (!res.ok) {
     const errorMessage = data.error || data.message || "Đăng nhập thất bại";
     throw new Error(errorMessage);
@@ -74,13 +74,11 @@ export async function loginWithGoogle(): Promise<{ message: string; user: IUser 
 
   return { message: "Đăng nhập Google thành công", user };
 }
-export async function checkToken(token: string): Promise<{ user: IUser } | null> {
+// --------- CHECKTOKEN ---------
+export async function checkToken(): Promise<{ user: IUser } | null> {
   const res = await fetch(`${API_BASE_URL}/check-token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ token }),
+    method: 'GET',
+    credentials: 'include'
   });
 
   if (!res.ok) {

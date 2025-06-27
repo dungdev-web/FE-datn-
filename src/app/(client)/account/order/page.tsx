@@ -12,12 +12,12 @@ export default function Order_Account() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          console.error("Token không tồn tại");
-          return;
-        }
-        const tokenData = await checkToken(token);
+        // const token = localStorage.getItem("token");
+        // if (!token) {
+        //   console.error("Token không tồn tại");
+        //   return;
+        // }
+        const tokenData = await checkToken();
 
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
 
