@@ -1,7 +1,7 @@
 "use client";
 import "@/src/app/admin/css/brands_admin.css";
 import Link from "next/link";
-import { useState } from "react";
+import { useState } from "react"; 
 
 export default function Brands() {
   const [isSearching, setIsSearching] = useState(false);
