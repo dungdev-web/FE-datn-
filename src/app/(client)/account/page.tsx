@@ -7,6 +7,7 @@ import { getInfoUser, checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import LogoutLink from "../component/log_out";
 import CheckTokenGuard from "@/store/CheckTokenGuard";
+import AccountSidebar from "../component/accountsidebar";
 export default function Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
@@ -14,12 +15,12 @@ export default function Account() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          console.error("Token không tồn tại");
-          return;
-        }
-        const tokenData = await checkToken(token);
+        // const token = localStorage.getItem("token");
+        // if (!token) {
+        //   console.error("Token không tồn tại");
+        //   return;
+        // }
+        const tokenData = await checkToken();
 
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
 
@@ -61,7 +62,7 @@ export default function Account() {
               <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
               <div className="breadcrumb-container">
                 <div className="title-page">
-                  <h2>Thôn tin tài khoản</h2>
+                  <h2>Thông tin tài khoản</h2>
                 </div>
                 <ul className="breadcrumb">
                   <li className="home">
@@ -72,7 +73,7 @@ export default function Account() {
                   </li>
                   <li>
                     <strong>
-                      <span>Thôn tin tài khoản</span>
+                      <span>Thông tin tài khoản</span>
                     </strong>
                   </li>
                   <li></li>
@@ -83,40 +84,8 @@ export default function Account() {
               <div className="container1">
                 <div className="row">
                   <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">
-                    <div className="block-account">
-                      <h5 className="title-account">Trang tài khoản</h5>
-                      <p>
-                        Xin chào, <span>{user.name}</span>&nbsp;!
-                      </p>
-                      <ul>
-                        <li>
-                          <LogoutLink></LogoutLink>
-                        </li>
-                        <li>
-                          <Link className="title-info active " href="/account">
-                            Thông tin tài khoản
-                          </Link>
-                        </li>
-                        <li>
-                          <Link className="title-info " href="/account/order">
-                            Đơn hàng của bạn
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            className="title-info"
-                            href="/account/change_pass"
-                          >
-                            Đổi mật khẩu
-                          </Link>
-                        </li>
-                        <li>
-                          <Link className="title-info" href="/account/address">
-                            Sổ địa chỉ (1)
-                          </Link>
-                        </li>
-                      </ul>
-                    </div>
+                    <AccountSidebar user={user} />
+
                   </div>
                   <div className="col-xs-12 col-sm-12 col-lg-9 col-right-ac">
                     <h1 className="title-head margin-top-0 ">
@@ -140,11 +109,11 @@ export default function Account() {
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <img
                           src={
-                            user.picture // Nếu đăng nhập Google có ảnh
+                            user.picture 
                               ? user.picture
-                              : user.avatar // Nếu đăng nhập thường có ảnh
+                              : user.avatar 
                               ? user.avatar
-                              : "/images/default.png" // Nếu không có ảnh
+                              : "/images/default.png" 
                           }
                           alt="Avatar"
                           style={{
@@ -176,7 +145,7 @@ export default function Account() {
                       <button
                         style={{
                           padding: "8px 16px",
-                          backgroundColor: "#007bff",
+                          backgroundColor: "#021688",
                           color: "white",
                           border: "none",
                           borderRadius: "5px",
@@ -213,7 +182,7 @@ export default function Account() {
                           input.click();
                         }}
                       >
-                        📷 Đổi ảnh
+                        <i className="fa-solid fa-camera"></i> Đổi ảnh
                       </button>
                     </div>
 

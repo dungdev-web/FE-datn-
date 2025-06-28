@@ -11,7 +11,7 @@ export default function GoogleCallback() {
     const code = searchParams.get("code");
 
     if (code) {
-      fetch("/api/google-auth", {
+      fetch("http://localhost:3000/google/callback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
@@ -19,7 +19,7 @@ export default function GoogleCallback() {
       })
         .then((res) => res.json())
         .then((data) => {
-          localStorage.setItem("token", data.token);
+          // localStorage.setItem("token", data.token);
           router.push("/account");
         })
         .catch((err) => console.error("Login error", err));
