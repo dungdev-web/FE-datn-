@@ -1,6 +1,5 @@
 "use client";
 import "../../css/detail.css";
-import "../../css/style.css";
 import { IProduct } from "@/types/product";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -9,12 +8,16 @@ import {
   getBestSellingMockProducts,
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
+import Swal from "sweetalert2";
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
   const [activeTab, setActiveTab] = useState("tab-1");
   const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
+  const [selectedImage, setSelectedImage] = useState("/images/placeholder.png");
+  const [quantity, setQuantity] = useState(1);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   useEffect(() => {
     const param = params.param;
@@ -49,6 +52,50 @@ export default function Detail() {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    if (product && Array.isArray(product.images) && product.images.length > 0) {
+      setSelectedImage(product.images[0]?.url ?? "/images/placeholder.png");
+    } else {
+      setSelectedImage("/images/placeholder.png");
+    }
+  }, [product]);
+  const handleMinus = () => {
+    setQuantity((prev) => Math.max(1, prev - 1)); // không nhỏ hơn 1
+  };
+
+  const handlePlus = () => {
+    setQuantity((prev) => Math.min(999, prev + 1)); // giới hạn 3 chữ số
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const num = parseInt(value, 10);
+    if (!isNaN(num) && num >= 1 && num <= 999) {
+      setQuantity(num);
+    } else if (value === "") {
+      setQuantity(1); // fallback nếu user xóa trắng
+    }
+  };
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code).then(() => {
+      Swal.fire({
+        icon: "success",
+        title: "Đã sao chép!",
+        text: `Mã "${code}" đã được sao chép.`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    });
+  };
+  const totalReviews = product?.reviews.length ?? 0;
+
+  const averageRating =
+    totalReviews > 0
+      ? product!.reviews.reduce((sum, r) => sum + parseFloat(r.rating), 0) /
+        totalReviews
+      : 0;
+
+  const roundedRating = Math.round(averageRating);
 
   if (loading) {
     return <div className="text-center py-10">Đang tải sản phẩm...</div>;
@@ -112,7 +159,11 @@ export default function Detail() {
                 <div className="row">
                   <div className="col-lg-5">
                     <div className="relative product-image-block">
-                      <div className="large-image">
+                      <div
+                        className="large-image"
+                        onClick={() => setIsZoomed(true)}
+                        style={{ cursor: "zoom-in" }}
+                      >
                         <div
                           data-href="https://bizweb.dktcdn.net/100/505/077/products/layer12137b41646ee49b99d29fc01.jpg?v=1702350249013"
                           className="large_image_url"
@@ -128,10 +179,7 @@ export default function Detail() {
                               <img
                                 id="zoom_01"
                                 className="img-responsive center-block !w-full !h-full"
-                                src={
-                                  product.images?.[0]?.url ||
-                                  "/images/placeholder.png"
-                                }
+                                src={selectedImage}
                                 alt={product.name}
                                 style={{ position: "absolute" }}
                               />
@@ -139,19 +187,35 @@ export default function Detail() {
                           </div>
                         </div>
                       </div>
+                      {isZoomed && (
+                        <div
+                          className="zoom-overlay"
+                          onClick={() => setIsZoomed(false)}
+                        >
+                          <img src={selectedImage} alt={product?.name} />
+                        </div>
+                      )}
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            {product.images?.map((img, index) => (
+                            {product.variants.map((img, index) => (
                               <div
                                 key={index}
-                                className="space-item-tsn tns-item tns-slide-active"
+                                className={`space-item-tsn tns-item tns-slide-active ${
+                                  selectedImage === img.color.image
+                                    ? "active"
+                                    : ""
+                                }`}
+                                onClick={() =>
+                                  setSelectedImage(img.color.image)
+                                }
+                                style={{ cursor: "pointer" }}
                               >
                                 <div className="item">
                                   <img
-                                    src={img.url}
+                                    src={img.color.image}
                                     className="img-responsive"
-                                    alt={img.alt_text || product.name}
+                                    alt={product.name}
                                   />
                                 </div>
                               </div>
@@ -199,14 +263,14 @@ export default function Detail() {
                             : "Hết hàng"}
                         </p>
                       </div>
-                      <div className="price-box clearfix">
+                      <div className="price-box clearfix gap-[10px] !m-0 ">
                         <span className="special-price">
-                          <span className="price product-price">
+                          <span className="price product-price !m-0">
                             {product.sale_price?.toLocaleString()}₫
                           </span>
                         </span>
                         <span className="old-price">
-                          <del className="price product-price-old">
+                          <del className="price product-price-old !ml-[10px]">
                             {product.price?.toLocaleString()}₫
                           </del>
                         </span>
@@ -241,19 +305,22 @@ export default function Detail() {
                           <span className="quantity-span hidden">
                             Số lượng:
                           </span>
-                          <span className="qtyminus" data-field="quantity">
+
+                          <span className="qtyminus" onClick={handleMinus}>
                             -
                           </span>
+
                           <input
                             type="text"
                             className="input-text qty"
                             maxLength={3}
-                            data-field="quantity"
-                            defaultValue="1"
+                            value={quantity}
+                            onChange={handleChange}
                             id="qty"
                             name="quantity"
                           />
-                          <span className="qtyplus" data-field="quantity">
+
+                          <span className="qtyplus" onClick={handlePlus}>
                             +
                           </span>
                         </div>
@@ -435,7 +502,6 @@ export default function Detail() {
                           <h4 className="text-lg font-semibold !mb-2">
                             Đánh giá trung bình
                           </h4>
-
                           <div className="flex items-center gap-2 !mb-4">
                             {[...Array(5)].map((_, i) => (
                               <svg
@@ -443,75 +509,54 @@ export default function Detail() {
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="18"
                                 height="18"
-                                fill={i < 4 ? "#facc15" : "#d1d5db"}
+                                fill={i < roundedRating ? "#facc15" : "#d1d5db"}
                                 viewBox="0 0 16 16"
                               >
                                 <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
                               </svg>
                             ))}
                             <span className="text-sm text-gray-500">
-                              (4.0 / 5)
+                              ({averageRating.toFixed(1)} / 5)
                             </span>
                           </div>
 
                           <div className="space-y-4">
-                            <div className="!p-3 border rounded shadow-sm bg-white !mb-[15px]">
-                              <div className="flex items-center gap-2 !mb-1">
-                                <strong className="text-sm">
-                                  Nguyễn Văn A
-                                </strong>
-                                <div className="flex gap-0.5">
-                                  {[...Array(5)].map((_, i) => (
-                                    <svg
-                                      key={i}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="14"
-                                      height="14"
-                                      fill="#facc15"
-                                      viewBox="0 0 16 16"
-                                    >
-                                      <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
-                                    </svg>
-                                  ))}
-                                </div>
-                              </div>
-                              <p className="text-sm text-gray-700">
-                                Giày đẹp, mang êm, đóng gói chắc chắn. Sẽ ủng hộ
-                                tiếp!
-                              </p>
-                            </div>
+                            {product.reviews.map((review, index) => {
+                              const rating = parseInt(review.rating);
 
-                            <div className="!p-3 border rounded shadow-sm bg-white !mb-[15px]">
-                              <div className="flex items-center gap-2 !mb-1">
-                                <strong className="text-sm">Trần Thị B</strong>
-                                <div className="flex gap-0.5">
-                                  {[...Array(4)].map((_, i) => (
-                                    <svg
-                                      key={i}
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      width="14"
-                                      height="14"
-                                      fill="#facc15"
-                                      viewBox="0 0 16 16"
-                                    >
-                                      <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
-                                    </svg>
-                                  ))}
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="14"
-                                    height="14"
-                                    fill="#d1d5db"
-                                    viewBox="0 0 16 16"
-                                  >
-                                    <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
-                                  </svg>
+                              return (
+                                <div
+                                  key={review.product_reviews_id || index}
+                                  className="!p-3 border rounded shadow-sm bg-white !mb-[15px]"
+                                >
+                                  <div className="flex items-center gap-2 !mb-1">
+                                    <img className="!w-[35px] rounded-[50%]" src={review.user.avatar} alt="" />
+                                    <strong className="text-sm">
+                                      {review.user?.name}
+                                    </strong>
+                                    <div className="flex gap-0.5">
+                                      {[...Array(5)].map((_, i) => (
+                                        <svg
+                                          key={i}
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="14"
+                                          height="14"
+                                          fill={
+                                            i < rating ? "#facc15" : "#d1d5db"
+                                          } 
+                                          viewBox="0 0 16 16"
+                                        >
+                                          <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
+                                        </svg>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <p className="text-sm text-gray-700">
+                                    {review.content}
+                                  </p>
                                 </div>
-                              </div>
-                              <p className="text-sm text-gray-700">
-                                Hàng đẹp nhưng giao hơi chậm. Chất lượng ổn áp.
-                              </p>
-                            </div>
+                              );
+                            })}
                           </div>
                           <div className="!mt-6 !p-4 border rounded-lg bg-white shadow-sm space-y-3">
                             <h4 className="text-lg font-semibold mb-2">
@@ -560,7 +605,7 @@ export default function Detail() {
                               ></textarea>
                             </div>
 
-                            <button className="!px-4 !py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                            <button className="!px-4 !py-2 bg-[#03177e] cursor-pointer text-white rounded hover:bg-blue-700 transition">
                               Gửi đánh giá
                             </button>
                           </div>
@@ -602,7 +647,7 @@ export default function Detail() {
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai1.png?1730865096645"
                           alt="Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng."
                         />
-                        <p>
+                        <p className="text-left">
                           Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
                         </p>
                       </li>
@@ -614,7 +659,9 @@ export default function Detail() {
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai2.png?1730865096645"
                           alt="Giảm giá 10% khi mua từ 5 sản phẩm trở lên."
                         />
-                        Giảm giá 10% khi mua từ 5 sản phẩm trở lên.
+                        <p className="text-left">
+                          Giảm giá 10% khi mua từ 5 sản phẩm trở lên.
+                        </p>
                       </li>
                       <li className="!flex gap-[10px]">
                         <img
@@ -624,9 +671,11 @@ export default function Detail() {
                           src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai3.png?1730865096645"
                           alt="Tặng 100.000₫ mua hàng tại website thành viên Halu Cosmetics, áp dụng khi mua Online tại Hà Nội và 1 số khu vực khác."
                         />
-                        Tặng 100.000₫ mua hàng tại website thành viên Halu
-                        Cosmetics, áp dụng khi mua Online tại Hà Nội và 1 số khu
-                        vực khác.
+                        <p className="text-left">
+                          Tặng 100.000₫ mua hàng tại website thành viên Halu
+                          Cosmetics, áp dụng khi mua Online tại Hà Nội và 1 số
+                          khu vực khác.
+                        </p>
                       </li>
                     </ul>
                   </div>
@@ -643,18 +692,16 @@ export default function Detail() {
                       <div className="d-flex items-center flex-wrap justify-between">
                         <button
                           className="btn btn-main btn-sm coupon_copy"
-                          data-ega-coupon="HLU10"
+                          onClick={() => handleCopy("HLU10")}
                         >
                           <span>Sao chép mã</span>
                         </button>
-
-                        <span
-                          className="coupon_info_toggle"
-                          data-toggle="tooltip"
-                          title=""
-                          data-original-title="Mã giảm 10% cho đơn tối thiểu 500k. Mỗi khách hàng được sử dụng tối đa 1 lần."
-                        >
+                        <span className="coupon_info_toggle">
                           Điều kiện
+                          <span className="tooltip-text">
+                            Mã giảm 10% cho đơn tối thiểu 500k. Mỗi khách hàng
+                            được sử dụng tối đa 1 lần.
+                          </span>
                         </span>
                       </div>
                     </div>
@@ -757,9 +804,9 @@ export default function Detail() {
                               {product.name}
                             </a>
                           </h3>
-                          <div className="price-box clearfix">
+                          <div className="price-box clearfix flex items-center !m-0 ">
                             <div className="special-price f-left">
-                              <span className="price product-price">
+                              <span className="price product-price !m-0">
                                 {product.sale_price.toLocaleString()}₫
                               </span>
                             </div>
