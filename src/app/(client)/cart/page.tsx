@@ -6,22 +6,77 @@ import Link from "next/link";
 import { getMockCartByUser } from "@/services/cartService";
 import { useEffect, useState } from "react";
 import { ICart, ICartItem } from "@/types/cart";
-
+import { checkToken } from "@/services/authService";
 export default function Cart() {
   const [cart, setCart] = useState<ICart | null>(null);
+  const FREE_SHIPPING_THRESHOLD = 9000000;
+  const subtotal =
+    cart?.items.reduce(
+      (sum, item) => sum + (item.price || 0) * item.quantity,
+      0
+    ) || 0;
+  const remainingAmount = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const progressPercent = Math.min(
+    100,
+    Math.floor((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
+  );
+const shipprice = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+
 
   useEffect(() => {
-    // Giả định userId lấy từ localStorage (hoặc từ context nếu bạn có)
-    const userIdStr = localStorage.getItem("userId");
-    if (userIdStr) {
-      const userId = parseInt(userIdStr);
-      const cartData = getMockCartByUser(userId);
-      setCart(cartData);
-    }
+    const fetchCart = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
+
+        const userId = tokenData.user.id;
+        const cartData = getMockCartByUser(userId);
+        setCart(cartData);
+      } catch (error) {
+        console.error("Lỗi khi lấy giỏ hàng:", error);
+      }
+    };
+
+    fetchCart();
   }, []);
 
   if (!cart) {
-    return <div>Không có sản phẩm trong giỏ hàng</div>;
+    return (
+      <>
+        <section
+          className="bread-crumb background-cover relative"
+          style={{
+            backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        >
+          {/* Lớp phủ làm mờ nền */}
+          <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+          <div className="breadcrumb-container">
+            <div className="title-page">
+              <h2>Giỏ hàng của bạn</h2>
+            </div>
+            <ul className="breadcrumb">
+              <li className="home">
+                <Link href="/" title="Trang chủ">
+                  <span>Trang chủ</span>
+                </Link>
+                <i className="fa fa-angle-right" aria-hidden="true"></i>
+              </li>
+              <li>
+                <strong>
+                  <span>Giỏ hàng</span>
+                </strong>
+              </li>
+              <li></li>
+            </ul>
+          </div>
+        </section>
+        <div>Không có sản phẩm trong giỏ hàng</div>
+      </>
+    );
   }
   return (
     <>
@@ -60,10 +115,18 @@ export default function Cart() {
         <div className="cart-container">
           <div className="cart-items">
             <div className="cart-header">
-              <div className="header-product">Sản phẩm</div>
-              <div className="header-price">Đơn Giá</div>
-              <div className="header-quantity">Số lượng</div>
-              <div className="header-total">Thành tiền</div>
+              <div className="header-product">
+                <p className="!ml-[200px]">Sản phẩm</p>
+              </div>
+              <div className="header-price">
+                <p>Đơn Giá</p>
+              </div>
+              <div className="header-quantity">
+                <p className="!ml-[20px]">Số lượng</p>
+              </div>
+              <div className="header-total">
+                <p>Thành tiền</p>
+              </div>
             </div>
 
             {cart.items.map((item: ICartItem) => (
@@ -78,12 +141,12 @@ export default function Cart() {
                       Tên sản phẩm {item.variant_id}
                     </div>
                     <div className="product-desc">
-                      Mã biến thể: {item.variant_id}
+                      Màu sắc: {item.variant_id}
                     </div>
                   </div>
                 </div>
                 <div className="cart-item-price">
-                  {item.price?.toLocaleString()}₫
+                  {item.price?.toLocaleString("vi")}₫
                 </div>
                 <div className="quantity-control">
                   <button>-</button>
@@ -91,7 +154,7 @@ export default function Cart() {
                   <button>+</button>
                 </div>
                 <div className="cart-item-total">
-                  {(item.price! * item.quantity).toLocaleString()}₫
+                  {(item.price! * item.quantity).toLocaleString("vi")}₫
                   <span className="remove-btn">
                     <i className="fa-solid fa-trash"></i>
                   </span>
@@ -109,29 +172,39 @@ export default function Cart() {
             </div>
             <div className="free-shipping-progress">
               <div className="progress-bar">
-                <div className="progress" style={{ width: "40%" }}>
-                  40%
+                <div
+                  className="progress"
+                  style={{ width: `${progressPercent}%` }}
+                >
+                  {progressPercent}%
                 </div>
               </div>
 
               <div className="progress-text">
-                <p>
-                  Chi thêm <span className="highlight">1,780,000₫</span> để được
-                  <strong>MIỄN PHÍ VẬN CHUYỂN!</strong>
-                </p>
-                <p>
-                  để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận giao
-                  hàng miễn phí cho đơn hàng
-                  <br />
-                  <span className="target-price">3,000,000₫</span>.
-                </p>
+                {remainingAmount > 0 ? (
+                  <>
+                    <p>
+                      Chi thêm{" "}
+                      <span className="highlight">
+                        {remainingAmount.toLocaleString("vi")}₫
+                      </span>{" "}
+                      để được <strong>MIỄN PHÍ VẬN CHUYỂN!</strong>
+                    </p>
+                    <p>
+                      để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận
+                      giao hàng miễn phí cho đơn hàng
+                      <br />
+                      <span className="target-price">9.000.000₫</span>.
+                    </p>
+                  </>
+                ) : (
+                  <p className="free-shipping">
+                    Chúc mừng! Bạn được giao hàng miễn phí với đơn hàng lớn hơn
+                    <b> 3,000,000₫</b>.
+                  </p>
+                )}
               </div>
             </div>
-
-            <p className="free-shipping">
-              Chúc mừng! Bạn được giao hàng miễn phí với đơn hàng lớn hơn
-              <b>3,000,000₫</b>.
-            </p>
           </div>
 
           <div className="cart-summary">
@@ -152,9 +225,16 @@ export default function Cart() {
               <div className="summary-row">
                 <span>Giao hàng:</span>
                 <span>
-                  <b>Free Shipping</b>
+                  {subtotal >= FREE_SHIPPING_THRESHOLD ? (
+                    <b>Free Shipping</b>
+                  ) : (
+                    <span>
+                      {shipprice.toLocaleString('vi')}₫
+                    </span>
+                  )}
                 </span>
               </div>
+
               <p className="shipping-note">
                 Tùy chọn giao hàng sẽ được cập nhật trong quá trình thanh toán.
               </p>
@@ -166,7 +246,7 @@ export default function Cart() {
 
               <div className="summary-row">
                 <span>Tổng:</span>
-                <span className="total">7,070,000₫</span>
+                <span className="total">{(subtotal+shipprice).toLocaleString("vi")}₫</span>
               </div>
             </div>
 
