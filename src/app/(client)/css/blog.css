@@ -77,7 +77,7 @@ main {
   gap: 10px; /* thêm khoảng cách giữa các cột */
 }
 
-aside {
+.desktop,.mobile-sidebar {
   width: 30%;
   padding: 20px;
 }

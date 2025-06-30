@@ -52,7 +52,7 @@ const defaultProducts: IProduct[] = [
       },
       {
         images_id: 104,
-        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        url: "/images/products/chaybo/NikeAirMax97SE(xanhlam).webp",
         alt_text: "Converse Run Star Motion bên hông",
         type: "gallery",
       },
@@ -63,11 +63,19 @@ const defaultProducts: IProduct[] = [
         product_reviews_id: 1001,
         rating: "5",
         content: "Giày đẹp, đi êm chân lắm!",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
       },
       {
         product_reviews_id: 1002,
         rating: "4",
         content: "Form hơi to, nên giảm nửa size.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
       },
     ],
 
@@ -75,13 +83,13 @@ const defaultProducts: IProduct[] = [
       {
         product_variants_id: 201,
         sku: "CV-RSM-BLK-40",
-        image: "/images/products/chaybo/ConverseRunStarMotion.webp",
         stock_quantity: 20,
         sale_price: 1200000,
         color: {
           id: 301,
           code_color: "#000000",
           name_color: "Đen",
+          image: "/images/products/chaybo/ConverseRunStarMotion.webp",
         },
         size: {
           id: 401,
@@ -91,13 +99,13 @@ const defaultProducts: IProduct[] = [
       {
         product_variants_id: 202,
         sku: "CV-RSM-WHT-41",
-        image: "/images/products/chaybo/ConverseRunStarMotion_white.webp",
         stock_quantity: 15,
         sale_price: 1200000,
         color: {
           id: 302,
           code_color: "#FFFFFF",
           name_color: "Trắng",
+          image: "/images/products/chaybo/ConverseRunStarMotion_white.webp",
         },
         size: {
           id: 402,
@@ -115,7 +123,11 @@ const defaultProducts: IProduct[] = [
     price: 2200000,
     sale_price: 1800000,
     status: "active",
-    category: { categories_id: 10, name: "Giày thể thao", slug: "giay-chay-bo" },
+    category: {
+      categories_id: 10,
+      name: "Giày thể thao",
+      slug: "giay-chay-bo",
+    },
     brand: {
       brand_id: 2,
       name: "Nike",
@@ -132,22 +144,46 @@ const defaultProducts: IProduct[] = [
       },
     ],
     reviews: [
-      { product_reviews_id: 2001, rating: "5", content: "Chạy rất đã." },
+      {
+        product_reviews_id: 2001,
+        rating: "5",
+        content: "Chạy rất đã.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
+      },
       {
         product_reviews_id: 2002,
         rating: "5",
         content: "Giày nhẹ, thoải mái.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
       },
-      { product_reviews_id: 2003, rating: "4", content: "Đế hơi cứng." },
+      {
+        product_reviews_id: 2003,
+        rating: "4",
+        content: "Đế hơi cứng.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
+      },
     ],
     variants: [
       {
         product_variants_id: 203,
         sku: "NK-PEG-GRN-42",
-        image: "/images/products/chaybo/NikePegasus39.webp",
         stock_quantity: 10,
         sale_price: 1800000,
-        color: { id: 303, code_color: "#00FF00", name_color: "Xanh lá" },
+        color: {
+          id: 303,
+          code_color: "#00FF00",
+          name_color: "Xanh lá",
+          image: "/images/products/chaybo/NikePegasus39.webp",
+        },
         size: { id: 403, number_size: "42" },
       },
     ],
@@ -184,21 +220,33 @@ const defaultProducts: IProduct[] = [
         product_reviews_id: 3001,
         rating: "5",
         content: "Cực kỳ êm và thoải mái.",
+        user: {
+          name: "dungne",
+          avatar: "images/default.png",
+        },
       },
       {
         product_reviews_id: 3002,
         rating: "4",
         content: "Đắt nhưng đáng tiền.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
       },
     ],
     variants: [
       {
         product_variants_id: 204,
         sku: "AD-UB22-BLU-43",
-        image: "/images/products/chaybo/Ultraboost22.webp",
         stock_quantity: 5,
         sale_price: 2550000,
-        color: { id: 304, code_color: "#0000FF", name_color: "Xanh dương" },
+        color: {
+          id: 304,
+          code_color: "#0000FF",
+          name_color: "Xanh dương",
+          image: "/images/products/chaybo/Ultraboost22.webp",
+        },
         size: { id: 404, number_size: "43" },
       },
     ],
@@ -231,17 +279,37 @@ const defaultProducts: IProduct[] = [
       },
     ],
     reviews: [
-      { product_reviews_id: 4001, rating: "4", content: "Nhẹ và thoải mái." },
-      { product_reviews_id: 4002, rating: "3", content: "Đế hơi cứng." },
+      {
+        product_reviews_id: 4001,
+        rating: "4",
+        content: "Nhẹ và thoải mái.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
+      },
+      {
+        product_reviews_id: 4002,
+        rating: "3",
+        content: "Đế hơi cứng.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
+      },
     ],
     variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
-        image: "/images/products/chaybo/PumaVelocityNitro2.webp",
         stock_quantity: 12,
         sale_price: 1600000,
-        color: { id: 305, code_color: "#FF0000", name_color: "Đỏ" },
+        color: {
+          id: 305,
+          code_color: "#FF0000",
+          name_color: "Đỏ",
+          image: "/images/products/chaybo/PumaVelocityNitro2.webp",
+        },
         size: { id: 405, number_size: "40" },
       },
     ],
@@ -273,17 +341,37 @@ const defaultProducts: IProduct[] = [
       },
     ],
     reviews: [
-      { product_reviews_id: 4001, rating: "4", content: "Nhẹ và thoải mái." },
-      { product_reviews_id: 4002, rating: "3", content: "Đế hơi cứng." },
+      {
+        product_reviews_id: 4001,
+        rating: "4",
+        content: "Nhẹ và thoải mái.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
+      },
+      {
+        product_reviews_id: 4002,
+        rating: "3",
+        content: "Đế hơi cứng.",
+        user: {
+          name: "dungne",
+          avatar: "/images/default.png",
+        },
+      },
     ],
     variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
-        image: "/images/products/chaybo/PumaVelocityNitro2.webp",
         stock_quantity: 12,
         sale_price: 1600000,
-        color: { id: 305, code_color: "#FF0000", name_color: "Đỏ" },
+        color: {
+          id: 305,
+          code_color: "#FF0000",
+          name_color: "Đỏ",
+          image: "/images/products/chaybo/PumaVelocityNitro2.webp",
+        },
         size: { id: 405, number_size: "40" },
       },
     ],
