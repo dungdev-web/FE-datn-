@@ -1,6 +1,7 @@
 "use client";
 import "../../css/detail.css";
 import { IProduct } from "@/types/product";
+import { ICartItem } from "@/types/cart";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
@@ -9,6 +10,8 @@ import {
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
+import { checkToken } from "@/services/authService";
+import { addToMockCart } from "@/services/cartService";
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,8 +20,36 @@ export default function Detail() {
   const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
   const [selectedImage, setSelectedImage] = useState("/images/placeholder.png");
   const [quantity, setQuantity] = useState(1);
+  const [variant, setVariant] = useState<ICartItem["variant"]>({
+    name: "",
+    color: {
+      id: 0,
+      code_color: "",
+      name_color: "",
+      image: "",
+    },
+    size: {
+      id: 0,
+      number_size: "",
+    },
+  });
+
+  const [price, setPrice] = useState<number>(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+
+  const handleAddToCart = async () => {
+    setLoading(true);
+    try {
+      const tokenData = await checkToken();
+      if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
+      await addToMockCart(tokenData.user.id, variant, quantity, price);
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const param = params.param;
@@ -32,10 +63,8 @@ export default function Detail() {
       let found = null;
 
       if (!isNaN(Number(paramStr))) {
-        // URL dạng id
         found = await getProductDetail({ id: Number(paramStr) });
       } else {
-        // URL dạng slug
         found = await getProductDetail({ slug: paramStr });
       }
 
@@ -60,6 +89,12 @@ export default function Detail() {
       setSelectedImage("/images/placeholder.png");
     }
   }, [product]);
+  useEffect(() => {
+  if (product) {
+    setPrice(product.sale_price ?? product.price); // Ưu tiên giá sale nếu có
+  }
+}, [product]);
+
   const handleMinus = () => {
     setQuantity((prev) => Math.max(1, prev - 1)); // không nhỏ hơn 1
   };
@@ -267,7 +302,7 @@ export default function Detail() {
                       <div className="price-box clearfix gap-[10px] !m-0 ">
                         <span className="special-price">
                           <span className="price product-price !m-0">
-                            {product.sale_price?.toLocaleString()}₫
+                            {price?.toLocaleString()}₫
                           </span>
                         </span>
                         <span className="old-price">
@@ -289,7 +324,14 @@ export default function Detail() {
                             <div
                               key={color.id}
                               className="color-circle"
-                              onClick={() => setSelectedColorId(color.id)}
+                              onClick={() => {
+                                setVariant({
+                                  name: product.name,
+                                  color: variant.color,
+                                  size: variant.size,
+                                });
+                                setSelectedColorId(color.id);
+                              }}
                               style={{
                                 backgroundColor: color.code_color,
                                 width: 24,
@@ -346,17 +388,16 @@ export default function Detail() {
                           <span className="quantity-span hidden">
                             Số lượng:
                           </span>
-
                           <span className="qtyminus" onClick={handleMinus}>
                             -
                           </span>
-
                           <input
                             type="text"
                             className="input-text qty"
                             maxLength={3}
                             value={quantity}
                             onChange={handleChange}
+                            
                             id="qty"
                             name="quantity"
                           />
@@ -452,10 +493,7 @@ export default function Detail() {
                         }`}
                       >
                         <div className="rte">
-                          <p>
-                            {product.description  }
-                          </p>
-                        
+                          <p>{product.description}</p>
                         </div>
                       </div>
 

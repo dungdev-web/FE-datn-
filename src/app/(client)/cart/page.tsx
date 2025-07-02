@@ -78,7 +78,7 @@ const handleChange = (
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
 
         const userId = tokenData.user.id;
-        const cartData = getMockCartByUser(userId);
+        const cartData = await getMockCartByUser(userId);
         setCart(cartData);
       } catch (error) {
         console.error("Lỗi khi lấy giỏ hàng:", error);
