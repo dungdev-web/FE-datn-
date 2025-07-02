@@ -159,7 +159,7 @@ const handleChange = (
           </ul>
         </div>
       </section>
-      <main>
+      <main className="main-cart">
         <div className="cart-container">
           <div className="cart-items">
             <div className="cart-header">
@@ -186,7 +186,7 @@ const handleChange = (
                   />
                   <div className="product-details">
                     <div className="product-name">
-                      Tên sản phẩm {item.variant.name}
+                       {item.variant.name}
                     </div>
                     <div className="product-desc">
                       Màu sắc: {item.variant.color.name_color} - Kích thước: {item.variant.size.number_size}

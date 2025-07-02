@@ -22,7 +22,7 @@ const defaultCart: ICart[] = [
             },
             size: {
               id: 401,
-              number_size: "40",
+              number_size: "41",
             },
           },
         
@@ -46,7 +46,7 @@ const defaultCart: ICart[] = [
             },
             size: {
               id: 401,
-              number_size: "40",
+              number_size: "41",
             },
           },
         
@@ -55,11 +55,35 @@ const defaultCart: ICart[] = [
         created_at: "2025-06-22T10:00:00.000Z",
         updated_at: "2025-06-22T10:00:00.000Z",
       },
+        {
+        cart_items_id: 3,
+        cart_id: 2,
+        variant: 
+          {
+            name: "Converse Run Star Motion",
+
+            color: {
+              id: 301,
+              code_color: "#000000",
+              name_color: "Đen",
+              image: "/images/products/chaybo/ConverseRunStarMotion.webp",
+            },
+            size: {
+              id: 401,
+              number_size: "31",
+            },
+          },
+        
+        quantity: 3,
+        price: 1200000,
+        created_at: "2025-06-22T11:00:00.000Z",
+        updated_at: "2025-06-22T11:00:00.000Z",
+      },
     ],
   },
-  {
+   {
     carts_id: 2,
-    user_id: 9,
+    user_id: 7,
     created_at: "2025-06-22T11:00:00.000Z",
     updated_at: "2025-06-22T11:00:00.000Z",
     items: [
@@ -78,7 +102,7 @@ const defaultCart: ICart[] = [
             },
             size: {
               id: 401,
-              number_size: "40",
+              number_size: "31",
             },
           },
         
@@ -89,6 +113,7 @@ const defaultCart: ICart[] = [
       },
     ],
   },
+ 
 ];
 export const getMockCart = (): ICart[] => {
   if (typeof window !== "undefined") {
