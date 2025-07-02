@@ -1,6 +1,7 @@
 "use client";
 import "../../css/detail.css";
 import { IProduct } from "@/types/product";
+import { ICartItem } from "@/types/cart";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
@@ -9,6 +10,8 @@ import {
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
+import { checkToken } from "@/services/authService";
+import { addToMockCart } from "@/services/cartService";
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +20,36 @@ export default function Detail() {
   const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
   const [selectedImage, setSelectedImage] = useState("/images/placeholder.png");
   const [quantity, setQuantity] = useState(1);
+  const [variant, setVariant] = useState<ICartItem["variant"]>({
+    name: "",
+    color: {
+      id: 0,
+      code_color: "",
+      name_color: "",
+      image: "",
+    },
+    size: {
+      id: 0,
+      number_size: "",
+    },
+  });
+
+  const [price, setPrice] = useState<number>(0);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+
+  const handleAddToCart = async () => {
+    setLoading(true);
+    try {
+      const tokenData = await checkToken();
+      if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
+      await addToMockCart(tokenData.user.id, variant, quantity, price);
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const param = params.param;
@@ -31,10 +63,8 @@ export default function Detail() {
       let found = null;
 
       if (!isNaN(Number(paramStr))) {
-        // URL dạng id
         found = await getProductDetail({ id: Number(paramStr) });
       } else {
-        // URL dạng slug
         found = await getProductDetail({ slug: paramStr });
       }
 
@@ -59,6 +89,12 @@ export default function Detail() {
       setSelectedImage("/images/placeholder.png");
     }
   }, [product]);
+  useEffect(() => {
+  if (product) {
+    setPrice(product.sale_price ?? product.price); // Ưu tiên giá sale nếu có
+  }
+}, [product]);
+
   const handleMinus = () => {
     setQuantity((prev) => Math.max(1, prev - 1)); // không nhỏ hơn 1
   };
@@ -266,7 +302,7 @@ export default function Detail() {
                       <div className="price-box clearfix gap-[10px] !m-0 ">
                         <span className="special-price">
                           <span className="price product-price !m-0">
-                            {product.sale_price?.toLocaleString()}₫
+                            {price?.toLocaleString()}₫
                           </span>
                         </span>
                         <span className="old-price">
@@ -288,14 +324,61 @@ export default function Detail() {
                             <div
                               key={color.id}
                               className="color-circle"
+                              onClick={() => {
+                                setVariant({
+                                  name: product.name,
+                                  color: variant.color,
+                                  size: variant.size,
+                                });
+                                setSelectedColorId(color.id);
+                              }}
                               style={{
                                 backgroundColor: color.code_color,
                                 width: 24,
                                 height: 24,
                                 borderRadius: "50%",
-                                border: "1px solid #ccc",
+                                border:
+                                  selectedColorId === color.id
+                                    ? "2px solid #facc15"
+                                    : "1px solid #ccc",
+                                cursor: "pointer",
                               }}
+                              title={color.name_color}
                             ></div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="swatch-size swatch clearfix">
+                        <div
+                          className="header"
+                          style={{
+                            background: "#fff",
+                          }}
+                        >
+                          Kích thước
+                        </div>
+
+                        <div className="size-options">
+                          {(selectedColorId
+                            ? product.variants.filter(
+                                (v) => v.color.id === selectedColorId
+                              )
+                            : product.variants
+                          ).map((variant, index) => (
+                            <button
+                              key={index}
+                              className="size-button"
+                              style={{
+                                padding: "8px 12px",
+                                marginRight: "5px",
+                                border: "1px solid #ccc",
+                                borderRadius: "4px",
+                                background: "#fff",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {variant.size.number_size}
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -305,17 +388,16 @@ export default function Detail() {
                           <span className="quantity-span hidden">
                             Số lượng:
                           </span>
-
                           <span className="qtyminus" onClick={handleMinus}>
                             -
                           </span>
-
                           <input
                             type="text"
                             className="input-text qty"
                             maxLength={3}
                             value={quantity}
                             onChange={handleChange}
+                            
                             id="qty"
                             name="quantity"
                           />
@@ -411,40 +493,7 @@ export default function Detail() {
                         }`}
                       >
                         <div className="rte">
-                          <p>
-                            Giới thiệu đôi giày Nike Air Jordan 14 Retro - sự
-                            kết hợp hoàn hảo giữa tốc độ vượt trội và phong cách
-                            đẳng cấp. Đôi giày sneaker này sở hữu gam màu Light
-                            Ginger, Trắng và Đen tạo nên vẻ ngoài táo bạo và độc
-                            đáo, thu hút sự chú ý bất kỳ nơi nào bạn đến.
-                          </p>
-                          <p>
-                            Được chế tạo với tinh tế và sự chú ý đến từng chi
-                            tiết, đôi giày này có phần trên màu da lộn màu vàng
-                            với điểm nhấn màu đen, tạo thêm độ sâu và sự tinh tế
-                            cho thiết kế. Đế trắng không chỉ phù hợp với gam màu
-                            mà còn mang lại độ bám và độ bền vượt trội.
-                          </p>
-                          <p>
-                            Thiết kế cho sự thoải mái tối đa, Nike Air Jordan 14
-                            Retro tích hợp công nghệ đệm khí Air của Nike, mang
-                            đến sự đàn hồi và êm ái mỗi bước đi. Gối đệm cổ chân
-                            và lưỡi gà đệm cung cấp sự hỗ trợ bổ sung cho mắt cá
-                            chân và giữ chân vững chắc, an toàn.
-                          </p>
-                          <p>
-                            Cho dù bạn đang đi dạo trên phố hay thi đấu trên sân
-                            bóng rổ, đôi giày này được thiết kế để biểu diễn.
-                            Vật liệu nhẹ và thoáng khí giúp giữ cho đôi chân mát
-                            mẻ và khô ráo, trong khi chất liệu chắc chắn có thể
-                            chịu đựng những hoạt động gay gắt.
-                          </p>
-                          <p>
-                            Nổi bật khác biệt và thể hiện phong cách độc đáo của
-                            bạn với đôi giày Nike Air Jordan 14 Retro. Sở hữu
-                            ngay đôi giày này và trải nghiệm sự kết hợp hoàn hảo
-                            giữa thời trang và tính năng.
-                          </p>
+                          <p>{product.description}</p>
                         </div>
                       </div>
 
@@ -530,7 +579,11 @@ export default function Detail() {
                                   className="!p-3 border rounded shadow-sm bg-white !mb-[15px]"
                                 >
                                   <div className="flex items-center gap-2 !mb-1">
-                                    <img className="!w-[35px] rounded-[50%]" src={review.user.avatar} alt="" />
+                                    <img
+                                      className="!w-[35px] rounded-[50%]"
+                                      src={review.user.avatar}
+                                      alt=""
+                                    />
                                     <strong className="text-sm">
                                       {review.user?.name}
                                     </strong>
@@ -543,7 +596,7 @@ export default function Detail() {
                                           height="14"
                                           fill={
                                             i < rating ? "#facc15" : "#d1d5db"
-                                          } 
+                                          }
                                           viewBox="0 0 16 16"
                                         >
                                           <path d="M3.612 15.443c-.396.198-.824-.149-.746-.592l.83-4.73-3.523-3.356c-.329-.314-.158-.888.283-.95l4.898-.696 2.184-4.327c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.283.95l-3.523 3.356.83 4.73c.078.443-.35.79-.746.592L8 13.187l-4.389 2.256z" />
