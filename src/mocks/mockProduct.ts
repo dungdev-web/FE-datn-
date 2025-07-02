@@ -97,6 +97,22 @@ const defaultProducts: IProduct[] = [
         },
       },
       {
+        product_variants_id: 201,
+        sku: "CV-RSM-BLK-40",
+        stock_quantity: 20,
+        sale_price: 1200000,
+        color: {
+          id: 301,
+          code_color: "#000000",
+          name_color: "Đen",
+          image: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        },
+        size: {
+          id: 401,
+          number_size: "41",
+        },
+      },
+      {
         product_variants_id: 202,
         sku: "CV-RSM-WHT-41",
         stock_quantity: 15,
@@ -109,7 +125,7 @@ const defaultProducts: IProduct[] = [
         },
         size: {
           id: 402,
-          number_size: "41",
+          number_size: "42",
         },
       },
     ],

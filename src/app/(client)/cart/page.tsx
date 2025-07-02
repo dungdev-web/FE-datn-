@@ -21,6 +21,54 @@ export default function Cart() {
     Math.floor((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
   );
 const shipprice = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+const handleMinus = (itemId: number) => {
+  setCart((prevCart) => {
+    if (!prevCart) return prevCart;
+    const newItems = prevCart.items.map((item) =>
+      item.cart_items_id === itemId
+        ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+        : item
+    );
+    return { ...prevCart, items: newItems };
+  });
+};
+
+const handlePlus = (itemId: number) => {
+  setCart((prevCart) => {
+    if (!prevCart) return prevCart;
+    const newItems = prevCart.items.map((item) =>
+      item.cart_items_id === itemId
+        ? { ...item, quantity: Math.min(999, item.quantity + 1) }
+        : item
+    );
+    return { ...prevCart, items: newItems };
+  });
+};
+
+const handleChange = (
+  itemId: number,
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const value = e.target.value;
+  const num = parseInt(value, 10);
+  setCart((prevCart) => {
+    if (!prevCart) return prevCart;
+    const newItems = prevCart.items.map((item) =>
+      item.cart_items_id === itemId
+        ? {
+            ...item,
+            quantity:
+              value === ""
+                ? 1
+                : !isNaN(num) && num >= 1 && num <= 999
+                ? num
+                : item.quantity,
+          }
+        : item
+    );
+    return { ...prevCart, items: newItems };
+  });
+};
 
 
   useEffect(() => {
@@ -133,15 +181,15 @@ const shipprice = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
                   <img
-                    src="/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp"
-                    alt={`Sản phẩm ${item.variant_id}`}
+                    src={item.variant.color.image}
+                    alt={`Sản phẩm ${item.variant.name}`}
                   />
                   <div className="product-details">
                     <div className="product-name">
-                      Tên sản phẩm {item.variant_id}
+                      Tên sản phẩm {item.variant.name}
                     </div>
                     <div className="product-desc">
-                      Màu sắc: {item.variant_id}
+                      Màu sắc: {item.variant.color.name_color} - Kích thước: {item.variant.size.number_size}
                     </div>
                   </div>
                 </div>
@@ -149,9 +197,9 @@ const shipprice = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
                   {item.price?.toLocaleString("vi")}₫
                 </div>
                 <div className="quantity-control">
-                  <button>-</button>
-                  <input type="text" value={item.quantity} readOnly />
-                  <button>+</button>
+                  <button  onClick={() => handleMinus(item.cart_items_id)}>-</button>
+                  <input type="text" value={item.quantity } onChange={(e) => handleChange(item.cart_items_id, e)}  />
+                  <button onClick={() => handlePlus(item.cart_items_id)}>+</button>
                 </div>
                 <div className="cart-item-total">
                   {(item.price! * item.quantity).toLocaleString("vi")}₫

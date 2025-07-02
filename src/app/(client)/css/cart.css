@@ -97,7 +97,7 @@ main {
 .cart-header,
 .cart-item {
     display: grid;
-    grid-template-columns: 4fr 1fr 2fr 1fr;;
+    grid-template-columns: 4fr 1fr 2fr 1.5fr;;
     align-items: center;
     gap: 20px;
     padding: 15px 0;
