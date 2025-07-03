@@ -20,30 +20,21 @@ export default function Detail() {
   const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
   const [selectedImage, setSelectedImage] = useState("/images/placeholder.png");
   const [quantity, setQuantity] = useState(1);
-  const [variant, setVariant] = useState<ICartItem["variant"]>({
-    name: "",
-    color: {
-      id: 0,
-      code_color: "",
-      name_color: "",
-      image: "",
-    },
-    size: {
-      id: 0,
-      number_size: "",
-    },
-  });
-
+  const [variantId, setVariantId] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
 
   const handleAddToCart = async () => {
     setLoading(true);
     try {
       const tokenData = await checkToken();
       if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
-      await addToMockCart(tokenData.user.id, variant, quantity, price);
+
+      await addToMockCart(tokenData.user.id, variantId, quantity, price);
+      console.log("đã thêm");
+      
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
     } finally {
@@ -90,10 +81,21 @@ export default function Detail() {
     }
   }, [product]);
   useEffect(() => {
-  if (product) {
-    setPrice(product.sale_price ?? product.price); // Ưu tiên giá sale nếu có
-  }
-}, [product]);
+    if (product) {
+      setPrice(product.sale_price ?? product.price);
+    }
+  }, [product]);
+  useEffect(() => {
+    if (selectedColorId && selectedSizeId && product) {
+      const match = product.variants.find(
+        (v) => v.color.id === selectedColorId && v.size.id === selectedSizeId
+      );
+      if (match) {
+        setVariantId(match.product_variants_id);
+        // setPrice(match.sale_price || match.); 
+      }
+    }
+  }, [selectedColorId, selectedSizeId, product]);
 
   const handleMinus = () => {
     setQuantity((prev) => Math.max(1, prev - 1)); // không nhỏ hơn 1
@@ -109,7 +111,7 @@ export default function Detail() {
     if (!isNaN(num) && num >= 1 && num <= 999) {
       setQuantity(num);
     } else if (value === "") {
-      setQuantity(1); // fallback nếu user xóa trắng
+      setQuantity(1);
     }
   };
   const handleCopy = (code: string) => {
@@ -325,11 +327,6 @@ export default function Detail() {
                               key={color.id}
                               className="color-circle"
                               onClick={() => {
-                                setVariant({
-                                  name: product.name,
-                                  color: variant.color,
-                                  size: variant.size,
-                                });
                                 setSelectedColorId(color.id);
                               }}
                               style={{
@@ -376,6 +373,7 @@ export default function Detail() {
                                 background: "#fff",
                                 cursor: "pointer",
                               }}
+                              onClick={() => setSelectedSizeId(variant.size.id)}
                             >
                               {variant.size.number_size}
                             </button>
@@ -397,7 +395,6 @@ export default function Detail() {
                             maxLength={3}
                             value={quantity}
                             onChange={handleChange}
-                            
                             id="qty"
                             name="quantity"
                           />
@@ -410,6 +407,7 @@ export default function Detail() {
                           type="submit"
                           className="btn btn-lg btn-gray btn-cart btn_buy add_to_cart"
                           title="Mua ngay"
+                          onClick={handleAddToCart}
                         >
                           <span className="txt-main">Mua ngay</span>
                         </button>

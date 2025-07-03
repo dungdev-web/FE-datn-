@@ -5,11 +5,17 @@ export interface ICart {
   updated_at: string;
   items: ICartItem[];
 }
-
+export interface Addtocart{
+  user_id: number;
+  variant_id:number;
+  quantity:number;
+  price:number;
+}
 export interface ICartItem {
   cart_items_id: number;
   cart_id: number;
   variant: {
+  variant_id:number;
     name:string;
     color: {
       id: number;

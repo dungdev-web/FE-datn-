@@ -12,8 +12,8 @@ const defaultCart: ICart[] = [
         cart_id: 1,
         variant: 
           {
+            variant_id:2,
             name: "Converse Run Star Motion",
-
             color: {
               id: 301,
               code_color: "#000000",
@@ -36,8 +36,8 @@ const defaultCart: ICart[] = [
         cart_id: 1,
         variant: 
           {
+            variant_id:2,
             name: "Converse Run Star Motion",
-
             color: {
               id: 301,
               code_color: "#000000",
@@ -60,8 +60,8 @@ const defaultCart: ICart[] = [
         cart_id: 2,
         variant: 
           {
+            variant_id:2,
             name: "Converse Run Star Motion",
-
             color: {
               id: 301,
               code_color: "#000000",
@@ -92,8 +92,8 @@ const defaultCart: ICart[] = [
         cart_id: 2,
         variant: 
           {
+            variant_id:2,
             name: "Converse Run Star Motion",
-
             color: {
               id: 301,
               code_color: "#000000",

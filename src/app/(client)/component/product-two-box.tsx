@@ -6,6 +6,7 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
@@ -61,11 +62,13 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                   <div className="product-itemlist-main">
                     <div className="product-card">
                       <div className="product-image">
+                        <Link href={`product/${sp.slug}`}>
                         <img
                           src={sp.images?.[0]?.url || "/images/placeholder.png"}
-                          alt=""
-                          className="!h-[150px]"
+                          alt={sp.name}
+                          className="!h-[150px] !w-[100%]"
                         />
+                        </Link>
                         <div className="product-icons">
                           <i className="fa-solid fa-heart always-show"></i>
                           <div className="hover-icons">

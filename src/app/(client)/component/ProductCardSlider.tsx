@@ -1,5 +1,5 @@
 import { IProduct } from "@/types/product";
-
+import Link from "next/link";
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const averageRating = product.reviews?.length
     ? Math.round(
@@ -21,7 +21,9 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
     <div className="product-itemlist-main">
       <div className="product-card">
         <div className="product-image">
+          <Link  href={`/product/${product.slug}`}>
           <img src={product.images[0].url || "/images/placeholder.png"} alt={product.name} />
+          </Link>
           <div className="product-icons">
             <i className="fa-solid fa-heart always-show"></i>
             <div className="hover-icons">

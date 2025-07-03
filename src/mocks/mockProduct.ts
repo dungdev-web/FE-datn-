@@ -84,7 +84,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 201,
         sku: "CV-RSM-BLK-40",
         stock_quantity: 20,
-        sale_price: 1200000,
         color: {
           id: 301,
           code_color: "#000000",
@@ -100,7 +99,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 201,
         sku: "CV-RSM-BLK-40",
         stock_quantity: 20,
-        sale_price: 1200000,
         color: {
           id: 301,
           code_color: "#000000",
@@ -116,7 +114,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 202,
         sku: "CV-RSM-WHT-41",
         stock_quantity: 15,
-        sale_price: 1200000,
         color: {
           id: 302,
           code_color: "#FFFFFF",
@@ -193,7 +190,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 203,
         sku: "NK-PEG-GRN-42",
         stock_quantity: 10,
-        sale_price: 1800000,
         color: {
           id: 303,
           code_color: "#00FF00",
@@ -256,7 +252,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 204,
         sku: "AD-UB22-BLU-43",
         stock_quantity: 5,
-        sale_price: 2550000,
         color: {
           id: 304,
           code_color: "#0000FF",
@@ -319,7 +314,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
         stock_quantity: 12,
-        sale_price: 1600000,
         color: {
           id: 305,
           code_color: "#FF0000",
@@ -356,7 +350,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    reviews: [  
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -381,7 +375,6 @@ const defaultProducts: IProduct[] = [
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
         stock_quantity: 12,
-        sale_price: 1600000,
         color: {
           id: 305,
           code_color: "#FF0000",
