@@ -35,13 +35,44 @@ export async function loginUser(
     credentials: 'include' 
   });
   const data = await res.json();
-
+  // localStorage.setItem("token",data.token);
   if (!res.ok) {
     const errorMessage = data.error || data.message || "Đăng nhập thất bại";
     throw new Error(errorMessage);
   }
 
   return data;
+}
+// --------- LOGIN GOOGLE -------
+export async function loginWithGoogle(): Promise<{ message: string; user: IUser }> {
+  const users = getMockUsers();
+
+  // Giả lập thông tin Google trả về
+  const googleEmail = "user.google@gmail.com";
+  const googleName = "Google User";
+
+  let user = users.find(u => u.email === googleEmail);
+
+  if (!user) {
+    // Nếu chưa có, tạo mới user
+    user = {
+      id: users.length + 1,
+      name: googleName,
+      email: googleEmail,
+      password_hash: "", // không có password
+      phone: "",
+      avatar: null,
+      picture: null,
+      address: "",
+      role: "user",
+      created_at: new Date(),
+      updated_at: new Date(),
+    };
+
+    saveMockUsers([...users, user]);
+  }
+
+  return { message: "Đăng nhập Google thành công", user };
 }
 // --------- CHECKTOKEN ---------
 export async function checkToken(): Promise<{ user: IUser } | null> {
@@ -58,7 +89,7 @@ export async function checkToken(): Promise<{ user: IUser } | null> {
   const data = await res.json();
   return data;
 }
-// --------- CHECKTOKEN ---------
+
 export async function logoutUser(): Promise<{ message: string }> {
   if (IS_MOCK) {
     // Giả lập logout thành công
@@ -75,7 +106,7 @@ export async function logoutUser(): Promise<{ message: string }> {
     const errorMessage = data.error || data.message || "Đăng xuất thất bại";
     throw new Error(errorMessage);
   }
-
+  localStorage.removeItem("token")
   const data = await res.json();
   return data;
 }
@@ -83,13 +114,16 @@ export async function logoutUser(): Promise<{ message: string }> {
 // --------- REGISTER ---------
 export async function registerUser(
   formData: RegisterCredentials
-): Promise<{ message: string; user: IUser }> {
+): Promise<{ message: string; user: IUser; otp: string }> {
   if (IS_MOCK) {
     const users = getMockUsers();
     const existingUser = users.find(
       (u) => u.email === formData.email || u.name === formData.name
     );
     if (existingUser) throw new Error("Email hoặc tên người dùng đã tồn tại");
+
+    // Tạo OTP ngẫu nhiên 6 chữ số
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
     const newUser: IUser = {
       id: users.length + 1,
@@ -98,6 +132,7 @@ export async function registerUser(
       password_hash: formData.password,
       phone: formData.phone,
       avatar: null,
+      picture: null,
       address: "",
       role: "user",
       created_at: new Date(),
@@ -105,7 +140,9 @@ export async function registerUser(
     };
 
     saveMockUsers([...users, newUser]);
-    return { message: "Đăng ký thành công", user: newUser };
+
+    // Trả về OTP để frontend hiển thị hoặc kiểm tra
+    return { message: "OTP đã gửi. Vui lòng xác thực.", user: newUser, otp };
   }
 
   const res = await fetch(`${API_BASE_URL}/register`, {

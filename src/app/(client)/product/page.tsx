@@ -1,5 +1,4 @@
 "use client";
-import "../css/product.css";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import { getAllProducts } from "@/services/productService";
@@ -450,7 +449,7 @@ export default function Product() {
                         >
                           <div className="product-image">
                             <Link
-                              href={`/product/${sp.products_id}-${sp.slug}`}
+                              href={`/product/${sp.slug}`}
                             >
                               <img
                                 src={
@@ -562,12 +561,18 @@ export default function Product() {
                           }}
                         >
                           <div className="product-image">
-                            <img
-                              src={
-                                sp.images?.[0]?.url || "/images/placeholder.png"
-                              }
-                              alt={sp.name}
-                            />
+                            <Link
+                              href={`/product/${sp.slug}`}
+                            >
+                              <img
+                                src={
+                                  sp.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={sp.name}
+                              />
+                            </Link>
+                           
                             <div className="product-icons">
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
@@ -576,20 +581,7 @@ export default function Product() {
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
-                            <div className="product-colors">
-                              {[
-                                ...new Map(
-                                  sp.variants.map((v) => [v.color.id, v.color])
-                                ).values(),
-                              ].map((color) => (
-                                <span
-                                  key={color.id}
-                                  className="color"
-                                  data-color={color.name_color}
-                                  style={{ backgroundColor: color.code_color }}
-                                ></span>
-                              ))}
-                            </div>
+                            
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -622,6 +614,7 @@ export default function Product() {
                             >
                               {sp.short_desc}...
                             </p>
+
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
@@ -638,6 +631,20 @@ export default function Product() {
                                   <i key={i} className="fa-regular fa-star"></i>
                                 )
                               )}
+                            </div>
+                            <div className="product-colors">
+                              {[
+                                ...new Map(
+                                  sp.variants.map((v) => [v.color.id, v.color])
+                                ).values(),
+                              ].map((color) => (
+                                <span
+                                  key={color.id}
+                                  className="color"
+                                  data-color={color.name_color}
+                                  style={{ backgroundColor: color.code_color }}
+                                ></span>
+                              ))}
                             </div>
                           </div>
                         </div>
