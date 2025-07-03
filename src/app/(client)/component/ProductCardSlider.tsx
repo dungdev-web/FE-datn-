@@ -1,5 +1,5 @@
 import { IProduct } from "@/types/product";
-
+import Link from "next/link";
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const averageRating = product.reviews?.length
     ? Math.round(
@@ -21,7 +21,12 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
     <div className="product-itemlist-main">
       <div className="product-card">
         <div className="product-image">
-          <img src={product.images[0].url || "/images/placeholder.png"} alt={product.name} />
+          <Link href={`/product/${product.slug}`}>
+            <img
+              src={product.images[0].url || "/images/placeholder.png"}
+              alt={product.name}
+            />
+          </Link>
           <div className="product-icons">
             <i className="fa-solid fa-heart always-show"></i>
             <div className="hover-icons">
@@ -46,19 +51,23 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
 
           <h4 className="product-title">{product.name}</h4>
           <div className="product-price">
-            <span className="old-price">
-              <del>{product.price.toLocaleString("vi")}đ</del>
-            </span>
+            {product.sale_price > 0 && (
+              <span className="old-price">
+                <del>{product.price.toLocaleString("vi")}đ</del>
+              </span>
+            )}
+
             <span className="new-price">
-              {product.sale_price.toLocaleString("vi")}đ
+              {(product.sale_price > 0
+                ? product.sale_price
+                : product.price
+              ).toLocaleString("vi")}
+              đ
             </span>
           </div>
           <div className="product-progress">
             <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: "87%" }}
-              >
+              <div className="progress-fill" style={{ width: "87%" }}>
                 <span className="sold">Đã bán {sold} sản phẩm</span>
               </div>
             </div>

@@ -28,9 +28,9 @@
   .col-lg-9 {
     width: 75%;
   }
-  .col-lg-push-3 {
+  /* .col-lg-push-3 {
     left: 25%;
-  }
+  } */
 }
 body {
   overflow-x: hidden;

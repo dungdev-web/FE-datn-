@@ -6,6 +6,7 @@ import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
@@ -53,7 +54,9 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
               );
 
               const uniqueColors = [
-                ...new Map(sp.variants.map((v) => [v.color.id, v.color])).values(),
+                ...new Map(
+                  sp.variants.map((v) => [v.color.id, v.color])
+                ).values(),
               ];
 
               return (
@@ -61,11 +64,15 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                   <div className="product-itemlist-main">
                     <div className="product-card">
                       <div className="product-image">
-                        <img
-                          src={sp.images?.[0]?.url || "/images/placeholder.png"}
-                          alt=""
-                          className="!h-[150px]"
-                        />
+                        <Link href={`product/${sp.slug}`}>
+                          <img
+                            src={
+                              sp.images?.[0]?.url || "/images/placeholder.png"
+                            }
+                            alt={sp.name}
+                            className="!h-[150px] !w-[100%]"
+                          />
+                        </Link>
                         <div className="product-icons">
                           <i className="fa-solid fa-heart always-show"></i>
                           <div className="hover-icons">
@@ -74,9 +81,14 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                             <i className="fa fa-exchange"></i>
                           </div>
                         </div>
-                        <span className="discount-tag">-{discountPercent}%</span>
+                        <span className="discount-tag">
+                          -{discountPercent}%
+                        </span>
                         <span className="new-tag">
-                          <img src="/images/logo/title_image_1_tag.webp" alt="" />
+                          <img
+                            src="/images/logo/title_image_1_tag.webp"
+                            alt=""
+                          />
                           Mới
                         </span>
                         <div className="product-colors">
@@ -92,17 +104,29 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                         </div>
                         <h4 className="product-title">{sp.name}</h4>
                         <div className="product-price">
-                          <span className="old-price">
-                            <del>{sp.sale_price.toLocaleString("vi")}đ</del>
-                          </span>
+                          {sp.sale_price > 0 && (
+                            <span className="old-price">
+                              <del>{sp.price.toLocaleString("vi")}đ</del>
+                            </span>
+                          )}
+
                           <span className="new-price">
-                            {sp.price.toLocaleString("vi")}đ
+                            {(sp.sale_price > 0
+                              ? sp.sale_price
+                              : sp.price
+                            ).toLocaleString("vi")}
+                            đ
                           </span>
                         </div>
                         <div className="product-progress">
                           <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: "87%" }}>
-                              <span className="sold">Đã bán {sold} sản phẩm</span>
+                            <div
+                              className="progress-fill"
+                              style={{ width: "87%" }}
+                            >
+                              <span className="sold">
+                                Đã bán {sold} sản phẩm
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -127,4 +151,3 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
     </div>
   );
 }
-

@@ -34,19 +34,22 @@ export interface IProduct {
   }[];
   reviews: {
     product_reviews_id: number;
-    rating:string;
-    content:string;
+    rating: string;
+    content: string;
+    user: {
+      name: string;
+      avatar: string;
+    };
   }[];
   variants: {
     product_variants_id: number;
     sku: string;
-    image: string;
     stock_quantity: number;
-    sale_price: number;
     color: {
       id: number;
       code_color: string;
       name_color: string;
+      image: string;
     };
     size: {
       id: number;
