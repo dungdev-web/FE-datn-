@@ -7,36 +7,24 @@ import { IProduct } from "@/types/product";
 import "swiper/css";
 import "swiper/css/navigation";
 import { getDealProducts } from "@/services/productService";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-export default function ProductSale({ product }: { product: IProduct }) {
-   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);
-    const averageRating = product?.reviews.length
-    ? Math.round(
-        product.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-          product.reviews.length
-      )
-    : 0;
 
-  const sold = product?.variants.reduce((sum, v) => sum + v.stock_quantity, 0);
-  const discount = Math.round(
-    ((product?.price - product?.sale_price) / product?.price) * 100
-  );
+export default function ProductSale() {
+  const [dealProducts, setDealProducts] = useState<IProduct[]>([]);
 
-  const uniqueColors = [
-    ...new Map(product?.variants.map((v) => [v.color.id, v.color])).values(),
-  ];
-    useEffect(() => {
-      const fetchDeals = async () => {
-        try {
-          const data = await getDealProducts();
-          setDealProducts(data);
-        } catch (error) {
-          console.error("Không thể tải sản phẩm đang deal:", error);
-        }
-      };
-      fetchDeals();
-    }, []);
+  useEffect(() => {
+    const fetchDeals = async () => {
+      try {
+        const data = await getDealProducts();
+        setDealProducts(data);
+      } catch (error) {
+        console.error("Không thể tải sản phẩm đang deal:", error);
+      }
+    };
+    fetchDeals();
+  }, []);
+
   return (
     <div className="w-full max-w-5xl mx-auto">
       <Swiper
@@ -61,67 +49,106 @@ export default function ProductSale({ product }: { product: IProduct }) {
         }}
         className="product-slider-track"
       >
-        {dealProducts.map((product) => (
+        {dealProducts.map((product) => {
+          const averageRating = product?.reviews?.length
+            ? Math.round(
+                product.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+                  product.reviews.length
+              )
+            : 0;
 
-        <SwiperSlide key={product.products_id}>
-          <div className="product-itemlist-main !block">
-            <div className="product-card11">
-              <div className="product-image">
-                <Link  href={`/product/${product.slug}`}>
-          <img src={product.images[0].url || "/images/placeholder.png"} alt={product.name} className="!h-[100%]"/>
-          </Link>
-                <div className="product-icons">
-                  <i className="fa-solid fa-heart always-show"></i>
-                  <div className="hover-icons">
-                    <i className="fa-solid fa-eye"></i>
-                    <i className="fa-solid fa-list"></i>
-                    <i className="fa fa-exchange"></i>
-                  </div>
-                </div>
+          const sold = product?.variants?.reduce(
+            (sum, v) => sum + v.stock_quantity,
+            0
+          );
 
-                <span className="discount-tag">-{discount}%</span>
+          const discount =
+            product?.price > 0
+              ? Math.round(
+                  ((product.price - product.sale_price) / product.price) * 100
+                )
+              : 0;
 
-                <div className="product-colors">
-                   {uniqueColors.map((color) => (
-              <span
-                key={color.id}
-                className="color"
-                data-color={color.name_color}
-                style={{ backgroundColor: color.code_color }}
-              ></span>
-            ))}
-                </div>
+          const uniqueColors = [
+            ...new Map(
+              product?.variants.map((v) => [v.color.id, v.color])
+            ).values(),
+          ];
 
-                <h4 className="product-title">{product.name}</h4>
-                <div className="product-price">
-                  <span className="old-price">
-                    <del>{product.sale_price}đ</del>
-                  </span>
-                  <span className="new-price"> {product.price}đ</span>
-                </div>
-                <div className="product-progress">
-                  <div className="progress-bar">
-                    <div className="progress-fill" style={{ width: "87%" }}>
-                      <span className="sold">Đã bán {sold} sản phẩm</span>
+          return (
+            <SwiperSlide key={product.products_id}>
+              <div className="product-itemlist-main !block">
+                <div className="product-card11">
+                  <div className="product-image">
+                    <Link href={`/product/${product.slug}`}>
+                      <img
+                        src={
+                          product.images[0]?.url || "/images/placeholder.png"
+                        }
+                        alt={product.name}
+                        className="!h-[100%]"
+                      />
+                    </Link>
+                    <div className="product-icons">
+                      <i className="fa-solid fa-heart always-show"></i>
+                      <div className="hover-icons">
+                        <i className="fa-solid fa-eye"></i>
+                        <i className="fa-solid fa-list"></i>
+                        <i className="fa fa-exchange"></i>
+                      </div>
+                    </div>
+
+                    <span className="discount-tag">-{discount}%</span>
+
+                    <div className="product-colors">
+                      {uniqueColors.map((color) => (
+                        <span
+                          key={color.id}
+                          className="color"
+                          data-color={color.name_color}
+                          style={{ backgroundColor: color.code_color }}
+                        ></span>
+                      ))}
+                    </div>
+
+                    <h4 className="product-title">{product.name}</h4>
+                    <div className="product-price">
+                      {product.sale_price > 0 && (
+                        <span className="old-price">
+                          <del>{product.price.toLocaleString("vi")}đ</del>
+                        </span>
+                      )}
+
+                      <span className="new-price">
+                        {(product.sale_price > 0
+                          ? product.sale_price
+                          : product.price
+                        ).toLocaleString("vi")}
+                        đ
+                      </span>
+                    </div>
+                    <div className="product-progress">
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: "87%" }}>
+                          <span className="sold">Đã bán {sold} sản phẩm</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="product-rating">
+                      {Array.from({ length: 5 }, (_, i) =>
+                        i < averageRating ? (
+                          <i key={i} className="fa-solid fa-star"></i>
+                        ) : (
+                          <i key={i} className="fa-regular fa-star"></i>
+                        )
+                      )}
                     </div>
                   </div>
                 </div>
-                <div className="product-rating">
-                  {Array.from({ length: 5 }, (_, i) =>
-              i < averageRating ? (
-                <i key={i} className="fa-solid fa-star"></i>
-              ) : (
-                <i key={i} className="fa-regular fa-star"></i>
-              )
-            )}
-                </div>
               </div>
-            </div>
-          </div>
-        </SwiperSlide>
-       
-             ))}
-
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
     </div>
   );

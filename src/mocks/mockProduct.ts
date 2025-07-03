@@ -327,7 +327,7 @@ const defaultProducts: IProduct[] = [
   {
     products_id: 5,
     name: "Puma Velocity Nitro 2",
-    slug: "puma-velocity-nitro-2",
+    slug: "puma-velocity-nitro-2.1",
     description:
       "Dòng giày nhẹ nhàng nhưng chắc chắn của Puma, dành cho vận động viên và người tập thể thao thường xuyên.",
     short_desc: "Công nghệ Nitro tạo độ bật và giảm lực tối ưu.",
