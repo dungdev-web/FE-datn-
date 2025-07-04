@@ -193,7 +193,7 @@ export default function Header() {
               {userId == 1 ? (
                 <Link
                   href="/account"
-                  className="cursor-pointer !text-white text-[12px] whitespace-nowrap"
+                  className="cursor-pointer !text-white text-[14px] whitespace-wrap"
                 >
                   Chào Truc
                 </Link>
