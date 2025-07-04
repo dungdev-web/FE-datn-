@@ -188,7 +188,7 @@ export default function Login() {
             <div className="register-link">
               <p>
                 Bạn chưa có tài khoản the light?{" "}
-                <Link href="/register.html">Đăng ký ngay</Link>
+                <Link href="/register">Đăng ký ngay</Link>
               </p>
             </div>
           </div>
