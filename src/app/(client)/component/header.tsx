@@ -12,7 +12,6 @@ export default function Header() {
   const cartIconRef = useRef<HTMLDivElement>(null);
   const cartPopupRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const menuRef = useRef<HTMLLIElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -189,19 +188,11 @@ export default function Header() {
         </div>
         <div className="icon-header">
           <div className="iconuser-header div">
-            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {userId == 1 ? (
-                <Link
-                  href="/account"
-                  className="cursor-pointer !text-white text-[14px] whitespace-wrap"
-                >
-                  Chào Truc
-                </Link>
-              ) : (
-                <Link href="/login">
-                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
-                </Link>
-              )}
+            <div className="login-mini">
+              <Link href="/login">
+                <i className="fa-solid fa-user cursor-pointer"></i>
+              </Link>
+
             </div>
           </div>
           <div className="iconheart-header div">
@@ -227,7 +218,6 @@ export default function Header() {
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
-      <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
       {showNav && (
         <nav className="transition-all duration-300">
           <div className="menu-nav">
