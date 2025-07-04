@@ -20,30 +20,21 @@ export default function Detail() {
   const [bestsellproducts, setBestSellProducts] = useState<IProduct[]>([]);
   const [selectedImage, setSelectedImage] = useState("/images/placeholder.png");
   const [quantity, setQuantity] = useState(1);
-  const [variant, setVariant] = useState<ICartItem["variant"]>({
-    name: "",
-    color: {
-      id: 0,
-      code_color: "",
-      name_color: "",
-      image: "",
-    },
-    size: {
-      id: 0,
-      number_size: "",
-    },
-  });
-
+  const [variantId, setVariantId] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState("");
 
   const handleAddToCart = async () => {
     setLoading(true);
     try {
       const tokenData = await checkToken();
       if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
-      await addToMockCart(tokenData.user.id, variant, quantity, price);
+
+      await addToMockCart(tokenData.user.id, variantId, quantity, price);
+      console.log("đã thêm");
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
     } finally {
@@ -90,10 +81,44 @@ export default function Detail() {
     }
   }, [product]);
   useEffect(() => {
-  if (product) {
-    setPrice(product.sale_price ?? product.price); // Ưu tiên giá sale nếu có
-  }
-}, [product]);
+    if (product) {
+      setPrice(product.sale_price > 0 ? product.sale_price : product.price);
+    }
+  }, [product]);
+
+  useEffect(() => {
+    if (selectedColorId && selectedSizeId && product) {
+      const match = product.variants.find(
+        (v) => v.color.id === selectedColorId && v.size.id === selectedSizeId
+      );
+      if (match) {
+        setVariantId(match.product_variants_id);
+        // setPrice(match.sale_price || match.);
+      }
+    }
+  }, [selectedColorId, selectedSizeId, product]);
+  useEffect(() => {
+    if (!product || product.sale_price <= 0) return;
+
+    const endTime = new Date(Date.now() + 1.5 * 60 * 60 * 1000); // 1.5 giờ
+
+    const interval = setInterval(() => {
+      const now = new Date();
+      const distance = endTime.getTime() - now.getTime();
+
+      if (distance <= 0) {
+        setCountdown("EXPIRED");
+        clearInterval(interval);
+      } else {
+        const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((distance / (1000 * 60)) % 60);
+        const seconds = Math.floor((distance / 1000) % 60);
+        setCountdown(`${hours} giờ ${minutes} phút ${seconds} giây`);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [product]);
 
   const handleMinus = () => {
     setQuantity((prev) => Math.max(1, prev - 1)); // không nhỏ hơn 1
@@ -109,7 +134,7 @@ export default function Detail() {
     if (!isNaN(num) && num >= 1 && num <= 999) {
       setQuantity(num);
     } else if (value === "") {
-      setQuantity(1); // fallback nếu user xóa trắng
+      setQuantity(1);
     }
   };
   const handleCopy = (code: string) => {
@@ -281,9 +306,10 @@ export default function Detail() {
                         data-date="2024-12-31 23:59:59"
                         id="countdown"
                       >
-                        EXPIRED
+                        {product.sale_price > 0 ? countdown : "EXPIRED"}
                       </div>
                     </div>
+
                     <h1 className="title-head">{product.name}</h1>
                     <div>
                       <link href="http://schema.org/InStock" />
@@ -299,17 +325,20 @@ export default function Detail() {
                             : "Hết hàng"}
                         </p>
                       </div>
-                      <div className="price-box clearfix gap-[10px] !m-0 ">
+                      <div className="price-box clearfix gap-[10px] !m-0">
                         <span className="special-price">
                           <span className="price product-price !m-0">
-                            {price?.toLocaleString()}₫
+                            {price?.toLocaleString("vi")}₫
                           </span>
                         </span>
-                        <span className="old-price">
-                          <del className="price product-price-old !ml-[10px]">
-                            {product.price?.toLocaleString()}₫
-                          </del>
-                        </span>
+
+                        {product.sale_price > 0 && price < product.price && (
+                          <span className="old-price">
+                            <del className="price product-price-old !ml-[10px]">
+                              {product.price?.toLocaleString("vi")}₫
+                            </del>
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="form-product">
@@ -325,11 +354,6 @@ export default function Detail() {
                               key={color.id}
                               className="color-circle"
                               onClick={() => {
-                                setVariant({
-                                  name: product.name,
-                                  color: variant.color,
-                                  size: variant.size,
-                                });
                                 setSelectedColorId(color.id);
                               }}
                               style={{
@@ -376,6 +400,7 @@ export default function Detail() {
                                 background: "#fff",
                                 cursor: "pointer",
                               }}
+                              onClick={() => setSelectedSizeId(variant.size.id)}
                             >
                               {variant.size.number_size}
                             </button>
@@ -397,7 +422,6 @@ export default function Detail() {
                             maxLength={3}
                             value={quantity}
                             onChange={handleChange}
-                            
                             id="qty"
                             name="quantity"
                           />
@@ -410,6 +434,7 @@ export default function Detail() {
                           type="submit"
                           className="btn btn-lg btn-gray btn-cart btn_buy add_to_cart"
                           title="Mua ngay"
+                          onClick={handleAddToCart}
                         >
                           <span className="txt-main">Mua ngay</span>
                         </button>

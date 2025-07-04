@@ -1,22 +1,22 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockCart, saveMockCart } from "@/mocks/mockCart";
-import { ICart,ICartItem } from "@/types/cart";
+import { ICart, ICartItem, Addtocart } from "@/types/cart";
 
 // Thêm sản phẩm vào giỏ mock
 export async function addToMockCart(
-  userId: number,
-  variant: ICartItem["variant"],
+  user_id: number,
+  variant_id: number,
   quantity: number,
   price: number
-): Promise<ICart | { data: any; total: number }> {
+): Promise<Addtocart | { data: any; total: number }> {
   if (IS_MOCK) {
     let carts = getMockCart();
-    let cart = carts.find(c => c.user_id === userId);
+    let cart = carts.find((c) => c.user_id === user_id);
 
     if (!cart) {
       cart = {
         carts_id: Date.now(),
-        user_id: userId,
+        user_id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         items: [],
@@ -25,20 +25,17 @@ export async function addToMockCart(
     }
 
     const existingItem = cart.items.find(
-      item =>
-        item.variant.color.id === variant.color.id &&
-        item.variant.size.id === variant.size.id &&
-        item.variant.name === variant.name
+      (item) => item.variant.variant_id === variant_id
     );
 
     if (existingItem) {
       existingItem.quantity += quantity;
       existingItem.updated_at = new Date().toISOString();
     } else {
-      const newItem: ICartItem = {
+      const newItem = {
         cart_items_id: Date.now(),
         cart_id: cart.carts_id,
-        variant,
+        variant: cart.items[0]?.variant,
         quantity,
         price,
         created_at: new Date().toISOString(),
@@ -50,7 +47,7 @@ export async function addToMockCart(
     cart.updated_at = new Date().toISOString();
     saveMockCart(carts);
 
-    return cart;
+    return { user_id, variant_id, quantity, price };
   } else {
     const res = await fetch(`${API_BASE_URL}/cart/addpro`, {
       method: "POST",
@@ -58,8 +55,8 @@ export async function addToMockCart(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId,
-        variant,
+        user_id,
+        variant_id,
         quantity,
         price,
       }),
@@ -77,12 +74,11 @@ export async function addToMockCart(
   }
 }
 
-
 // Lấy giỏ hàng của user
 export async function getMockCartByUser(userId: number): Promise<ICart | null> {
   if (IS_MOCK) {
     const carts = getMockCart();
-    return carts.find(c => c.user_id === userId) || null;
+    return carts.find((c) => c.user_id === userId) || null;
   }
   try {
     const res = await fetch(`${API_BASE_URL}/cart/user/${userId}`, {
@@ -109,12 +105,10 @@ export async function getMockCartByUser(userId: number): Promise<ICart | null> {
 export async function clearMockCart(userId: number): Promise<ICart | null> {
   if (IS_MOCK) {
     const allCarts = getMockCart();
-    const updatedCarts = allCarts.filter(c => c.user_id !== userId);
+    const updatedCarts = allCarts.filter((c) => c.user_id !== userId);
     saveMockCart(updatedCarts);
     return null;
   }
-
-  // Nếu dùng API thật
   const res = await fetch(`${API_BASE_URL}/cart/delete`, {
     method: "POST",
     body: JSON.stringify({ userId }),

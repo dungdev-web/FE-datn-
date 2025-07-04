@@ -951,7 +951,7 @@
 
 .swiper-slide img {
   /* width: 100%; */
- 
+  height: 255px ;
   display: block;
   object-fit: cover;
 }
@@ -1282,6 +1282,12 @@
     padding: 0;
   }
 
+ .swiper-slide img {
+    height: 205px !important;
+    object-fit: cover;
+    object-position: center;
+  }
+
   .banner-slider {
     height: 250px !important;
   }
@@ -1420,6 +1426,7 @@
   /* height: 650px; */
   object-fit: cover;
   object-position: center;
+  width: 100%;
 }
 
 .button-banner-left {

@@ -45,7 +45,6 @@ export interface IProduct {
     product_variants_id: number;
     sku: string;
     stock_quantity: number;
-    sale_price: number;
     color: {
       id: number;
       code_color: string;

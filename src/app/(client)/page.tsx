@@ -17,8 +17,9 @@ import { IProduct } from "@/types/product";
 import {
   getNewestProducts,
   getFeaturedProducts,
-  getProductsByCategory
+  getProductsByCategory,
 } from "@/services/productService";
+import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
 export default function Home({ product }: { product: IProduct }) {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
@@ -28,6 +29,9 @@ export default function Home({ product }: { product: IProduct }) {
   const marqueeRef = useRef<HTMLDivElement | null>(null);
   const [newproducts, setNewProducts] = useState<IProduct[]>([]);
   const [cateproducts, serCateProducts] = useState<IProduct[]>([]);
+  const [cateproducts1, serCateProducts1] = useState<IProduct[]>([]);
+  const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
+  const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
 
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
@@ -38,7 +42,7 @@ export default function Home({ product }: { product: IProduct }) {
   const handleClose = () => {
     setIsPlaying(false);
     if (videoRef.current) {
-      videoRef.current.src = ""; // Dừng video
+      videoRef.current.src = "";
     }
   };
   useEffect(() => {
@@ -113,17 +117,19 @@ export default function Home({ product }: { product: IProduct }) {
     };
     fetchData();
   }, []);
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const data = await getProductsByCategory("giày thể thao");
-          serCateProducts(data.slice(0, 10));
-        } catch (err) {
-          console.error("Lỗi khi lấy sản phẩm theo danh mục:", err);
-        }
-      };
-      fetchData();
-    }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getProductsByCategory("giày thể thao");
+        const data1 = await getProductsByCategory("giày chạy bộ");
+        serCateProducts(data.slice(0, 10));
+        serCateProducts1(data1.slice(0, 10));
+      } catch (err) {
+        console.error("Lỗi khi lấy sản phẩm theo danh mục:", err);
+      }
+    };
+    fetchData();
+  }, []);
   return (
     <div>
       <div className="banner-home relative">
@@ -442,12 +448,14 @@ export default function Home({ product }: { product: IProduct }) {
               return (
                 <div className="hot-product-card" key={product.products_id}>
                   <div className="hot-product-image">
-                    <img
-                      src={
-                        product.images?.[0]?.url || "/images/placeholder.png"
-                      }
-                      alt=""
-                    />
+                    <Link href={`product/${product.slug}`}>
+                      <img
+                        src={
+                          product.images?.[0]?.url || "/images/placeholder.png"
+                        }
+                        alt={product.name}
+                      />
+                    </Link>
                     <div className="hot-product-icons">
                       <i className="fa-solid fa-heart icon-favorite"></i>
                       <div className="icon-hover-group">
@@ -471,13 +479,20 @@ export default function Home({ product }: { product: IProduct }) {
                     </div>
                     <h4 className="hot-product-title">{product.name}</h4>
                     <div className="hot-product-price">
-                      <span className="price-old">
-                        <del>{product.price.toLocaleString("vi")}đ</del>
-                      </span>
+                      {product.sale_price > 0 && (
+                        <span className="price-old">
+                          <del>{product.price.toLocaleString("vi")}đ</del>
+                        </span>
+                      )}
                       <span className="price-new">
-                        {product.sale_price.toLocaleString("vi")}đ
+                        {(product.sale_price > 0
+                          ? product.sale_price
+                          : product.price
+                        ).toLocaleString("vi")}
+                        đ
                       </span>
                     </div>
+
                     <div className="hot-product-progress">
                       <div className="progress-bar">
                         <div className="progress-fill" style={{ width: "87%" }}>
@@ -544,12 +559,14 @@ export default function Home({ product }: { product: IProduct }) {
               return (
                 <div className="hot-product-card" key={product.products_id}>
                   <div className="hot-product-image">
-                    <img
-                      src={
-                        product.images?.[0]?.url || "/images/placeholder.png"
-                      }
-                      alt=""
-                    />
+                    <Link href={`product/${product.slug}`}>
+                      <img
+                        src={
+                          product.images?.[0]?.url || "/images/placeholder.png"
+                        }
+                        alt={product.name}
+                      />
+                    </Link>
                     <div className="hot-product-icons">
                       <i className="fa-solid fa-heart icon-favorite"></i>
                       <div className="icon-hover-group">
@@ -573,11 +590,17 @@ export default function Home({ product }: { product: IProduct }) {
                     </div>
                     <h4 className="hot-product-title">{product.name}</h4>
                     <div className="hot-product-price">
-                      <span className="price-old">
-                        <del>{product.price.toLocaleString("vi")}đ</del>
-                      </span>
+                      {product.sale_price > 0 && (
+                        <span className="price-old">
+                          <del>{product.price.toLocaleString("vi")}đ</del>
+                        </span>
+                      )}
                       <span className="price-new">
-                        {product.sale_price.toLocaleString("vi")}đ
+                        {(product.sale_price > 0
+                          ? product.sale_price
+                          : product.price
+                        ).toLocaleString("vi")}
+                        đ
                       </span>
                     </div>
                     <div className="hot-product-progress">
@@ -607,13 +630,11 @@ export default function Home({ product }: { product: IProduct }) {
 
         <div className="product-two-box-container flex gap-[75px] flex-wrap">
           <>
-          <Show2sanpham products={cateproducts} />
-          <Show2sanpham products={cateproducts} />
-
+            <Show2sanpham products={cateproducts} />
+            <Show2sanpham products={cateproducts1} />
           </>
           <img src="/images/banner/session_cate.jpg" alt="" />
           <Show2sanpham products={cateproducts} />
-          
         </div>
 
         <div className="video-main">
