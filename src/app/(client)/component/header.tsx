@@ -22,7 +22,7 @@ export default function Header() {
 
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
-
+  const userId = 1;
   let hideTimeout = null;
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -177,10 +177,9 @@ export default function Header() {
           </div>
         </div>
         <div className="logo-header">
-          <Link href={'/'}>
+          <Link href={"/"}>
             <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
           </Link>
-        
         </div>
         <div className="iconphone-header">
           <div className="iconphon-header1">
@@ -190,11 +189,19 @@ export default function Header() {
         </div>
         <div className="icon-header">
           <div className="iconuser-header div">
-            <div className="login-mini">
-              <i
-                className="fa-solid fa-user cursor-pointer"
-                onClick={() => setShowLogin(true)}
-              ></i>
+            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+              {userId == 1 ? (
+                <Link
+                  href="/account"
+                  className="cursor-pointer !text-white text-[12px] whitespace-nowrap"
+                >
+                  Chào Truc
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
+                </Link>
+              )}
             </div>
           </div>
           <div className="iconheart-header div">

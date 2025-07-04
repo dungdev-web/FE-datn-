@@ -96,7 +96,7 @@ export default function Register() {
 
             <div className="register-link">
               <p>
-                Bạn chưa có tài khoản? <a href="/login.html">Đăng nhập ngay</a>
+                Bạn chưa có tài khoản? <a href="/login">Đăng nhập ngay</a>
               </p>
             </div>
           </div>
