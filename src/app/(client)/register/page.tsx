@@ -158,6 +158,8 @@ export default function Register() {
               <p className="p">
                 Thông tin của bạn sẽ được bảo mật theo chính sách riêng tư của
                 chúng tôi
+              <p>
+                Bạn chưa có tài khoản? <a href="/login">Đăng nhập ngay</a>
               </p>
             </div>
 

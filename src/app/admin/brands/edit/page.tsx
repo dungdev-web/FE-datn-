@@ -1,5 +1,5 @@
 "use client";
-import "@/src/app/admin/css/brand_add_admin.css";
+import "../css/brand_add_admin.css";
 import Link from "next/link";
 export default function BrandEdit() {
   return (
@@ -65,9 +65,9 @@ export default function BrandEdit() {
 
           <div className="form-actions">
             <button type="submit" className="submit-btn">
-               Cập nhật 
+              Cập nhật
             </button>
-             <Link href={'/admin/brands'} type="button" className="btn btn-back">
+            <Link href={"/admin/brands"} type="button" className="btn btn-back">
               <i className="fa-solid fa-arrow-left"></i> Trở về
             </Link>
           </div>
