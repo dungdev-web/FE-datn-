@@ -1,5 +1,5 @@
 "use client";
-import "@/src/app/admin/css/categories_add_admin.css";
+import "../css/categories_add_admin.css";
 import Link from "next/link";
 export default function CategoryAdd() {
   return (
