@@ -1,7 +1,7 @@
 export type ValidateFieldProps = {
   name: string;
   value: string;
-  formType: "login" | "register";
+  formType: "login" | "register" | "forgotPassword" | "otp";
 };
 
 export const validateField = ({
@@ -56,6 +56,13 @@ export const validateField = ({
         if (!value.trim()) return "Số điện thoại không được để trống";
         if (!/^0\d{9}$/.test(value))
           return "Số điện thoại phải bắt đầu bằng 0 và đủ 10 số";
+      }
+      return "";
+
+    case "otp":
+      if (formType === "otp") {
+        if (!value.trim()) return "OTP không được để trống";
+        if (!/^\d{6}$/.test(value)) return "OTP phải gồm 6 chữ số";
       }
       return "";
 

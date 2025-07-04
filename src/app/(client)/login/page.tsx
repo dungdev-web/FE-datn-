@@ -7,7 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
 import { Eye, EyeOff } from "lucide-react";
 import { validateField } from "@/hooks/validate_login_register";
-
+import Link from "next/link";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -177,7 +177,9 @@ export default function Login() {
             )}
 
             <br />
-            <h5>Quên mật khẩu?</h5>
+            <h5><Link href="/forgot-password">
+            Quên mật khẩu?
+            </Link></h5>
 
             <button className="google-login" onClick={googleLogin}>
               <i className="fab fa-google"></i> Đăng nhập bằng Google
@@ -186,7 +188,7 @@ export default function Login() {
             <div className="register-link">
               <p>
                 Bạn chưa có tài khoản the light?{" "}
-                <a href="/register.html">Đăng ký ngay</a>
+                <Link href="/register.html">Đăng ký ngay</Link>
               </p>
             </div>
           </div>
