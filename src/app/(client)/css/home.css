@@ -1287,6 +1287,12 @@
     object-position: center;
   }
 
+ .swiper-slide img {
+    height: 205px !important;
+    object-fit: cover;
+    object-position: center;
+  }
+
   .banner-slider {
     height: 250px !important;
   }

@@ -1,5 +1,7 @@
 "use client";
-import "@/src/app/admin/css/brands_admin.css";
+
+import "../css/brands_admin.css";
+>>>>>> main
 import Link from "next/link";
 import { useState } from "react"; 
 
