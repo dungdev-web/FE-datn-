@@ -102,7 +102,7 @@ header {
 
 /* Nền màu */
 header:before {
-  /* background-color: #021688; */
+  background-color: #021688;
   content: "";
   position: absolute;
   top: 0;

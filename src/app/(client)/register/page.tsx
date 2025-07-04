@@ -30,14 +30,7 @@ export default function Register() {
   };
   return (
     <>
-      <div className="intro-banner">
-        <div className="intro-content">
-          <h1>Giỏ hàng</h1>
-          <p>
-            <a href="/index.html">Trang chủ</a> • Giỏ hàng
-          </p>
-        </div>
-      </div>
+
       <main>
         <div className="auth-container">
           <img

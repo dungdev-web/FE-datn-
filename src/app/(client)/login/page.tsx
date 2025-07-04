@@ -68,8 +68,8 @@ export default function Login() {
 
   return (
     <>
-      <div className="intro-banner"></div>
-      <main>
+     
+      <main className="">
         <div className="auth-container">
           <img
             src="images/blog/section_instagram_img6.webp"
