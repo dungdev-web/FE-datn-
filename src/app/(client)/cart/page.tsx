@@ -1,8 +1,131 @@
+"use client";
 import "../css/style.css";
 import "../css/cart.css";
 import "../css/product.css";
 import Link from "next/link";
+import { getMockCartByUser } from "@/services/cartService";
+import { useEffect, useState } from "react";
+import { ICart, ICartItem } from "@/types/cart";
+import { checkToken } from "@/services/authService";
 export default function Cart() {
+  const [cart, setCart] = useState<ICart | null>(null);
+  const FREE_SHIPPING_THRESHOLD = 9000000;
+  const subtotal =
+    cart?.items.reduce(
+      (sum, item) => sum + (item.price || 0) * item.quantity,
+      0
+    ) || 0;
+  const remainingAmount = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+  const progressPercent = Math.min(
+    100,
+    Math.floor((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
+  );
+const shipprice = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
+const handleMinus = (itemId: number) => {
+  setCart((prevCart) => {
+    if (!prevCart) return prevCart;
+    const newItems = prevCart.items.map((item) =>
+      item.cart_items_id === itemId
+        ? { ...item, quantity: Math.max(1, item.quantity - 1) }
+        : item
+    );
+    return { ...prevCart, items: newItems };
+  });
+};
+
+const handlePlus = (itemId: number) => {
+  setCart((prevCart) => {
+    if (!prevCart) return prevCart;
+    const newItems = prevCart.items.map((item) =>
+      item.cart_items_id === itemId
+        ? { ...item, quantity: Math.min(999, item.quantity + 1) }
+        : item
+    );
+    return { ...prevCart, items: newItems };
+  });
+};
+
+const handleChange = (
+  itemId: number,
+  e: React.ChangeEvent<HTMLInputElement>
+) => {
+  const value = e.target.value;
+  const num = parseInt(value, 10);
+  setCart((prevCart) => {
+    if (!prevCart) return prevCart;
+    const newItems = prevCart.items.map((item) =>
+      item.cart_items_id === itemId
+        ? {
+            ...item,
+            quantity:
+              value === ""
+                ? 1
+                : !isNaN(num) && num >= 1 && num <= 999
+                ? num
+                : item.quantity,
+          }
+        : item
+    );
+    return { ...prevCart, items: newItems };
+  });
+};
+
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
+
+        const userId = tokenData.user.id;
+        const cartData = await getMockCartByUser(userId);
+        setCart(cartData);
+      } catch (error) {
+        console.error("Lỗi khi lấy giỏ hàng:", error);
+      }
+    };
+
+    fetchCart();
+  }, []);
+
+  if (!cart) {
+    return (
+      <>
+        <section
+          className="bread-crumb background-cover relative"
+          style={{
+            backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        >
+          {/* Lớp phủ làm mờ nền */}
+          <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+
+          <div className="breadcrumb-container">
+            <div className="title-page">
+              <h2>Giỏ hàng của bạn</h2>
+            </div>
+            <ul className="breadcrumb">
+              <li className="home">
+                <Link href="/" title="Trang chủ">
+                  <span>Trang chủ</span>
+                </Link>
+                <i className="fa fa-angle-right" aria-hidden="true"></i>
+              </li>
+              <li>
+                <strong>
+                  <span>Giỏ hàng</span>
+                </strong>
+              </li>
+              <li></li>
+            </ul>
+          </div>
+        </section>
+        <div>Không có sản phẩm trong giỏ hàng</div>
+      </>
+    );
+  }
   return (
     <>
       <section
@@ -36,67 +159,56 @@ export default function Cart() {
           </ul>
         </div>
       </section>
-      <main>
+      <main className="main-cart">
         <div className="cart-container">
           <div className="cart-items">
             <div className="cart-header">
-              <div className="header-product">Sản phẩm</div>
-              <div className="header-price">Đơn Giá</div>
-              <div className="header-quantity">Số lượng</div>
-              <div className="header-total">Thành tiền</div>
+              <div className="header-product">
+                <p className="!ml-[200px]">Sản phẩm</p>
+              </div>
+              <div className="header-price">
+                <p>Đơn Giá</p>
+              </div>
+              <div className="header-quantity">
+                <p className="!ml-[20px]">Số lượng</p>
+              </div>
+              <div className="header-total">
+                <p>Thành tiền</p>
+              </div>
             </div>
 
-            <div className="cart-item">
-              <div className="product-info">
-                <img
-                  src="/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp"
-                  alt="Sản phẩm 1"
-                />
-                <div className="product-details">
-                  <div className="product-name">
-                    Abyss & Habidecor Super Pile Washcloth
+            {cart.items.map((item: ICartItem) => (
+              <div className="cart-item" key={item.cart_items_id}>
+                <div className="product-info">
+                  <img
+                    src={item.variant.color.image}
+                    alt={`Sản phẩm ${item.variant.name}`}
+                  />
+                  <div className="product-details">
+                    <div className="product-name">
+                       {item.variant.name}
+                    </div>
+                    <div className="product-desc">
+                      Màu sắc: {item.variant.color.name_color} - Kích thước: {item.variant.size.number_size}
+                    </div>
                   </div>
-                  <div className="product-desc">Màu sắc: xanh lam</div>
+                </div>
+                <div className="cart-item-price">
+                  {item.price?.toLocaleString("vi")}₫
+                </div>
+                <div className="quantity-control">
+                  <button  onClick={() => handleMinus(item.cart_items_id)}>-</button>
+                  <input type="text" value={item.quantity } onChange={(e) => handleChange(item.cart_items_id, e)}  />
+                  <button onClick={() => handlePlus(item.cart_items_id)}>+</button>
+                </div>
+                <div className="cart-item-total">
+                  {(item.price! * item.quantity).toLocaleString("vi")}₫
+                  <span className="remove-btn">
+                    <i className="fa-solid fa-trash"></i>
+                  </span>
                 </div>
               </div>
-              <div className="cart-item-price">1,220,000₫</div>
-              <div className="quantity-control">
-                <button>-</button>
-                <input type="text" defaultValue="1" />
-                <button>+</button>
-              </div>
-              <div className="cart-item-total">
-                1,220,000₫
-                <span className="remove-btn">
-                  <i className="fa-solid fa-trash"></i>
-                </span>
-              </div>
-            </div>
-
-            <div className="cart-item">
-              <div className="product-info">
-                <img
-                  src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
-                  alt="Sản phẩm 2"
-                />
-                <div className="product-details">
-                  <div className="product-name">Cell phone Silver</div>
-                  <div className="product-desc">Màu sắc: Black</div>
-                </div>
-              </div>
-              <div className="cart-item-price">5,850,000₫</div>
-              <div className="quantity-control">
-                <button>-</button>
-                <input type="text" defaultValue="1" />
-                <button>+</button>
-              </div>
-              <div className="cart-item-total">
-                5,850,000₫
-                <span className="remove-btn">
-                  <i className="fa-solid fa-trash"></i>
-                </span>
-              </div>
-            </div>
+            ))}
 
             <div className="cart-actions">
               <a href="#" className="continue-shopping">
@@ -108,29 +220,39 @@ export default function Cart() {
             </div>
             <div className="free-shipping-progress">
               <div className="progress-bar">
-                <div className="progress" style={{ width: "40%" }}>
-                  40%
+                <div
+                  className="progress"
+                  style={{ width: `${progressPercent}%` }}
+                >
+                  {progressPercent}%
                 </div>
               </div>
 
               <div className="progress-text">
-                <p>
-                  Chi thêm <span className="highlight">1,780,000₫</span> để được
-                  <strong>MIỄN PHÍ VẬN CHUYỂN!</strong>
-                </p>
-                <p>
-                  để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận giao
-                  hàng miễn phí cho đơn hàng
-                  <br />
-                  <span className="target-price">3,000,000₫</span>.
-                </p>
+                {remainingAmount > 0 ? (
+                  <>
+                    <p>
+                      Chi thêm{" "}
+                      <span className="highlight">
+                        {remainingAmount.toLocaleString("vi")}₫
+                      </span>{" "}
+                      để được <strong>MIỄN PHÍ VẬN CHUYỂN!</strong>
+                    </p>
+                    <p>
+                      để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận
+                      giao hàng miễn phí cho đơn hàng
+                      <br />
+                      <span className="target-price">9.000.000₫</span>.
+                    </p>
+                  </>
+                ) : (
+                  <p className="free-shipping">
+                    Chúc mừng! Bạn được giao hàng miễn phí với đơn hàng lớn hơn
+                    <b> 3,000,000₫</b>.
+                  </p>
+                )}
               </div>
             </div>
-
-            <p className="free-shipping">
-              Chúc mừng! Bạn được giao hàng miễn phí với đơn hàng lớn hơn
-              <b>3,000,000₫</b>.
-            </p>
           </div>
 
           <div className="cart-summary">
@@ -151,9 +273,16 @@ export default function Cart() {
               <div className="summary-row">
                 <span>Giao hàng:</span>
                 <span>
-                  <b>Free Shipping</b>
+                  {subtotal >= FREE_SHIPPING_THRESHOLD ? (
+                    <b>Free Shipping</b>
+                  ) : (
+                    <span>
+                      {shipprice.toLocaleString('vi')}₫
+                    </span>
+                  )}
                 </span>
               </div>
+
               <p className="shipping-note">
                 Tùy chọn giao hàng sẽ được cập nhật trong quá trình thanh toán.
               </p>
@@ -165,7 +294,7 @@ export default function Cart() {
 
               <div className="summary-row">
                 <span>Tổng:</span>
-                <span className="total">7,070,000₫</span>
+                <span className="total">{(subtotal+shipprice).toLocaleString("vi")}₫</span>
               </div>
             </div>
 
