@@ -1281,6 +1281,11 @@
   .product-card {
     padding: 0;
   }
+ .swiper-slide img {
+    height: 205px !important;
+    object-fit: cover;
+    object-position: center;
+  }
 
  .swiper-slide img {
     height: 205px !important;
@@ -1389,7 +1394,13 @@
   position: relative;
 }
 @media (max-width: 1024px) {
- 
+  /* Chiều cao ảnh và vùng chứa banner */
+  .banner-slider,
+  .swiper-slide img {
+    height: 400px ;
+    object-fit: cover;
+    object-position: center;
+  }
 
   /* Vị trí button bên trái */
   .button-banner-left {
