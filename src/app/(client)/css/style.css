@@ -175,7 +175,7 @@ header.scrolled {
   justify-content: center;
 }
 
-.icon-header .div::after {
+.icon-header .div:not(:first-child)::after {
   content: "0";
   position: absolute;
   top: -5px;
