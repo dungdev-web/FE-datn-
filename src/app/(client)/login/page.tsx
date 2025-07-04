@@ -1,11 +1,12 @@
 "use client";
 import "../css/login.css";
-import { loginUser } from "@/services/authService";
+import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
+import { API_BASE_URL } from "@/config/env";
+import { Eye, EyeOff } from "lucide-react"; // Bạn có thể dùng FontAwesome hoặc bất kỳ icon lib
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -13,6 +14,7 @@ export default function Login() {
   const [showLoader, setShowLoader] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +29,29 @@ export default function Login() {
     } catch (err: any) {
       toast.error(err.message);
     }
+  };
+  const handleGoogleLogin = async () => {
+    try {
+      const res = await loginWithGoogle();
+      localStorage.setItem("userIdG", res.user.id.toString());
+      toast.success(res.message);
+      router.push("/account");
+    } catch (err: any) {
+      toast.error(err.message || "Đăng nhập Google thất bại");
+    }
+  };
+  const googleLogin = () => {
+    const clientId =
+      "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
+    const redirectUri = encodeURIComponent(
+      `http://localhost:3001/google/callback`
+    );
+    const scope = encodeURIComponent("profile email");
+    const responseType = "code";
+    console.log(clientId);
+
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
+    window.location.href = url;
   };
 
   useEffect(() => {
@@ -65,15 +90,27 @@ export default function Login() {
                 placeholder="Tài Khoản"
                 required
               />
-
-              <input
-                type="password"
-                placeholder="Mật Khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mật Khẩu"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <div
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </div>
+              </div>
               <div className="remember-me">
                 <input type="checkbox" />
                 Lưu tài khoản
@@ -95,13 +132,12 @@ export default function Login() {
             <br />
             <h5>Quên mật khẩu?</h5>
 
-            <div className="google-login">
+            <button className="google-login" onClick={googleLogin}>
               <i className="fab fa-google"></i> Đăng nhập bằng Google
-            </div>
+            </button>
 
             <div className="register-link">
               <p>
-
                 Bạn chưa có tài khoản the light?{" "}
                 <a href="/register.html">Đăng ký ngay</a>
               </p>

@@ -73,7 +73,7 @@
     z-index: 1;
 }
 
-main {
+.main-cart {
     width: 90%;
     margin: 0 auto;
     padding: 30px;
@@ -97,7 +97,7 @@ main {
 .cart-header,
 .cart-item {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
+    grid-template-columns: 4fr 1fr 2fr 1.5fr;;
     align-items: center;
     gap: 20px;
     padding: 15px 0;
@@ -115,9 +115,9 @@ main {
     text-align: left;
 }
 
-.cart-item {
+/* .cart-item {
     padding: 20px 10px;
-}
+} */
 
 .cart-item img {
     width: 80px;
@@ -180,7 +180,7 @@ main {
 .remove-btn {
     display: inline-block;
     margin-left: 10px;
-    color: #4bd963;
+    color: red;
     cursor: pointer;
 }
 
