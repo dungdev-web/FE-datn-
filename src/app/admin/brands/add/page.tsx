@@ -1,5 +1,5 @@
 "use client";
-import "../css/brand_add_admin.css";
+import "../../css/brands_admin.css";
 import Link from "next/link";
 export default function BrandAdd() {
   return (
