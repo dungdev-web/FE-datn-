@@ -5,41 +5,56 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
-import { API_BASE_URL } from "@/config/env";
-import { Eye, EyeOff } from "lucide-react"; // Bạn có thể dùng FontAwesome hoặc bất kỳ icon lib
+import { Eye, EyeOff } from "lucide-react";
+import { validateField } from "@/hooks/validate_login_register";
+
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showLoader, setShowLoader] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
-  const router = useRouter();
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    const emailError = validateField({
+      name: "email",
+      value: usernameOrEmail,
+      formType: "login",
+    });
+
+    const passwordError = validateField({
+      name: "password",
+      value: password,
+      formType: "login",
+    });
+
+    if (emailError) newErrors.email = emailError;
+    if (passwordError) newErrors.password = passwordError;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!validateForm()) return;
+
     try {
       const res = await loginUser({ usernameOrEmail, password });
       localStorage.setItem("userId", res.user.id.toString());
-
-      // Hiện loader
       setShowLoader(true);
       setLoginSuccess(true);
     } catch (err: any) {
       toast.error(err.message);
     }
   };
-  const handleGoogleLogin = async () => {
-    try {
-      const res = await loginWithGoogle();
-      localStorage.setItem("userIdG", res.user.id.toString());
-      toast.success(res.message);
-      router.push("/account");
-    } catch (err: any) {
-      toast.error(err.message || "Đăng nhập Google thất bại");
-    }
-  };
+
   const googleLogin = () => {
     const clientId =
       "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
@@ -48,7 +63,6 @@ export default function Login() {
     );
     const scope = encodeURIComponent("profile email");
     const responseType = "code";
-    console.log(clientId);
 
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
     window.location.href = url;
@@ -68,8 +82,7 @@ export default function Login() {
 
   return (
     <>
-     
-      <main className="">
+      <main>
         <div className="auth-container">
           <img
             src="images/blog/section_instagram_img6.webp"
@@ -83,21 +96,56 @@ export default function Login() {
             </div>
 
             <form onSubmit={handleLogin}>
-              <input
-                value={usernameOrEmail}
-                onChange={(e) => setIdentifier(e.target.value)}
-                type="text"
-                placeholder="Tài Khoản"
-                required
-              />
+              <div>
+                <input
+                  value={usernameOrEmail}
+                  onChange={(e) => {
+                    setIdentifier(e.target.value);
+                    setErrors((prev) => ({ ...prev, email: "" }));
+                  }}
+                  onBlur={(e) =>
+                    setErrors((prev) => ({
+                      ...prev,
+                      email: validateField({
+                        name: "email",
+                        value: e.target.value,
+                        formType: "login",
+                      }),
+                    }))
+                  }
+                  type="text"
+                  placeholder="Tài Khoản"
+                 
+                />
+                {errors.email && (
+                  <p className="text-sm text-red-500 mt-1">{errors.email}</p>
+                )}
+              </div>
+
               <div style={{ position: "relative" }}>
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Mật Khẩu"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, password: "" }));
+                  }}
+                  onBlur={(e) =>
+                    setErrors((prev) => ({
+                      ...prev,
+                      password: validateField({
+                        name: "password",
+                        value: e.target.value,
+                        formType: "login",
+                      }),
+                    }))
+                  }
+                 
                 />
+                {errors.password && (
+                  <p className="text-sm text-red-500 mt-1">{errors.password}</p>
+                )}
                 <div
                   onClick={() => setShowPassword(!showPassword)}
                   style={{
@@ -111,10 +159,12 @@ export default function Login() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </div>
               </div>
+
               <div className="remember-me">
                 <input type="checkbox" />
                 Lưu tài khoản
               </div>
+
               <button type="submit">Đăng nhập ngay</button>
             </form>
 
@@ -123,9 +173,6 @@ export default function Login() {
             {showLoader && (
               <div className="loader-overlay">
                 <Loader />
-                {/* <p style={{ color: "white", marginTop: "10px" }}>
-                  Đang xử lý đăng nhập...
-                </p> */}
               </div>
             )}
 
