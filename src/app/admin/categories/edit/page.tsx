@@ -1,5 +1,5 @@
 "use client";
-import "@/src/app/admin/css/categories_add_admin.css";
+import "../css/categories_add_admin.css";
 import Link from "next/link";
 export default function CategoryAdd() {
   return (
@@ -67,7 +67,11 @@ export default function CategoryAdd() {
             <button type="submit" className="submit-btn">
               Cập Nhật
             </button>
-              <Link href={'/admin/categories'} type="button" className="btn btn-back">
+            <Link
+              href={"/admin/categories"}
+              type="button"
+              className="btn btn-back"
+            >
               <i className="fa-solid fa-arrow-left"></i> Trở về
             </Link>
           </div>
