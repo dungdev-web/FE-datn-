@@ -199,7 +199,7 @@ export default function Header() {
                   href="/account"
                   className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
                 >
-                  Chào Truc
+                  Chào Tan Truc
                 </Link>
               ) : (
                 <Link href="/login">
