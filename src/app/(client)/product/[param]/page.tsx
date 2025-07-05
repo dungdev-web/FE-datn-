@@ -26,21 +26,49 @@ export default function Detail() {
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [countdown, setCountdown] = useState("");
-
-  const handleAddToCart = async () => {
-    setLoading(true);
-    try {
-      const tokenData = await checkToken();
-      if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
-
-      await addToMockCart(tokenData.user.id, variantId, quantity, price);
-      console.log("đã thêm");
-    } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
-    } finally {
-      setLoading(false);
+const handleAddToCart = async () => {
+  setLoading(true);
+  try {
+    const tokenData = await checkToken();
+    if (!tokenData?.user?.id) {
+      throw new Error("bạn chưa đăng nhập");
     }
-  };
+
+    await addToMockCart(tokenData.user.id, variantId, quantity, price);
+
+    Swal.fire({
+      icon: "success",
+      title: "Đã thêm vào giỏ hàng",
+      text: "Sản phẩm đã được thêm thành công!",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } catch (error: any) {
+    console.error("Lỗi khi thêm vào giỏ hàng:", error);
+
+    if (error.message === "bạn chưa đăng nhập") {
+      Swal.fire({
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+        confirmButtonText: "Đăng nhập ngay",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Thêm giỏ hàng thất bại",
+        text: error.message || "Đã có lỗi xảy ra!",
+      });
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     const param = params.param;
