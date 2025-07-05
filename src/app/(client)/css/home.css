@@ -71,6 +71,9 @@
   .product-dealbox-main h1 {
     font-size: 24px;
   }
+  .product-textsale-main{
+    display: none;
+  }
 }
 .product-listdeal-main {
   display: flex;
@@ -323,6 +326,11 @@
   overflow: hidden;
   min-height: 600px;
 }
+@media (max-width: 768px) {
+  .look-book-main {
+    margin: 0px auto;
+  }
+}
 
 .look-book-text {
   flex: 0 0 35%; /* Bên trái nhỏ lại */
@@ -508,7 +516,19 @@
   padding: 40px 20px;
   background-color: #fff; /* nền trắng */
 }
-
+@media (max-width: 768px) {
+  .shipping-main {
+   padding: 10px 5px;
+  }
+  .shipping-main h3{
+    font-size: 12px !important; /* giảm kích thước chữ tiêu đề */
+  }
+  .shipping-main p {
+    font-size: 11px !important; /* giảm kích thước chữ mô tả */
+    color: #7d7d7d; /* màu ghi nhẹ cho mô tả */
+  line-height: 1 !important;
+  }
+}
 .shipping-main > div {
   display: flex;
   flex-direction: column;
@@ -544,7 +564,13 @@
   background: #fff;
   font-family: Arial, sans-serif;
 }
-
+@media (max-width: 768px) {
+  .hot-products {
+    padding: 0px;
+    
+  }
+  
+}
 .hot-products-header {
   display: flex;
   justify-content: space-between;
@@ -850,7 +876,15 @@
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
-
+@media (max-width: 768px) {
+  .video-embed iframe {
+    width: 100%;
+    height: 200px;
+  }
+  .play-button i {
+   margin-left: 5px;
+  }
+}
 /* Nút Close */
 .close-button {
   position: absolute;
@@ -889,16 +923,15 @@
 /* blog */
 .blog-main {
   width: 90%;
-
   margin: 0 auto;
-  padding: 50px 0; /* bỏ padding ngang để ôm sát */
+  padding: 30px 0; /* bỏ padding ngang để ôm sát */
   background: #fff;
 }
 .blog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
 }
 
 .blog-title-left {
@@ -948,6 +981,15 @@
 .swiper-slide {
   display: flex;
 }
+@media (max-width: 768px) {
+@media (max-width: 768px) {
+  .box-blog {
+  width: 191px !important; /* giảm kích thước slide trên mobile */
+  margin-right: 10px !important; /* giảm khoảng cách giữa các slide */
+  }
+
+}
+}
 
 .swiper-slide img {
   /* width: 100%; */
@@ -969,7 +1011,14 @@
   font-weight: bold;
   margin: 10px 15px;
 }
-
+@media (max-width: 768px) {
+  .blog-title {
+    font-size: 14px;
+  }
+  .blog-desc {
+    font-size: 12px !important;
+  }
+}
 .blog-desc {
   font-size: 15px;
   color: #555;
@@ -1218,6 +1267,9 @@
   .category-main1-item {
     width: 100% !important;
   }
+   .category-main{
+    margin-top: -60px;
+  }
   .instagram-main {
     padding-top: 0;
   }
@@ -1276,7 +1328,13 @@
     width: 100% !important;
   }
   .product-two-box-container {
-    margin: 30px 43px !important;
+    margin: 30px 23px !important;
+    gap: 20px !important;
+  }
+  .product-two-box-container h1{
+    font-weight: bold;
+    font-size: 24px;
+    
   }
   .product-card {
     padding: 0;
@@ -1327,11 +1385,14 @@
   }
   .category-main1 {
     display: grid !important;
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     padding: 5px;
   }
   .category-main1-item {
     margin-top: 5px;
+  }
+  .category-main{
+    margin-top: -60px;
   }
   .instagram-list {
     grid-template-columns: repeat(1, 1fr);

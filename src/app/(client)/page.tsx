@@ -629,6 +629,9 @@ export default function Home({ product }: { product: IProduct }) {
         </div>
 
         <div className="product-two-box-container flex gap-[75px] flex-wrap">
+          <h1>
+            SẢN PHẨM THEO DANH MỤC
+          </h1>
           <>
             <Show2sanpham products={cateproducts} />
             <Show2sanpham products={cateproducts1} />

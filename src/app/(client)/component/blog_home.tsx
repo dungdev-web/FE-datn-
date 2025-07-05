@@ -26,7 +26,7 @@ export default function BlogHome() {
         }
       }}
     >
-      <SwiperSlide>
+      <SwiperSlide className="box-blog">
         <div className="blog-item">
           <img src="/images/blog/layer-2.webp" alt="" />
           <div className="blog-info">
@@ -42,7 +42,7 @@ export default function BlogHome() {
           </p>
         </div>
       </SwiperSlide>
-      <SwiperSlide>
+      <SwiperSlide className="box-blog">
         <div className="blog-item">
           <img src="/images/blog/layer-2.webp" alt="" />
           <div className="blog-info">
@@ -58,7 +58,7 @@ export default function BlogHome() {
           </p>
         </div>
       </SwiperSlide>
-      <SwiperSlide>
+      <SwiperSlide className="box-blog">
         <div className="blog-item">
           <img src="/images/blog/layer-2.webp" alt="" />
           <div className="blog-info">
@@ -74,7 +74,7 @@ export default function BlogHome() {
           </p>
         </div>
       </SwiperSlide>
-      <SwiperSlide>
+      <SwiperSlide className="box-blog">
         <div className="blog-item">
           <img src="/images/blog/layer-2.webp" alt="" />
           <div className="blog-info">
@@ -90,7 +90,7 @@ export default function BlogHome() {
           </p>
         </div>
       </SwiperSlide>
-      <SwiperSlide>
+      <SwiperSlide className="box-blog">
         <div className="blog-item">
           <img src="/images/blog/layer-2.webp" alt="" />
           <div className="blog-info">
