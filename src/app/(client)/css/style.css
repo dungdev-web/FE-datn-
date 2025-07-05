@@ -174,8 +174,28 @@ header.scrolled {
   align-items: center;
   justify-content: center;
 }
+.icon-header .div1 {
+  background-color: #0c2b63;
+  padding: 10px;
+  position: relative;
+  min-width: 50px;
+  height: 50px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-.icon-header .div:not(:first-child)::after {
+.icon-header .div1.logged-out {
+  border-radius: 50%;
+}
+
+.icon-header .div1.logged-in {
+  border-radius: 40px;
+}
+
+
+.icon-header .div::after {
   content: "0";
   position: absolute;
   top: -5px;
