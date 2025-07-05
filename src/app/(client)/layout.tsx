@@ -19,7 +19,7 @@ export default function RootLayout({
         <div className="container">
           <LoaderProvider>
             <Header/>
-            {children}
+           {children}
             <Footer></Footer>
             <ButtonToTop />
           </LoaderProvider>

@@ -9,7 +9,6 @@ export default function Blog() {
 
   return (
     <>
-      <main className="main-content">
         <div className="post-list">
           <h2>Danh sách bài viết</h2>
 
@@ -123,7 +122,7 @@ export default function Blog() {
             </button>
           </div>
         </div>
-      </main>
+      
     </>
   );
 }

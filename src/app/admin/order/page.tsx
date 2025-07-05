@@ -27,7 +27,6 @@ export default function OrderPage() {
 
   return (
     <div>
-      <main className="main-content">
         <div className="order-list">
           <h2>Danh sách đơn hàng</h2>
 
@@ -277,7 +276,6 @@ export default function OrderPage() {
             </button>
           </div>
         </div>
-      </main>
 
       {isViewModalOpen && (
         <div className="modal-overlay">

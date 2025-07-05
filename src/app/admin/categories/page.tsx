@@ -6,7 +6,6 @@ export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
   return (
-    <main className="main-content">
       <div className="category-list">
         <h2>Danh sách danh mục</h2>
 
@@ -168,6 +167,5 @@ export default function Categories() {
           </button>
         </div>
       </div>
-    </main>
   );
 }

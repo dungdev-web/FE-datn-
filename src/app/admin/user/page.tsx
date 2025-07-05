@@ -22,7 +22,6 @@ export default function ListUser() {
 
   return (
     <>
-      <main className="main-content">
         <div className="user-list">
           <h2>Danh sách người dùng</h2>
 
@@ -151,7 +150,6 @@ export default function ListUser() {
             </button>
           </div>
         </div>
-      </main>
 
       {isModalOpen && (
         <div className="modal-overlay" id="statusModal">
