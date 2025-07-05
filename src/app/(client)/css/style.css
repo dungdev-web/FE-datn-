@@ -45,7 +45,7 @@ input[type="tel"],
 textarea,
 select {
   border: 1px solid #e1e1e1;
-  padding: 0 20px;
+ 
   max-width: 100%;
   display: block;
 }
@@ -102,7 +102,7 @@ header {
 
 /* Nền màu */
 header:before {
-  /* background-color: #021688; */
+  background-color: #021688;
   content: "";
   position: absolute;
   top: 0;
@@ -175,7 +175,7 @@ header.scrolled {
   justify-content: center;
 }
 
-.icon-header .div::after {
+.icon-header .div:not(:first-child)::after {
   content: "0";
   position: absolute;
   top: -5px;
@@ -188,7 +188,7 @@ header.scrolled {
   height: 18px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center;  
 }
 
 nav {

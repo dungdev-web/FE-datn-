@@ -12,7 +12,6 @@ export default function Header() {
   const cartIconRef = useRef<HTMLDivElement>(null);
   const cartPopupRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const menuRef = useRef<HTMLLIElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -22,7 +21,7 @@ export default function Header() {
 
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
-
+  const userId = 1;
   let hideTimeout = null;
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -177,10 +176,9 @@ export default function Header() {
           </div>
         </div>
         <div className="logo-header">
-          <Link href={'/'}>
+          <Link href={"/"}>
             <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
           </Link>
-        
         </div>
         <div className="iconphone-header">
           <div className="iconphon-header1">
@@ -191,10 +189,10 @@ export default function Header() {
         <div className="icon-header">
           <div className="iconuser-header div">
             <div className="login-mini">
-              <i
-                className="fa-solid fa-user cursor-pointer"
-                onClick={() => setShowLogin(true)}
-              ></i>
+              <Link href="/login">
+                <i className="fa-solid fa-user cursor-pointer"></i>
+              </Link>
+
             </div>
           </div>
           <div className="iconheart-header div">
@@ -220,7 +218,6 @@ export default function Header() {
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
-      <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
       {showNav && (
         <nav className="transition-all duration-300">
           <div className="menu-nav">

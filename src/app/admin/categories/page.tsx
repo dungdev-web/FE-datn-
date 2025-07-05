@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import "@/src/app/admin/css/categories_admin.css";
+import "../css/categories_admin.css";
 import Link from "next/link";
 export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
