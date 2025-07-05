@@ -208,7 +208,7 @@ const defaultProducts: IProduct[] = [
           name_color: "Xanh dương",
           image: "/images/products/chaybo/AirJordanDMP1Retro(xanhduong).webp",
         },
-        size: { id: 403, number_size: "42" },
+        size: { id: 402, number_size: "41" },
       },
     ],
   },
