@@ -8,7 +8,7 @@ export default function Products() {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <main className="main-content">
+    <>
       {/* sản phẩm ở đây */}
       <div className="product-list">
         <h2>Danh sách sản phẩm</h2>
@@ -144,6 +144,6 @@ export default function Products() {
           </button>
         </div>
       </div>
-    </main>
+    </>
   );
 }

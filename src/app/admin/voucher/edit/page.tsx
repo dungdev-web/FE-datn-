@@ -3,7 +3,6 @@ import "../css/voucher_add_admin.css";
 import Link from "next/link";
 export default function VoucherEdit() {
   return (
-    <main className="main-content">
       <div className="promotion-container">
         <h2>Chỉnh sửa mã giảm giá</h2>
 
@@ -78,6 +77,5 @@ export default function VoucherEdit() {
           </div>
         </form>
       </div>
-    </main>
   );
 }
