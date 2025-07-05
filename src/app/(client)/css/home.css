@@ -108,8 +108,17 @@
   padding: 10px;
   transition: 0.3s;
 }
-
-.product-card:hover {
+.product-card-list {
+  position: relative;
+ 
+  border-radius: 10px;
+  background: #f9f9f9;
+  overflow: hidden;
+  padding: 10px;
+  transition: 0.3s;
+}
+.product-card,
+.product-card-list:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -983,7 +992,7 @@
 }
 @media (max-width: 768px) {
 @media (max-width: 768px) {
-  .box-blog {
+  .box-blog-home {
   width: 191px !important; /* giảm kích thước slide trên mobile */
   margin-right: 10px !important; /* giảm khoảng cách giữa các slide */
   }
@@ -1208,6 +1217,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+  /* Khi hover card thì hiện icon lên */
+  .product-card-list:hover .product-icons .hover-icons {
+    opacity: 1;
+    transform: translateY(0);
+  }
   /* Hiển thị icon group khi hover thẻ chứa */
   .hot-product-card:hover .hot-product-icons .icon-hover-group {
     transition: all 3s ease-in;
@@ -1263,6 +1277,7 @@
   .category-main1 {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr);
+    gap: 0;
   }
   .category-main1-item {
     width: 100% !important;
@@ -1338,6 +1353,7 @@
   }
   .product-card {
     padding: 0;
+    
   }
  .swiper-slide img {
     height: 205px !important;
@@ -1406,6 +1422,10 @@
   }
   .hot-products-list {
     grid-template-columns: repeat(2, 1fr);
+  }
+   .product-card {
+    padding: 0;
+    width: 190px !important; /* giảm kích thước card */
   }
   
 }
