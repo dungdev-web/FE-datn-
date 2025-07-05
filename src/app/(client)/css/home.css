@@ -1342,11 +1342,14 @@
   .box-container {
     width: 100% !important;
   }
-  .product-two-box-container {
-    margin: 30px 23px !important;
+  .product-two-box-container{ 
+    margin: 10px !important;
     gap: 20px !important;
   }
-  .product-two-box-container h1{
+  .product-two-box-main {
+    padding: 0px !important;
+  }
+  .product-two-box-main .h1{
     font-weight: bold;
     font-size: 24px;
     
@@ -1436,10 +1439,20 @@
   background-position: center; /* Canh giữa ảnh */
 }
 /* session mới */
-.product-two-box-container {
-  margin: 30px 85px;
-}
 
+.product-two-box-main{
+    background: #fff;
+    max-width: 90%;
+    margin: 30px  auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+.product-two-box-main h1{
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+
+}
 .content {
   display: flex;
   justify-content: space-between;
