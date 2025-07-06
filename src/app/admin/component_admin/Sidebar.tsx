@@ -16,6 +16,7 @@ import { DocumentScannerTwoTone } from "@mui/icons-material";
 import { Help } from "@mui/icons-material";
 import { Settings } from "@mui/icons-material";
 import Link from "next/link";
+import { usePathname } from 'next/navigation';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -30,6 +31,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
     setOpenMenuKey((prevKey) => (prevKey === menuKey ? null : menuKey));
   };
 
+const pathname = usePathname();
 
   return (
     <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
@@ -42,7 +44,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         </li>
        
         <li>
-          <Link href={'/admin'} className="flex items-center tick">
+          <Link href={'/admin'} className={`flex items-center ${pathname === '/admin' ? 'tick' : ''}`}>
             <SpaceDashboardIcon />
             {!isCollapsed && <span>Dashboard</span>}
           </Link>
@@ -50,7 +52,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "taikhoan" ? "open" : ""}`}
         >
-          <Link href={'/admin/user'} onClick={() => toggleMenu("taikhoan")}>
+          <Link href={'/admin/user'} className={`flex items-center ${pathname === '/admin/user' ? 'tick' : ''}`} onClick={() => toggleMenu("taikhoan")}>
             <AccountCircleIcon /> 
             {!isCollapsed && (
               <>
@@ -62,10 +64,10 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
           {!isCollapsed && (
             <ul className="submenu">
               <li>
-                <a href="#">Danh sách tài khoản</a>
+                <Link href="#">Danh sách tài khoản</Link>
               </li>
               <li>
-                <a href="#">Thêm mới tài khoản</a>
+                <Link href="#">Thêm mới tài khoản</Link>
               </li>
             </ul>
           )}
@@ -73,7 +75,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "nhanhieu" ? "open" : ""}`}
         >
-          <Link href={'/admin/brands'} onClick={() => toggleMenu("nhanhieu")}>
+          <Link href={'/admin/brands'} className={`flex items-center ${pathname === '/admin/brands' ? 'tick' : ''}`} onClick={() => toggleMenu("nhanhieu")}>
             <LabelIcon /> 
             {!isCollapsed && (
               <>
@@ -96,7 +98,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "danhmuc" ? "open" : ""}`}
         >
-          <Link href={'/admin/categories'} onClick={() => toggleMenu("danhmuc")}>
+          <Link href={'/admin/categories'} className={`flex items-center ${pathname === '/admin/categories' ? 'tick' : ''}`} onClick={() => toggleMenu("danhmuc")}>
             <Inventory2Icon /> 
             {!isCollapsed && (
               <>
@@ -119,7 +121,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "sanpham" ? "open" : ""}`}
         >
-          <Link href={'/admin/products'} onClick={() => toggleMenu("sanpham")}>
+          <Link href={'/admin/products'} className={`flex items-center ${pathname === '/admin/products' ? 'tick' : ''}`} onClick={() => toggleMenu("sanpham")}>
             <StorefrontIcon /> 
             {!isCollapsed && (
               <>
@@ -142,7 +144,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "khuyenmai" ? "open" : ""}`}
         >
-          <Link href={'/admin/voucher'} onClick={() => toggleMenu("khuyenmai")}>
+          <Link href={'/admin/voucher'} className={`flex items-center ${pathname === '/admin/voucher' ? 'tick' : ''}`} onClick={() => toggleMenu("khuyenmai")}>
             <LocalOfferIcon /> 
             {!isCollapsed && (
               <>
@@ -166,7 +168,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "donhang" ? "open" : ""}`}
         >
-          <Link href={'/admin/order'} onClick={() => toggleMenu("donhang")}>
+          <Link href={'/admin/order'} className={`flex items-center ${pathname === '/admin/order' ? 'tick' : ''}`} onClick={() => toggleMenu("donhang")}>
             <ReceiptLongIcon /> 
             {!isCollapsed && (
               <>
@@ -186,7 +188,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "baiviet" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("baiviet")}>
+          <Link href={'/admin/blog'} className={`flex items-center ${pathname === '/admin/blog' ? 'tick' : ''}`} onClick={() => toggleMenu("baiviet")}>
             <ArticleIcon /> 
             {!isCollapsed && (
               <>
@@ -194,7 +196,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
                 <i className="fa-solid fa-chevron-down submenu-icon"></i>
               </>
             )}
-          </a>
+          </Link>
           {!isCollapsed && (
             <ul className="submenu">
               <li>
@@ -209,7 +211,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "binhluan" ? "open" : ""}`}
         >
-          <Link href={'/admin/comment'} onClick={() => toggleMenu("binhluan")}>
+          <Link href={'/admin/comment'} className={`flex items-center ${pathname === '/admin/comment' ? 'tick' : ''}`} onClick={() => toggleMenu("binhluan")}>
             <CommentIcon /> 
             {!isCollapsed && (
               <>
@@ -233,7 +235,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
         <li
           className={`has-submenu ${openMenuKey === "danhgia" ? "open" : ""}`}
         >
-          <a href="#" onClick={() => toggleMenu("danhgia")}>
+          <Link href={'/admin/comment'} className={`flex items-center ${pathname === '/admin/comment' ? 'tick' : ''}`} onClick={() => toggleMenu("danhgia")}>
             <RateReviewIcon /> 
             {!isCollapsed && (
               <>
@@ -241,7 +243,7 @@ export default function SideBar({ isCollapsed, toggleSidebar }: SidebarProps) {
                 <i className="fa-solid fa-chevron-down submenu-icon"></i>
               </>
             )}
-          </a>
+          </Link>
           {!isCollapsed && (
             <ul className="submenu">
               <li>
