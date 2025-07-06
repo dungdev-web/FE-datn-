@@ -1646,6 +1646,8 @@ input[type="submit"] {
   grid-template-columns: repeat(1, 1fr);
   gap: 10px;
 }
+/* mobile */
+
 @media (max-width: 1198px) {
   .header-nav-bg {
     margin-bottom: 80px !important;
@@ -1740,6 +1742,15 @@ input[type="submit"] {
   header:before {
     background-color: #021688;
   }
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cột */
+    gap: 8px;
+  }
+
+  .hot-product-card {
+    width: 100% !important; /* Chiếm toàn bộ cột, do cột đã chia ở trên */
+  }
+ 
 }
 /* @media (max-width:620px){
   .header-nav-bg {

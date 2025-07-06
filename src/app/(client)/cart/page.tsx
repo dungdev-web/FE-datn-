@@ -87,7 +87,6 @@ const handleChange = (
 
     fetchCart();
   }, []);
-
   if (!cart) {
     return (
       <>
