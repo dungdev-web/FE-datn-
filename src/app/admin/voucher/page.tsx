@@ -8,7 +8,6 @@ export default function Voucher() {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <main className="main-content">
       <div className="promotion-list">
         <h2>Danh sách mã giảm giá</h2>
 
@@ -112,6 +111,5 @@ export default function Voucher() {
           </button>
         </div>
       </div>
-    </main>
   );
 }

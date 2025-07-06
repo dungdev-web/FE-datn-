@@ -2,13 +2,13 @@
 
 import "../css/brands_admin.css";
 import Link from "next/link";
-import { useState } from "react";
+import { useState } from "react"; 
 
 export default function Brands() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
   return (
-    <main className="main-content">
+    <>
       <div className="brand-list">
         <h2>Danh sách nhãn hiệu</h2>
 
@@ -166,6 +166,6 @@ export default function Brands() {
           </button>
         </div>
       </div>
-    </main>
+      </>
   );
 }

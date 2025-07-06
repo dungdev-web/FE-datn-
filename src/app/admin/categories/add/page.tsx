@@ -3,7 +3,6 @@ import "../css/categories_add_admin.css";
 import Link from "next/link";
 export default function CategoryAdd() {
   return (
-    <main className="main-content">
       <div className="category-container">
         <h2>Thêm danh mục mới</h2>
 
@@ -73,6 +72,5 @@ export default function CategoryAdd() {
           </div>
         </form>
       </div>
-    </main>
   );
 }

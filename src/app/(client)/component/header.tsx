@@ -12,7 +12,6 @@ export default function Header() {
   const cartIconRef = useRef<HTMLDivElement>(null);
   const cartPopupRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const menuRef = useRef<HTMLLIElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
@@ -232,7 +231,6 @@ export default function Header() {
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
-      <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
       {showNav && (
         <nav className="transition-all duration-300">
           <div className="menu-nav">

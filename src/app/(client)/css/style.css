@@ -45,7 +45,7 @@ input[type="tel"],
 textarea,
 select {
   border: 1px solid #e1e1e1;
-  padding: 0 20px;
+ 
   max-width: 100%;
   display: block;
 }
@@ -102,7 +102,7 @@ header {
 
 /* Nền màu */
 header:before {
-  /* background-color: #021688; */
+  background-color: #021688;
   content: "";
   position: absolute;
   top: 0;

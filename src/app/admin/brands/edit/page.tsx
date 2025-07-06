@@ -3,7 +3,7 @@ import "../../css/brand_add_admin.css";
 import Link from "next/link";
 export default function BrandEdit() {
   return (
-    <main className="main-content">
+    <>
       <div className="brand-container">
         <h2>Chỉnh sửa nhãn hiệu </h2>
 
@@ -73,6 +73,6 @@ export default function BrandEdit() {
           </div>
         </form>
       </div>
-    </main>
+      </>
   );
 }
