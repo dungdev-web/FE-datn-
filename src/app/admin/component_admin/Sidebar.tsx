@@ -38,7 +38,7 @@ const pathname = usePathname();
       <ul className="menu">
         <li>
           <div className="logo bg-[#000]">
-            <img src="/images/logo/1.png" alt="" />
+            <img src="/images/logo/E.png" alt="" />
              
           </div>
         </li>
