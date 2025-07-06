@@ -67,11 +67,13 @@ export default function Register() {
 
         <div className="form-container">
           <h2>Đăng Ký email</h2>
+
           <div className="register-link">
             <p>
               Hãy đăng ký để được hưởng nhiều đặc quyền riêng dành cho bạn
             </p>
           </div>
+
           <form id="formRegister" onSubmit={handleSubmit}>
             <div>
               <input
@@ -93,7 +95,6 @@ export default function Register() {
                     }),
                   }))
                 }
-               
               />
               {errors.fullName && (
                 <p className="text-sm text-red-500 mt-1">{errors.fullName}</p>
@@ -120,7 +121,6 @@ export default function Register() {
                     }),
                   }))
                 }
-              
               />
               {errors.email && (
                 <p className="text-sm text-red-500 mt-1">{errors.email}</p>
@@ -147,7 +147,6 @@ export default function Register() {
                     }),
                   }))
                 }
-               
               />
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">{errors.password}</p>
@@ -155,9 +154,7 @@ export default function Register() {
             </div>
 
             <div className="register-link">
-              <p className="p">
-                Thông tin của bạn sẽ được bảo mật theo chính sách riêng tư của
-                chúng tôi
+             
               <p>
                 Bạn chưa có tài khoản? <a href="/login">Đăng nhập ngay</a>
               </p>
@@ -172,12 +169,6 @@ export default function Register() {
 
           <div className="google-login">
             <i className="fab fa-google"></i> Đăng nhập bằng Google
-          </div>
-
-          <div className="register-link">
-            <p>
-              Bạn đã có tài khoản? <a href="/login.html">Đăng nhập ngay</a>
-            </p>
           </div>
         </div>
       </div>
