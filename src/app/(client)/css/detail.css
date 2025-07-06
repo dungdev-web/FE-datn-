@@ -45,12 +45,7 @@
     padding-left: 15px;
   }
 
-  .col-lg-3 {
-    width: 25%;
-    padding-right: 15px;
-    float: left;
-    padding-left: 15px;
-  }
+
 }
 
 h1,
@@ -1670,7 +1665,7 @@ input[type="submit"] {
   .col-md-6 {
     padding: 0 20px;
   }
-  #open-filters {
+  .open-filters {
     color: #fff;
     display: block !important;
     background: #4bd963;
@@ -1686,7 +1681,7 @@ input[type="submit"] {
     transition: all 0.35s ease;
   }
 
-  #filter-sidebar {
+  .filter-sidebar {
     position: fixed;
     top: 0;
     right: 0;
@@ -1701,11 +1696,11 @@ input[type="submit"] {
     padding: 20px;
   }
 
-  #filter-sidebar.active {
+  .filter-sidebar.active {
     transform: translateX(0);
   }
 
-  #filter-sidebar h3 {
+  .filter-sidebar h3 {
     margin-top: 0;
     color: #0033cc;
   }
@@ -1713,7 +1708,7 @@ input[type="submit"] {
   .filter-section {
     margin-bottom: 20px;
   }
-  #open-filters {
+  .open-filters {
     color: #fff;
     background: #4bd963;
     position: fixed;
@@ -1728,7 +1723,7 @@ input[type="submit"] {
     transition: transform 0.35s ease, right 0.35s ease;
   }
 
-  #open-filters.move-left {
+  .open-filters.move-left {
     right: 280px;
   }
 }
@@ -1736,7 +1731,7 @@ input[type="submit"] {
   .main_container {
     padding: 10px 30px;
   }
-  #open-filters {
+  .open-filters {
     font-size: 16px;
   }
   .header-nav-bg {
@@ -1752,8 +1747,8 @@ input[type="submit"] {
   }
 } */
 @media (min-width: 1024px) {
-  #open-filters,
-  #filter-sidebar {
+  .open-filters,
+  .filter-sidebar {
     display: none;
   }
 }
