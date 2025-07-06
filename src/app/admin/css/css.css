@@ -4,28 +4,67 @@
   box-sizing: border-box;
 }
 
-body, .sidebar {
+body, .sidebar,
+body.dark .custom-after-border:after
+ {
   background-color: #fff ;
   color: #222;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.dark .sidebar,
-body.dark {
+body.dark,
+body.dark .category-tag {
   background-color: #101828;
   color: #f1f1f1;
 }
+body.dark .revenue-card,
+body.dark .card,
+body.dark .chart-container,
+body.dark tr,
+body.dark td,
+body.dark th,
+body.dark .product-card,
+body.dark .stock-item,
+body.dark .notification-box,
+body.dark .internal-news,
+body.dark .quick-actions,
+body.dark .alerts-system,
+body.dark .user-list,
+body.dark .brand-list,
+body.dark .category-list,
+body.dark .product-list,
+body.dark .post-list,
+body.dark   .promotion-list,
+body.dark .review-container,
+body.dark .filter-row select:focus, body.dark .filter-row input:focus
+{
+  background-color: color-mix(in oklab, #ffffff 3%, transparent) !important;
+}
 
-body.dark .sidebar .menu li a 
+body.dark .sidebar .menu li a ,
+body.dark p,
+body.dark h1,
+body.dark h3,
+body.dark h2,
+body.dark span,
+body.dark li,
+body.dark .dashboard-cards .card .info .title,
+body.dark input[type="text"]::placeholder,
+body.dark .fa-eye,
+body.dark .fa-user-pen
 {
   color: white;
+  /* font-weight: bold; */
 }
+
 body.dark .tick{
    color: #465fff ;
   background-color:color-mix(in oklab, #465fff 12%, transparent);
 }
 body.dark .header,
-body.dark .submenu-dark-mode {
+body.dark .submenu-dark-mode,
+body.dark .notification-list li {
   background-color: #101828;
   color: white;
 }
@@ -35,16 +74,19 @@ body.dark .sidebar .menu li .logo{
 body.dark .submenu-dark-mode li:hover {
   background-color: #444;
 }
-body.dark .header .header-left button,body.dark .header .header-right .header-icon {
+body.dark .header .header-left button,
+body.dark .header .header-right .header-icon {
   color: #98a2b3 !important;
   background-color: #1d2939 !important;
 }
-
+body.dark .header .header-right .header-icon i{
+  color: #007bff;
+}
 
 /* HEADER CHÍNH */
 .header {
   background: white;
-  padding: 15px 30px;
+  padding: 15px 0px;
   border-bottom: 1px solid #e9ecef;
   display: flex;
   align-items: center;

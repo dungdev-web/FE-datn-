@@ -28,15 +28,54 @@ export default function Detail() {
   const [countdown, setCountdown] = useState("");
 
   const handleAddToCart = async () => {
+    if (!selectedColorId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Vui lòng chọn màu sắc",
+      text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
+    });
+    return;
+  }
+
+  if (!selectedSizeId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Vui lòng chọn kích thước",
+      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+    });
+    return;
+  }
+     if (!variantId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Vui lòng chọn kích thước",
+      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+    });
+    return;
+  }
     setLoading(true);
     try {
       const tokenData = await checkToken();
       if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
 
       await addToMockCart(tokenData.user.id, variantId, quantity, price);
-      console.log("đã thêm");
+      console.log(variantId);
+      console.log(quantity);
+      console.log(price);
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã thêm vào giỏ hàng!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: (error as Error).message || "Thêm sản phẩm thất bại",
+      });
     } finally {
       setLoading(false);
     }
@@ -400,7 +439,13 @@ export default function Detail() {
                                 background: "#fff",
                                 cursor: "pointer",
                               }}
-                              onClick={() => setSelectedSizeId(variant.size.id)}
+                              onClick={() => {
+                                console.log(
+                                  "Selected size ID:",
+                                  variant.size.id
+                                );
+                                setSelectedSizeId(variant.size.id);
+                              }}
                             >
                               {variant.size.number_size}
                             </button>
