@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../css/checkout.css";
-import "../css/style.css";
+
 import { District, Province, Ward } from "@/types/Country";
 
 export default function Checkout() {
@@ -43,7 +43,7 @@ export default function Checkout() {
   }, [selectedDistrict]);
 
   return (
-    <div className="checkout-container !mt-[170px] px-4 flex flex-col lg:flex-row gap-6">
+    <div className="checkout-container px-4 flex flex-col lg:flex-row gap-6">
       {/* LEFT: Thông tin nhận hàng */}
       <div className="checkout-left w-full lg:w-1/2">
         <a href="" className="text-blue-600 font-bold text-xl">TERA Shoes</a>

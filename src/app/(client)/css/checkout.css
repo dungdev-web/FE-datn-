@@ -7,6 +7,7 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin: 170px auto;
 }
 
 .checkout-left,
@@ -186,3 +187,14 @@ textarea {
 
     cursor:pointer;
 }
+@media (max-width: 768px) {
+ .checkout-container{
+    margin: 30px auto;
+  }
+  .checkout-left, .checkout-right, .checkout-extra{
+    padding: 0PX;
+  }
+}
+
+
+
