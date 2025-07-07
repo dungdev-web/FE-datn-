@@ -6,6 +6,7 @@ import AccountSidebar from "../../component/accountsidebar";
 import { IUser } from "@/types/user";
 import { useState, useEffect } from "react";
 import { checkToken } from "@/services/authService";
+import VNAddressSelector from "../../component/VNAddressSelector";
 export default function Address() {
   const [user, setUser] = useState<IUser | null>(null);
 
@@ -138,14 +139,15 @@ export default function Address() {
                           className="hidden btn btn-dark-address btn-edit-addr btn-delete"
                           type="button"
                         >
-                          <span>Xóa</span>
+                        <button className="btn btn-dark-address btn-delete">
+                          <span className="text-red-500">Xóa</span>
+                  </button> 
                         </button>
                       </p>
                     </div>
                   </div>
                 </div>
-
-                {/* <div id="edit_address_31677624" className="form-list modal_address modal modal_edit_address" style="height: 545px;">
+               {/* <div id="edit_address_31677624" className="form-list modal_address modal modal_edit_address" style="height: 545px;">
 						<div className="btn-close closed_pop"><i className="fa fa-times"></i></div>
 						<h2 className="title_pop">
 							Chỉnh sửa địa chỉ

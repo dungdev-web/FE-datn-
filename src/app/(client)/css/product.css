@@ -696,9 +696,7 @@ input[type="submit"] {
     display: none;
   }
 
-  .col-md-6 {
-    padding: 0 20px;
-  }
+ 
   #open-filters {
     color: #fff;
     display: block !important;

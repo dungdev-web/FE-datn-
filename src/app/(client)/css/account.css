@@ -6,7 +6,7 @@
 .col-lg-1,
 .col-lg-10,
 .col-lg-11,
-.col-lg-12,
+
 .col-lg-2,
 .col-lg-3,
 .col-lg-4,
@@ -18,12 +18,10 @@
 .col-md-1,
 .col-md-10,
 .col-md-11,
-.col-md-12,
 .col-md-2,
 .col-md-3,
 .col-md-4,
 .col-md-5,
-.col-md-6,
 .col-md-7,
 .col-md-8,
 .col-md-9,
@@ -42,7 +40,6 @@
 .col-xs-1,
 .col-xs-10,
 .col-xs-11,
-.col-xs-12,
 .col-xs-2,
 .col-xs-3,
 .col-xs-4,
@@ -422,10 +419,8 @@ th {
   .col-left-ac .block-account {
     margin-bottom: 15px;
   } 
-  
   .container1 .row {
-    margin-right: 20px !important;
-    margin-left: 20px !important;
+   margin: 0 auto;
   }
 }
 .no-padding {
@@ -698,5 +693,22 @@ input.btn-primary[type="submit"] {
 @media (min-width: 768px) {
   p {
     margin: 0 0 5px 0;
+  }
+
+}
+/* ✅ Mobile */
+@media (max-width: 767px) {
+  .btn-upload-avatar {
+    width: 22%;
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    justify-content: center; /* căn giữa icon + text */
+    margin-top: -15px;
+  }
+  .img-avatar{
+    margin-right: 5px !important;
+  }
+  .user-profile-header{
+    margin-bottom: 5px !important;
   }
 }

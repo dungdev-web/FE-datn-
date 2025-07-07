@@ -102,7 +102,7 @@ export default function MenuRight({ isMenuOpen, closeMenu }: MenuRightProps) {
             <Link href="/contact">LIÊN HỆ</Link>
           </li>
           <li>
-            <Link href="/login">TÀI KHOẢN</Link>
+            <Link href="/account">TÀI KHOẢN</Link>
           </li>
           <li>
             <Link href="/register">ĐĂNG KÍ</Link>

@@ -115,6 +115,7 @@ export default function Account() {
                               ? user.avatar
                               : "/images/default.png" 
                           }
+                          className="img-avatar"
                           alt="Avatar"
                           style={{
                             width: "80px",
@@ -143,6 +144,7 @@ export default function Account() {
                       </div>
 
                       <button
+                       className="btn-upload-avatar"
                         style={{
                           padding: "8px 16px",
                           backgroundColor: "#021688",
