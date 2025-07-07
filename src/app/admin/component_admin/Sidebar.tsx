@@ -208,29 +208,7 @@ const pathname = usePathname();
             </ul>
           )}
         </li>
-        <li
-          className={`has-submenu ${openMenuKey === "binhluan" ? "open" : ""}`}
-        >
-          <Link href={'/admin/comment'} className={`flex items-center ${pathname === '/admin/comment' ? 'tick' : ''}`} onClick={() => toggleMenu("binhluan")}>
-            <CommentIcon /> 
-            {!isCollapsed && (
-              <>
-                <span>Quản lý bình luận</span>
-                <i className="fa-solid fa-chevron-down submenu-icon"></i>
-              </>
-            )}
-          </Link>
-          {!isCollapsed && (
-            <ul className="submenu">
-              <li>
-                <Link href={'admin/comment'}>Danh sách bình luận</Link>
-              </li>
-              <li>
-                <a href="#">Bình luận ...</a>
-              </li>
-            </ul>
-          )}
-        </li>
+        
 
         <li
           className={`has-submenu ${openMenuKey === "danhgia" ? "open" : ""}`}
