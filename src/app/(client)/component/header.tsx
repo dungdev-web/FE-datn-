@@ -187,14 +187,27 @@ export default function Header() {
           </div>
         </div>
         <div className="icon-header">
-          <div className="iconuser-header div">
-            <div className="login-mini">
-              <Link href="/login">
-                <i className="fa-solid fa-user cursor-pointer"></i>
-              </Link>
-
+          <div
+            className={`iconuser-header div1 ${
+              userId === 1 ? "logged-in" : "logged-out"
+            }`}
+          >
+            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+              {userId === 1 ? (
+                <Link
+                  href="/account"
+                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
+                >
+                  Chào Tan Truc
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
+                </Link>
+              )}
             </div>
           </div>
+
           <div className="iconheart-header div">
             <Link href="/wishlist">
               <i className="fa-solid fa-heart"></i>

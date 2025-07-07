@@ -5,7 +5,6 @@ import "../../css/dashboard.css";
 export default function ViewUser() {
   return (
     <>
-      <main className="main-content">
         <section className="user-detail-card">
           <div className="user-header">
             <img
@@ -205,7 +204,6 @@ export default function ViewUser() {
             </button>
           </div>
         </div>
-      </main>
     </>
   );
 }

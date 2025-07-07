@@ -88,42 +88,79 @@ const handleChange = (
     fetchCart();
   }, []);
   if (!cart) {
-    return (
-      <>
-        <section
-          className="bread-crumb background-cover relative"
-          style={{
-            backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
-          }}
-        >
-          {/* Lớp phủ làm mờ nền */}
-          <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+return (
+  <>
+    <section
+      className="bread-crumb background-cover relative"
+      style={{
+        backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+      }}
+    >
+      <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
 
-          <div className="breadcrumb-container">
-            <div className="title-page">
-              <h2>Giỏ hàng của bạn</h2>
-            </div>
-            <ul className="breadcrumb">
-              <li className="home">
-                <Link href="/" title="Trang chủ">
-                  <span>Trang chủ</span>
-                </Link>
-                <i className="fa fa-angle-right" aria-hidden="true"></i>
-              </li>
-              <li>
-                <strong>
-                  <span>Giỏ hàng</span>
-                </strong>
-              </li>
-              <li></li>
-            </ul>
-          </div>
-        </section>
-        <div>Không có sản phẩm trong giỏ hàng</div>
-      </>
-    );
+      <div className="breadcrumb-container relative z-10">
+        <div className="title-page">
+          <h2>Giỏ hàng của bạn</h2>
+        </div>
+        <ul className="breadcrumb">
+          <li className="home">
+            <Link href="/" title="Trang chủ">
+              <span>Trang chủ</span>
+            </Link>
+            <i className="fa fa-angle-right" aria-hidden="true"></i>
+          </li>
+          <li>
+            <strong>
+              <span>Giỏ hàng</span>
+            </strong>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    {/* Layout trống giỏ hàng căn giữa toàn màn hình */}
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="mb-6"
+        viewBox="0 0 64 64"
+        fill="none"
+        width="100"
+        height="100"
+      >
+        <path
+          d="M20 22V18C20 13.5817 23.5817 10 28 10H36C40.4183 10 44 13.5817 44 18V22"
+          stroke="#00C853"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M12 22H52L58 54C58 56.2091 56.2091 58 54 58H10C7.79086 58 6 56.2091 6 54L12 22Z"
+          stroke="#00C853"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+        <circle cx="24" cy="30" r="2" fill="#00C853" />
+        <circle cx="40" cy="30" r="2" fill="#00C853" />
+      </svg>
+
+      <p className="text-gray-700 text-lg font-medium">
+        Không có sản phẩm nào trong giỏ hàng của bạn
+      </p>
+
+      <Link
+        href="/"
+        className="mt-6 inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+      >
+        Tiếp tục mua sắm
+      </Link>
+    </div>
+  </>
+);
+
+
   }
   return (
     <>

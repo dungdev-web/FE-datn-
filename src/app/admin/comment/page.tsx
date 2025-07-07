@@ -4,7 +4,6 @@ import Link from "next/link";
 
 export default function CommentPage() {
   return (
-    <main className="main-content">
       <div className="review-container">
         <h2>Quản lý bình luận sản phẩm</h2>
 
@@ -135,6 +134,5 @@ export default function CommentPage() {
           </button>
         </div>
       </div>
-    </main>
   );
 }
