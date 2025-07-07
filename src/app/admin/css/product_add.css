@@ -68,6 +68,7 @@
 
 .form-group {
   margin-bottom: 20px;
+  display: block !important;
 }
 
 label {

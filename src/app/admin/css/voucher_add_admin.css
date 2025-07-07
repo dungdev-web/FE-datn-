@@ -14,7 +14,7 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
-h2 {
+.promotion-container h2 {
   text-align: center;
   color: #222;
   margin-bottom: 30px;
