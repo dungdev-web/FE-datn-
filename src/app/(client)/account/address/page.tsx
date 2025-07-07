@@ -1,6 +1,7 @@
 "use client";
 import "../../css/product.css";
 import "../../css/account.css";
+import "@/app/(client)/css/form-address.css";
 import Link from "next/link";
 import AccountSidebar from "../../component/accountsidebar";
 import { IUser } from "@/types/user";
@@ -9,6 +10,10 @@ import { checkToken } from "@/services/authService";
 import VNAddressSelector from "../../component/VNAddressSelector";
 export default function Address() {
   const [user, setUser] = useState<IUser | null>(null);
+  const [showAddPopup, setShowAddPopup] = useState(false);
+
+  const handleOpenPopup = () => setShowAddPopup(true);
+  const handleClosePopup = () => setShowAddPopup(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -33,7 +38,7 @@ export default function Address() {
         console.error("Lỗi lấy thông tin người dùng:", error);
         // Ví dụ: có thể redirect về trang login nếu cần
         // router.push("/login");
-      } 
+      }
     };
 
     fetchUser();
@@ -89,6 +94,7 @@ export default function Address() {
                 <button
                   className="btn-edit-addr btn btn-primary btn-more"
                   type="button"
+                  onClick={handleOpenPopup} // thêm dòng này
                 >
                   Thêm địa chỉ
                 </button>
@@ -139,15 +145,15 @@ export default function Address() {
                           className="hidden btn btn-dark-address btn-edit-addr btn-delete"
                           type="button"
                         >
-                        <button className="btn btn-dark-address btn-delete">
-                          <span className="text-red-500">Xóa</span>
-                  </button> 
+                          <button className="btn btn-dark-address btn-delete">
+                            <span className="text-red-500">Xóa</span>
+                          </button>
                         </button>
                       </p>
                     </div>
                   </div>
                 </div>
-               {/* <div id="edit_address_31677624" className="form-list modal_address modal modal_edit_address" style="height: 545px;">
+                {/* <div id="edit_address_31677624" className="form-list modal_address modal modal_edit_address" style="height: 545px;">
 						<div className="btn-close closed_pop"><i className="fa fa-times"></i></div>
 						<h2 className="title_pop">
 							Chỉnh sửa địa chỉ
@@ -232,6 +238,69 @@ export default function Address() {
           </div>
         </div>
       </main>
+{showAddPopup && (
+  <div className="popup-overlay">
+    <div className="popup-container">
+      <button onClick={handleClosePopup} className="popup-close-btn">
+        &times;
+      </button>
+      <h3 className="popup-title">Thêm địa chỉ mới</h3>
+
+      <form className="popup-form">
+        <div className="popup-grid">
+          <div>
+            <label className="form-label">Họ tên</label>
+            <input
+              type="text"
+              placeholder="Nhập họ tên"
+              className="form-input"
+            />
+          </div>
+          <div>
+            <label className="form-label">Số điện thoại</label>
+            <input
+              type="text"
+              placeholder="Nhập số điện thoại"
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="form-label">Địa chỉ chi tiết</label>
+          <input
+            type="text"
+            placeholder="Ví dụ: 123 đường ABC, phường XYZ..."
+            className="form-input"
+          />
+        </div>
+
+        <VNAddressSelector />
+        <label className="toggle-container">
+  <span className="toggle-label">Đặt làm địa chỉ mặc định</span>
+  <input type="checkbox" className="toggle-checkbox"  />
+  <span className="toggle-slider"></span>
+</label>
+
+        <div className="popup-actions">
+          <button
+            type="button"
+            onClick={handleClosePopup}
+            className="btn-cancel"
+          >
+            Hủy
+          </button>
+          <button type="submit" className="btn-save">
+            Lưu địa chỉ
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
+
+
     </>
   );
 }

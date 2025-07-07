@@ -43,8 +43,6 @@ export default function VNAddressSelector() {
 
   return (
     <div className="address-selector">
-  <h3 className="title">Chọn địa chỉ</h3>
-
   <div className="selector-grid">
     {/* Tỉnh/Thành phố */}
     <div>
