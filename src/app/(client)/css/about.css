@@ -163,6 +163,10 @@
   .timeline-line {
     left: 40px;
   }
+  .timeline-container {
+    padding: 20px 0px;
+    margin: 20 auto;
+  }
 }
 /* Large devices (Desktop >= 1200px) */
 @media (min-width: 1200px) {
@@ -228,6 +232,7 @@
   .about-us {
     flex-direction: column;
     text-align: center;
+    padding: 20px;
   }
   .about-text h2 {
     font-size: 22px;
@@ -236,7 +241,7 @@
     font-size: 14px;
   }
   .about-image img {
-    max-width: 90%;
+    max-width: 114%;
   }
   .timeline-line {
     left: 20px;
@@ -246,7 +251,7 @@
   }
   .timeline-item.left::before,
   .timeline-item.right::before {
-    left: 15px;
+    left: 10px;
   }
   .header-nav-bg {
     margin-bottom: 50px;

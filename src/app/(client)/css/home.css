@@ -71,6 +71,9 @@
   .product-dealbox-main h1 {
     font-size: 24px;
   }
+  .product-textsale-main{
+    display: none;
+  }
 }
 .product-listdeal-main {
   display: flex;
@@ -105,8 +108,17 @@
   padding: 10px;
   transition: 0.3s;
 }
-
-.product-card:hover {
+.product-card-list {
+  position: relative;
+ 
+  border-radius: 10px;
+  background: #f9f9f9;
+  overflow: hidden;
+  padding: 10px;
+  transition: 0.3s;
+}
+.product-card,
+.product-card-list:hover {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -323,6 +335,11 @@
   overflow: hidden;
   min-height: 600px;
 }
+@media (max-width: 768px) {
+  .look-book-main {
+    margin: 0px auto;
+  }
+}
 
 .look-book-text {
   flex: 0 0 35%; /* Bên trái nhỏ lại */
@@ -508,7 +525,19 @@
   padding: 40px 20px;
   background-color: #fff; /* nền trắng */
 }
-
+@media (max-width: 768px) {
+  .shipping-main {
+   padding: 10px 5px;
+  }
+  .shipping-main h3{
+    font-size: 12px !important; /* giảm kích thước chữ tiêu đề */
+  }
+  .shipping-main p {
+    font-size: 11px !important; /* giảm kích thước chữ mô tả */
+    color: #7d7d7d; /* màu ghi nhẹ cho mô tả */
+  line-height: 1 !important;
+  }
+}
 .shipping-main > div {
   display: flex;
   flex-direction: column;
@@ -544,7 +573,13 @@
   background: #fff;
   font-family: Arial, sans-serif;
 }
-
+@media (max-width: 768px) {
+  .hot-products {
+    padding: 0px;
+    
+  }
+  
+}
 .hot-products-header {
   display: flex;
   justify-content: space-between;
@@ -850,7 +885,15 @@
   border-radius: 10px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
-
+@media (max-width: 768px) {
+  .video-embed iframe {
+    width: 100%;
+    height: 200px;
+  }
+  .play-button i {
+   margin-left: 5px;
+  }
+}
 /* Nút Close */
 .close-button {
   position: absolute;
@@ -889,16 +932,15 @@
 /* blog */
 .blog-main {
   width: 90%;
-
   margin: 0 auto;
-  padding: 50px 0; /* bỏ padding ngang để ôm sát */
+  padding: 30px 0; /* bỏ padding ngang để ôm sát */
   background: #fff;
 }
 .blog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 10px;
 }
 
 .blog-title-left {
@@ -948,6 +990,15 @@
 .swiper-slide {
   display: flex;
 }
+@media (max-width: 768px) {
+@media (max-width: 768px) {
+  .box-blog-home {
+  width: 191px !important; /* giảm kích thước slide trên mobile */
+  margin-right: 10px !important; /* giảm khoảng cách giữa các slide */
+  }
+
+}
+}
 
 .swiper-slide img {
   /* width: 100%; */
@@ -969,7 +1020,14 @@
   font-weight: bold;
   margin: 10px 15px;
 }
-
+@media (max-width: 768px) {
+  .blog-title {
+    font-size: 14px;
+  }
+  .blog-desc {
+    font-size: 12px !important;
+  }
+}
 .blog-desc {
   font-size: 15px;
   color: #555;
@@ -1159,6 +1217,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+  /* Khi hover card thì hiện icon lên */
+  .product-card-list:hover .product-icons .hover-icons {
+    opacity: 1;
+    transform: translateY(0);
+  }
   /* Hiển thị icon group khi hover thẻ chứa */
   .hot-product-card:hover .hot-product-icons .icon-hover-group {
     transition: all 3s ease-in;
@@ -1214,9 +1277,13 @@
   .category-main1 {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr);
+    gap: 0;
   }
   .category-main1-item {
     width: 100% !important;
+  }
+   .category-main{
+    margin-top: -60px;
   }
   .instagram-main {
     padding-top: 0;
@@ -1275,11 +1342,21 @@
   .box-container {
     width: 100% !important;
   }
-  .product-two-box-container {
-    margin: 30px 43px !important;
+  .product-two-box-container{ 
+    margin: 10px !important;
+    gap: 20px !important;
+  }
+  .product-two-box-main {
+    padding: 0px !important;
+  }
+  .product-two-box-main .h1{
+    font-weight: bold;
+    font-size: 24px;
+    
   }
   .product-card {
     padding: 0;
+    
   }
  .swiper-slide img {
     height: 205px !important;
@@ -1327,11 +1404,14 @@
   }
   .category-main1 {
     display: grid !important;
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     padding: 5px;
   }
   .category-main1-item {
     margin-top: 5px;
+  }
+  .category-main{
+    margin-top: -60px;
   }
   .instagram-list {
     grid-template-columns: repeat(1, 1fr);
@@ -1346,6 +1426,10 @@
   .hot-products-list {
     grid-template-columns: repeat(2, 1fr);
   }
+   .product-card {
+    padding: 0;
+    width: 190px !important; /* giảm kích thước card */
+  }
   
 }
 .flash-sale {
@@ -1355,10 +1439,20 @@
   background-position: center; /* Canh giữa ảnh */
 }
 /* session mới */
-.product-two-box-container {
-  margin: 30px 85px;
-}
 
+.product-two-box-main{
+    background: #fff;
+    max-width: 90%;
+    margin: 30px  auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+.product-two-box-main h1{
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+
+}
 .content {
   display: flex;
   justify-content: space-between;
