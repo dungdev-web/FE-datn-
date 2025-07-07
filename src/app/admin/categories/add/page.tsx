@@ -1,10 +1,10 @@
 "use client";
-import "../css/categories_add_admin.css";
+import "@/app/admin/css/categories_add_admin.css";
 import Link from "next/link";
 export default function CategoryAdd() {
   return (
     <main className="main-content">
-      <div className="category-container">
+      <div className="cate/gory-container">
         <h2>Thêm danh mục mới</h2>
 
         <form className="category-form">

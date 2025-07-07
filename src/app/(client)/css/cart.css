@@ -74,9 +74,9 @@
 }
 
 .main-cart {
-    width: 90%;
-    margin: 0 auto;
-    padding: 30px;
+   width: 90%;
+    margin: 20px auto;
+    
 }
 
 .cart-container {
@@ -329,6 +329,16 @@
     border-radius: 5px;
     margin-top: 20px;
     cursor: pointer;
+}
+@media (max-width: 768px) {
+     .main-cart{
+        width: 90%;
+     }
+     .cart-item{
+        gap: 9px;
+        padding: 5px 0;
+       
+     }
 }
 @media (max-width:991px){
     .intro-banner{
