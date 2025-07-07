@@ -1,11 +1,4 @@
 
-/* Base style */
-body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f1f3f9;
-  margin: 0;
-  padding: 0;
-}
 
 .main-content {
   padding: 40px 20px;
@@ -15,6 +8,7 @@ body {
 .category-container {
   max-width: 900px;
   margin: auto;
+  margin-top: 30px;
   padding: 40px 30px;
   background: linear-gradient(145deg, #ffffff, #f0f3f7);
   border-radius: 16px;
