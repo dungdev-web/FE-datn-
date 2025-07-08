@@ -1,5 +1,5 @@
 "use client";
-import "../../css/brand_add_admin.css";
+import "@/app/admin/css/brand_add_admin.css";
 import Link from "next/link";
 export default function BrandEdit() {
   return (

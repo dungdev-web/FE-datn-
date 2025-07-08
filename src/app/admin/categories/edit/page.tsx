@@ -1,7 +1,7 @@
 "use client";
-import "../css/categories_add_admin.css";
+import "@/app/admin/css/categories_add_admin.css";
 import Link from "next/link";
-export default function CategoryAdd() {
+export default function CategoryEdit() {
   return (
       <div className="category-container">
         <h2>Chỉnh sửa danh mục</h2>

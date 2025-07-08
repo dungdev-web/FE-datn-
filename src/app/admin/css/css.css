@@ -4,19 +4,30 @@
   box-sizing: border-box;
 }
 
-body, .sidebar,
-body.dark .custom-after-border:after
- {
-  background-color: #fff ;
+body,
+.sidebar,
+body.dark .custom-after-border:after {
+  background-color: #fff;
   color: #222;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
+input[type="text"]::placeholder,
+body.dark .dropdown-option:hover.dropdown-option span.color-name {
+  color: #222;
+}
+body.dark .dropdown-option:hover {
+  background: #fff;
+}
 body.dark .sidebar,
 body.dark,
-body.dark .category-tag {
-  background-color: #101828;
+body.dark .category-tag,
+body.dark .dropdown-options,
+body.dark option {
+  background: #101828 !important;
   color: #f1f1f1;
+}
+body.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 body.dark .revenue-card,
 body.dark .card,
@@ -24,6 +35,8 @@ body.dark .chart-container,
 body.dark tr,
 body.dark td,
 body.dark th,
+body.dark section,
+body.dark .info-item,
 body.dark .product-card,
 body.dark .stock-item,
 body.dark .notification-box,
@@ -32,17 +45,37 @@ body.dark .quick-actions,
 body.dark .alerts-system,
 body.dark .user-list,
 body.dark .brand-list,
+body.dark .order-list,
 body.dark .category-list,
 body.dark .product-list,
 body.dark .post-list,
-body.dark   .promotion-list,
+body.dark select,
+body.dark select:focus,
+body.dark .promotion-list,
 body.dark .review-container,
-body.dark .filter-row select:focus, body.dark .filter-row input:focus
-{
-  background-color: color-mix(in oklab, #ffffff 3%, transparent) !important;
+body.dark .filter-row select:focus,
+body.dark .filter-row input:focus,
+body.dark .brand-container,
+body.dark .category-container,
+body.dark .promotion-container,
+body.dark .input-field,
+body.dark .ck-blurred,
+body.dark .ck-rounded-corners .ck.ck-editor__top .ck-sticky-panel .ck-toolbar,
+body.dark .ck-editor__editable.ck-focused:not(.ck-editor__nested-editable),
+body.dark .tab,
+body.dark .dropdown-multiselect,
+body.dark .tags-input,
+body.dark .custom-select,
+body.dark .form-add-post,
+body.dark .ql-toolbar.ql-snow + .ql-container.ql-snow,
+body.dark textarea,
+body.dark .filepond--drop-label,
+body.dark .filepond--root :not(text),
+body.dark .dropdown {
+  background: color-mix(in oklab, #ffffff 3%, transparent) !important;
 }
 
-body.dark .sidebar .menu li a ,
+body.dark .sidebar .menu li a,
 body.dark p,
 body.dark h1,
 body.dark h3,
@@ -51,24 +84,36 @@ body.dark span,
 body.dark li,
 body.dark .dashboard-cards .card .info .title,
 body.dark input[type="text"]::placeholder,
+body.dark input[type="number"]::placeholder,
 body.dark .fa-eye,
-body.dark .fa-user-pen
-{
+body.dark .fa-user-pen,
+body.dark .fa-pen,
+body.dark .fa-trash,
+body.dark .fa-eye-slash,
+body.dark .fa-check,
+body.dark label,
+body.dark select,
+body.dark .ck,
+body.dark .tab.active,
+body.dark .dropdown-option span.color-name {
   color: white;
   /* font-weight: bold; */
 }
 
-body.dark .tick{
-   color: #465fff ;
-  background-color:color-mix(in oklab, #465fff 12%, transparent);
+body.dark .tick {
+  color: #465fff;
+  background-color: color-mix(in oklab, #465fff 12%, transparent);
 }
 body.dark .header,
 body.dark .submenu-dark-mode,
-body.dark .notification-list li {
+body.dark .notification-list li,
+body.dark .modal-box,
+body.dark .modal-header,
+body.dark .modal-footer {
   background-color: #101828;
   color: white;
 }
-body.dark .sidebar .menu li .logo{
+body.dark .sidebar .menu li .logo {
   background: none;
 }
 body.dark .submenu-dark-mode li:hover {
@@ -79,7 +124,7 @@ body.dark .header .header-right .header-icon {
   color: #98a2b3 !important;
   background-color: #1d2939 !important;
 }
-body.dark .header .header-right .header-icon i{
+body.dark .header .header-right .header-icon i {
   color: #007bff;
 }
 
@@ -135,9 +180,7 @@ body.dark .header .header-right .header-icon i{
   align-items: center;
   gap: 15px;
   position: relative;
-
 }
-
 
 .submenu-dark-mode {
   position: absolute;
@@ -261,12 +304,12 @@ body.dark .header .header-right .header-icon i{
   white-space: nowrap;
   overflow: hidden;
 }
-.tick{
+.tick {
   color: #465fff !important;
   background-color: #ecf3ff;
 }
-.menu li span{
-  word-wrap: break-word;  
+.menu li span {
+  word-wrap: break-word;
   white-space: normal;
 }
 /* Khi sidebar thu gọn, chỉ hiển thị icon */
@@ -384,8 +427,8 @@ body.dark .header .header-right .header-icon i{
   margin-left: 68px;
   width: 95%;
 }
-.sidebar.collapsed ~ .main-content .charts-wrapper .chart-container{
-      max-width: 690px !important; 
+.sidebar.collapsed ~ .main-content .charts-wrapper .chart-container {
+  max-width: 690px !important;
 }
 /* Responsive cho màn hình nhỏ */
 @media (max-width: 768px) {

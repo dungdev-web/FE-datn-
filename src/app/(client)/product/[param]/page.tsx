@@ -58,7 +58,7 @@ export default function Detail() {
     setLoading(true);
     try {
       const tokenData = await checkToken();
-      if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
+      if (!tokenData?.user?.id) throw new Error("Không có người dùng");
 
       await addToMockCart(tokenData.user.id, variantId, quantity, price);
       console.log(variantId);
