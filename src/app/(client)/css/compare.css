@@ -1,5 +1,5 @@
 
-.container1 {
+.container2 {
     max-width: 1320px;
     width: 100%;
     padding-right: 15px;
@@ -138,7 +138,7 @@ td {
 }
 /*   */
 @media (min-width: 768px) {
-  .container1 {
+  .container2 {
     width: 750px;
   }
   .mobile{
@@ -146,7 +146,7 @@ td {
   }
 }
 @media (min-width: 1200px) {
-  .container1 {
+  .container2 {
     max-width: 1320px;
     width: 100%;
   }
@@ -155,12 +155,12 @@ td {
   .col-md-12 {
     width: 100%;
   }
-  .container1 {
+  .container2 {
     width: 970px;
   }
 }
 @media (min-width: 1200px) {
-    .container1 {
+    .container2 {
         max-width: 1320px;
         width: 100%;
     }

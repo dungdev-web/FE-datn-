@@ -38,7 +38,7 @@ export default function Compare_product() {
 </section>
 
       <main style={{ marginTop: "30px" }} className="main">
-        <div className="container1">
+        <div className="container2">
           <div className="row">
             {/* <div className="col-xs-12 col-sm-12 col-md-12" id="none">
             <div className="null-table d-block">
