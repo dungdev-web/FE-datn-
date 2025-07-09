@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import { getAllProducts } from "@/services/productService";
 import Link from "next/link";
+import "@/app/(client)/css/pagination.css";
 export default function Product() {
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
@@ -448,9 +449,7 @@ export default function Product() {
                           style={{ width: "230px" }}
                         >
                           <div className="product-image">
-                            <Link
-                              href={`/product/${sp.slug}`}
-                            >
+                            <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
                                   sp.images?.[0]?.url ||
@@ -555,15 +554,13 @@ export default function Product() {
                         <div
                           className="product-card-list"
                           style={{
-                           width: "100% !important",
+                            width: "100% !important",
                             display: "flex",
                             background: "none",
                           }}
                         >
                           <div className="product-image">
-                            <Link
-                              href={`/product/${sp.slug}`}
-                            >
+                            <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
                                   sp.images?.[0]?.url ||
@@ -572,7 +569,7 @@ export default function Product() {
                                 alt={sp.name}
                               />
                             </Link>
-                           
+
                             <div className="product-icons">
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
@@ -581,7 +578,6 @@ export default function Product() {
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
-                            
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -652,10 +648,12 @@ export default function Product() {
                     ))}
                   </div>
                 )}
-                <div className="flex justify-center items-center gap-2 mt-6">
+                <div className="pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === 1}
                   >
                     <i className="fa-solid fa-chevron-left"></i>
@@ -665,11 +663,7 @@ export default function Product() {
                     <button
                       key={i + 1}
                       onClick={() => setPage(i + 1)}
-                      className={`!p-[7px]  rounded ${
-                        page === i + 1
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      }`}
+                      className={`page-btn ${page === i + 1 ? "active" : ""}`}
                     >
                       {i + 1}
                     </button>
@@ -677,7 +671,9 @@ export default function Product() {
 
                   <button
                     onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === totalPages}
                   >
                     <i className="fa-solid fa-chevron-right"></i>
