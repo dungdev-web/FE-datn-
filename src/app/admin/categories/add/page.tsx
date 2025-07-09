@@ -4,8 +4,6 @@ import Link from "next/link";
 export default function CategoryAdd() {
   return (
       <div className="category-container">
-
-
         <h2>Thêm danh mục mới</h2>
 
         <form className="category-form">
@@ -74,6 +72,5 @@ export default function CategoryAdd() {
           </div>
         </form>
       </div>
-
   );
 }
