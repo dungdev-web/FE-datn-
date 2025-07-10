@@ -251,20 +251,38 @@ export default function Header() {
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
                       <h4>SẢN PHẨM MỚI NHẤT</h4>
-                      <a href="#">Giày chạy bộ</a>
-                      <a href="#">Giày Nike</a>
-                      <a href="#">Giày Adidas</a>
-                      <a href="#">Giày thể thao</a>
+                      <a href="#">Giày chạy bộ nam</a>
+                      <a href="#">Giày Nike Air Zoom</a>
+                      <a href="#">Giày Adidas Ultraboost</a>
+                      <a href="#">Giày thể thao mùa hè</a>
                     </div>
+
                     <div className="mega-column">
                       <h4>SẢN PHẨM NỔI BẬT</h4>
-                      <a href="#">Giày cho nam</a>
-                      <a href="#">Giày cho nữ</a>
+                      <a href="#">Giày Sneaker nam</a>
+                      <a href="#">Giày cao gót nữ</a>
+                      <a href="#">Giày lười thời trang</a>
                     </div>
+
                     <div className="mega-column">
                       <h4>SẢN PHẨM BÁN CHẠY</h4>
-                      <a href="#">Giày Puma</a>
-                      <a href="#">Nike Air</a>
+                      <a href="#">Giày Puma Suede</a>
+                      <a href="#">Nike Air Max 90</a>
+                      <a href="#">Giày Vans Old Skool</a>
+                    </div>
+
+                    <div className="mega-column">
+                      <h4>DANH MỤC MỚI NHẤT</h4>
+                      <a href="#">Giày thời trang nam</a>
+                      <a href="#">Giày thể thao nữ</a>
+                      <a href="#">Giày đi học</a>
+                    </div>
+
+                    <div className="mega-column">
+                      <h4>NHÃN HIỆU MỚI NHẤT</h4>
+                      <a href="#">Converse</a>
+                      <a href="#">New Balance</a>
+                      <a href="#">Bitis Hunter</a>
                     </div>
                   </div>
 
