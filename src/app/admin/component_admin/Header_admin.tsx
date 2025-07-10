@@ -182,7 +182,7 @@ export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
             </div>
 
             {openNote && (
-              <div className="absolute right-0 !mt-2 w-96 bg-white shadow-lg rounded-md z-50 flex flex-col max-h-[500px]">
+              <div className="menunote absolute right-0 !mt-2 w-96 bg-white shadow-lg rounded-md z-50 flex flex-col max-h-[500px]">
                 {/* Header */}
                 <div className="flex justify-between items-center border-b !px-4 !py-2">
                   <h4 className="text-lg font-semibold">Notifications</h4>
