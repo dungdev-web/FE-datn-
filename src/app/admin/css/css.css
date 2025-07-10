@@ -94,6 +94,7 @@ body.dark .fa-eye-slash,
 body.dark .fa-check,
 body.dark label,
 body.dark select,
+body.dark strong,
 body.dark .ck,
 body.dark .tab.active,
 body.dark .dropdown-option span.color-name {
@@ -238,7 +239,7 @@ body.dark .header .header-right .header-icon i {
   position: relative;
 }
 
-.notification-badge::after {
+/* .notification-badge::after {
   content: "3";
   position: absolute;
   top: -5px;
@@ -252,7 +253,7 @@ body.dark .header .header-right .header-icon i {
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 /* NỘI DUNG CHÍNH */
 .container {

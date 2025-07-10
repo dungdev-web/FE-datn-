@@ -25,7 +25,7 @@ export async function addToMockCart(
     }
 
     const existingItem = cart.items.find(
-      (item) => item.variant.variant_id === variant_id
+      (item) => item.variant?.variant_id === variant_id
     );
 
     if (existingItem) {

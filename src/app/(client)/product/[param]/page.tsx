@@ -29,30 +29,30 @@ export default function Detail() {
 
   const handleAddToCart = async () => {
     if (!selectedColorId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn màu sắc",
-      text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn màu sắc",
+        text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
 
-  if (!selectedSizeId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn kích thước",
-      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-     if (!variantId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn kích thước",
-      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
+    if (!selectedSizeId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn kích thước",
+        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
+    if (!variantId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn kích thước",
+        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
     setLoading(true);
     try {
       const tokenData = await checkToken();
@@ -128,8 +128,10 @@ export default function Detail() {
   useEffect(() => {
     if (selectedColorId && selectedSizeId && product) {
       const match = product.variants.find(
-        (v) => v.color.id === selectedColorId && v.size.id === selectedSizeId
+        (v) =>
+          v?.color?.id === selectedColorId && v?.size?.id === selectedSizeId
       );
+
       if (match) {
         setVariantId(match.product_variants_id);
         // setPrice(match.sale_price || match.);
@@ -386,7 +388,9 @@ export default function Detail() {
                         <div className="color-options">
                           {[
                             ...new Map(
-                              product.variants.map((v) => [v.color.id, v.color])
+                              product.variants
+                                .filter((v) => v?.color?.id)
+                                .map((v) => [v.color.id, v.color])
                             ).values(),
                           ].map((color) => (
                             <div
@@ -423,9 +427,8 @@ export default function Detail() {
 
                         <div className="size-options">
                           {(selectedColorId
-                            ? product.variants.filter(
-                                (v) => v.color.id === selectedColorId
-                              )
+                            ? product.variants.filter((v) => v?.color?.id === selectedColorId)
+
                             : product.variants
                           ).map((variant, index) => (
                             <button

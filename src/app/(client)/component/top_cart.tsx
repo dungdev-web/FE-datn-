@@ -60,7 +60,7 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                         href="/giay-nam-nike-air-max"
                         title={item.variant?.name}
                       >
-                        {item.variant?.name} - {item.variant.color.name_color} - {item.variant.size.number_size}
+                        {item.variant?.name} - {item.variant?.color.name_color} - {item.variant?.size.number_size}
                       </a>
                     </h3>
                   </div>

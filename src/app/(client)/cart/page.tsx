@@ -218,15 +218,15 @@ return (
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
                   <img
-                    src={item.variant.color.image}
-                    alt={`Sản phẩm ${item.variant.name}`}
+                    src={item.variant?.color.image}
+                    alt={`Sản phẩm ${item.variant?.name}`}
                   />
                   <div className="product-details">
                     <div className="product-name">
-                       {item.variant.name}
+                       {item.variant?.name}
                     </div>
                     <div className="product-desc">
-                      Màu sắc: {item.variant.color.name_color} - Kích thước: {item.variant.size.number_size}
+                      Màu sắc: {item.variant?.color.name_color} - Kích thước: {item.variant?.size.number_size}
                     </div>
                   </div>
                 </div>
@@ -305,7 +305,7 @@ return (
               <h3>Cộng Giỏ Hàng</h3>
               <div className="summary-row">
                 <span>Tạm tính:</span>
-                <span className="total">7,070,000₫</span>
+                <span className="total">{subtotal.toLocaleString('vi')}₫</span>
               </div>
               <div className="summary-row">
                 <span>Giao hàng:</span>
