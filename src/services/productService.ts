@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct } from "@/types/product";
+import { IProduct,IReview } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 type ProductIdentifier = { id: number } | { slug: string };
 
@@ -353,7 +353,27 @@ export async function getRelatedProducts(
 
   return Array.isArray(related) ? related : [];
 }
+// lấy tất cả review theo product
+export async function getReviewProduct(productId: number): Promise<IReview[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/review/product/${productId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
+    if (!res.ok) {
+      throw new Error("Không thể lấy review sản phẩm.");
+    }
+
+    const data: IReview[] = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Lỗi khi lấy đánh giá sản phẩm:", error);
+    return [];
+  }
+}
 
 // Thêm sản phẩm mới
 export async function addProduct(newProduct: IProduct): Promise<IProduct> {

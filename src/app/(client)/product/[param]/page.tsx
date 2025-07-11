@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import {
   getProductDetail,
   getBestSellingMockProducts,
+  getReviewProduct
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
@@ -304,18 +305,18 @@ const roundedRating = Math.round(averageRating);
                               <div
                                 key={index}
                                 className={`space-item-tsn tns-item tns-slide-active ${
-                                  selectedImage === img.color.image
+                                  selectedImage === img.color.images
                                     ? "active"
                                     : ""
                                 }`}
                                 onClick={() =>
-                                  setSelectedImage(img.color.image)
+                                  setSelectedImage(img.color.images)
                                 }
                                 style={{ cursor: "pointer" }}
                               >
                                 <div className="item">
                                   <img
-                                    src={img.color.image}
+                                    src={img.color.images || '/images/logo/1.png'}
                                     className="img-responsive"
                                     alt={product.name}
                                   />

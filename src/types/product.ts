@@ -49,11 +49,25 @@ export interface IProduct {
       id: number;
       code_color: string;
       name_color: string;
-      image: string;
+      images: string;
     };
     size: {
       id: number;
       number_size: string;
     };
   }[];
+}
+export interface IReview {
+  product_reviews_id: number;
+  user_id: number;
+  product_id: number;
+  rating: number;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  user: {
+    user_id: number;
+    name: string;
+    avatar: string;
+  };
 }
