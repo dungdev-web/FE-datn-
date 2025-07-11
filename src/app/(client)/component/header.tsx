@@ -7,6 +7,8 @@ import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { getCategories } from "@/services/categoryService";
 import { ICategory } from "@/types/ICategory";
+import { IBrand } from "@/types/IBrand";
+import { getBrands } from "@/services/brandService";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,15 +23,18 @@ export default function Header() {
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
-  const lastScrollTop = useRef(0);
+  const lastScrollTop = useRef(0); 
   const userId = 1;
   let hideTimeout = null;
 
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
-
+  useEffect(() => {
+    getBrands().then(setBrands);
+  }, []);
   const parentCategories = categories.filter((cat) => cat.parent_id === null);
 
   useEffect(() => {
@@ -272,9 +277,13 @@ export default function Header() {
 
                     <div className="mega-column">
                       <h4>NHÃN HIỆU MỚI NHẤT</h4>
-                      <a href="#">Converse</a>
-                      <a href="#">New Balance</a>
-                      <a href="#">Bitis Hunter</a>
+                      <div className="mega-brands">
+                        {brands.map((brand) => (
+                          <a key={brand.brand_id} href={`/brand/${brand.slug}`}>
+                            {brand.name}
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
