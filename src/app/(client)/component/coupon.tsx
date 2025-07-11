@@ -1,29 +1,25 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import "../css/coupon.css";
+import { ICoupon } from "@/types/coupon";
+import { getCouponList } from "@/services/couponService";
 
-
-import React, { useState } from 'react';
-import '../css/coupon.css'; // Đảm bảo bạn đã có file CSS tương ứng trong public hoặc styles
-
-type Coupon = {
+// Component hiển thị từng coupon
+type CouponCardProps = {
   code: string;
   discount: string;
   desc: string;
-};
-
-const coupons: Coupon[] = [
-  { code: 'FISHOES', discount: 'Giảm 10%', desc: 'Mã giảm 10% khi mua 1 sản phẩm' },
-  { code: 'FISHOES2', discount: 'Giảm 13%', desc: 'Mã giảm 13% khi mua 2 sản phẩm' },
-  { code: 'FISHOES3', discount: 'Giảm 18%', desc: 'Mã giảm 18% khi mua 3 sản phẩm' },
-  { code: 'FISHOES4', discount: 'Giảm 20%', desc: 'Mã giảm 20% khi mua 4 sản phẩm' }
-];
-
-type CouponCardProps = Coupon & {
-  onApplyClick: (e: React.MouseEvent<HTMLAnchorElement>, code: string, desc: string) => void;
+  onApplyClick: (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    code: string,
+    desc: string
+  ) => void;
 };
 
 function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
   const handleCopy = () => {
     navigator.clipboard.writeText(code).then(() => {
-      alert('Đã sao chép mã: ' + code);
+      alert("Đã sao chép mã: " + code);
     });
   };
 
@@ -33,11 +29,14 @@ function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
         <div className="code">Mã: {code}</div>
         <div className="discount-box">
           <div className="title">MÃ GIẢM</div>
-         <div className="percent">{discount}</div>
+          <div className="percent">{discount}</div>
         </div>
         <div className="desc">{desc}</div>
         <div className="action-row">
-          <a className="apply-link" onClick={(e) => onApplyClick(e, code, desc)}>
+          <a
+            className="apply-link"
+            onClick={(e) => onApplyClick(e, code, desc)}
+          >
             Điều kiện áp dụng
           </a>
           <button className="copy-button" onClick={handleCopy}>
@@ -50,28 +49,30 @@ function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
   );
 }
 
+// Modal hiển thị khi click "Điều kiện áp dụng"
 type ModalProps = {
   visible: boolean;
   code: string;
   desc: string;
+  usageLimit: number;
+
   onClose: () => void;
 };
 
-function Modal({ visible, code, desc, onClose }: ModalProps) {
+function Modal({ visible, code, desc, usageLimit, onClose }: ModalProps) {
   if (!visible) return null;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code).then(() => {
-      alert('Đã sao chép mã: ' + code);
+      alert("Đã sao chép mã: " + code);
     });
   };
 
   return (
     <div className="modal-overlay">
-
       <div className="modal-content-coupon">
         <h2>
-          Mã : <span style={{ color: '#ff4500' }}>{code}</span>
+          Mã : <span style={{ color: "#ff4500" }}>{code}</span>
         </h2>
         <p>
           <strong>Mã khuyến mãi:</strong> {code}
@@ -79,8 +80,11 @@ function Modal({ visible, code, desc, onClose }: ModalProps) {
         <p>
           <strong>Điều kiện:</strong>
         </p>
-        <p>{desc} - Mỗi khách hàng được sử dụng tối đa 1 lần - Số lượng voucher có hạn</p>
-        <div style={{ textAlign: 'right', marginTop: '15px' }}>
+        <p>
+          {desc} - Mỗi khách hàng được sử dụng tối đa {usageLimit} lần - Số
+          lượng voucher có hạn
+        </p>
+        <div style={{ textAlign: "right", marginTop: "15px" }}>
           <button onClick={handleCopy} className="modal-btn copy">
             Sao chép mã
           </button>
@@ -93,19 +97,38 @@ function Modal({ visible, code, desc, onClose }: ModalProps) {
   );
 }
 
+// Component chính
 export default function CouponApp() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedCode, setSelectedCode] = useState('');
-  const [selectedDesc, setSelectedDesc] = useState('');
+  const [selectedCode, setSelectedCode] = useState("");
+  const [selectedDesc, setSelectedDesc] = useState("");
+  const [coupons, setCoupons] = useState<ICoupon[]>([]);
+  const [selectedUsageLimit, setSelectedUsageLimit] = useState<number>(1);
 
-const handleApplyClick = (e: React.MouseEvent<HTMLAnchorElement>, code: string, desc: string) => {
-  e.preventDefault();
-  console.log('Click mã:', code);
-  setSelectedCode(code);
-  setSelectedDesc(desc);
-  setModalVisible(true);
-};
+  useEffect(() => {
+    const fetchDataVoucher = async () => {
+      try {
+        const data = await getCouponList();
+        setCoupons(data);
+      } catch (err) {
+        console.error("Lỗi khi lấy voucher:", err);
+      }
+    };
+    fetchDataVoucher();
+  }, []);
 
+  const handleApplyClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    code: string,
+    desc: string,
+    usageLimit: number
+  ) => {
+    e.preventDefault();
+    setSelectedCode(code);
+    setSelectedDesc(desc);
+    setModalVisible(true);
+    setSelectedUsageLimit(usageLimit);
+  };
 
   return (
     <>
@@ -114,9 +137,30 @@ const handleApplyClick = (e: React.MouseEvent<HTMLAnchorElement>, code: string, 
           <CouponCard
             key={index}
             code={coupon.code}
-            discount={coupon.discount}
-            desc={coupon.desc}
-            onApplyClick={handleApplyClick}
+            discount={
+              coupon.discount_type === "percentage"
+                ? `Giảm ${parseFloat(coupon.discount_value)}%`
+                : `Giảm ${parseInt(coupon.discount_value).toLocaleString(
+                    "vi"
+                  )}đ`
+            }
+            desc={`Áp dụng từ ${new Date(
+              coupon.start_date
+            ).toLocaleDateString()} đến ${new Date(
+              coupon.end_date
+            ).toLocaleDateString()}`}
+            onApplyClick={(e) =>
+              handleApplyClick(
+                e,
+                coupon.code,
+                `Áp dụng từ ${new Date(
+                  coupon.start_date
+                ).toLocaleDateString()} đến ${new Date(
+                  coupon.end_date
+                ).toLocaleDateString()}`,
+                coupon.usage_limit
+              )
+            }
           />
         ))}
       </div>
@@ -124,6 +168,7 @@ const handleApplyClick = (e: React.MouseEvent<HTMLAnchorElement>, code: string, 
         visible={modalVisible}
         code={selectedCode}
         desc={selectedDesc}
+        usageLimit={selectedUsageLimit}
         onClose={() => setModalVisible(false)}
       />
     </>

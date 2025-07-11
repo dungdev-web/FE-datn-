@@ -32,7 +32,7 @@ export interface IProduct {
     alt_text: string;
     type: string;
   }[];
-  reviews: {
+  product_reviews: {
     product_reviews_id: number;
     rating: string;
     content: string;
@@ -41,7 +41,7 @@ export interface IProduct {
       avatar: string;
     };
   }[];
-  variants: {
+  product_variants: {
     product_variants_id: number;
     sku: string;
     stock_quantity: number;

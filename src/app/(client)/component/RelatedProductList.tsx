@@ -16,6 +16,8 @@ export default function RelatedProductList({ categoryId }: Props) {
       try {
         const data = await getRelatedProducts(categoryId);
         setRelatedProducts(data);
+              console.log("👉 Dữ liệu trả về từ API (related products):", data);
+
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm cùng loại:", error);
       }
@@ -26,9 +28,13 @@ export default function RelatedProductList({ categoryId }: Props) {
 
   return (
     <div className="product-grid slider-wrapper">
-      {relatedProducts.map((product) => (
+    {Array.isArray(relatedProducts) && relatedProducts.length > 0 ? (
+      relatedProducts.map((product) => (
         <Product4box key={product.products_id} sp={product} />
-      ))}
-    </div>
+      ))
+    ) : (
+      <p>Không có sản phẩm liên quan.</p>
+    )}
+  </div>
   );
 }

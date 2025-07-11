@@ -1,22 +1,24 @@
-export interface IPost {
-  posts_id: number;
+export interface IBlog {
+  post_id: number;
   title: string;
-  content: string;
   slug: string;
+  content: string;
   thumbnail: string;
-  status: boolean;
-  image: string;
-  created_at: Date;
-  updated_at: Date;
-  author?: {
-    id: number;
-    name: string;
-    email?: string;
-    avatar?: string;
-  };
-  categories?: {
-    categories_id: number;
+  images: string[] | null;
+  status: number;
+  category_post_id: number;
+  author_id: number;
+  created_at: string;
+  updated_at: string;
+  category_post: {
+    category_post_id: number;
     name: string;
     slug: string;
-  }[];
+    parent_id: number | null;
+  };
+  author: {
+    user_id: number;
+    name: string;
+    avatar: string;
+  };
 }
