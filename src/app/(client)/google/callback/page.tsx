@@ -1,5 +1,6 @@
 // pages/auth/google/callback.tsx
 "use client";
+import { API_BASE_URL } from "@/config/env";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -11,7 +12,7 @@ export default function GoogleCallback() {
     const code = searchParams.get("code");
 
     if (code) {
-      fetch("http://localhost:3000/google/callback", {
+      fetch(`${API_BASE_URL}/google/callback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
