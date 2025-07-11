@@ -11,3 +11,18 @@ export interface IUser {
   created_at: Date;
   updated_at: Date;
 }
+export interface StoredUser {
+  token: string | null;
+  userId: string | null;
+  username: string | null;
+  email: string | null;
+}
+
+export interface UserData {
+  token: string;
+  user: {
+    userId: string;
+    username: string;
+    email: string;
+  };
+}

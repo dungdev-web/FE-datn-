@@ -6,42 +6,47 @@ import { RegisterCredentials } from "@/types/auth";
 
 // --------- LOGIN ---------
 export async function loginUser(
-  credentialss: LoginCredentials
+  credentials: LoginCredentials
 ): Promise<{ token: string; user: IUser }> {
   if (IS_MOCK) {
     const users = getMockUsers();
 
     const user = users.find(
       (u) =>
-        u.email === credentialss.usernameOrEmail ||
-        u.name === credentialss.usernameOrEmail
+        u.email === credentials.usernameOrEmail ||
+        u.name === credentials.usernameOrEmail
     );
 
     if (!user) {
       throw new Error("Tài khoản không tồn tại trong hệ thống");
     }
-    console.log("usernameOrEmail nhận được:", credentialss.usernameOrEmail);
+    console.log("usernameOrEmail nhận được:", credentials.usernameOrEmail);
 
-    if (user.password_hash !== credentialss.password) {
+    if (user.password_hash !== credentials.password) {
       throw new Error("Mật khẩu không đúng");
     }
 
     return { token: "mock-token-123", user };
   }
   const res = await fetch(`${API_BASE_URL}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentialss),
-    credentials: 'include' 
-  });
-  const data = await res.json();
-  // localStorage.setItem("token",data.token);
-  if (!res.ok) {
-    const errorMessage = data.error || data.message || "Đăng nhập thất bại";
-    throw new Error(errorMessage);
-  }
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(credentials), // Không typo: credentialss ❌
+  credentials: "include", // Chỉ cần nếu dùng cookie/session
+});
 
-  return data;
+const data = await res.json();
+
+if (!res.ok) {
+  const errorMessage = data.error || data.message || "Đăng nhập thất bại";
+  throw new Error(errorMessage);
+}
+
+// Lưu token nếu dùng JWT
+// localStorage.setItem("token", data.token);
+
+return data;
+
 }
 // --------- LOGIN GOOGLE -------
 export async function loginWithGoogle(): Promise<{ message: string; user: IUser }> {
