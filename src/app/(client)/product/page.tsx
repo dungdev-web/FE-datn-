@@ -4,15 +4,24 @@ import { IProduct } from "@/types/product";
 import { getAllProducts } from "@/services/productService";
 import Link from "next/link";
 import "@/app/(client)/css/pagination.css";
+import { ICategory } from "@/types/ICategory";
+import { getCategories } from "@/services/categoryService";
 export default function Product() {
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [products, setProducts] = useState<IProduct[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
 
   const totalPages = Math.ceil(total / productsPerPage);
+  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
+
+  const toggleCategory = (id: number) => {
+    setOpenCategoryId(openCategoryId === id ? null : id);
+  };
+
   const toggleSidebar = () => {
     setIsActive(!isActive);
   };
@@ -20,7 +29,9 @@ export default function Product() {
     setViewMode(mode);
     setPage(1);
   };
-
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -80,43 +91,43 @@ export default function Product() {
                   </div>
                   <div className="categories-box">
                     <ul className="lv1">
-                      <li className="nav-item nav-items">
-                        <a href="/" title="Trang chủ">
-                          {" "}
-                          Trang chủ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/gioi-thieu" title="Giới thiệu">
-                          {" "}
-                          Giới thiệu
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items active">
-                        <a
-                          href="/collections/all"
-                          className="nav-link"
-                          title="Sản phẩm"
+                      {categories.map((cat) => (
+                        <li
+                          key={cat.categories_id}
+                          className="nav-item nav-items"
                         >
-                          Sản phẩm
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/tin-tuc" className="nav-link" title="Tin tức">
-                          Tin tức
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/lien-he" title="Liên hệ">
-                          {" "}
-                          Liên hệ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
-                          Hệ thống cửa hàng
-                        </a>
-                      </li>
+                          <button
+                            type="button"
+                            className={`nav-button ${
+                              openCategoryId === cat.categories_id ? "open" : ""
+                            }`}
+                            onClick={() => toggleCategory(cat.categories_id)}
+                          >
+                            {cat.name}
+                            {cat.children && cat.children.length > 0 && (
+                              <span className="arrow">
+                                {openCategoryId === cat.categories_id
+                                  ? "▾"
+                                  : "▸"}
+                              </span>
+                            )}
+                          </button>
+
+                          {cat.children &&
+                            cat.children.length > 0 &&
+                            openCategoryId === cat.categories_id && (
+                              <ul className="lv2">
+                                {cat.children.map((child) => (
+                                  <li key={child.categories_id}>
+                                    <a href={`/category/${child.slug}`}>
+                                      {child.name}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </aside>

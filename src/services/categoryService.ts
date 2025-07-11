@@ -11,7 +11,7 @@ export async function getCategories(): Promise<ICategory[]> {
     cache: "no-store",
   });
 
-  // ✅ FIX: API trả trực tiếp mảng, không có json.categories
+  // FIX: API trả trực tiếp mảng, không có json.categories
   const json: ICategory[] = await res.json();
   return json;
 }

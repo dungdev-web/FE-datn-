@@ -268,7 +268,7 @@ export default function Header() {
                       {categories.map((cat) => (
                         <a
                           key={cat.categories_id}
-                          href={`/product/${cat.slug}`}
+                          href={`/product/category?category=${cat.slug}`}
                         >
                           {cat.name}
                         </a>
@@ -286,7 +286,6 @@ export default function Header() {
                       </div>
                     </div>
                   </div>
-
                   <div className="mega-images">
                     <img src="/images/banner/mega-menu-images1.webp" alt="" />
                     <img src="/images/banner/mega-menu-images2.webp" alt="" />
