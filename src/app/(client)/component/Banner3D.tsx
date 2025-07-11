@@ -27,12 +27,12 @@ useGLTF.preload("/models/shoe1.glb");
 
 export default function Banner3D() {
   return (
-    <div className="w-full h-screen bg-[#021688] text-white flex flex-col justify-center items-center">
+    <div className="w-full h-screen bg-gradient-to-r from-[#021688] to-[#0642a4] text-white flex flex-col justify-center items-center">
       <div className="max-w-[1280px] w-full grid grid-cols-1 md:grid-cols-2 items-center gap-10 px-6 py-12">
         {/* LEFT: TEXT */}
         <div className="space-y-6 text-left">
           <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-            Giày Thời Trang Mới Nhất 2025
+            Giày thời trang mới nhất 2025
           </h1>
           <p className="text-lg text-gray-300 max-w-md">
             Công nghệ tiên tiến, chất liệu cao cấp, phong cách hiện đại.
