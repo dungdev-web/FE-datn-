@@ -1,5 +1,5 @@
 "use client";
-import "@/src/app/admin/css/voucher_admin.css";
+import "../css/voucher_admin.css";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -8,7 +8,6 @@ export default function Voucher() {
   const [searchText, setSearchText] = useState("");
 
   return (
-    <main className="main-content">
       <div className="promotion-list">
         <h2>Danh sách mã giảm giá</h2>
 
@@ -47,11 +46,12 @@ export default function Voucher() {
           <thead>
             <tr>
               <th>Mã khuyến mãi</th>
-              <th>Tên khuyến mãi</th>
               <th>Loại</th>
-              <th>Trạng thái</th>
-              <th>Giá trị</th>
+              <th>Giá trị (%)</th>
+              <th>Ngày bắt đầu</th>
               <th>Ngày hết hạn</th>
+              <th>Giới hạn</th>
+              <th>Đã dùng</th>
               <th>Thao tác</th>
             </tr>
             <tr className="promotion-filter-row">
@@ -59,14 +59,7 @@ export default function Voucher() {
                 <input type="text" placeholder="Lọc mã..." />
               </th>
               <th>
-                <input type="text" placeholder="Lọc tên..." />
-              </th>
-              <th>
-                <select>
-                  <option value="">Tất cả</option>
-                  <option value="public">Công khai</option>
-                  <option value="private">Riêng tư</option>
-                </select>
+                <input type="text" placeholder="Lọc loại..." />
               </th>
               <th>
                 <select>
@@ -75,6 +68,13 @@ export default function Voucher() {
                   <option value="false">Vô hiệu</option>
                 </select>
               </th>
+              <th>
+                <input type="date" name="" id="" />
+              </th>
+              <th>
+                <input type="date" name="" id="" />
+              </th>
+
               <th></th>
               <th></th>
               <th></th>
@@ -84,32 +84,11 @@ export default function Voucher() {
             <tr>
               <td>BLA01</td>
               <td>BLACK FRIDAY</td>
-              <td className="status-column">
-                <span className="badge badge-public">Công khai</span>
-              </td>
-              <td className="status-column">
-                <span className="badge badge-success">Kích hoạt</span>
-              </td>
-              <td>50000 đ</td>
-              <td>11-12-2021</td>
-              <td>
-                <Link href={"/admin/voucher/edit"}>
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>KH123</td>
-              <td>2/9</td>
-              <td className="status-column">
-                <span className="badge badge-public">Công khai</span>
-              </td>
-              <td className="status-column">
-                <span className="badge badge-success">Kích hoạt</span>
-              </td>
               <td>30%</td>
-              <td>06-09-2021</td>
+              <td>11-12-2021</td>
+              <td>11-12-2021</td>
+              <td>5</td>
+              <td>5</td>
               <td>
                 <Link href={"/admin/voucher/edit"}>
                   <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
@@ -132,6 +111,5 @@ export default function Voucher() {
           </button>
         </div>
       </div>
-    </main>
   );
 }

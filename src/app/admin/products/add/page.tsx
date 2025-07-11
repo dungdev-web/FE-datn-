@@ -243,7 +243,6 @@ export default function Add_pro() {
 
   return (
     <>
-      <main className="main-content">
         <div className="header-bar">
           <div className="header-left">
             <button className="btn btn-back">
@@ -754,7 +753,6 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
             </button>
           </div>
         </div>
-      </main>
     </>
   );
 }

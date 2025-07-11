@@ -628,13 +628,18 @@ export default function Home({ product }: { product: IProduct }) {
           </div>
         </div>
 
-        <div className="product-two-box-container flex gap-[75px] flex-wrap">
-          <>
+        <div className="product-two-box-main">
+          <h1 className="h1">
+            SẢN PHẨM THEO DANH MỤC
+          </h1>
+          <div className="product-two-box-container flex gap-[75px] flex-wrap">
+            <>
+              <Show2sanpham products={cateproducts} />
+              <Show2sanpham products={cateproducts1} />
+            </>
+            <img src="/images/banner/session_cate.jpg" alt="" />
             <Show2sanpham products={cateproducts} />
-            <Show2sanpham products={cateproducts1} />
-          </>
-          <img src="/images/banner/session_cate.jpg" alt="" />
-          <Show2sanpham products={cateproducts} />
+          </div>
         </div>
 
         <div className="video-main">

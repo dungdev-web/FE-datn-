@@ -16,6 +16,11 @@ export default function CheckTokenGuard({ children }: Props) {
   useEffect(() => {
     const verifyToken = async () => {
       try {
+        // const token = localStorage.getItem("token");
+        //  if (!token) {
+        //   console.error("Token không tồn tại");
+        //   return;
+        // }
         const data = await checkToken();
         if (!data) {
           await Swal.fire({

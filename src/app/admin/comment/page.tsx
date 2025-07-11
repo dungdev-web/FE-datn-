@@ -1,10 +1,9 @@
 "use client";
-import "@/src/app/admin/css/comment_admin.css";
+import "../css/comment_admin.css";
 import Link from "next/link";
 
 export default function CommentPage() {
   return (
-    <main className="main-content">
       <div className="review-container">
         <h2>Quản lý bình luận sản phẩm</h2>
 
@@ -35,9 +34,15 @@ export default function CommentPage() {
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">
-              <th><input type="text" placeholder="Lọc ID..." /></th>
-              <th><input type="text" placeholder="Lọc người dùng..." /></th>
-              <th><input type="text" placeholder="Lọc sản phẩm..." /></th>
+              <th>
+                <input type="text" placeholder="Lọc ID..." />
+              </th>
+              <th>
+                <input type="text" placeholder="Lọc người dùng..." />
+              </th>
+              <th>
+                <input type="text" placeholder="Lọc sản phẩm..." />
+              </th>
               <th>
                 <select>
                   <option value="">Tất cả</option>
@@ -48,7 +53,9 @@ export default function CommentPage() {
                   <option value="5">★★★★★</option>
                 </select>
               </th>
-              <th><input type="text" placeholder="Tìm nội dung..." /></th>
+              <th>
+                <input type="text" placeholder="Tìm nội dung..." />
+              </th>
               <th></th>
               <th></th>
             </tr>
@@ -59,13 +66,30 @@ export default function CommentPage() {
               <td>Lê Chí Bảo</td>
               <td>Giày NIKE</td>
               <td>★★★★☆</td>
-              <td>Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.</td>
-              <td><span className="status approved">Đã duyệt</span></td>
               <td>
-                <i className="fa-solid fa-eye view-icon" title="Xem chi tiết"></i>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa bình luận"></i>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa bình luận"></i>
-                <i className="fa-solid fa-eye-slash hide-icon" title="Ẩn bình luận"></i>
+                Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn
+                thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.
+              </td>
+              <td>
+                <span className="status approved">Đã duyệt</span>
+              </td>
+              <td>
+                <i
+                  className="fa-solid fa-eye view-icon"
+                  title="Xem chi tiết"
+                ></i>
+                <i
+                  className="fa-solid fa-pen edit-icon"
+                  title="Sửa bình luận"
+                ></i>
+                <i
+                  className="fa-solid fa-trash delete-icon"
+                  title="Xóa bình luận"
+                ></i>
+                <i
+                  className="fa-solid fa-eye-slash hide-icon"
+                  title="Ẩn bình luận"
+                ></i>
               </td>
             </tr>
             <tr>
@@ -73,25 +97,42 @@ export default function CommentPage() {
               <td>Lưu Đức Chó</td>
               <td>Giày NIKE</td>
               <td>★★★★★</td>
-              <td>Giày đẹp đúng như hình, chất liệu tốt, mang êm chân và rất thời trang. Phù hợp cả đi học lẫn đi chơi.</td>
-              <td><span className="status pending">Chờ duyệt</span></td>
               <td>
-                <i className="fa-solid fa-check approve-icon" title="Duyệt bình luận"></i>
-                <i className="fa-solid fa-eye view-icon" title="Xem chi tiết"></i>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa bình luận"></i>
+                Giày đẹp đúng như hình, chất liệu tốt, mang êm chân và rất thời
+                trang. Phù hợp cả đi học lẫn đi chơi.
+              </td>
+              <td>
+                <span className="status pending">Chờ duyệt</span>
+              </td>
+              <td>
+                <i
+                  className="fa-solid fa-check approve-icon"
+                  title="Duyệt bình luận"
+                ></i>
+                <i
+                  className="fa-solid fa-eye view-icon"
+                  title="Xem chi tiết"
+                ></i>
+                <i
+                  className="fa-solid fa-trash delete-icon"
+                  title="Xóa bình luận"
+                ></i>
               </td>
             </tr>
           </tbody>
         </table>
 
         <div className="pagination">
-          <button className="page-btn" disabled><i className="fa-solid fa-angle-left"></i></button>
+          <button className="page-btn" disabled>
+            <i className="fa-solid fa-angle-left"></i>
+          </button>
           <button className="page-btn active">1</button>
           <button className="page-btn">2</button>
           <button className="page-btn">3</button>
-          <button className="page-btn"><i className="fa-solid fa-angle-right"></i></button>
+          <button className="page-btn">
+            <i className="fa-solid fa-angle-right"></i>
+          </button>
         </div>
       </div>
-    </main>
   );
 }

@@ -1,19 +1,34 @@
-
+"use client";
 import "./admin.css";
 import Header_admin from "./component_admin/Header_admin";
 import SideBar from "./component_admin/Sidebar";
+import { useState } from "react";
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const toggleSidebar = () => setIsSidebarCollapsed((prev) => !prev);
   return (
     <html lang="en">
       <body>
-        <div className="container">
-        <Header_admin></Header_admin>
-        {children}
-        <SideBar></SideBar>
+        <div className="container1">
+          <div
+            className={`dashboard-layout ${
+              isSidebarCollapsed ? "sidebar-collapsed" : ""
+            }`}
+          >
+            <SideBar
+              isCollapsed={isSidebarCollapsed}
+              toggleSidebar={toggleSidebar}
+            />
+
+            <main className="main-content">
+              <Header_admin toggleSidebar={toggleSidebar}></Header_admin>
+              {children}
+            </main>
+          </div>
         </div>
       </body>
     </html>

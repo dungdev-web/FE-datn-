@@ -45,7 +45,7 @@ input[type="tel"],
 textarea,
 select {
   border: 1px solid #e1e1e1;
-  padding: 0 20px;
+ 
   max-width: 100%;
   display: block;
 }
@@ -102,7 +102,7 @@ header {
 
 /* Nền màu */
 header:before {
-  /* background-color: #021688; */
+  background-color: #021688;
   content: "";
   position: absolute;
   top: 0;
@@ -174,6 +174,26 @@ header.scrolled {
   align-items: center;
   justify-content: center;
 }
+.icon-header .div1 {
+  background-color: #0c2b63;
+  padding: 10px;
+  position: relative;
+  min-width: 50px;
+  height: 50px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-header .div1.logged-out {
+  border-radius: 50%;
+}
+
+.icon-header .div1.logged-in {
+  border-radius: 40px;
+}
+
 
 .icon-header .div::after {
   content: "0";
@@ -188,7 +208,7 @@ header.scrolled {
   height: 18px;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center;  
 }
 
 nav {
@@ -441,21 +461,57 @@ nav {
     font-size: 24px;
     margin-bottom: 5px;
   }
+   .category-main1 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 5px;
+  }
+
 }
 
+@media (max-width: 480px) {
+  .category-main h1 {
+    font-size: 20px;
+    margin-bottom: 5px;
+  }
+  
+  .category-main1 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 5px;
+  }
+}
 .category-main1 {
-  flex-grow: 1;
-  flex-basis: 200px;
-  min-width: 150px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  transition: flex-basis 1.5s ease-out;
-  /* Sử dụng flex-basis thay vì flex-grow */
+  gap: 10px;
 }
 
 .category-main1-item {
-  transition: flex-basis 1.5s ease-out;
-  /* Đảm bảo hover có chuyển động mượt mà */
+  position: relative;
+  overflow: hidden;
+  width: 23%;
+  min-width: 200px;
+  height: 450px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+  .category-main1-item {
+    width: 48%;
+    min-width: unset;
+    margin: 1%;
+  }
+  
+  .category-main1-item {
+    width: 48%;
+    min-width: unset;
+    height: 300px;
+  }
+
 }
 
 .category-main1-item:hover {

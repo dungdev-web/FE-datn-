@@ -6,23 +6,24 @@ import MenuRight from "./menu_right";
 import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
+import { useAuthCookie } from "@/hooks/useAuthCookie";
+import { useAuthUser } from "@/hooks/useAuthUser";
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const cartIconRef = useRef<HTMLDivElement>(null);
   const cartPopupRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
   const menuRef = useRef<HTMLLIElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
-
+  const { user } = useAuthUser();
   let hideTimeout = null;
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -135,22 +136,13 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-      console.log(
-        "scrollY:",
-        currentScroll,
-        "lastScrollTop:",
-        lastScrollTop.current
-      );
 
       if (currentScroll > lastScrollTop.current) {
-        console.log("scrolling down -> hide nav");
         setShowNav(false);
       } else {
         if (currentScroll === 0) {
-          console.log("scrolling up to top -> show nav");
           setShowNav(true);
         } else {
-          console.log("scrolling up but not top -> hide nav");
           setShowNav(false);
         }
       }
@@ -177,10 +169,9 @@ export default function Header() {
           </div>
         </div>
         <div className="logo-header">
-          <Link href={'/'}>
+          <Link href={"/"}>
             <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
           </Link>
-        
         </div>
         <div className="iconphone-header">
           <div className="iconphon-header1">
@@ -189,14 +180,27 @@ export default function Header() {
           </div>
         </div>
         <div className="icon-header">
-          <div className="iconuser-header div">
-            <div className="login-mini">
-              <i
-                className="fa-solid fa-user cursor-pointer"
-                onClick={() => setShowLogin(true)}
-              ></i>
+          <div
+            className={`iconuser-header div1 ${
+              user ? "logged-in" : "logged-out"
+            }`}
+          >
+            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+              {user ? (
+                <Link
+                  href="/account"
+                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
+                >
+                  Chào {user.name}
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
+                </Link>
+              )}
             </div>
           </div>
+
           <div className="iconheart-header div">
             <Link href="/wishlist">
               <i className="fa-solid fa-heart"></i>
@@ -220,7 +224,6 @@ export default function Header() {
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
       <MenuRight isMenuOpen={isMenuOpen} closeMenu={closeMenu} />
-      <LoginMenu isOpen={showLogin} onClose={() => setShowLogin(false)} />
       {showNav && (
         <nav className="transition-all duration-300">
           <div className="menu-nav">

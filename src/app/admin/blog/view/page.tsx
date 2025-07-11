@@ -59,7 +59,6 @@ export default function Blog_View() {
   }, []);
 
   return (
-    <main className="main-content">
       <form className="form-add-post">
         <div className="form-header flex justify-between items-center !mb-[24px]">
           <h2 className="form-title">Thêm bài viết mới</h2>
@@ -147,6 +146,5 @@ export default function Blog_View() {
           <div id="editor" className="quill-editor"></div>
         </div>
       </form>
-    </main>
   );
 }
