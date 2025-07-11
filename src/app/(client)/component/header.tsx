@@ -6,6 +6,9 @@ import MenuRight from "./menu_right";
 import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
+import { useAuthCookie } from "@/hooks/useAuthCookie";
+import { useAuthUser } from "@/hooks/useAuthUser";
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -18,10 +21,9 @@ export default function Header() {
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
-  const userId = 1;
+  const { user } = useAuthUser();
   let hideTimeout = null;
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -134,22 +136,13 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-      console.log(
-        "scrollY:",
-        currentScroll,
-        "lastScrollTop:",
-        lastScrollTop.current
-      );
 
       if (currentScroll > lastScrollTop.current) {
-        console.log("scrolling down -> hide nav");
         setShowNav(false);
       } else {
         if (currentScroll === 0) {
-          console.log("scrolling up to top -> show nav");
           setShowNav(true);
         } else {
-          console.log("scrolling up but not top -> hide nav");
           setShowNav(false);
         }
       }
@@ -187,14 +180,27 @@ export default function Header() {
           </div>
         </div>
         <div className="icon-header">
-          <div className="iconuser-header div">
-            <div className="login-mini">
-              <Link href="/login">
-                <i className="fa-solid fa-user cursor-pointer"></i>
-              </Link>
-
+          <div
+            className={`iconuser-header div1 ${
+              user ? "logged-in" : "logged-out"
+            }`}
+          >
+            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+              {user ? (
+                <Link
+                  href="/account"
+                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
+                >
+                  Chào {user.name}
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
+                </Link>
+              )}
             </div>
           </div>
+
           <div className="iconheart-header div">
             <Link href="/wishlist">
               <i className="fa-solid fa-heart"></i>
