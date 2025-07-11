@@ -448,9 +448,7 @@ export default function Product() {
                           style={{ width: "230px" }}
                         >
                           <div className="product-image">
-                            <Link
-                              href={`/product/${sp.slug}`}
-                            >
+                            <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
                                   sp.images?.[0]?.url ||
@@ -472,7 +470,9 @@ export default function Product() {
                             <span className="discount-tag">
                               -
                               {Math.round(
-                                ((sp.price - sp.sale_price) / sp.price) * 100
+                                ((Number(sp.price) - Number(sp.sale_price)) /
+                                  Number(sp.price)) *
+                                  100
                               )}
                               %
                             </span>
@@ -480,7 +480,10 @@ export default function Product() {
                             <div className="product-colors">
                               {[
                                 ...new Map(
-                                  sp.variants.map((v) => [v.color.id, v.color])
+                                  sp.product_variants.map((v) => [
+                                    v.color.id,
+                                    v.color,
+                                  ])
                                 ).values(),
                               ].map((color) => (
                                 <span
@@ -493,12 +496,15 @@ export default function Product() {
                             </div>
 
                             <h4 className="product-title">{sp.name}</h4>
+
                             <div className="product-price">
                               <span className="old-price">
-                                <del>{sp.price.toLocaleString("vi")}đ</del>
+                                <del>
+                                  {Number(sp.price).toLocaleString("vi")}đ
+                                </del>
                               </span>
                               <span className="new-price">
-                                {sp.sale_price.toLocaleString("vi")}đ
+                                {Number(sp.sale_price).toLocaleString("vi")}đ
                               </span>
                             </div>
 
@@ -512,7 +518,7 @@ export default function Product() {
                                 >
                                   <span className="sold-info">
                                     Đã bán{" "}
-                                    {sp.variants.reduce(
+                                    {sp.product_variants.reduce(
                                       (sum, v) => sum + v.stock_quantity,
                                       0
                                     )}{" "}
@@ -545,6 +551,7 @@ export default function Product() {
                     ))}
                   </div>
                 )}
+
                 {viewMode === "list" && (
                   <div className="product-grid-column">
                     {products.map((sp) => (
@@ -561,9 +568,7 @@ export default function Product() {
                           }}
                         >
                           <div className="product-image">
-                            <Link
-                              href={`/product/${sp.slug}`}
-                            >
+                            <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
                                   sp.images?.[0]?.url ||
@@ -572,7 +577,7 @@ export default function Product() {
                                 alt={sp.name}
                               />
                             </Link>
-                           
+
                             <div className="product-icons">
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
@@ -581,7 +586,6 @@ export default function Product() {
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
-                            
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -635,7 +639,10 @@ export default function Product() {
                             <div className="product-colors">
                               {[
                                 ...new Map(
-                                  sp.variants.map((v) => [v.color.id, v.color])
+                                  sp.product_variants.map((v) => [
+                                    v.color.id,
+                                    v.color,
+                                  ])
                                 ).values(),
                               ].map((color) => (
                                 <span

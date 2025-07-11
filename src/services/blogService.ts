@@ -1,15 +1,14 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { getMockCoupon,saveMockCoupon} from "@/mocks/mockCoupon";
-import { ICoupon } from "@/types/coupon";
-
+import { IBlog } from "@/types/blog";
+import { getMockBlog } from "@/mocks/mockBlog";
 // Lấy giỏ hàng của user
-export async function getCouponList(): Promise<ICoupon[]> {
+export async function getPost(): Promise<IBlog[]> {
   if (IS_MOCK) {
-    return getMockCoupon();
+    return getMockBlog();
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/product/coupons`, {
+    const res = await fetch(`${API_BASE_URL}/post`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -21,7 +20,7 @@ export async function getCouponList(): Promise<ICoupon[]> {
     }
 
     const data = await res.json();
-    return data.products || data;
+    return data.posts || data;
   } catch (error) {
     console.error("Lỗi khi lấy dữ liệu coupon:", error);
     return [];

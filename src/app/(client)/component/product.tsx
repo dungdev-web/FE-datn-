@@ -5,10 +5,10 @@ export default function Product4box(props: any) {
   if (!sp) return null;
 
   const averageRating =
-    sp?.reviews?.length > 0
+    sp?.product_reviews?.length > 0
       ? Math.round(
-          sp.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-            sp.reviews.length
+          sp.product_reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+            sp.product_reviews.length
         )
       : 0;
   const discountPercent = Math.round(
@@ -37,7 +37,7 @@ export default function Product4box(props: any) {
           <div className="hot-product-colors">
             {[
               ...new Map(
-                sp.variants.map((v) => [v.color.id, v.color])
+                (sp.product_variants ?? []).map((v) => [v.color.id, v.color])
               ).values(),
             ].map((color, index) => (
               <span
@@ -62,7 +62,10 @@ export default function Product4box(props: any) {
               <div className="progress-fill" style={{ width: "87%" }}>
                 <span className="sold-info">
                   Đã bán{" "}
-                  {sp.variants.reduce((sum, v) => sum + v.stock_quantity, 0)}{" "}
+                  {(sp.product_variants ?? []).reduce(
+                    (sum, v) => sum + v.stock_quantity,
+                    0
+                  )}{" "}
                   sản phẩm
                 </span>
               </div>

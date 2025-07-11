@@ -58,7 +58,7 @@ const defaultProducts: IProduct[] = [
       },
     ],
 
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 1001,
         rating: "5",
@@ -79,7 +79,7 @@ const defaultProducts: IProduct[] = [
       },
     ],
 
-    variants: [
+    product_variants: [
       {
         product_variants_id: 201,
         sku: "CV-RSM-BLK-40",
@@ -156,7 +156,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 2001,
         rating: "5",
@@ -185,7 +185,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 203,
         sku: "NK-PEG-GRN-42",
@@ -238,7 +238,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 3001,
         rating: "5",
@@ -258,7 +258,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 204,
         sku: "AD-UB22-BLU-43",
@@ -324,7 +324,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -344,7 +344,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
@@ -409,7 +409,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [  
+    product_reviews: [  
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -429,7 +429,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
@@ -479,8 +479,8 @@ function normalizeProduct(p: any): IProduct {
     price: p.price,
     sale_price: p.sale_price,
     description: p.description,
-    variants: p.variants || [],
-    reviews: p.reviews || [],
+    product_variants: p.variants || [],
+    product_reviews: p.reviews || [],
   };
 }
 

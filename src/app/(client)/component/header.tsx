@@ -3,7 +3,6 @@ import React, { useEffect, useState, useRef } from "react";
 import Search from "./showsearch";
 import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
-import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { useAuthCookie } from "@/hooks/useAuthCookie";
