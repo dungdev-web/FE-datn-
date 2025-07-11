@@ -5,6 +5,9 @@ import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
+import { getCategories } from "@/services/categoryService";
+import { ICategory } from "@/types/ICategory";
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -17,11 +20,18 @@ export default function Header() {
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
   const userId = 1;
   let hideTimeout = null;
+
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
+
+  const parentCategories = categories.filter((cat) => cat.parent_id === null);
+
   useEffect(() => {
     const cartIcon = cartIconRef.current;
     const cartPopup = cartPopupRef.current;
@@ -249,32 +259,15 @@ export default function Header() {
                 >
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
-                      <h4>SẢN PHẨM MỚI NHẤT</h4>
-                      <a href="#">Giày chạy bộ nam</a>
-                      <a href="#">Giày Nike Air Zoom</a>
-                      <a href="#">Giày Adidas Ultraboost</a>
-                      <a href="#">Giày thể thao mùa hè</a>
-                    </div>
-
-                    <div className="mega-column">
-                      <h4>SẢN PHẨM NỔI BẬT</h4>
-                      <a href="#">Giày Sneaker nam</a>
-                      <a href="#">Giày cao gót nữ</a>
-                      <a href="#">Giày lười thời trang</a>
-                    </div>
-
-                    <div className="mega-column">
-                      <h4>SẢN PHẨM BÁN CHẠY</h4>
-                      <a href="#">Giày Puma Suede</a>
-                      <a href="#">Nike Air Max 90</a>
-                      <a href="#">Giày Vans Old Skool</a>
-                    </div>
-
-                    <div className="mega-column">
                       <h4>DANH MỤC MỚI NHẤT</h4>
-                      <a href="#">Giày thời trang nam</a>
-                      <a href="#">Giày thể thao nữ</a>
-                      <a href="#">Giày đi học</a>
+                      {categories.map((cat) => (
+                        <a
+                          key={cat.categories_id}
+                          href={`/product/${cat.slug}`}
+                        >
+                          {cat.name}
+                        </a>
+                      ))}
                     </div>
 
                     <div className="mega-column">

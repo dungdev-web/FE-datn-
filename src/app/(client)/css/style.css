@@ -282,7 +282,7 @@ nav {
 .has-mega-menu {
   position: relative;
 }
-
+/* Hiển thị mega menu */
 .mega-menu {
   display: none;
   position: absolute;
@@ -295,26 +295,47 @@ nav {
   color: white;
   z-index: 999;
   flex-direction: column;
-  /* ✅ xếp dọc */
   gap: 20px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Hiển thị khi hover */
 .has-mega-menu:hover .mega-menu {
   display: flex;
-}
-
-.mega-columns-wrapper {
-  display: flex;
-  gap: 30px;
+}.mega-columns-wrapper {
+  column-count: 4; /* Số cột bạn muốn */
+  column-gap: 30px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
 }
 
 .mega-column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  break-inside: avoid; /* Quan trọng để không bị tách giữa h4 và các a */
+  margin-bottom: 20px;
 }
 
+.mega-column h4 {
+  color: #4bd963;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.mega-column a {
+  display: block;
+  margin-bottom: 8px;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.mega-column a:hover {
+  color: #4bd963;
+}
+
+
+/* Hình ảnh trong mega menu (nếu có) */
 .mega-images {
   display: flex;
   flex-wrap: wrap;
@@ -333,25 +354,7 @@ nav {
   transform: scale(1.05);
 }
 
-.mega-column h4 {
-  color: #4bd963;
-  margin-bottom: 10px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.mega-column a {
-  display: block;
-  margin-bottom: 8px;
-  color: white;
-  text-decoration: none;
-  transition: 0.3s;
-}
-
-.mega-column a:hover {
-  color: #4bd963;
-}
-
+/* Menu con trong danh sách (nếu có hình ảnh nhỏ) */
 .menu-nav ul li ul li {
   margin-bottom: 8px;
 }
@@ -360,6 +363,7 @@ nav {
   width: 600px;
   margin: 5px;
 }
+
 
 .seach-nav {
   display: flex;
