@@ -7,6 +7,7 @@ import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { useAuthCookie } from "@/hooks/useAuthCookie";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -22,8 +23,7 @@ export default function Header() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
-  const {getUserFromCookies} = useAuthCookie();
-  const userId = getUserFromCookies().userId;
+  const { user } = useAuthUser();
   let hideTimeout = null;
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -142,7 +142,7 @@ export default function Header() {
       } else {
         if (currentScroll === 0) {
           setShowNav(true);
-        } else { 
+        } else {
           setShowNav(false);
         }
       }
@@ -182,16 +182,16 @@ export default function Header() {
         <div className="icon-header">
           <div
             className={`iconuser-header div1 ${
-              userId ? "logged-in" : "logged-out"
+              user ? "logged-in" : "logged-out"
             }`}
           >
             <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {userId ? (
+              {user ? (
                 <Link
                   href="/account"
                   className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
                 >
-                  Chào Tan Truc
+                  Chào {user.name}
                 </Link>
               ) : (
                 <Link href="/login">

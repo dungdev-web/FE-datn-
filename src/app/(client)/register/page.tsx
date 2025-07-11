@@ -52,6 +52,7 @@ export default function Register() {
       };
       const res = await registerUser(formData);
       toast.success(res.message);
+      window.location.href = "/login";
     } catch (err: any) {
       toast.error(err.message);
     }

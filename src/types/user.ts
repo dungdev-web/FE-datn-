@@ -13,9 +13,6 @@ export interface IUser {
 }
 export interface StoredUser {
   token: string | null;
-  userId: string | null;
-  username: string | null;
-  email: string | null;
 }
 
 export interface UserData {
