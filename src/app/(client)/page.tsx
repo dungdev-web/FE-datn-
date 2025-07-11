@@ -21,6 +21,7 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
+import Banner3D from "./component/Banner3D";
 export default function Home({ product }: { product: IProduct }) {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -143,7 +144,7 @@ export default function Home({ product }: { product: IProduct }) {
 
   return (
     <div>
-      <div className="banner-home relative">
+      {/* <div className="banner-home relative">
         <Swiper
           modules={[Autoplay]}
           autoplay={{ delay: 3000 }}
@@ -182,8 +183,8 @@ export default function Home({ product }: { product: IProduct }) {
             </div>
           </SwiperSlide>
         </Swiper>
-      </div>
-
+      </div> */}
+      <Banner3D />
       <main>
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
