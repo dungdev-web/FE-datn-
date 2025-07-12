@@ -118,41 +118,41 @@ export default function Home({ product }: { product: IProduct }) {
     fetchData();
   }, []);
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const data = await getProductsByCategory("giày chạy bộ");
-      const data1 = await getProductsByCategory("giày bóng rổ");
-      const data2 = await getProductsByCategory("sneaker");
-      const data3 = await getProductsByCategory("giày tập gym");
-      if (Array.isArray(data)) {
-        serCateProducts(data.slice(0, 10));
-      } else {
-        console.error("data.products không đúng định dạng:", data);
-      }
+    const fetchData = async () => {
+      try {
+        const data = await getProductsByCategory("giày chạy bộ");
+        const data1 = await getProductsByCategory("giày bóng rổ");
+        const data2 = await getProductsByCategory("sneaker");
+        const data3 = await getProductsByCategory("giày tập gym");
+        if (Array.isArray(data)) {
+          serCateProducts(data.slice(0, 10));
+        } else {
+          console.error("data.products không đúng định dạng:", data);
+        }
 
-      if (Array.isArray(data1)) {
-        serCateProducts1(data1.slice(0, 10));
-      } else {
-        console.error("data1.products không đúng định dạng:", data1);
-      }
-      
-      if (Array.isArray(data2)) {
-        serCateProducts2(data2.slice(0, 10));
-      } else {
-        console.error("data2.products không đúng định dạng:", data2);
-      }
+        if (Array.isArray(data1)) {
+          serCateProducts1(data1.slice(0, 10));
+        } else {
+          console.error("data1.products không đúng định dạng:", data1);
+        }
+
+        if (Array.isArray(data2)) {
+          serCateProducts2(data2.slice(0, 10));
+        } else {
+          console.error("data2.products không đúng định dạng:", data2);
+        }
         if (Array.isArray(data3)) {
-        serCateProducts3(data3.slice(0, 10));
-      } else {
-        console.error("data3.products không đúng định dạng:", data3);
+          serCateProducts3(data3.slice(0, 10));
+        } else {
+          console.error("data3.products không đúng định dạng:", data3);
+        }
+      } catch (err) {
+        console.error("Lỗi khi lấy sản phẩm theo danh mục:", err);
       }
-    } catch (err) {
-      console.error("Lỗi khi lấy sản phẩm theo danh mục:", err);
-    }
-  };
+    };
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   return (
     <div>
@@ -440,7 +440,7 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {newproducts.map((product) => {
-              const averageRating = product.product_reviews ?.length
+              const averageRating = product.product_reviews?.length
                 ? Math.round(
                     product.product_reviews.reduce(
                       (sum, r) => sum + Number(r.rating),
@@ -465,7 +465,10 @@ export default function Home({ product }: { product: IProduct }) {
 
               const uniqueColors = [
                 ...new Map(
-                  (product.product_variants || []).map((v) => [v.color.id, v.color])
+                  (product.product_variants || []).map((v) => [
+                    v.color.id,
+                    v.color,
+                  ])
                 ).values(),
               ];
 
@@ -576,7 +579,10 @@ export default function Home({ product }: { product: IProduct }) {
 
               const uniqueColors = [
                 ...new Map(
-                  (product.product_variants || []).map((v) => [v.color.id, v.color])
+                  (product.product_variants || []).map((v) => [
+                    v.color.id,
+                    v.color,
+                  ])
                 ).values(),
               ];
 
@@ -653,21 +659,14 @@ export default function Home({ product }: { product: IProduct }) {
         </div>
 
         <div className="product-two-box-main">
-          <h1 className="h1">
-            SẢN PHẨM THEO DANH MỤC
-          </h1>
+          <h1 className="h1">SẢN PHẨM THEO DANH MỤC</h1>
           <div className="product-two-box-container flex gap-[75px] flex-wrap">
-            <>
-              <Show2sanpham products={cateproducts} />
-              <Show2sanpham products={cateproducts1} />
-            </>
-            <img src="/images/banner/session_cate.jpg" alt="" />
             <Show2sanpham products={cateproducts} />
             <Show2sanpham products={cateproducts1} />
-          </>
-          <img src="/images/banner/session_cate.jpg" alt="" />
-          <Show2sanpham products={cateproducts2} />
-          <Show2sanpham products={cateproducts3} />
+
+            <img src="/images/banner/session_cate.jpg" alt="" />
+            <Show2sanpham products={cateproducts2} />
+            <Show2sanpham products={cateproducts3} />
           </div>
         </div>
 
