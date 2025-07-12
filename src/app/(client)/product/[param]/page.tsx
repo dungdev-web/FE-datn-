@@ -1,13 +1,13 @@
 "use client";
 import "../../css/detail.css";
-import { IProduct } from "@/types/product";
+import { IProduct,IReview } from "@/types/product";
 import { ICartItem } from "@/types/cart";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
   getProductDetail,
   getBestSellingMockProducts,
-  getReviewProduct
+  getReviewProduct,
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
@@ -27,7 +27,7 @@ export default function Detail() {
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [countdown, setCountdown] = useState("");
-
+  const [views, setReviews] = useState<IReview[]>([]);
   const handleAddToCart = async () => {
     if (!selectedColorId) {
       Swal.fire({
@@ -113,8 +113,26 @@ export default function Detail() {
 
     fetchData();
   }, []);
+   useEffect(() => {
+  const fetchData = async () => {
+    if (!product?.products_id) return;
+
+    try {
+      const data = await getReviewProduct(product.products_id);
+      setReviews(data);
+    } catch (error) {
+      console.error("Lỗi khi lấy đánh giá sản phẩm:", error);
+    }
+  };
+
+  fetchData();
+}, [product?.products_id]);
   useEffect(() => {
-    if (product && Array.isArray(product.images) && product.images?.length > 0) {
+    if (
+      product &&
+      Array.isArray(product.images) &&
+      product.images?.length > 0
+    ) {
       setSelectedImage(product.images[0]?.url ?? "/images/placeholder.png");
     } else {
       setSelectedImage("/images/placeholder.png");
@@ -190,15 +208,19 @@ export default function Detail() {
       });
     });
   };
-  const totalReviews = Array.isArray(product?.product_reviews) ? product.product_reviews.length : 0;
-
-const averageRating =
-  totalReviews > 0
-    ? product!.product_reviews!.reduce((sum, r) => sum + parseFloat(r.rating), 0) / totalReviews
+  const totalReviews = Array.isArray(product?.product_reviews)
+    ? product.product_reviews.length
     : 0;
 
-const roundedRating = Math.round(averageRating);
+  const averageRating =
+    totalReviews > 0
+      ? product!.product_reviews!.reduce(
+          (sum, r) => sum + parseFloat(r.rating),
+          0
+        ) / totalReviews
+      : 0;
 
+  const roundedRating = Math.round(averageRating);
 
   if (loading) {
     return <div className="text-center py-10">Đang tải sản phẩm...</div>;
@@ -316,7 +338,9 @@ const roundedRating = Math.round(averageRating);
                               >
                                 <div className="item">
                                   <img
-                                    src={img.color.images || '/images/logo/1.png'}
+                                    src={
+                                      img.color.images || "/images/logo/1.png"
+                                    }
                                     className="img-responsive"
                                     alt={product.name}
                                   />
@@ -385,7 +409,7 @@ const roundedRating = Math.round(averageRating);
                     </div>
                     <div className="form-product">
                       <div className="swatch-color swatch clearfix">
-                        <div className="header posintion-fixed">Màu sắc</div>
+                        <div className="header position-fixed">Màu sắc</div>
                         <div className="color-options">
                           {[
                             ...new Map(
@@ -399,6 +423,7 @@ const roundedRating = Math.round(averageRating);
                               className="color-circle"
                               onClick={() => {
                                 setSelectedColorId(color.id);
+                                setSelectedSizeId(null);
                               }}
                               style={{
                                 backgroundColor: color.code_color,
@@ -416,24 +441,24 @@ const roundedRating = Math.round(averageRating);
                           ))}
                         </div>
                       </div>
+
                       <div className="swatch-size swatch clearfix">
-                        <div
-                          className="header"
-                          style={{
-                            background: "#fff",
-                          }}
-                        >
+                        <div className="header" style={{ background: "#fff" }}>
                           Kích thước
                         </div>
-
                         <div className="size-options">
-                          {(selectedColorId
-                            ? product.product_variants.filter((v) => v?.color?.id === selectedColorId)
-
-                            : product.product_variants
-                          ).map((variant, index) => (
+                          {[
+                            ...new Map(
+                              (selectedColorId
+                                ? product.product_variants.filter(
+                                    (v) => v?.color?.id === selectedColorId
+                                  )
+                                : product.product_variants
+                              ).map((v) => [v.size.id, v])
+                            ).values(),
+                          ].map((variant) => (
                             <button
-                              key={index}
+                              key={variant.size.id}
                               className="size-button"
                               style={{
                                 padding: "8px 12px",
@@ -444,10 +469,6 @@ const roundedRating = Math.round(averageRating);
                                 cursor: "pointer",
                               }}
                               onClick={() => {
-                                console.log(
-                                  "Selected size ID:",
-                                  variant.size.id
-                                );
                                 setSelectedSizeId(variant.size.id);
                               }}
                             >
@@ -474,7 +495,6 @@ const roundedRating = Math.round(averageRating);
                             id="qty"
                             name="quantity"
                           />
-
                           <span className="qtyplus" onClick={handlePlus}>
                             +
                           </span>
@@ -489,6 +509,7 @@ const roundedRating = Math.round(averageRating);
                         </button>
                       </div>
 
+                      {/* CHÍNH SÁCH */}
                       <ul className="chinhsach-pro">
                         <li>
                           <img
@@ -644,8 +665,8 @@ const roundedRating = Math.round(averageRating);
                           </div>
 
                           <div className="space-y-4">
-                            {product.product_reviews.map((review, index) => {
-                              const rating = parseInt(review.rating);
+                            {views.map((review, index) => {
+                              const rating = review.rating;
 
                               return (
                                 <div
@@ -655,7 +676,7 @@ const roundedRating = Math.round(averageRating);
                                   <div className="flex items-center gap-2 !mb-1">
                                     <img
                                       className="!w-[35px] rounded-[50%]"
-                                      src={review.user.avatar}
+                                      src={review.user.avatar || "/images/default.png"}
                                       alt=""
                                     />
                                     <strong className="text-sm">
@@ -690,16 +711,6 @@ const roundedRating = Math.round(averageRating);
                               Viết đánh giá của bạn
                             </h4>
 
-                            <div>
-                              <label className="block text-sm font-medium !mb-1">
-                                Tên của bạn
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Nhập tên..."
-                                className="!w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
 
                             <div>
                               <label className="block text-sm font-medium !mb-1">

@@ -356,7 +356,7 @@ export async function getRelatedProducts(
 // lấy tất cả review theo product
 export async function getReviewProduct(productId: number): Promise<IReview[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/review/product/${productId}`, {
+    const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
