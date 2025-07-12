@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { IProduct } from "@/types/product";
-import { getRelatedProducts } from "@/services/productService"; // Đã tạo trước đó
+import { getRelatedProducts } from "@/services/productService"; 
 import Product4box from "./product";
 interface Props {
   categoryId: number;
@@ -16,8 +16,7 @@ export default function RelatedProductList({ categoryId }: Props) {
       try {
         const data = await getRelatedProducts(categoryId);
         setRelatedProducts(data);
-              console.log("👉 Dữ liệu trả về từ API (related products):", data);
-
+        console.log("👉 Dữ liệu trả về từ API (related products):", data);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm cùng loại:", error);
       }
@@ -28,13 +27,13 @@ export default function RelatedProductList({ categoryId }: Props) {
 
   return (
     <div className="product-grid slider-wrapper">
-    {Array.isArray(relatedProducts) && relatedProducts.length > 0 ? (
-      relatedProducts.map((product) => (
-        <Product4box key={product.products_id} sp={product} />
-      ))
-    ) : (
-      <p>Không có sản phẩm liên quan.</p>
-    )}
-  </div>
+      {Array.isArray(relatedProducts) && relatedProducts.length > 0 ? (
+        relatedProducts.map((product) => (
+          <Product4box key={product.products_id} sp={product} />
+        ))
+      ) : (
+        <p>Không có sản phẩm liên quan.</p>
+      )}
+    </div>
   );
 }
