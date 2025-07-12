@@ -29,10 +29,7 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
       <ul id="cart-sidebar" className="mini-products-list count_li">
         <ul className="list-item-cart">
           {cart?.items.map((item: ICartItem) => (
-            <li
-              className="item productid-105205720"
-              key={item.cart_items_id}
-            >
+            <li className="item productid-105205720" key={item.cart_items_id}>
               <div className="wrap_item">
                 <a
                   className="product-image"
@@ -77,7 +74,10 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                         type="hidden"
                         name="variantId"
                       />
-                      <button className="btn_reduced reduced items-count btn-minus" type="button">
+                      <button
+                        className="btn_reduced reduced items-count btn-minus"
+                        type="button"
+                      >
                         <i className="fa fa-minus"></i>
                       </button>
                       <input
@@ -89,7 +89,10 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                         value={item.quantity}
                         readOnly
                       />
-                      <button className="btn_increase increase items-count btn-plus" type="button">
+                      <button
+                        className="btn_increase increase items-count btn-plus"
+                        type="button"
+                      >
                         <i className="fa fa-plus"></i>
                       </button>
                     </div>
@@ -110,7 +113,10 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
             <span className="price">
               {cart
                 ? cart.items
-                    .reduce((total, item) => total + item.price * item.quantity, 0)
+                    .reduce(
+                      (total, item) => total + item.price * item.quantity,
+                      0
+                    )
                     .toLocaleString("vi-VN")
                 : "0"}
               ₫
@@ -120,10 +126,7 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
 
         <div className="wrap_button">
           <div className="actions">
-            <a
-              href="/cart"
-              className="btn btn-gray btn-cart-page pink hidden"
-            >
+            <a href="/cart" className="btn btn-gray btn-cart-page pink hidden">
               <span>Đến giỏ hàng</span>
             </a>
             <a

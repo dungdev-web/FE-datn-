@@ -2,7 +2,7 @@
 import "../../css/detail.css";
 import { IProduct,IReview } from "@/types/product";
 import { ICartItem } from "@/types/cart";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
   getProductDetail,
@@ -13,6 +13,8 @@ import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";
+
+
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,7 +82,52 @@ export default function Detail() {
     } finally {
       setLoading(false);
     }
-  };
+  const [showSidebar, setShowSidebar] = useState(false);
+  const toggleSidebar = () => setShowSidebar(!showSidebar);
+const handleAddToCart = async () => {
+  setLoading(true);
+  try {
+    const tokenData = await checkToken();
+    if (!tokenData?.user?.id) {
+      throw new Error("bạn chưa đăng nhập");
+
+    }
+
+    await addToMockCart(tokenData.user.id, variantId, quantity, price);
+
+    Swal.fire({
+      icon: "success",
+      title: "Đã thêm vào giỏ hàng",
+      text: "Sản phẩm đã được thêm thành công!",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+  } catch (error: any) {
+    console.error("Lỗi khi thêm vào giỏ hàng:", error);
+
+    if (error.message === "bạn chưa đăng nhập") {
+      Swal.fire({
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+        confirmButtonText: "Đăng nhập ngay",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
+        }
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Thêm giỏ hàng thất bại",
+        text: error.message || "Đã có lỗi xảy ra!",
+      });
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     const param = params.param;
@@ -233,9 +280,10 @@ export default function Detail() {
       </div>
     );
   }
-
+ 
   return (
     <>
+
       <section
         className="bread-crumb background-cover relative"
         style={{
@@ -275,8 +323,9 @@ export default function Detail() {
           </ul>
         </div>
       </section>
-
-      <main>
+   
+  
+         <main>
         <section className="product">
           <div className="container1">
             <div className="row row-flex-detail">
@@ -764,7 +813,40 @@ export default function Detail() {
 
                 <RelatedProductList categoryId={product.products_id} />
               </div>
-              <div className="sidebar left left-content col-lg-3 col-md-3">
+      
+        
+             {/* Nút mở sidebar (hiện trên mobile) */}
+      <button
+        onClick={toggleSidebar}
+        className="open-filters block md:hidden fixed top-4 right-4 z-50 bg-white p-2 border rounded shadow"
+      >
+        <i className="fa fa-filter"></i>
+      </button>
+
+      {/* Sidebar – Trượt trên mobile, cố định desktop */}
+      <div
+        className={`bg-white shadow-lg h-full z-40 overflow-y-auto transition-transform duration-300 ease-in-out 
+          fixed top-0 w-[320px]
+          md:relative md:translate-x-0 md:block
+          ${
+            showSidebar
+              ? "translate-x-0 right-0"
+              : "translate-x-full right-0 md:translate-x-0"
+          }`}
+      >
+        {/* Nút đóng (chỉ mobile) */}
+        <div className="text-right p-4 block md:hidden">
+          <button
+            onClick={toggleSidebar}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <i className="fa fa-times text-xl"></i>
+          </button>
+        </div>
+
+        {/* Nội dung sidebar */}
+        <div className="sidebar-content">
+              <div className="sidebar left left-content ">
                 <div className="khuyen-mai">
                   <div className="title">
                     <img
@@ -965,10 +1047,18 @@ export default function Detail() {
                   </div>
                 </div>
               </div>
+        </div>
+
+        {/* KHÔNG THAY ĐỔI phần nội dung gốc của bạn – giữ nguyên tất cả khuyến mãi, mã giảm giá và sản phẩm */}
+        {/* Copy phần "div.sidebar left-content" của bạn vào đây như cũ */}
+      </div>
+         
             </div>
           </div>
+         
         </section>
       </main>
     </>
+    
   );
 }

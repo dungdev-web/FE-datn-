@@ -560,9 +560,9 @@ export default function Product() {
                         key={sp.products_id}
                       >
                         <div
-                          className="product-card"
+                          className="product-card-list"
                           style={{
-                            width: "100%",
+                           width: "100% !important",
                             display: "flex",
                             background: "none",
                           }}

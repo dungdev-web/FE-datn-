@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
 @media (min-width: 1200px) {
   .container1 {
-    max-width: 1320px;
+    max-width: 1440px;
     width: 100%;
     padding-right: 15px;
     padding-left: 15px;
@@ -290,10 +290,7 @@ a,
   display: flex;
 }
 
-.row {
-  margin-right: -15px;
-  margin-left: -15px;
-}
+
 .categories-box,
 .aside-filter .filter-container {
   border: 1px solid #cdcdcd;
@@ -691,7 +688,9 @@ input[type="submit"] {
     margin-bottom: 80px !important;
   }
   .main_container {
-    padding: 10px 110px;
+     width: 95%;
+    margin: 0 auto;
+    
   }
   .col-test{
     display: none;
@@ -764,7 +763,8 @@ input[type="submit"] {
 }
 @media (max-width: 768px) {
   .main_container {
-    padding: 10px 30px;
+    width: 95%;
+    margin: 0 auto;
   }
   #open-filters {
     font-size: 16px;
@@ -777,11 +777,20 @@ input[type="submit"] {
   }
  
 }
-/* @media (max-width:620px){
-  .header-nav-bg {
-    margin-bottom: 50px !important;
+@media (max-width:620px){
+ .main_container {
+    width: 95%;
+    margin: 0 auto;
   }
-} */
+  .product-grid{ 
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 4px;
+  }
+  .sortPagiBar{
+    margin-bottom: 10px;
+  }
+
+}
 @media (min-width: 1024px) {
   #open-filters,
   #filter-sidebar {

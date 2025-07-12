@@ -21,6 +21,7 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
+import Banner3D from "./component/Banner3D";
 export default function Home({ product }: { product: IProduct }) {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -155,7 +156,7 @@ export default function Home({ product }: { product: IProduct }) {
 
   return (
     <div>
-      <div className="banner-home relative">
+      {/* <div className="banner-home relative">
         <Swiper
           modules={[Autoplay]}
           autoplay={{ delay: 3000 }}
@@ -194,8 +195,8 @@ export default function Home({ product }: { product: IProduct }) {
             </div>
           </SwiperSlide>
         </Swiper>
-      </div>
-
+      </div> */}
+      <Banner3D />
       <main>
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
@@ -651,14 +652,23 @@ export default function Home({ product }: { product: IProduct }) {
           </div>
         </div>
 
-        <div className="product-two-box-container flex gap-[75px] flex-wrap">
-          <>
+        <div className="product-two-box-main">
+          <h1 className="h1">
+            SẢN PHẨM THEO DANH MỤC
+          </h1>
+          <div className="product-two-box-container flex gap-[75px] flex-wrap">
+            <>
+              <Show2sanpham products={cateproducts} />
+              <Show2sanpham products={cateproducts1} />
+            </>
+            <img src="/images/banner/session_cate.jpg" alt="" />
             <Show2sanpham products={cateproducts} />
             <Show2sanpham products={cateproducts1} />
           </>
           <img src="/images/banner/session_cate.jpg" alt="" />
           <Show2sanpham products={cateproducts2} />
           <Show2sanpham products={cateproducts3} />
+          </div>
         </div>
 
         <div className="video-main">

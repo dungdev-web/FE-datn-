@@ -266,8 +266,8 @@ article {
     background-color: #021688;
   }
   main {
-    width: 95%;
-    padding: 15px;
+    width: 100%;
+    padding: 0px;
   }
   aside,
   article {
@@ -372,7 +372,7 @@ main > aside:not(.mobile-sidebar) {
   .toggle-sidebar-btn {
     display: block;
     position: relative;
-    z-index: 1000 !important;
+   z-index: 100 !important;
   }
   
 

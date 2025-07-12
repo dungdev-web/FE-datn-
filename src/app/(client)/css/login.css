@@ -127,6 +127,7 @@
 .form-container .register-link p {
   font-size: 16px;
   color: black;
+  padding:  10px 0px;
 }
 .form-container .register-link .p {
   padding: 20px;
@@ -211,6 +212,10 @@
   }
   .auth-container{
     margin-bottom: 30px;
+    width: 100%;
+  }
+  .form-container .remember-me{
+    font-size: 12px;
   }
   header:before{
    background-color: #021688;
@@ -223,7 +228,7 @@
 /* Small-sized devices (e.g., mobile phones) */
 @media (max-width: 480px) {
   .auth-container {
-    margin-left: 10%;
+
     margin-top: 100px;
     padding: 15px;
   }

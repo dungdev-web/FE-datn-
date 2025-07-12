@@ -3,7 +3,7 @@ import { ICartItem, ICart } from "@/types/cart";
 const defaultCart: ICart[] = [
   {
     carts_id: 1,
-    user_id: 9,
+    user_id: 4,
     created_at: "2025-06-22T10:00:00.000Z",
     updated_at: "2025-06-22T10:00:00.000Z",
     items: [
@@ -83,7 +83,7 @@ const defaultCart: ICart[] = [
   },
    {
     carts_id: 2,
-    user_id: 7,
+    user_id: 4,
     created_at: "2025-06-22T11:00:00.000Z",
     updated_at: "2025-06-22T11:00:00.000Z",
     items: [
