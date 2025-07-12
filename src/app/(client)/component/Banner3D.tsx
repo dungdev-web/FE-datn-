@@ -23,13 +23,13 @@ function RotatingShoe({ url }: { url: string }) {
   return <primitive object={scene} ref={ref} scale={2.5} />;
 }
 
-useGLTF.preload("/models/shoe1.glb");
+useGLTF.preload("/models/shoes1.glb");
 
 export default function Banner3D() {
   return (
     <div className="w-full h-screen bg-gradient-to-r from-[#021688] to-[#0642a4] text-white flex flex-col justify-center items-center overflow-hidden">
-      <div className="max-w-[1280px] w-full grid grid-cols-1 md:grid-cols-2 items-center gap-10 px-6 py-12">
-        <div className="space-y-6 text-left !px-2 sm:!px-3">
+      <div className="max-w-[1280px] w-full grid grid-cols-1 md:grid-cols-2 items-center gap-10 py-12">
+        <div className="space-y-6 text-left !px-12 sm:px-8 md:px-12">
           <h1 className="text-2xl sm:text-4xl md:text-6xl font-bold !leading-snug md:!leading-tight">
             Giày thời trang mới nhất{" "}
             <span className="text-green-400">2025</span>
@@ -42,7 +42,7 @@ export default function Banner3D() {
           </button>
         </div>
 
-        <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] bg-transparent">
+        <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] bg-transparent px-6 sm:px-8 md:px-12">
           <Canvas camera={{ position: [0, 1.5, 6], fov: 45 }}>
             <ambientLight intensity={1.5} />
             <directionalLight position={[2, 2, 5]} intensity={2} />
