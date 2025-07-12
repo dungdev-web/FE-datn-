@@ -160,7 +160,7 @@ const handleAddToCart = async () => {
     fetchData();
   }, []);
   useEffect(() => {
-    if (product && Array.isArray(product.images) && product.images.length > 0) {
+    if (product && Array.isArray(product.images) && product.images?.length > 0) {
       setSelectedImage(product.images[0]?.url ?? "/images/placeholder.png");
     } else {
       setSelectedImage("/images/placeholder.png");
@@ -174,7 +174,7 @@ const handleAddToCart = async () => {
 
   useEffect(() => {
     if (selectedColorId && selectedSizeId && product) {
-      const match = product.variants.find(
+      const match = product.product_variants.find(
         (v) =>
           v?.color?.id === selectedColorId && v?.size?.id === selectedSizeId
       );
@@ -236,15 +236,15 @@ const handleAddToCart = async () => {
       });
     });
   };
-  const totalReviews = product?.reviews.length ?? 0;
+  const totalReviews = Array.isArray(product?.product_reviews) ? product.product_reviews.length : 0;
 
-  const averageRating =
-    totalReviews > 0
-      ? product!.reviews.reduce((sum, r) => sum + parseFloat(r.rating), 0) /
-        totalReviews
-      : 0;
+const averageRating =
+  totalReviews > 0
+    ? product!.product_reviews!.reduce((sum, r) => sum + parseFloat(r.rating), 0) / totalReviews
+    : 0;
 
-  const roundedRating = Math.round(averageRating);
+const roundedRating = Math.round(averageRating);
+
 
   if (loading) {
     return <div className="text-center py-10">Đang tải sản phẩm...</div>;
@@ -349,7 +349,7 @@ const handleAddToCart = async () => {
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            {product.variants.map((img, index) => (
+                            {product.product_variants.map((img, index) => (
                               <div
                                 key={index}
                                 className={`space-item-tsn tns-item tns-slide-active ${
@@ -437,7 +437,7 @@ const handleAddToCart = async () => {
                         <div className="color-options">
                           {[
                             ...new Map(
-                              product.variants
+                              product.product_variants
                                 .filter((v) => v?.color?.id)
                                 .map((v) => [v.color.id, v.color])
                             ).values(),
@@ -476,9 +476,9 @@ const handleAddToCart = async () => {
 
                         <div className="size-options">
                           {(selectedColorId
-                            ? product.variants.filter((v) => v?.color?.id === selectedColorId)
+                            ? product.product_variants.filter((v) => v?.color?.id === selectedColorId)
 
-                            : product.variants
+                            : product.product_variants
                           ).map((variant, index) => (
                             <button
                               key={index}
@@ -692,7 +692,7 @@ const handleAddToCart = async () => {
                           </div>
 
                           <div className="space-y-4">
-                            {product.reviews.map((review, index) => {
+                            {product.product_reviews.map((review, index) => {
                               const rating = parseInt(review.rating);
 
                               return (
@@ -799,7 +799,7 @@ const handleAddToCart = async () => {
                   </div>
                 </div>
 
-                <RelatedProductList categoryId={10} />
+                <RelatedProductList categoryId={product.products_id} />
               </div>
       
         

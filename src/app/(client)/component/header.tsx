@@ -9,6 +9,9 @@ import { getCategories } from "@/services/categoryService";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getBrands } from "@/services/brandService";
+import { useAuthCookie } from "@/hooks/useAuthCookie";
+import { useAuthUser } from "@/hooks/useAuthUser";
+
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -25,8 +28,8 @@ export default function Header() {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
-  const lastScrollTop = useRef(0); 
-  const userId = 1;
+  const lastScrollTop = useRef(0);
+  const { user } = useAuthUser();
   let hideTimeout = null;
 
   useEffect(() => {
@@ -148,22 +151,13 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-      console.log(
-        "scrollY:",
-        currentScroll,
-        "lastScrollTop:",
-        lastScrollTop.current
-      );
 
       if (currentScroll > lastScrollTop.current) {
-        console.log("scrolling down -> hide nav");
         setShowNav(false);
       } else {
         if (currentScroll === 0) {
-          console.log("scrolling up to top -> show nav");
           setShowNav(true);
         } else {
-          console.log("scrolling up but not top -> hide nav");
           setShowNav(false);
         }
       }
@@ -203,16 +197,16 @@ export default function Header() {
         <div className="icon-header">
           <div
             className={`iconuser-header div1 ${
-              userId === 1 ? "logged-in" : "logged-out"
+              user ? "logged-in" : "logged-out"
             }`}
           >
             <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {userId === 1 ? (
+              {user ? (
                 <Link
                   href="/account"
                   className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
                 >
-                  Chào Tan Truc
+                  Chào {user.name}
                 </Link>
               ) : (
                 <Link href="/login">

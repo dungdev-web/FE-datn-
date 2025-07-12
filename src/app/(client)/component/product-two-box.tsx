@@ -9,6 +9,7 @@ import "swiper/css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
+
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
   if (!products?.length) return null;
 
@@ -39,7 +40,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
           >
             {products.map((sp) => {
               const averageRating =
-                sp?.reviews?.length > 0
+                Array.isArray(sp.reviews) && sp.reviews.length > 0
                   ? Math.round(
                       sp.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
                         sp.reviews.length
@@ -48,16 +49,17 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
               const discountPercent = Math.round(
                 ((sp.price - sp.sale_price) / sp.price) * 100
               );
-              const sold = sp.variants?.reduce(
-                (sum, v) => sum + v.stock_quantity,
-                0
-              );
+              const sold = Array.isArray(sp.variants)
+                ? sp.variants.reduce((sum, v) => sum + v.stock_quantity, 0)
+                : 0;
 
-              const uniqueColors = [
-                ...new Map(
-                  sp.variants.map((v) => [v.color.id, v.color])
-                ).values(),
-              ];
+              const uniqueColors = Array.isArray(sp.variants)
+                ? [
+                    ...new Map(
+                      sp.variants.map((v) => [v.color.id, v.color])
+                    ).values(),
+                  ]
+                : [];
 
               return (
                 <SwiperSlide key={sp.products_id}>

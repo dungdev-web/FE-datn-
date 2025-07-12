@@ -17,7 +17,11 @@ export default function ProductSale() {
     const fetchDeals = async () => {
       try {
         const data = await getDealProducts();
-        setDealProducts(data);
+        if (Array.isArray(data)) {
+          setDealProducts(data);
+        } else {
+          console.error("❌ Dữ liệu không hợp lệ:", data);
+        }
       } catch (error) {
         console.error("Không thể tải sản phẩm đang deal:", error);
       }
@@ -34,44 +38,36 @@ export default function ProductSale() {
         loop={true}
         navigation
         breakpoints={{
-          0: {
-            slidesPerView: 2,
-          },
-          576: {
-            slidesPerView: 2,
-          },
-          768: {
-            slidesPerView: 2,
-          },
-          992: {
-            slidesPerView: 3,
-          },
+          0: { slidesPerView: 2 },
+          576: { slidesPerView: 2 },
+          768: { slidesPerView: 2 },
+          992: { slidesPerView: 3 },
         }}
         className="product-slider-track"
       >
         {dealProducts.map((product) => {
-          const averageRating = product?.reviews?.length
+          const variants = product.product_variants || [];
+          const reviews = product.reviews || [];
+          const images = product.images || [];
+
+          const averageRating = reviews.length
             ? Math.round(
-                product.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-                  product.reviews.length
+                reviews.reduce((sum, r) => sum + Number(r.rating), 0) / reviews.length
               )
             : 0;
 
-          const sold = product?.variants?.reduce(
-            (sum, v) => sum + v.stock_quantity,
-            0
-          );
+          const sold = variants.reduce((sum, v) => sum + v.stock_quantity, 0);
 
           const discount =
-            product?.price > 0
-              ? Math.round(
-                  ((product.price - product.sale_price) / product.price) * 100
-                )
+            product.price > 0
+              ? Math.round(((product.price - product.sale_price) / product.price) * 100)
               : 0;
 
           const uniqueColors = [
             ...new Map(
-              product?.variants.map((v) => [v.color.id, v.color])
+              variants
+                .filter((v) => v.color?.id)
+                .map((v) => [v.color.id, v.color])
             ).values(),
           ];
 
@@ -82,13 +78,12 @@ export default function ProductSale() {
                   <div className="product-image">
                     <Link href={`/product/${product.slug}`}>
                       <img
-                        src={
-                          product.images[0]?.url || "/images/placeholder.png"
-                        }
+                        src={images?.[0]?.url || "/images/placeholder.png"}
                         alt={product.name}
                         className="!h-[100%]"
                       />
                     </Link>
+
                     <div className="product-icons">
                       <i className="fa-solid fa-heart always-show"></i>
                       <div className="hover-icons">
@@ -118,7 +113,6 @@ export default function ProductSale() {
                           <del>{product.price.toLocaleString("vi")}đ</del>
                         </span>
                       )}
-
                       <span className="new-price">
                         {(product.sale_price > 0
                           ? product.sale_price
