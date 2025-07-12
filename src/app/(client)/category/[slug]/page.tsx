@@ -1,7 +1,12 @@
- "use client";
+"use client";
+import { useEffect, useState } from "react";
 import { getProductsByCategorySlug } from "@/services/brandService";
 import { getCategories } from "@/services/categoryService";
+import Link from "next/link";
 import Image from "next/image";
+import { useParams } from "next/navigation";
+import { IProduct } from "@/types/product";
+import { ICategory } from "@/types/ICategory";
 
 interface Params {
   params: {
@@ -9,55 +14,997 @@ interface Params {
   };
 }
 
-export default async function CategoryPage({ params }: Params) {
-  const { slug } = params;
-  const products = await getProductsByCategorySlug(slug);
-  const categories = await getCategories();
-  const category = categories.find((c) => c.slug === slug);
+export default  function CategoryPage({ params }: Params) {
+  const { slug } = useParams();
+const [products, setProducts] = useState<IProduct[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [category, setCategory] = useState<ICategory | null>(null);
+
+     const [isActive, setIsActive] = useState(false);
+     const [viewMode, setViewMode] = useState("grid");
+       const [page, setPage] = useState(1);
+       const [total, setTotal] = useState(0);
+       const productsPerPage = viewMode === "grid" ? 12 : 6;
+     
+  const totalPages = Math.ceil(total / productsPerPage);
+useEffect(() => {
+    async function fetchData() {
+      try {
+        if (slug) {
+          const fetchedProducts = await getProductsByCategorySlug(slug as string);
+          const fetchedCategories = await getCategories();
+
+          const productArray = Array.isArray(fetchedProducts) ? fetchedProducts : [];
+          setProducts(productArray);
+          setTotal(productArray.length);
+          setCategories(Array.isArray(fetchedCategories) ? fetchedCategories : []);
+          
+        const categoryList = Array.isArray(fetchedCategories) ? fetchedCategories : [];
+        setCategories(categoryList);
+
+        // Tìm category theo slug
+        const matched = categoryList.find((cat) => cat.slug === slug);
+        setCategory(matched || null);
+        }
+      } catch (error) {
+        console.error("Lỗi khi fetch data:", error);
+      }
+    }
+
+    fetchData();
+  }, [slug]);
+
+  const toggleSidebar = () => {
+    setIsActive(!isActive);
+  };
+
+  const changeViewMode = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    setPage(1);
+  };
+
+  const paginatedProducts = products.slice(
+    (page - 1) * productsPerPage,
+    page * productsPerPage
+  );
+
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-4">
-        {category ? category.name : "Danh mục không xác định"}
-      </h1>
+    <>
+     <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        {/* Lớp phủ làm mờ nền */}
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
 
-      {products.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-          {products.map((product) => {
-            const image = product.images?.[0];
-            return (
-              <a
-                key={product.products_id}
-                href={`/client/product/${product.slug}/detail`}
-                className="block border border-gray-200 rounded hover:shadow-lg transition"
-              >
-                <div className="w-full h-48 bg-gray-100 relative">
-                  {image?.url ? (
-                    <Image
-                      src={image.url}
-                      alt={image.alt_text || product.name}
-                      fill
-                      className="object-cover rounded-t"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                      Không có ảnh
-                    </div>
-                  )}
-                </div>
-                <div className="p-2">
-                  <h3 className="text-sm font-semibold">{product.name}</h3>
-                  <p className="text-red-500 font-bold">
-                    {Number(product.sale_price).toLocaleString()}₫
-                  </p>
-                </div>
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Tất cả sản phẩm</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <a href="/" title="Trang chủ">
+                <span>Trang chủ</span>
               </a>
-            );
-          })}
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+               <span>{category?.name || "Danh mục không xác định"}</span>
+
+              </strong>
+            </li>
+            <li></li>
+          </ul>
         </div>
-      ) : (
-        <p className="text-gray-500">Không tìm thấy sản phẩm nào.</p>
-      )}
-    </div>
+      </section>
+      <main>
+        <div className="container1">
+          <div className="row">
+            <div className="wrapper">
+              <div className="col-lg-3 col-test">
+                <aside className="aside-item collection-category">
+                  <div className="aside-title">
+                    <h2 className="title-head margin-top-0">
+                      <span>Danh mục</span>
+                    </h2>
+                  </div>
+                  <div className="categories-box">
+                    <ul className="lv1">
+                      <li className="nav-item nav-items">
+                        <a href="/" title="Trang chủ">
+                          {" "}
+                          Trang chủ
+                        </a>
+                      </li>
+                      <li className="nav-item nav-items">
+                        <a href="/gioi-thieu" title="Giới thiệu">
+                          {" "}
+                          Giới thiệu
+                        </a>
+                      </li>
+                      <li className="nav-item nav-items active">
+                        <a
+                          href="/collections/all"
+                          className="nav-link"
+                          title="Sản phẩm"
+                        >
+                          Sản phẩm
+                        </a>
+                      </li>
+                      <li className="nav-item nav-items">
+                        <a href="/tin-tuc" className="nav-link" title="Tin tức">
+                          Tin tức
+                        </a>
+                      </li>
+                      <li className="nav-item nav-items">
+                        <a href="/lien-he" title="Liên hệ">
+                          {" "}
+                          Liên hệ
+                        </a>
+                      </li>
+                      <li className="nav-item nav-items">
+                        <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
+                          Hệ thống cửa hàng
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </aside>
+                <div className="aside-filter">
+                  <div className="aside-title">
+                    <h2 className="title-head margin-top-0">
+                      <span>Bộ lọc</span>
+                    </h2>
+                  </div>
+                  <div className="filter-container">
+                    <aside className="aside-item filter-price">
+                      <div className="module-title">
+                        <h2 className="title-head margin-top-0">
+                          <span>Giá sản phẩm</span>
+                        </h2>
+                      </div>
+                      <div className="aside-content filter-group">
+                        <ul>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-duoi-100-000d"
+                                  data-group="Khoảng giá"
+                                  data-field="price_min"
+                                  data-text="Dưới 100.000đ"
+                                  value="(<100000)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                Giá dưới 100.000đ
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-100-000d-200-000d"
+                                  data-group="Khoảng giá"
+                                  data-field="price_min"
+                                  data-text="100.000đ - 200.000đ"
+                                  value="(>=100000 AND <200000)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                100.000đ - 200.000đ
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-200-000d-300-000d"
+                                  data-group="Khoảng giá"
+                                  data-field="price_min"
+                                  data-text="200.000đ - 300.000đ"
+                                  value="(>=200000 AND <300000)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                200.000đ - 300.000đ
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-300-000d-500-000d"
+                                  data-group="Khoảng giá"
+                                  data-field="price_min"
+                                  data-text="300.000đ - 500.000đ"
+                                  value="(>=300000 AND <500000)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                300.000đ - 500.000đ
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-500-000d-1-000-000d"
+                                  data-group="Khoảng giá"
+                                  data-field="price_min"
+                                  data-text="500.000đ - 1.000.000đ"
+                                  value="(>500000 AND <1000000)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                500.000đ - 1.000.000đ
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-tren1-000-000d"
+                                  data-group="Khoảng giá"
+                                  data-field="price_min"
+                                  data-text="Trên 1.000.000đ"
+                                  value="(>1000000)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                Giá trên 1.000.000đ
+                              </label>
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
+                    </aside>
+                    <aside className="aside-item filter-type">
+                      <div className="module-title">
+                        <h2 className="title-head margin-top-0">
+                          <span>Loại</span>
+                        </h2>
+                      </div>
+                      <div className="aside-content filter-group">
+                        <ul>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-giay-nam"
+                                  data-group="Loại"
+                                  data-field="product_type"
+                                  data-text="Giày Nam"
+                                  value="(Giày Nam)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                Giày Nam
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label>
+                                <input
+                                  type="checkbox"
+                                  id="filter-giay-nu"
+                                  data-group="Loại"
+                                  data-field="product_type"
+                                  data-text="Giày Nữ"
+                                  value="(Giày Nữ)"
+                                  data-operator="OR"
+                                />
+                                <i className="fa"></i>
+                                Giày Nữ
+                              </label>
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
+                    </aside>
+                    <aside className="aside-item filter-vendor">
+                      <div className="module-title">
+                        <h2 className="title-head margin-top-0">
+                          <span>Thương hiệu</span>
+                        </h2>
+                      </div>
+                      <div className="aside-content filter-group aside_vendor">
+                        <ul>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label className="label_relative">
+                                <input type="checkbox" id="filter-nike-air" />
+                                <i className="fa"></i>
+                                <span className="filter_tt">Nike Air</span>
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label className="label_relative">
+                                <input
+                                  type="checkbox"
+                                  id="filter-nike-air-max"
+                                />
+                                <i className="fa"></i>
+                                <span className="filter_tt">Nike Air Max</span>
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label className="label_relative">
+                                <input
+                                  type="checkbox"
+                                  id="filter-nike-jordan"
+                                />
+                                <i className="fa"></i>
+                                <span className="filter_tt">Nike Jordan</span>
+                              </label>
+                            </span>
+                          </li>
+                          <li className="filter-item filter-item--check-box filter-item--green">
+                            <span>
+                              <label className="label_relative">
+                                <input type="checkbox" id="filter-puma" />
+                                <i className="fa"></i>
+                                <span className="filter_tt">Puma</span>
+                              </label>
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
+                    </aside>
+                  </div>
+                </div>
+                <aside className="aside-item hidden-767">
+                  <div className="aside-content">
+                    <a href="#" title="Thời trang nam">
+                      <img
+                        className="img-responsive center-block"
+                        src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
+                        data-lazyload="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
+                        alt="Thời trang nam"
+                      />
+                    </a>
+                  </div>
+                </aside>
+              </div>
+              <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
+                <div className="category-products products">
+                  <div className="sortPagiBar">
+                    <div className="row">
+                      <div className="col-xs-5 col-md-6 col-sm-6">
+                        <div className="hidden-xs">
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              changeViewMode("grid");
+                            }}
+                          >
+                            <span
+                              className={`btn button-view-mode view-mode-grid ${
+                                viewMode === "grid" ? "active" : ""
+                              }`}
+                            >
+                              <i className="fa fa-th" aria-hidden="true"></i>
+                            </span>
+                          </a>
+                          <a
+                            href="#"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              changeViewMode("list");
+                            }}
+                          >
+                            <span
+                              className={`btn button-view-mode view-mode-list ${
+                                viewMode === "list" ? "active" : ""
+                              }`}
+                            >
+                              <i
+                                className="fa fa-th-list"
+                                aria-hidden="true"
+                              ></i>
+                            </span>
+                          </a>
+
+                          <div className="tt hidden">
+                            <div id="ttfix" className="hidden-sm hidden-xs">
+                              Hiển thị <span>1</span> - <span>12</span> trong
+                              tổng số <span></span> sản phẩm
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-xs-12 col-md-6 col-sm-6 text-xs-left text-sm-right">
+                        <div id="sort-by">
+                          <label className="left">Sắp xếp: </label>
+                          <ul>
+                            <li>
+                              <span className="val">Mặc định</span>
+                              <ul className="ul_2">
+                                <li>
+                                  <a href="#">Mặc định</a>
+                                </li>
+                                <li>
+                                  <a href="#">A → Z</a>
+                                </li>
+                                <li>
+                                  <a href="#">Z → A</a>
+                                </li>
+                                <li>
+                                  <a href="#">Giá tăng dần</a>
+                                </li>
+                                <li>
+                                  <a href="#">Giá giảm dần</a>
+                                </li>
+                                <li>
+                                  <a href="#">Hàng mới nhất</a>
+                                </li>
+                                <li>
+                                  <a href="#">Hàng cũ nhất</a>
+                                </li>
+                              </ul>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {viewMode === "grid" && (
+                  <div className="product-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                    {products.map((sp) => (
+                      <div
+                        className="product-itemlist-main !block"
+                        key={sp.products_id}
+                      >
+                        <div className="product-card" style={{ width: "100%" }}>
+                          <div className="product-image relative h-48">
+                            <Link href={`/product/${sp.slug}`}>
+                              <img
+                                src={
+                                  sp.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={sp.name}
+                                className="w-full h-full object-cover rounded"
+                              />
+                            </Link>
+                            <div className="product-icons absolute top-1 right-1">
+                              <i className="fa-solid fa-heart always-show"></i>
+                              <div className="hover-icons">
+                                <i className="fa-solid fa-eye"></i>
+                                <i className="fa-solid fa-list"></i>
+                                <i className="fa fa-exchange"></i>
+                              </div>
+                            </div>
+                            <span className="discount-tag absolute top-1 left-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                              -
+                              {Math.round(
+                                ((Number(sp.price) - Number(sp.sale_price)) /
+                                  Number(sp.price)) *
+                                  100
+                              )}
+                              %
+                            </span>
+                          </div>
+
+                          <div className="product-colors flex gap-1 mt-2">
+                            {[
+                              ...new Map(
+                                sp.product_variants.map((v) => [
+                                  v.color.id,
+                                  v.color,
+                                ])
+                              ).values(),
+                            ].map((color) => (
+                              <span
+                                key={color.id}
+                                className="w-4 h-4 rounded-full border"
+                                style={{ backgroundColor: color.code_color }}
+                              ></span>
+                            ))}
+                          </div>
+
+                          <h4 className="product-title text-sm font-semibold mt-2">
+                            {sp.name}
+                          </h4>
+
+                          <div className="product-price text-red-500 font-bold">
+                            <span className="old-price text-gray-400 text-sm line-through mr-2">
+                              {Number(sp.price).toLocaleString("vi")}đ
+                            </span>
+                            <span className="new-price">
+                              {Number(sp.sale_price).toLocaleString("vi")}đ
+                            </span>
+                          </div>
+
+                          <div className="product-rating mt-1">
+                            {Array.from({ length: 5 }, (_, i) =>
+                              i <
+                              (sp.reviews?.length
+                                ? Math.round(
+                                    sp.reviews.reduce(
+                                      (s, r) => s + Number(r.rating),
+                                      0
+                                    ) / sp.reviews.length
+                                  )
+                                : 0) ? (
+                                <i
+                                  key={i}
+                                  className="fa-solid fa-star text-yellow-400"
+                                ></i>
+                              ) : (
+                                <i
+                                  key={i}
+                                  className="fa-regular fa-star text-gray-300"
+                                ></i>
+                              )
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {viewMode === "list" && (
+                  <div className="product-grid-column flex flex-col gap-4">
+                    {products.map((sp) => (
+                      <div
+                        className="product-itemlist-main"
+                        key={sp.products_id}
+                      >
+                        <div
+                          className="product-card-list flex bg-white p-4 border border-gray-200 rounded"
+                          style={{ width: "100%" }}
+                        >
+                          <div className="product-image w-48 h-48 flex-shrink-0 relative">
+                            <Link href={`/product/${sp.slug}`}>
+                              <img
+                                src={
+                                  sp.images?.[0]?.url ||
+                                  "/images/placeholder.png"
+                                }
+                                alt={sp.name}
+                                className="w-full h-full object-cover rounded"
+                              />
+                            </Link>
+                            <div className="product-icons absolute top-1 right-1">
+                              <i className="fa-solid fa-heart always-show"></i>
+                              <div className="hover-icons">
+                                <i className="fa-solid fa-eye"></i>
+                                <i className="fa-solid fa-list"></i>
+                                <i className="fa fa-exchange"></i>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="ml-4 flex flex-col justify-between flex-grow">
+                            <div>
+                              <span className="discount-tag text-sm text-red-500 font-medium">
+                                -
+                                {Math.round(
+                                  ((Number(sp.price) - Number(sp.sale_price)) /
+                                    Number(sp.price)) *
+                                    100
+                                )}
+                                %
+                              </span>
+
+                              <h4 className="product-title-column text-lg font-semibold mt-1">
+                                {sp.name}
+                              </h4>
+
+                              <div className="product-price mt-1">
+                                <span className="old-price text-gray-400 text-sm line-through mr-2">
+                                  {sp.price.toLocaleString("vi")}đ
+                                </span>
+                                <span className="new-price text-red-500 font-bold">
+                                  {sp.sale_price.toLocaleString("vi")}đ
+                                </span>
+                              </div>
+
+                              <p className="text-sm mt-2 text-gray-600">
+                                {sp.short_desc}...
+                              </p>
+                            </div>
+
+                            <div className="flex flex-col gap-2 mt-2">
+                              <div className="product-rating">
+                                {Array.from({ length: 5 }, (_, i) =>
+                                  i <
+                                  (sp.reviews?.length
+                                    ? Math.round(
+                                        sp.reviews.reduce(
+                                          (s, r) => s + Number(r.rating),
+                                          0
+                                        ) / sp.reviews.length
+                                      )
+                                    : 0) ? (
+                                    <i
+                                      key={i}
+                                      className="fa-solid fa-star text-yellow-400"
+                                    ></i>
+                                  ) : (
+                                    <i
+                                      key={i}
+                                      className="fa-regular fa-star text-gray-300"
+                                    ></i>
+                                  )
+                                )}
+                              </div>
+
+                              <div className="product-colors flex gap-1">
+                                {[
+                                  ...new Map(
+                                    sp.product_variants.map((v) => [
+                                      v.color.id,
+                                      v.color,
+                                    ])
+                                  ).values(),
+                                ].map((color) => (
+                                  <span
+                                    key={color.id}
+                                    className="w-4 h-4 rounded-full border"
+                                    style={{
+                                      backgroundColor: color.code_color,
+                                    }}
+                                  ></span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                  <div className="flex justify-center items-center gap-2 mt-6">
+                  <button
+                    onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    disabled={page === 1}
+                  >
+                    <i className="fa-solid fa-chevron-left"></i>
+                  </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i + 1}
+                      onClick={() => setPage(i + 1)}
+                      className={`!p-[7px]  rounded ${
+                        page === i + 1
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-200 hover:bg-gray-300"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    disabled={page === totalPages}
+                  >
+                    <i className="fa-solid fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <div
+        id="open-filters"
+        className={isActive ? "move-left" : ""}
+        onClick={toggleSidebar}
+      >
+        <i
+          id="filter-icon"
+          className={`fa ${isActive ? "fa-times" : "fa-filter"}`}
+        ></i>
+      </div>
+        {/* <!-- Sidebar bộ lọc --> */}
+      <div id="filter-sidebar" className={isActive ? "active" : ""}>
+        <aside className="aside-item collection-category">
+          <div className="aside-title">
+            <h2 className="title-head margin-top-0">
+              <span>Danh mục</span>
+            </h2>
+          </div>
+          <div className="categories-box">
+            <ul className="lv1">
+              <li className="nav-item nav-items">
+                <a href="/" title="Trang chủ">
+                  {" "}
+                  Trang chủ
+                </a>
+              </li>
+              <li className="nav-item nav-items">
+                <a href="/gioi-thieu" title="Giới thiệu">
+                  {" "}
+                  Giới thiệu
+                </a>
+              </li>
+              <li className="nav-item nav-items active">
+                <a
+                  href="/collections/all"
+                  className="nav-link"
+                  title="Sản phẩm"
+                >
+                  Sản phẩm
+                </a>
+              </li>
+              <li className="nav-item nav-items">
+                <a href="/tin-tuc" className="nav-link" title="Tin tức">
+                  Tin tức
+                </a>
+              </li>
+              <li className="nav-item nav-items">
+                <a href="/lien-he" title="Liên hệ">
+                  {" "}
+                  Liên hệ
+                </a>
+              </li>
+              <li className="nav-item nav-items">
+                <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
+                  Hệ thống cửa hàng
+                </a>
+              </li>
+            </ul>
+          </div>
+        </aside>
+        <div className="aside-filter">
+          <div className="aside-title">
+            <h2 className="title-head margin-top-0">
+              <span>Bộ lọc</span>
+            </h2>
+          </div>
+          <div className="filter-container">
+            <aside className="aside-item filter-price">
+              <div className="module-title">
+                <h2 className="title-head margin-top-0">
+                  <span>Giá sản phẩm</span>
+                </h2>
+              </div>
+              <div className="aside-content filter-group">
+                <ul>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-duoi-100-000d"
+                          data-group="Khoảng giá"
+                          data-field="price_min"
+                          data-text="Dưới 100.000đ"
+                          value="(<100000)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        Giá dưới 100.000đ
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-100-000d-200-000d"
+                          data-group="Khoảng giá"
+                          data-field="price_min"
+                          data-text="100.000đ - 200.000đ"
+                          value="(>=100000 AND <200000)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        100.000đ - 200.000đ
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-200-000d-300-000d"
+                          data-group="Khoảng giá"
+                          data-field="price_min"
+                          data-text="200.000đ - 300.000đ"
+                          value="(>=200000 AND <300000)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        200.000đ - 300.000đ
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-300-000d-500-000d"
+                          data-group="Khoảng giá"
+                          data-field="price_min"
+                          data-text="300.000đ - 500.000đ"
+                          value="(>=300000 AND <500000)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        300.000đ - 500.000đ
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-500-000d-1-000-000d"
+                          data-group="Khoảng giá"
+                          data-field="price_min"
+                          data-text="500.000đ - 1.000.000đ"
+                          value="(>500000 AND <1000000)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        500.000đ - 1.000.000đ
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-tren1-000-000d"
+                          data-group="Khoảng giá"
+                          data-field="price_min"
+                          data-text="Trên 1.000.000đ"
+                          value="(>1000000)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        Giá trên 1.000.000đ
+                      </label>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </aside>
+            <aside className="aside-item filter-type">
+              <div className="module-title">
+                <h2 className="title-head margin-top-0">
+                  <span>Loại</span>
+                </h2>
+              </div>
+              <div className="aside-content filter-group">
+                <ul>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-giay-nam"
+                          data-group="Loại"
+                          data-field="product_type"
+                          data-text="Giày Nam"
+                          value="(Giày Nam)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        Giày Nam
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label>
+                        <input
+                          type="checkbox"
+                          id="filter-giay-nu"
+                          data-group="Loại"
+                          data-field="product_type"
+                          data-text="Giày Nữ"
+                          value="(Giày Nữ)"
+                          data-operator="OR"
+                        />
+                        <i className="fa"></i>
+                        Giày Nữ
+                      </label>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </aside>
+            <aside className="aside-item filter-vendor">
+              <div className="module-title">
+                <h2 className="title-head margin-top-0">
+                  <span>Thương hiệu</span>
+                </h2>
+              </div>
+              <div className="aside-content filter-group aside_vendor">
+                <ul>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label className="label_relative">
+                        <input type="checkbox" id="filter-nike-air" />
+                        <i className="fa"></i>
+                        <span className="filter_tt">Nike Air</span>
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label className="label_relative">
+                        <input type="checkbox" id="filter-nike-air-max" />
+                        <i className="fa"></i>
+                        <span className="filter_tt">Nike Air Max</span>
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label className="label_relative">
+                        <input type="checkbox" id="filter-nike-jordan" />
+                        <i className="fa"></i>
+                        <span className="filter_tt">Nike Jordan</span>
+                      </label>
+                    </span>
+                  </li>
+                  <li className="filter-item filter-item--check-box filter-item--green">
+                    <span>
+                      <label className="label_relative">
+                        <input type="checkbox" id="filter-puma" />
+                        <i className="fa"></i>
+                        <span className="filter_tt">Puma</span>
+                      </label>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </div>
+        <aside className="aside-item hidden-767">
+          <div className="aside-content">
+            <a href="#" title="Thời trang nam">
+              <img
+                className="img-responsive center-block"
+                src="/images/banner/aside_banner.webp"
+                data-lazyload="/images/banner/aside_banner.webp"
+                alt="Thời trang nam"
+              />
+            </a>
+          </div>
+        </aside>
+      </div>
+    </>
   );
 }

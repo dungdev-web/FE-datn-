@@ -24,13 +24,13 @@ export default function Header() {
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
-    const [categories, setCategories] = useState<ICategory[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
   const { user } = useAuthUser();
   let hideTimeout = null;
-    useEffect(() => {
+  useEffect(() => {
     getCategories().then(setCategories);
   }, []);
   useEffect(() => {
@@ -165,7 +165,7 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
+console.log("Categories:", categories); // Thêm dòng này để log
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -252,13 +252,13 @@ export default function Header() {
                   ref={megaMenuRef}
                   style={{ display: isMegaMenuOpen ? "block" : "none" }}
                 >
-                         <div className="mega-columns-wrapper">
+                  <div className="mega-columns-wrapper">
                     <div className="mega-column">
                       <h4>DANH MỤC MỚI NHẤT</h4>
                       {categories.map((cat) => (
                         <a
                           key={cat.categories_id}
-                          href={`/product/category?category=${cat.slug}`}
+                          href={`/category/${cat.slug}`}
                         >
                           {cat.name}
                         </a>
