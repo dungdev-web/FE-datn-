@@ -9,19 +9,17 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
+import { getBrands, getProductsByBrandId } from "@/services/brandService";
+import { IBrand } from "@/types/IBrand";
 
-interface Params {
-  params: {
-    slug: string;
-  };
-}
 
-export default function CategoryPage({ params }: Params) {
-  const { slug } = useParams();
+export default function CategoryPage() {
+  const params = useParams();
+  const brandId = Number(params.id);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [category, setCategory] = useState<ICategory | null>(null);
-
+ const [brands, setBrand] = useState<IBrand | null>(null); // thêm state cho brand
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [page, setPage] = useState(1);
@@ -29,41 +27,29 @@ export default function CategoryPage({ params }: Params) {
   const productsPerPage = viewMode === "grid" ? 12 : 6;
 
   const totalPages = Math.ceil(total / productsPerPage);
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        if (slug) {
-          const fetchedProducts = await getProductsByCategorySlug(
-            slug as string
-          );
-          const fetchedCategories = await getCategories();
+useEffect(() => {
+  async function fetchProducts() {
+    if (!brandId) return;
+    try {
+      const fetched = await getProductsByBrandId(brandId);
+      const fetchedBrands = await getBrands();
 
-          const productArray = Array.isArray(fetchedProducts)
-            ? fetchedProducts
-            : [];
-          setProducts(productArray);
-          setTotal(productArray.length);
-          setCategories(
-            Array.isArray(fetchedCategories) ? fetchedCategories : []
-          );
+      setProducts(fetched);
+      setTotal(fetched.length);
 
-          const categoryList = Array.isArray(fetchedCategories)
-            ? fetchedCategories
-            : [];
-          setCategories(categoryList);
-
-          // Tìm category theo slug
-          const matched = categoryList.find((cat) => cat.slug === slug);
-          setCategory(matched || null);
-        }
-      } catch (error) {
-        console.error("Lỗi khi fetch data:", error);
-      }
+      const matchedBrand = fetchedBrands.find(b => b.brand_id === brandId);
+      setBrand(matchedBrand || null);
+    } catch (err) {
+      console.error("Lỗi khi load sản phẩm theo brand:", err);
     }
+  }
 
-    fetchData();
-  }, [slug]);
-
+  fetchProducts();
+}, [brandId]);
+  const paginatedProducts = products.slice(
+    (page - 1) * productsPerPage,
+    page * productsPerPage
+  );
   const toggleSidebar = () => {
     setIsActive(!isActive);
   };
@@ -72,12 +58,6 @@ export default function CategoryPage({ params }: Params) {
     setViewMode(mode);
     setPage(1);
   };
-
-  const paginatedProducts = products.slice(
-    (page - 1) * productsPerPage,
-    page * productsPerPage
-  );
-
   return (
     <>
       <section
@@ -104,7 +84,7 @@ export default function CategoryPage({ params }: Params) {
             </li>
             <li>
               <strong>
-                <span>{category?.name || "Danh mục không xác định"}</span>
+                <span>{brands?.name || "Thương hiệu không xác định"}</span>
               </strong>
             </li>
             <li></li>

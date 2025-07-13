@@ -269,7 +269,7 @@ console.log("Categories:", categories); // Thêm dòng này để log
                       <h4>NHÃN HIỆU MỚI NHẤT</h4>
                       <div className="mega-brands">
                         {brands.map((brand) => (
-                          <a key={brand.brand_id} href={`/brand/${brand.slug}`}>
+                          <a key={brand.brand_id} href={`/brand/${brand.brand_id}`}>
                             {brand.name}
                           </a>
                         ))}

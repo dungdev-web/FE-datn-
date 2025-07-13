@@ -20,16 +20,21 @@ export async function getBrands(): Promise<IBrand[]> {
     return [];
   }
 }
-// Gọi danh sách sản phẩm theo slug danh mục
-export async function getProductsByCategorySlug(slug: string): Promise<IProduct[]> {
-  if (!slug) return [];
 
-  const res = await fetch(`${API_BASE_URL}/product/category?category=${slug}`, {
+// Gọi danh sách sản phẩm theo brand ID
+export async function getProductsByBrandId(brandId: number): Promise<IProduct[]> {
+  if (!brandId) return [];
+
+  const res = await fetch(`${API_BASE_URL}/product/brand/${brandId}`, {
     cache: "no-store",
   });
 
+  if (!res.ok) {
+    console.error("Lỗi khi gọi API:", res.statusText);
+    return [];
+  }
+
   const json = await res.json();
 
-  // Đảm bảo dữ liệu đúng định dạng (nếu cần map lại)
   return json.products || [];
 }
