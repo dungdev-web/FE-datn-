@@ -21,6 +21,7 @@ interface Params {
 
 export default function CategoryPage({ params }: Params) {
   const { slug } = useParams();
+  
    const brandId = Number(params.id);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -390,10 +391,13 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
                             >
                               <span>
                                 <label className="label_relative">
-                                  <input
-                                    type="checkbox"
-                                    id={`filter-${brand.brand_id}`}
-                                  />
+                                 <input
+  type="checkbox"
+  id={`filter-${brand.brand_id}`}
+  checked={selectedBrandIds.includes(brand.brand_id)}
+  onChange={() => handleBrandCheckboxChange(brand.brand_id)}
+/>
+
                                   <i className="fa"></i>
                                   <span className="filter_tt">
                                     {brand.name}
