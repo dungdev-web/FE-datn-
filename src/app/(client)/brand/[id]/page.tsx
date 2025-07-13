@@ -11,41 +11,44 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
-
+import "@/app/(client)/css/pagination.css";
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 export default function CategoryPage() {
   const params = useParams();
   const brandId = Number(params.id);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [category, setCategory] = useState<ICategory | null>(null);
- const [brands, setBrand] = useState<IBrand | null>(null); // thêm state cho brand
+  const [brands, setBrand] = useState<IBrand | null>(null); // thêm state cho brand
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
-
+  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const totalPages = Math.ceil(total / productsPerPage);
-useEffect(() => {
-  async function fetchProducts() {
-    if (!brandId) return;
-    try {
-      const fetched = await getProductsByBrandId(brandId);
-      const fetchedBrands = await getBrands();
+  useEffect(() => {
+    async function fetchProducts() {
+      if (!brandId) return;
+      try {
+        const fetched = await getProductsByBrandId(brandId);
+        const fetchedBrands = await getBrands();
+        const fetchedCategories = await getCategories();
+        setCategories(
+          Array.isArray(fetchedCategories) ? fetchedCategories : []
+        );
+        setProducts(fetched);
+        setTotal(fetched.length);
 
-      setProducts(fetched);
-      setTotal(fetched.length);
-
-      const matchedBrand = fetchedBrands.find(b => b.brand_id === brandId);
-      setBrand(matchedBrand || null);
-    } catch (err) {
-      console.error("Lỗi khi load sản phẩm theo brand:", err);
+        const matchedBrand = fetchedBrands.find((b) => b.brand_id === brandId);
+        setBrand(matchedBrand || null);
+      } catch (err) {
+        console.error("Lỗi khi load sản phẩm theo brand:", err);
+      }
     }
-  }
 
-  fetchProducts();
-}, [brandId]);
+    fetchProducts();
+  }, [brandId]);
   const paginatedProducts = products.slice(
     (page - 1) * productsPerPage,
     page * productsPerPage
@@ -57,6 +60,9 @@ useEffect(() => {
   const changeViewMode = (mode: "grid" | "list") => {
     setViewMode(mode);
     setPage(1);
+  };
+  const toggleCategory = (id: number) => {
+    setOpenCategoryId(openCategoryId === id ? null : id);
   };
   return (
     <>
@@ -104,43 +110,46 @@ useEffect(() => {
                   </div>
                   <div className="categories-box">
                     <ul className="lv1">
-                      <li className="nav-item nav-items">
-                        <a href="/" title="Trang chủ">
-                          {" "}
-                          Trang chủ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/gioi-thieu" title="Giới thiệu">
-                          {" "}
-                          Giới thiệu
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items active">
-                        <a
-                          href="/collections/all"
-                          className="nav-link"
-                          title="Sản phẩm"
+                      {categories.map((cat) => (
+                        <li
+                          key={cat.categories_id}
+                          className="nav-item nav-items"
                         >
-                          Sản phẩm
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/tin-tuc" className="nav-link" title="Tin tức">
-                          Tin tức
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/lien-he" title="Liên hệ">
-                          {" "}
-                          Liên hệ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
-                          Hệ thống cửa hàng
-                        </a>
-                      </li>
+                          <Link
+                            href={`/category/${cat.slug}`}
+                            type="button"
+                            className={`nav-button ${
+                              openCategoryId === cat.categories_id ? "open" : ""
+                            }`}
+                            onClick={() => toggleCategory(cat.categories_id)}
+                          >
+                            {cat.name}
+                            {cat.children && cat.children.length > 0 && (
+                              <span className="arrow">
+                                {openCategoryId === cat.categories_id ? (
+                                  <ChevronDown size={16} />
+                                ) : (
+                                  <ChevronRight size={16} />
+                                )}
+                              </span>
+                            )}
+                          </Link>
+
+                          {cat.children &&
+                            cat.children.length > 0 &&
+                            openCategoryId === cat.categories_id && (
+                              <ul className="lv2">
+                                {cat.children.map((child) => (
+                                  <li key={child.categories_id}>
+                                    <Link href={`/category/${child.slug}`}>
+                                      {child.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </aside>
@@ -488,7 +497,7 @@ useEffect(() => {
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
-                            <span className="discount-tag absolute top-1 left-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded">
+                            <span className="discount-tag absolute top-1 left-1 text-white text-xs px-2 py-0.5 rounded">
                               -
                               {Math.round(
                                 ((Number(sp.price) - Number(sp.sale_price)) /
@@ -592,7 +601,7 @@ useEffect(() => {
 
                           <div className="ml-4 flex flex-col justify-between flex-grow">
                             <div>
-                              <span className="discount-tag text-sm text-red-500 font-medium">
+                              <span className="discount-tag text-sm text-red-600 font-medium">
                                 -
                                 {Math.round(
                                   ((Number(sp.price) - Number(sp.sale_price)) /
@@ -670,10 +679,12 @@ useEffect(() => {
                     ))}
                   </div>
                 )}
-                <div className="flex justify-center items-center gap-2 mt-6">
+                <div className="pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === 1}
                   >
                     <i className="fa-solid fa-chevron-left"></i>
@@ -683,11 +694,7 @@ useEffect(() => {
                     <button
                       key={i + 1}
                       onClick={() => setPage(i + 1)}
-                      className={`!p-[7px]  rounded ${
-                        page === i + 1
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      }`}
+                      className={`page-btn ${page === i + 1 ? "active" : ""}`}
                     >
                       {i + 1}
                     </button>
@@ -695,7 +702,9 @@ useEffect(() => {
 
                   <button
                     onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === totalPages}
                   >
                     <i className="fa-solid fa-chevron-right"></i>

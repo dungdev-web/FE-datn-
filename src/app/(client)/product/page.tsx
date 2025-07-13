@@ -3,6 +3,10 @@ import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import { getAllProducts } from "@/services/productService";
 import Link from "next/link";
+import { ICategory } from "@/types/ICategory";
+import { getCategories } from "@/services/categoryService";
+import "@/app/(client)/css/pagination.css";
+import { ChevronDown, ChevronRight } from "lucide-react";
 export default function Product() {
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
@@ -10,7 +14,8 @@ export default function Product() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
-
+  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const totalPages = Math.ceil(total / productsPerPage);
   const toggleSidebar = () => {
     setIsActive(!isActive);
@@ -19,11 +24,16 @@ export default function Product() {
     setViewMode(mode);
     setPage(1);
   };
+  const toggleCategory = (id: number) => {
+    setOpenCategoryId(openCategoryId === id ? null : id);
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await getAllProducts(page, productsPerPage);
+        const fetched = await getCategories();
+        setCategories(Array.isArray(fetched) ? fetched : []);
         setProducts(res.data);
         setTotal(res.total);
       } catch (err) {
@@ -79,43 +89,46 @@ export default function Product() {
                   </div>
                   <div className="categories-box">
                     <ul className="lv1">
-                      <li className="nav-item nav-items">
-                        <a href="/" title="Trang chủ">
-                          {" "}
-                          Trang chủ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/gioi-thieu" title="Giới thiệu">
-                          {" "}
-                          Giới thiệu
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items active">
-                        <a
-                          href="/collections/all"
-                          className="nav-link"
-                          title="Sản phẩm"
+                      {categories.map((cat) => (
+                        <li
+                          key={cat.categories_id}
+                          className="nav-item nav-items"
                         >
-                          Sản phẩm
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/tin-tuc" className="nav-link" title="Tin tức">
-                          Tin tức
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/lien-he" title="Liên hệ">
-                          {" "}
-                          Liên hệ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
-                          Hệ thống cửa hàng
-                        </a>
-                      </li>
+                          <Link
+                            href={`/category/${cat.slug}`}
+                            type="button"
+                            className={`nav-button ${
+                              openCategoryId === cat.categories_id ? "open" : ""
+                            }`}
+                            onClick={() => toggleCategory(cat.categories_id)}
+                          >
+                            {cat.name}
+                            {cat.children && cat.children.length > 0 && (
+                              <span className="arrow">
+                                {openCategoryId === cat.categories_id ? (
+                                  <ChevronDown size={16} />
+                                ) : (
+                                  <ChevronRight size={16} />
+                                )}
+                              </span>
+                            )}
+                          </Link>
+
+                          {cat.children &&
+                            cat.children.length > 0 &&
+                            openCategoryId === cat.categories_id && (
+                              <ul className="lv2">
+                                {cat.children.map((child) => (
+                                  <li key={child.categories_id}>
+                                    <Link href={`/category/${child.slug}`}>
+                                      {child.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                        </li>
+                      ))}
                     </ul>
                   </div>
                 </aside>
@@ -562,7 +575,7 @@ export default function Product() {
                         <div
                           className="product-card-list"
                           style={{
-                           width: "100% !important",
+                            width: "100% !important",
                             display: "flex",
                             background: "none",
                           }}
@@ -659,10 +672,12 @@ export default function Product() {
                     ))}
                   </div>
                 )}
-                <div className="flex justify-center items-center gap-2 mt-6">
+                <div className="pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === 1}
                   >
                     <i className="fa-solid fa-chevron-left"></i>
@@ -672,11 +687,7 @@ export default function Product() {
                     <button
                       key={i + 1}
                       onClick={() => setPage(i + 1)}
-                      className={`!p-[7px]  rounded ${
-                        page === i + 1
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      }`}
+                      className={`page-btn ${page === i + 1 ? "active" : ""}`}
                     >
                       {i + 1}
                     </button>
@@ -684,7 +695,9 @@ export default function Product() {
 
                   <button
                     onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === totalPages}
                   >
                     <i className="fa-solid fa-chevron-right"></i>
