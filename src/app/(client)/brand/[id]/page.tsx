@@ -20,6 +20,7 @@ export default function CategoryPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [brands, setBrand] = useState<IBrand | null>(null); // thêm state cho brand
+  const [brandsList, setBrandsList] = useState<IBrand[]>([]);
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [page, setPage] = useState(1);
@@ -27,6 +28,38 @@ export default function CategoryPage() {
   const productsPerPage = viewMode === "grid" ? 12 : 6;
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const totalPages = Math.ceil(total / productsPerPage);
+  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
+  const handleBrandCheckboxChange = (brandId: number) => {
+    setSelectedBrandIds((prev) =>
+      prev.includes(brandId)
+        ? prev.filter((id) => id !== brandId)
+        : [...prev, brandId]
+    );
+  };
+  useEffect(() => {
+    async function fetchFilteredProducts() {
+      if (selectedBrandIds.length === 0) {
+        // nếu không chọn brand nào -> hiện tất cả
+        const allProducts = await getProductsByBrandId(brandId); // hoặc get all nếu bạn có
+        setProducts(allProducts);
+        setTotal(allProducts.length);
+        return;
+      }
+
+      let combinedProducts: IProduct[] = [];
+
+      for (const id of selectedBrandIds) {
+        const brandProducts = await getProductsByBrandId(id);
+        combinedProducts = [...combinedProducts, ...brandProducts];
+      }
+
+      setProducts(combinedProducts);
+      setTotal(combinedProducts.length);
+    }
+
+    fetchFilteredProducts();
+  }, [selectedBrandIds]);
+
   useEffect(() => {
     async function fetchProducts() {
       if (!brandId) return;
@@ -39,6 +72,7 @@ export default function CategoryPage() {
         );
         setProducts(fetched);
         setTotal(fetched.length);
+        setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
 
         const matchedBrand = fetchedBrands.find((b) => b.brand_id === brandId);
         setBrand(matchedBrand || null);
@@ -326,48 +360,32 @@ export default function CategoryPage() {
                       </div>
                       <div className="aside-content filter-group aside_vendor">
                         <ul>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input type="checkbox" id="filter-nike-air" />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Nike Air</span>
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input
-                                  type="checkbox"
-                                  id="filter-nike-air-max"
-                                />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Nike Air Max</span>
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input
-                                  type="checkbox"
-                                  id="filter-nike-jordan"
-                                />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Nike Jordan</span>
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input type="checkbox" id="filter-puma" />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Puma</span>
-                              </label>
-                            </span>
-                          </li>
+                          {brandsList.map((brand) => (
+                            <li
+                              key={brand.brand_id}
+                              className="filter-item filter-item--check-box filter-item--green"
+                            >
+                              <span>
+                                <label className="label_relative">
+                                  <input
+                                    type="checkbox"
+                                    id={`filter-${brand.brand_id}`}
+                                    checked={selectedBrandIds.includes(
+                                      brand.brand_id
+                                    )}
+                                    onChange={() =>
+                                      handleBrandCheckboxChange(brand.brand_id)
+                                    }
+                                  />
+
+                                  <i className="fa"></i>
+                                  <span className="filter_tt">
+                                    {brand.name}
+                                  </span>
+                                </label>
+                              </span>
+                            </li>
+                          ))}
                         </ul>
                       </div>
                     </aside>
@@ -735,43 +753,46 @@ export default function CategoryPage() {
           </div>
           <div className="categories-box">
             <ul className="lv1">
-              <li className="nav-item nav-items">
-                <a href="/" title="Trang chủ">
-                  {" "}
-                  Trang chủ
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/gioi-thieu" title="Giới thiệu">
-                  {" "}
-                  Giới thiệu
-                </a>
-              </li>
-              <li className="nav-item nav-items active">
-                <a
-                  href="/collections/all"
-                  className="nav-link"
-                  title="Sản phẩm"
-                >
-                  Sản phẩm
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/tin-tuc" className="nav-link" title="Tin tức">
-                  Tin tức
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/lien-he" title="Liên hệ">
-                  {" "}
-                  Liên hệ
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
-                  Hệ thống cửa hàng
-                </a>
-              </li>
+              {categories.map((cat) => (
+                <li key={cat.categories_id} className="nav-item nav-items ">
+                  <Link
+                   href={`/category/${cat.slug}`}
+                    type="button"
+                    className={` nav-button ${
+                      openCategoryId === cat.categories_id ? "bg-gray-100" : ""
+                    }`}
+                    onClick={() => toggleCategory(cat.categories_id)}
+                  >
+                    <span>{cat.name}</span>
+                    {cat.children && cat.children.length > 0 && (
+                      <span className="arrow">
+                        {openCategoryId === cat.categories_id ? (
+                          <ChevronDown size={16} />
+                        ) : (
+                          <ChevronRight size={16} />
+                        )}
+                      </span>
+                    )}
+                  </Link>
+
+                  {cat.children &&
+                    cat.children.length > 0 &&
+                    openCategoryId === cat.categories_id && (
+                      <ul className="lv2 pl-4 py-2 bg-gray-50">
+                        {cat.children.map((child) => (
+                          <li key={child.categories_id} className="py-1">
+                            <Link
+                              href={`/category/${child.slug}`}
+                              className="block text-sm text-gray-700 hover:text-red-500"
+                            >
+                              {child.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                </li>
+              ))}
             </ul>
           </div>
         </aside>
@@ -946,44 +967,30 @@ export default function CategoryPage() {
                   <span>Thương hiệu</span>
                 </h2>
               </div>
-              <div className="aside-content filter-group aside_vendor">
+              <div className="aside-content filter-group aside_vendor block md:hidden">
                 <ul>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-nike-air" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Nike Air</span>
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-nike-air-max" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Nike Air Max</span>
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-nike-jordan" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Nike Jordan</span>
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-puma" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Puma</span>
-                      </label>
-                    </span>
-                  </li>
+                  {brandsList.map((brand) => (
+                    <li
+                      key={brand.brand_id}
+                      className="filter-item filter-item--check-box filter-item--green"
+                    >
+                      <span>
+                        <label className="label_relative">
+                          <input
+                            type="checkbox"
+                            id={`filter-${brand.brand_id}`}
+                            checked={selectedBrandIds.includes(brand.brand_id)}
+                            onChange={() =>
+                              handleBrandCheckboxChange(brand.brand_id)
+                            }
+                            className="mr-2"
+                          />
+                          <i className="fa"></i>
+                          <span className="filter_tt">{brand.name}</span>
+                        </label>
+                      </span>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </aside>
