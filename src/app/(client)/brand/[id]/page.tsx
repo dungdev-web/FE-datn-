@@ -1,91 +1,36 @@
 "use client";
-import { useState, useEffect } from "react";
-import { IProduct } from "@/types/product";
-import { getAllProducts } from "@/services/productService";
+import { useEffect, useState } from "react";
+import {
+  getCategories,
+  getProductsByCategorySlug,
+} from "@/services/categoryService";
 import Link from "next/link";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
-import { getCategories } from "@/services/categoryService";
-import "@/app/(client)/css/pagination.css";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
-import { useParams } from "next/navigation";
-import SidebarFilter from "../component/products/SidebarFilter";
-import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
+import "@/app/(client)/css/pagination.css";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import SidebarFilter from "../../component/products/SidebarFilter";
+import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
 
-export default function Product() {
+export default function CategoryPage() {
   const params = useParams();
   const brandId = Number(params.id);
-
-  const [brandsList, setBrandsList] = useState<IBrand[]>([]);
-  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrand] = useState<IBrand | null>(null); // thêm state cho brand
+  const [brandsList, setBrandsList] = useState<IBrand[]>([]);
+  const [isActive, setIsActive] = useState(false);
+  const [viewMode, setViewMode] = useState("grid");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [viewMode, setViewMode] = useState("grid");
-  const [isActive, setIsActive] = useState(false);
-  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
+  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const totalPages = Math.ceil(total / productsPerPage);
-
-  useEffect(() => {
-    async function fetchBrands() {
-      try {
-        const fetchedBrands = await getBrands();
-        setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách brand:", error);
-      }
-    }
-
-    fetchBrands();
-  }, []);
-
-
-  useEffect(() => {
-    async function fetchFilteredProducts() {
-      try {
-        if (selectedBrandIds.length === 0) {
-          // Không chọn brand nào → lấy theo brandId
-          const allProducts = await getProductsByBrandId(brandId);
-          setProducts(allProducts);
-          setTotal(allProducts.length);
-        } else {
-          let combined: IProduct[] = [];
-          for (const id of selectedBrandIds) {
-            const brandProducts = await getProductsByBrandId(id);
-            combined = [...combined, ...brandProducts];
-          }
-          setProducts(combined);
-          setTotal(combined.length);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lọc sản phẩm theo brand:", error);
-      }
-    }
-
-    fetchFilteredProducts();
-  }, [selectedBrandIds, brandId]);
-
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await getAllProducts(page, productsPerPage);
-        const fetched = await getCategories();
-        setCategories(Array.isArray(fetched) ? fetched : []);
-        setProducts(res.data);
-        setTotal(res.total);
-      } catch (err) {
-        console.error("Lỗi lấy sản phẩm hoặc danh mục:", err);
-      }
-    };
-
-    fetchProducts();
-  }, [page, viewMode]);
-
-
+  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -93,7 +38,57 @@ export default function Product() {
         : [...prev, brandId]
     );
   };
+  useEffect(() => {
+    async function fetchFilteredProducts() {
+      if (selectedBrandIds.length === 0) {
+        // nếu không chọn brand nào -> hiện tất cả
+        const allProducts = await getProductsByBrandId(brandId); // hoặc get all nếu bạn có
+        setProducts(allProducts);
+        setTotal(allProducts.length);
+        return;
+      }
 
+      let combinedProducts: IProduct[] = [];
+
+      for (const id of selectedBrandIds) {
+        const brandProducts = await getProductsByBrandId(id);
+        combinedProducts = [...combinedProducts, ...brandProducts];
+      }
+
+      setProducts(combinedProducts);
+      setTotal(combinedProducts.length);
+    }
+
+    fetchFilteredProducts();
+  }, [selectedBrandIds]);
+
+  useEffect(() => {
+    async function fetchProducts() {
+      if (!brandId) return;
+      try {
+        const fetched = await getProductsByBrandId(brandId);
+        const fetchedBrands = await getBrands();
+        const fetchedCategories = await getCategories();
+        setCategories(
+          Array.isArray(fetchedCategories) ? fetchedCategories : []
+        );
+        setProducts(fetched);
+        setTotal(fetched.length);
+        setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
+
+        const matchedBrand = fetchedBrands.find((b) => b.brand_id === brandId);
+        setBrand(matchedBrand || null);
+      } catch (err) {
+        console.error("Lỗi khi load sản phẩm theo brand:", err);
+      }
+    }
+
+    fetchProducts();
+  }, [brandId]);
+  const paginatedProducts = products.slice(
+    (page - 1) * productsPerPage,
+    page * productsPerPage
+  );
   const toggleSidebar = () => {
     setIsActive(!isActive);
   };
@@ -102,11 +97,9 @@ export default function Product() {
     setViewMode(mode);
     setPage(1);
   };
-
   const toggleCategory = (id: number) => {
     setOpenCategoryId(openCategoryId === id ? null : id);
   };
-
   return (
     <>
       <section
@@ -133,7 +126,7 @@ export default function Product() {
             </li>
             <li>
               <strong>
-                <span>Tất cả sản phẩm</span>
+                <span>{brands?.name || "Thương hiệu không xác định"}</span>
               </strong>
             </li>
             <li></li>
@@ -144,7 +137,7 @@ export default function Product() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-              <SidebarFilter
+             <SidebarFilter
   categories={categories}
   openCategoryId={openCategoryId}
   toggleCategory={toggleCategory}
@@ -238,17 +231,14 @@ export default function Product() {
                   </div>
                 </div>
                 {viewMode === "grid" && (
-                  <div className="product-grid">
+                  <div className="product-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
                     {products.map((sp) => (
                       <div
                         className="product-itemlist-main !block"
                         key={sp.products_id}
                       >
-                        <div
-                          className="product-card"
-                          style={{ width: "230px" }}
-                        >
-                          <div className="product-image">
+                        <div className="product-card" style={{ width: "100%" }}>
+                          <div className="product-image relative h-48">
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
@@ -256,10 +246,10 @@ export default function Product() {
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
+                                className="w-full h-full object-cover rounded"
                               />
                             </Link>
-
-                            <div className="product-icons">
+                            <div className="product-icons absolute top-1 right-1">
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
                                 <i className="fa-solid fa-eye"></i>
@@ -267,8 +257,7 @@ export default function Product() {
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
-
-                            <span className="discount-tag">
+                            <span className="discount-tag absolute top-1 left-1 text-white text-xs px-2 py-0.5 rounded">
                               -
                               {Math.round(
                                 ((Number(sp.price) - Number(sp.sale_price)) /
@@ -277,75 +266,60 @@ export default function Product() {
                               )}
                               %
                             </span>
+                          </div>
 
-                            <div className="product-colors">
-                              {[
-                                ...new Map(
-                                  sp.product_variants.map((v) => [
-                                    v.color.id,
-                                    v.color,
-                                  ])
-                                ).values(),
-                              ].map((color) => (
-                                <span
-                                  key={color.id}
-                                  className="color"
-                                  data-color={color.name_color}
-                                  style={{ backgroundColor: color.code_color }}
-                                ></span>
-                              ))}
-                            </div>
+                          <div className="product-colors flex gap-1 mt-2">
+                            {[
+                              ...new Map(
+                                sp.product_variants.map((v) => [
+                                  v.color.id,
+                                  v.color,
+                                ])
+                              ).values(),
+                            ].map((color) => (
+                              <span
+                                key={color.id}
+                                className="w-4 h-4 rounded-full border"
+                                style={{ backgroundColor: color.code_color }}
+                              ></span>
+                            ))}
+                          </div>
 
-                            <h4 className="product-title">{sp.name}</h4>
+                          <h4 className="product-title text-sm font-semibold mt-2">
+                            {sp.name}
+                          </h4>
 
-                            <div className="product-price">
-                              <span className="old-price">
-                                <del>
-                                  {Number(sp.price).toLocaleString("vi")}đ
-                                </del>
-                              </span>
-                              <span className="new-price">
-                                {Number(sp.sale_price).toLocaleString("vi")}đ
-                              </span>
-                            </div>
+                          <div className="product-price text-red-500 font-bold">
+                            <span className="old-price text-gray-400 text-sm line-through mr-2">
+                              {Number(sp.price).toLocaleString("vi")}đ
+                            </span>
+                            <span className="new-price">
+                              {Number(sp.sale_price).toLocaleString("vi")}đ
+                            </span>
+                          </div>
 
-                            <div className="hot-product-progress">
-                              <div className="progress-bar">
-                                <div
-                                  className="progress-fill"
-                                  style={{
-                                    width: "87%",
-                                  }}
-                                >
-                                  <span className="sold-info">
-                                    Đã bán{" "}
-                                    {sp.product_variants.reduce(
-                                      (sum, v) => sum + v.stock_quantity,
+                          <div className="product-rating mt-1">
+                            {Array.from({ length: 5 }, (_, i) =>
+                              i <
+                              (sp.reviews?.length
+                                ? Math.round(
+                                    sp.reviews.reduce(
+                                      (s, r) => s + Number(r.rating),
                                       0
-                                    )}{" "}
-                                    sản phẩm
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="product-rating">
-                              {Array.from({ length: 5 }, (_, i) =>
-                                i <
-                                (sp.reviews?.length
-                                  ? Math.round(
-                                      sp.reviews.reduce(
-                                        (s, r) => s + Number(r.rating),
-                                        0
-                                      ) / sp.reviews.length
-                                    )
-                                  : 0) ? (
-                                  <i key={i} className="fa-solid fa-star"></i>
-                                ) : (
-                                  <i key={i} className="fa-regular fa-star"></i>
-                                )
-                              )}
-                            </div>
+                                    ) / sp.reviews.length
+                                  )
+                                : 0) ? (
+                                <i
+                                  key={i}
+                                  className="fa-solid fa-star text-yellow-400"
+                                ></i>
+                              ) : (
+                                <i
+                                  key={i}
+                                  className="fa-regular fa-star text-gray-300"
+                                ></i>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>
@@ -354,21 +328,17 @@ export default function Product() {
                 )}
 
                 {viewMode === "list" && (
-                  <div className="product-grid-column">
+                  <div className="product-grid-column flex flex-col gap-4">
                     {products.map((sp) => (
                       <div
                         className="product-itemlist-main"
                         key={sp.products_id}
                       >
                         <div
-                          className="product-card-list"
-                          style={{
-                            width: "100% !important",
-                            display: "flex",
-                            background: "none",
-                          }}
+                          className="product-card-list flex bg-white p-4 border border-gray-200 rounded"
+                          style={{ width: "100%" }}
                         >
-                          <div className="product-image">
+                          <div className="product-image w-48 h-48 flex-shrink-0 relative">
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
@@ -376,10 +346,10 @@ export default function Product() {
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
+                                className="w-full h-full object-cover rounded"
                               />
                             </Link>
-
-                            <div className="product-icons">
+                            <div className="product-icons absolute top-1 right-1">
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
                                 <i className="fa-solid fa-eye"></i>
@@ -388,71 +358,80 @@ export default function Product() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col">
-                            <span className="discount-tag">
-                              -
-                              {Math.round(
-                                ((sp.price - sp.sale_price) / sp.price) * 100
-                              )}
-                              %
-                            </span>
 
-                            <h4
-                              className="product-title-column"
-                              style={{ fontSize: "larger" }}
-                            >
-                              {sp.name}
-                            </h4>
-                            <div className="product-price">
-                              <span className="old-price">
-                                <del>{sp.price.toLocaleString("vi")}đ</del>
+                          <div className="ml-4 flex flex-col justify-between flex-grow">
+                            <div>
+                              <span className="discount-tag text-sm text-red-600 font-medium">
+                                -
+                                {Math.round(
+                                  ((Number(sp.price) - Number(sp.sale_price)) /
+                                    Number(sp.price)) *
+                                    100
+                                )}
+                                %
                               </span>
-                              <span className="new-price">
-                                {sp.sale_price.toLocaleString("vi")}đ
-                              </span>
-                            </div>
-                            <p
-                              style={{
-                                margin: "10px 0 6px 10px",
-                                fontSize: "14px",
-                              }}
-                            >
-                              {sp.short_desc}...
-                            </p>
 
-                            <div className="product-rating">
-                              {Array.from({ length: 5 }, (_, i) =>
-                                i <
-                                (sp.reviews?.length
-                                  ? Math.round(
-                                      sp.reviews.reduce(
-                                        (s, r) => s + Number(r.rating),
-                                        0
-                                      ) / sp.reviews.length
-                                    )
-                                  : 0) ? (
-                                  <i key={i} className="fa-solid fa-star"></i>
-                                ) : (
-                                  <i key={i} className="fa-regular fa-star"></i>
-                                )
-                              )}
+                              <h4 className="product-title-column text-lg font-semibold mt-1">
+                                {sp.name}
+                              </h4>
+
+                              <div className="product-price mt-1">
+                                <span className="old-price text-gray-400 text-sm line-through mr-2">
+                                  {sp.price.toLocaleString("vi")}đ
+                                </span>
+                                <span className="new-price text-red-500 font-bold">
+                                  {sp.sale_price.toLocaleString("vi")}đ
+                                </span>
+                              </div>
+
+                              <p className="text-sm mt-2 text-gray-600">
+                                {sp.short_desc}...
+                              </p>
                             </div>
-                            <div className="product-colors">
-                              {[
-                                ...new Map(
-                                  sp.product_variants.map((v) => [
-                                    v.color.id,
-                                    v.color,
-                                  ])
-                                ).values(),
-                              ].map((color) => (
-                                <span
-                                  key={color.id}
-                                  className="color"
-                                  data-color={color.name_color}
-                                  style={{ backgroundColor: color.code_color }}
-                                ></span>
-                              ))}
+
+                            <div className="flex flex-col gap-2 mt-2">
+                              <div className="product-rating">
+                                {Array.from({ length: 5 }, (_, i) =>
+                                  i <
+                                  (sp.reviews?.length
+                                    ? Math.round(
+                                        sp.reviews.reduce(
+                                          (s, r) => s + Number(r.rating),
+                                          0
+                                        ) / sp.reviews.length
+                                      )
+                                    : 0) ? (
+                                    <i
+                                      key={i}
+                                      className="fa-solid fa-star text-yellow-400"
+                                    ></i>
+                                  ) : (
+                                    <i
+                                      key={i}
+                                      className="fa-regular fa-star text-gray-300"
+                                    ></i>
+                                  )
+                                )}
+                              </div>
+
+                              <div className="product-colors flex gap-1">
+                                {[
+                                  ...new Map(
+                                    sp.product_variants.map((v) => [
+                                      v.color.id,
+                                      v.color,
+                                    ])
+                                  ).values(),
+                                ].map((color) => (
+                                  <span
+                                    key={color.id}
+                                    className="w-4 h-4 rounded-full border"
+                                    style={{
+                                      backgroundColor: color.code_color,
+                                    }}
+                                  ></span>
+                                ))}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -506,7 +485,6 @@ export default function Product() {
           className={`fa ${isActive ? "fa-times" : "fa-filter"}`}
         ></i>
       </div>
-
                 <MobileSidebarFilter
   isActive={isActive}
   categories={categories}
