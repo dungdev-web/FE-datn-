@@ -12,7 +12,7 @@ export async function getBrands(): Promise<IBrand[]> {
     });
 
     const json = await res.json();
-    console.log("API Brands Response:", json); // 
+ 
 
     return Array.isArray(json) ? json : [];
   } catch (err) {
