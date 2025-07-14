@@ -457,3 +457,9 @@ export async function deleteProduct(id: number): Promise<void> {
     throw new Error("Không thể xoá sản phẩm.");
   }
 }
+//search
+export async function searchProducts(keyword: string, page = 1, limit = 12) {
+  const res = await fetch(`${API_BASE_URL}/product/search?q=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`);
+  if (!res.ok) throw new Error("Lỗi khi tìm kiếm sản phẩm");
+  return await res.json();
+}

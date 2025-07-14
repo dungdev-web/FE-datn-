@@ -46,7 +46,7 @@ export default function Banner3D() {
           <Canvas camera={{ position: [0, 1.5, 6], fov: 45 }}>
             <ambientLight intensity={1.5} />
             <directionalLight position={[2, 2, 5]} intensity={2} />
-            <ShoeModel url="/models/shoes1.glb" scale={0.5} />
+            <ShoeModel url="/models/shoes1.glb" scale={0.6} />
             <Environment preset="city" background={false} />
             <OrbitControls
               enableZoom={false}

@@ -10,8 +10,12 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+
 import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
+import { searchProducts } from "@/services/productService";
+import { log } from "console";
 
 export default function Product() {
   const params = useParams();
@@ -28,7 +32,8 @@ export default function Product() {
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
   const totalPages = Math.ceil(total / productsPerPage);
-
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("q") || "";
   useEffect(() => {
     async function fetchBrands() {
       try {
@@ -85,7 +90,20 @@ export default function Product() {
     fetchProducts();
   }, [page, viewMode]);
 
-
+useEffect(() => {
+    const fetchSearch = async () => {
+      if (!keyword) return;
+      try {
+        const res = await searchProducts(keyword);
+        setProducts(res.products || []);
+        console.log(res.products);
+        
+      } catch (err) {
+        console.error("Lỗi tìm kiếm:", err);
+      }
+    };
+    fetchSearch();
+  }, [keyword]);
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -332,12 +350,12 @@ export default function Product() {
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
-                                (sp.reviews?.length
+                                (sp.product_reviews?.length
                                   ? Math.round(
-                                      sp.reviews.reduce(
+                                      sp.product_reviews.reduce(
                                         (s, r) => s + Number(r.rating),
                                         0
-                                      ) / sp.reviews.length
+                                      ) / sp.product_reviews.length
                                     )
                                   : 0) ? (
                                   <i key={i} className="fa-solid fa-star"></i>
@@ -423,12 +441,12 @@ export default function Product() {
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
-                                (sp.reviews?.length
+                                (sp.product_reviews?.length
                                   ? Math.round(
-                                      sp.reviews.reduce(
+                                      sp.product_reviews.reduce(
                                         (s, r) => s + Number(r.rating),
                                         0
-                                      ) / sp.reviews.length
+                                      ) / sp.product_reviews.length
                                     )
                                   : 0) ? (
                                   <i key={i} className="fa-solid fa-star"></i>

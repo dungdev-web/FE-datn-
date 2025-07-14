@@ -5,12 +5,14 @@ import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
+import { useRouter } from "next/navigation";
 import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
+import { searchProducts } from "@/services/productService";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -30,6 +32,19 @@ export default function Header() {
   const lastScrollTop = useRef(0);
   const { user } = useAuthUser();
   let hideTimeout = null;
+  const [keyword, setKeyword] = useState("");
+  const router = useRouter();
+
+  const handleSearch = () => {
+  if (!keyword.trim()) return;
+  router.push(`/product?q=${encodeURIComponent(keyword)}`);
+};
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
@@ -268,7 +283,10 @@ export default function Header() {
                       <h4>NHÃN HIỆU MỚI NHẤT</h4>
                       <div className="mega-brands">
                         {brands.map((brand) => (
-                          <a key={brand.brand_id} href={`/brand/${brand.brand_id}`}>
+                          <a
+                            key={brand.brand_id}
+                            href={`/brand/${brand.brand_id}`}
+                          >
                             {brand.name}
                           </a>
                         ))}
@@ -298,8 +316,14 @@ export default function Header() {
                 type="text"
                 placeholder="Tìm kiếm sản phẩm"
                 className="input-search-nav !text-black"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={handleKeyPress}
               />
-              <i className="fa-solid fa-magnifying-glass"></i>
+              <i
+                className="fa-solid fa-magnifying-glass"
+                onClick={handleSearch}
+              ></i>
             </div>
           </div>
         </nav>
