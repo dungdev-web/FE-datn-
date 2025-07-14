@@ -24,23 +24,22 @@ export async function getProductsByCategorySlug(slug: string): Promise<IProduct[
 
   try {
     const url = `${API_BASE_URL}/product/category?category=${slug}`;
-    console.log("[Server] Fetching products from:", url);
+    
 
     const res = await fetch(url, {
       cache: "no-store",
     });
 
     if (!res.ok) {
-      console.error("[Server] API lỗi:", res.status, res.statusText);
+    
       throw new Error("Failed to fetch");
     }
 
     const json = await res.json();
-    console.log("[Server] Products response:", json); // sẽ hiện ở terminal (không phải browser console)
-
+  
     return json.products || [];
   } catch (error) {
-    console.error("Lỗi khi lấy sản phẩm theo category:", error);
+  
     return [];
   }
 }

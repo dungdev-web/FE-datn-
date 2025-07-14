@@ -117,3 +117,24 @@ export async function clearMockCart(userId: number): Promise<ICart | null> {
   if (!res.ok) throw new Error("Không thể xóa giỏ hàng.");
   return null;
 }
+export const getCartByUserId = async (userId: number): Promise<(ICart & { items: ICartItem[] }) | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`);
+    if (!res.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
+    const data: ICart = await res.json();
+
+    // ✅ Chuyển đổi cart_items => items, ép price về number
+    const cartWithItems = {
+      ...data,
+      items: data.cart_items.map((item) => ({
+        ...item,
+        price: Number(item.price), // ép từ string => number để tính toán
+      })),
+    };
+
+    return cartWithItems;
+  } catch (error) {
+    console.error("Lỗi lấy giỏ hàng:", error);
+    return null;
+  }
+};
