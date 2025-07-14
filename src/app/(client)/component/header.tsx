@@ -165,7 +165,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
