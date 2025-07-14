@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";

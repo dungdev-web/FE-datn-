@@ -7,6 +7,10 @@ import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { ICategory } from "@/types/ICategory";
+import { IBrand } from "@/types/IBrand";
+import { getCategories } from "@/services/categoryService";
+import { getBrands } from "@/services/brandService";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -20,10 +24,18 @@ export default function Header() {
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
   const { user } = useAuthUser();
   let hideTimeout = null;
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
+  useEffect(() => {
+    getBrands().then(setBrands);
+  }, []);
   useEffect(() => {
     const cartIcon = cartIconRef.current;
     const cartPopup = cartPopupRef.current;
@@ -153,7 +165,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -242,21 +253,26 @@ export default function Header() {
                 >
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
-                      <h4>SẢN PHẨM MỚI NHẤT</h4>
-                      <a href="#">Giày chạy bộ</a>
-                      <a href="#">Giày Nike</a>
-                      <a href="#">Giày Adidas</a>
-                      <a href="#">Giày thể thao</a>
+                      <h4>DANH MỤC MỚI NHẤT</h4>
+                      {categories.map((cat) => (
+                        <a
+                          key={cat.categories_id}
+                          href={`/category/${cat.slug}`}
+                        >
+                          {cat.name}
+                        </a>
+                      ))}
                     </div>
+
                     <div className="mega-column">
-                      <h4>SẢN PHẨM NỔI BẬT</h4>
-                      <a href="#">Giày cho nam</a>
-                      <a href="#">Giày cho nữ</a>
-                    </div>
-                    <div className="mega-column">
-                      <h4>SẢN PHẨM BÁN CHẠY</h4>
-                      <a href="#">Giày Puma</a>
-                      <a href="#">Nike Air</a>
+                      <h4>NHÃN HIỆU MỚI NHẤT</h4>
+                      <div className="mega-brands">
+                        {brands.map((brand) => (
+                          <a key={brand.brand_id} href={`/brand/${brand.brand_id}`}>
+                            {brand.name}
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
