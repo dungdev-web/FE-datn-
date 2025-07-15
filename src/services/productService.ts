@@ -463,3 +463,10 @@ export async function searchProducts(keyword: string, page = 1, limit = 12) {
   if (!res.ok) throw new Error("Lỗi khi tìm kiếm sản phẩm");
   return await res.json();
 }
+//review
+export async function reviewProduct(productId:number) {
+  const res = await fetch( `${API_BASE_URL}/product/reviews/${productId}`);
+  if(!res.ok) throw new Error("Lỗi lấy review ");
+  return await res.json();
+  
+}

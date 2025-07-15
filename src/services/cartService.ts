@@ -81,7 +81,7 @@ export async function getMockCartByUser(userId: number): Promise<ICart | null> {
     return carts.find((c) => c.user_id === userId) || null;
   }
   try {
-    const res = await fetch(`${API_BASE_URL}/cart/user/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export async function getMockCartByUser(userId: number): Promise<ICart | null> {
     }
 
     const json = await res.json();
-    return json.cart || null;
+    return json || null;
   } catch (error) {
     console.error("Lỗi khi gọi API giỏ hàng:", error);
     return null;
