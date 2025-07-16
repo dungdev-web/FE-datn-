@@ -22,7 +22,8 @@ body.dark .sidebar,
 body.dark,
 body.dark .category-tag,
 body.dark .dropdown-options,
-body.dark option {
+body.dark option,
+body.dark .menunote  {
   background: #101828 !important;
   color: #f1f1f1;
 }
@@ -71,7 +72,7 @@ body.dark .ql-toolbar.ql-snow + .ql-container.ql-snow,
 body.dark textarea,
 body.dark .filepond--drop-label,
 body.dark .filepond--root :not(text),
-body.dark .dropdown {
+body.dark .dropdown{
   background: color-mix(in oklab, #ffffff 3%, transparent) !important;
 }
 
@@ -93,6 +94,7 @@ body.dark .fa-eye-slash,
 body.dark .fa-check,
 body.dark label,
 body.dark select,
+body.dark strong,
 body.dark .ck,
 body.dark .tab.active,
 body.dark .dropdown-option span.color-name {
@@ -237,7 +239,7 @@ body.dark .header .header-right .header-icon i {
   position: relative;
 }
 
-.notification-badge::after {
+/* .notification-badge::after {
   content: "3";
   position: absolute;
   top: -5px;
@@ -251,7 +253,7 @@ body.dark .header .header-right .header-icon i {
   display: flex;
   align-items: center;
   justify-content: center;
-}
+} */
 
 /* NỘI DUNG CHÍNH */
 .container {

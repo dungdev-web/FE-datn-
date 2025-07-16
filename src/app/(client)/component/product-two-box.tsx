@@ -9,9 +9,21 @@ import "swiper/css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-export default function Show2sanpham({ products }: { products: IProduct[] }) {
-  if (!products?.length) return null;
 
+export default function Show2sanpham({ products }: { products: IProduct[] }) {
+   const images = [
+    "https://file.hstatic.net/200000581855/file/1_5d0aee5d42d245f395b3bfbc9d46e9f3.png",
+    "https://file.hstatic.net/200000581855/file/2_5e1eb6264dce4a33b1c2ef620bd0232a.png",
+    // Bạn có thể thêm nhiều ảnh ở đây
+  ];
+
+  const [randomImage, setRandomImage] = useState(images[0]);
+
+  useEffect(() => {
+    const index = Math.floor(Math.random() * images.length);
+    setRandomImage(images[index]);
+  }, []);
+  if (!products?.length) return null;
   return (
     <div className="w-[47%] float-left box-container">
       <div className="content">
@@ -21,12 +33,9 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
         </p>
       </div>
       <div className="flex w-full">
-        <div className="images">
-          <img
-            src="https://file.hstatic.net/200000581855/file/1_5d0aee5d42d245f395b3bfbc9d46e9f3.png"
-            alt=""
-          />
-        </div>
+         <div className="images">
+      <img src={randomImage} alt="Ảnh ngẫu nhiên" />
+    </div>
         <div className="slider-wrapper w-full">
           <Swiper
             modules={[Navigation, Pagination]}
@@ -39,25 +48,26 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
           >
             {products.map((sp) => {
               const averageRating =
-                sp?.reviews?.length > 0
+                Array.isArray(sp.product_reviews) && sp.product_reviews.length > 0
                   ? Math.round(
-                      sp.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-                        sp.reviews.length
+                      sp.product_reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+                        sp.product_reviews.length
                     )
                   : 0;
               const discountPercent = Math.round(
                 ((sp.price - sp.sale_price) / sp.price) * 100
               );
-              const sold = sp.variants?.reduce(
-                (sum, v) => sum + v.stock_quantity,
-                0
-              );
+              const sold = Array.isArray(sp.product_variants)
+                ? sp.product_variants.reduce((sum, v) => sum + v.stock_quantity, 0)
+                : 0;
 
-              const uniqueColors = [
-                ...new Map(
-                  sp.variants.map((v) => [v.color.id, v.color])
-                ).values(),
-              ];
+              const uniqueColors = Array.isArray(sp.product_variants)
+                ? [
+                    ...new Map(
+                      sp.product_variants.map((v) => [v.color.id, v.color])
+                    ).values(),
+                  ]
+                : [];
 
               return (
                 <SwiperSlide key={sp.products_id}>
