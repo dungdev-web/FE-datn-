@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
+import { Label } from "@mui/icons-material";
 
 interface Props {
   categories: ICategory[];
@@ -11,6 +12,9 @@ interface Props {
   brandsList: IBrand[];
   selectedBrandIds: number[];
   handleBrandCheckboxChange: (brandId: number) => void;
+
+  selectedGender: string | null;
+  handleGenderChange: (gender: string) => void;
 }
 
 export default function SidebarFilter({
@@ -20,6 +24,8 @@ export default function SidebarFilter({
   brandsList,
   selectedBrandIds,
   handleBrandCheckboxChange,
+  selectedGender,
+  handleGenderChange,
 }: Props) {
   return (
     <div className="col-lg-3 col-test">
@@ -122,29 +128,43 @@ export default function SidebarFilter({
             </div>
           </aside>
 
-          {/* Lọc theo loại */}
-          <aside className="aside-item filter-type">
-            <div className="module-title">
-              <h2 className="title-head margin-top-0">
-                <span>Loại</span>
-              </h2>
-            </div>
-            <div className="aside-content filter-group">
-              <ul>
-                {["Giày Nam", "Giày Nữ"].map((type) => (
-                  <li key={type} className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input type="checkbox" value={type} />
-                        <i className="fa"></i>
-                        {type}
-                      </label>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+         {/* Lọc theo loại */}
+<aside className="aside-item filter-type">
+  <div className="module-title">
+    <h2 className="title-head margin-top-0">
+      <span>Loại</span>
+    </h2>
+  </div>
+  <div className="aside-content filter-group">
+    <ul>
+      {[
+        { label: "Giày Nam", value: "nam" },
+        { label: "Giày Nữ", value: "nu" },
+       
+      ].map((type) => (
+        <li
+          key={type.value}
+          className="filter-item filter-item--check-box filter-item--green"
+        >
+          <span>
+            <label>
+              <input
+                type="radio"
+                name="gender"
+                value={type.value}
+                checked={selectedGender === type.value}
+                onChange={() => handleGenderChange(type.value)}
+              />
+              <i className="fa"></i>
+              {type.label}
+            </label>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</aside>
+
 
           {/* Lọc theo thương hiệu */}
           <aside className="aside-item filter-vendor">

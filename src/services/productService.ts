@@ -437,3 +437,16 @@ export async function deleteProduct(id: number): Promise<void> {
     throw new Error("Không thể xoá sản phẩm.");
   }
 }
+
+export const getProductsByGender = async (gender: string): Promise<IProduct[]> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product?gender=${gender}`);
+    if (!res.ok) throw new Error("Lỗi khi lấy danh sách sản phẩm theo giới tính");
+    
+    const data = await res.json();
+    return data.products as IProduct[];
+  } catch (error) {
+    console.error("Lỗi getProductsByGender:", error);
+    return [];
+  }
+};

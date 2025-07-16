@@ -12,8 +12,11 @@ interface Props {
   brandsList: IBrand[];
   selectedBrandIds: number[];
   handleBrandCheckboxChange: (brandId: number) => void;
-}
 
+  // Thêm dòng này
+  selectedGender: string | null;
+  handleGenderChange: (gender: string) => void;
+}
 export default function MobileSidebarFilter({
   isActive,
   categories,
@@ -22,6 +25,8 @@ export default function MobileSidebarFilter({
   brandsList,
   selectedBrandIds,
   handleBrandCheckboxChange,
+  selectedGender,
+  handleGenderChange,
 }: Props) {
   return (
     <div id="filter-sidebar" className={isActive ? "active" : ""}>
@@ -103,13 +108,28 @@ export default function MobileSidebarFilter({
               <ul>
                 {[
                   { label: "Giá dưới 100.000đ", value: "(<100000)" },
-                  { label: "100.000đ - 200.000đ", value: "(>=100000 AND <200000)" },
-                  { label: "200.000đ - 300.000đ", value: "(>=200000 AND <300000)" },
-                  { label: "300.000đ - 500.000đ", value: "(>=300000 AND <500000)" },
-                  { label: "500.000đ - 1.000.000đ", value: "(>500000 AND <1000000)" },
+                  {
+                    label: "100.000đ - 200.000đ",
+                    value: "(>=100000 AND <200000)",
+                  },
+                  {
+                    label: "200.000đ - 300.000đ",
+                    value: "(>=200000 AND <300000)",
+                  },
+                  {
+                    label: "300.000đ - 500.000đ",
+                    value: "(>=300000 AND <500000)",
+                  },
+                  {
+                    label: "500.000đ - 1.000.000đ",
+                    value: "(>500000 AND <1000000)",
+                  },
                   { label: "Giá trên 1.000.000đ", value: "(>1000000)" },
                 ].map((price, index) => (
-                  <li key={index} className="filter-item filter-item--check-box filter-item--green">
+                  <li
+                    key={index}
+                    className="filter-item filter-item--check-box filter-item--green"
+                  >
                     <span>
                       <label>
                         <input type="checkbox" value={price.value} />
@@ -122,7 +142,6 @@ export default function MobileSidebarFilter({
               </ul>
             </div>
           </aside>
-
           {/* Loại */}
           <aside className="aside-item filter-type">
             <div className="module-title">
@@ -132,13 +151,25 @@ export default function MobileSidebarFilter({
             </div>
             <div className="aside-content filter-group">
               <ul>
-                {["Giày Nam", "Giày Nữ"].map((type) => (
-                  <li key={type} className="filter-item filter-item--check-box filter-item--green">
+                {[
+                  { label: "Giày Nam", value: "nam" },
+                  { label: "Giày Nữ", value: "nu" },
+                ].map((type) => (
+                  <li
+                    key={type.value}
+                    className="filter-item filter-item--check-box filter-item--green"
+                  >
                     <span>
                       <label>
-                        <input type="checkbox" value={type} />
+                        <input
+                          type="radio"
+                          name="gender"
+                          value={type.value}
+                          checked={selectedGender === type.value}
+                          onChange={() => handleGenderChange(type.value)}
+                        />
                         <i className="fa"></i>
-                        {type}
+                        {type.label}
                       </label>
                     </span>
                   </li>
@@ -157,14 +188,19 @@ export default function MobileSidebarFilter({
             <div className="aside-content filter-group aside_vendor block md:hidden">
               <ul>
                 {brandsList.map((brand) => (
-                  <li key={brand.brand_id} className="filter-item filter-item--check-box filter-item--green">
+                  <li
+                    key={brand.brand_id}
+                    className="filter-item filter-item--check-box filter-item--green"
+                  >
                     <span>
                       <label className="label_relative">
                         <input
                           type="checkbox"
                           id={`filter-${brand.brand_id}`}
                           checked={selectedBrandIds.includes(brand.brand_id)}
-                          onChange={() => handleBrandCheckboxChange(brand.brand_id)}
+                          onChange={() =>
+                            handleBrandCheckboxChange(brand.brand_id)
+                          }
                           className="mr-2"
                         />
                         <i className="fa"></i>
