@@ -8,12 +8,12 @@ import { useState, useEffect } from "react";
 import { checkToken } from "@/services/authService";
 import { changePasswordService } from "@/services/userService";
 import { toast, ToastContainer } from "react-toastify";
+import { useChangePasswordForm } from "@/hooks/usePasswordValidation";
 
 export default function Change_pass() {
   const [user, setUser] = useState<IUser | null>(null);
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { form, errors, handleChange, validateAll, resetForm } =
+    useChangePasswordForm();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -32,27 +32,21 @@ export default function Change_pass() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      toast.error("Vui lòng điền đầy đủ thông tin.");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      toast.error("Mật khẩu mới và xác nhận không khớp.");
+    const isValid = validateAll();
+    if (!isValid) {
+      toast.error("Vui lòng kiểm tra lại thông tin.");
       return;
     }
 
     try {
       await changePasswordService({
         userId: user?.id || "",
-        oldPassword,
-        newPassword,
+        oldPassword: form.oldPassword,
+        newPassword: form.newPassword,
       });
 
       toast.success("Đổi mật khẩu thành công!");
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      resetForm();
     } catch (err: any) {
       toast.error(err.message || "Lỗi đổi mật khẩu.");
     }
@@ -75,14 +69,22 @@ export default function Change_pass() {
           </div>
           <ul className="breadcrumb">
             <li className="home">
-              <Link href={"/"}><span>Trang chủ</span></Link>
+              <Link href={"/"}>
+                <span>Trang chủ</span>
+              </Link>
               <i className="fa fa-angle-right" aria-hidden="true"></i>
             </li>
             <li className="home">
-              <Link href={"/account"}><span>Tài khoản</span></Link>
+              <Link href={"/account"}>
+                <span>Tài khoản</span>
+              </Link>
               <i className="fa fa-angle-right" aria-hidden="true"></i>
             </li>
-            <li><strong><span>Đổi mật khẩu</span></strong></li>
+            <li>
+              <strong>
+                <span>Đổi mật khẩu</span>
+              </strong>
+            </li>
           </ul>
         </div>
       </section>
@@ -105,36 +107,82 @@ export default function Change_pass() {
                       </p>
                       <div className="form-signup clearfix">
                         <fieldset className="form-group">
-                          <label>Mật khẩu cũ <span className="error">*</span></label>
+                          <label>
+                            Mật khẩu cũ <span className="error">*</span>
+                          </label>
                           <input
                             type="password"
-                            className="form-control form-control-lg"
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
+                            name="oldPassword"
+                            value={form.oldPassword}
+                            onChange={handleChange}
+                            className={`form-control outline-none form-control-lg ${
+                              errors.oldPassword
+                                ? "border !border-red-500"
+                                : form.oldPassword
+                                ? "border !border-green-500"
+                                : ""
+                            }`}
                           />
+                          {errors.oldPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.oldPassword}
+                            </p>
+                          )}
                         </fieldset>
 
                         <fieldset className="form-group">
-                          <label>Mật khẩu mới <span className="error">*</span></label>
+                          <label>
+                            Mật khẩu mới <span className="error">*</span>
+                          </label>
                           <input
                             type="password"
-                            className="form-control form-control-lg"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
+                            name="newPassword"
+                            value={form.newPassword}
+                            onChange={handleChange}
+                            className={`form-control outline-none form-control-lg ${
+                              errors.newPassword
+                                ? "border !border-red-500"
+                                : form.newPassword
+                                ? "border !border-green-500"
+                                : ""
+                            }`}
                           />
+                          {errors.newPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.newPassword}
+                            </p>
+                          )}
                         </fieldset>
 
                         <fieldset className="form-group">
-                          <label>Xác nhận lại mật khẩu <span className="error">*</span></label>
+                          <label>
+                            Xác nhận lại mật khẩu{" "}
+                            <span className="error">*</span>
+                          </label>
                           <input
                             type="password"
-                            className="form-control form-control-lg"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            name="confirmPassword"
+                            value={form.confirmPassword}
+                            onChange={handleChange}
+                            className={`form-control outline-none form-control-lg ${
+                              errors.confirmPassword
+                                ? "border !border-red-500"
+                                : form.confirmPassword
+                                ? "border !border-green-500"
+                                : ""
+                            }`}
                           />
+                          {errors.confirmPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.confirmPassword}
+                            </p>
+                          )}
                         </fieldset>
 
-                        <button type="submit" className="button btn-edit-addr btn btn-primary btn-more">
+                        <button
+                          type="submit"
+                          className="button btn-edit-addr btn btn-primary btn-more"
+                        >
                           <i className="hoverButton"></i>Đặt lại mật khẩu
                         </button>
                       </div>
