@@ -464,13 +464,13 @@ export default function Home({ product }: { product: IProduct }) {
                   : 0;
 
               const uniqueColors = [
-                ...new Map(
-                  (product.product_variants || []).map((v) => [
-                    v.color.id,
-                    v.color,
-                  ])
-                ).values(),
-              ];
+  ...new Map(
+    (product.product_variants || [])
+      .filter((v) => v.color && v.color.id) // tránh undefined/null
+      .map((v) => [v.color.id, v.color])
+  ).values(),
+];
+
 
               return (
                 <div className="hot-product-card" key={product.products_id}>
