@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct } from "@/types/product";
+import { IProduct,IReview } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 type ProductIdentifier = { id: number } | { slug: string };
 
@@ -20,7 +20,7 @@ export async function getAllProducts(
   }
 
   const res = await fetch(
-    `${API_BASE_URL}/product/products?page=${page}&limit=${limit}`
+    `${API_BASE_URL}/product?page=${page}&limit=${limit}`
   );
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm từ server.");
@@ -53,9 +53,9 @@ export const getProductDetail = async (
     let url = "";
     
     if ("id" in identifier && identifier.id) {
-      url = `${API_BASE_URL}/product/products/${identifier.id}`;
+      url = `${API_BASE_URL}/product/detail/${identifier.id}`;
     } else if ("slug" in identifier && identifier.slug) {
-      url = `${API_BASE_URL}/product/products/slug/${identifier.slug}`;
+      url = `${API_BASE_URL}/product/detail/slug?slug=${identifier.slug}`;
     } else {
       throw new Error("Thiếu id hoặc slug");
     }
@@ -124,7 +124,7 @@ export async function getBestSellingMockProducts(top = 5): Promise<IProduct[]> {
     // Giả lập sold_count từ số lượng review hoặc random
     const productsWithSold = products.map((p) => ({
       ...p,
-      sold_count: (p.reviews?.length || 0) * 10 + Math.floor(Math.random() * 20),
+      sold_count: (p.product_reviews?.length || 0) * 10 + Math.floor(Math.random() * 20),
     }));
 
     // Sắp xếp và lấy top sản phẩm bán chạy nhất
@@ -134,7 +134,7 @@ export async function getBestSellingMockProducts(top = 5): Promise<IProduct[]> {
   }
 
   // Nếu không mock → gọi API thực
-  const res = await fetch(`${API_BASE_URL}/product/products/best-selling?page=1&limit=${top}`);
+  const res = await fetch(`${API_BASE_URL}/product/best-selling?page=1&limit=${top}`);
 
   if (!res.ok) {
     throw new Error("Không thể lấy sản phẩm bán chạy.");
@@ -154,7 +154,7 @@ export async function getProductBySlug(
   }
 
   // Nếu sau này dùng API thật, có thể sửa endpoint như sau:
-  const res = await fetch(`${API_BASE_URL}/products/slug/${slug}`);
+  const res = await fetch(`${API_BASE_URL}/product/slug/${slug}`);
   if (!res.ok) {
     throw new Error("Không thể lấy sản phẩm theo slug.");
   }
@@ -169,7 +169,7 @@ export async function getNewestProducts(): Promise<IProduct[]> {
   }
 
   const res = await fetch(
-    `${API_BASE_URL}/product/products/newest?page=1&limit=20`
+    `${API_BASE_URL}/product/newest?page=1&limit=20`
   );
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm mới nhất.");
@@ -187,7 +187,7 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
     const all = getMockProducts();
 
     return all.filter((product) => {
-      const reviews = product.reviews || [];
+      const reviews = product.product_reviews || [];
       if (reviews.length < 1) return false;
 
       const avgRating =
@@ -199,7 +199,7 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
   }
 
   const res = await fetch(
-    `${API_BASE_URL}/product/products/featured?page=1&limit=20`
+    `${API_BASE_URL}/product/featured?page=1&limit=20`
   );
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm nổi bật.");
@@ -285,7 +285,7 @@ export async function getProductsByCategory(
   }
 
   const res = await fetch(
-    `${API_BASE_URL}/product/products/category?category=${encodeURIComponent(
+    `${API_BASE_URL}/product/category?category=${encodeURIComponent(
       categoryName
     )}&page=1&limit=20`
   );
@@ -318,7 +318,7 @@ export async function getDealProducts(): Promise<IProduct[]> {
   }
 
   const res = await fetch(
-    `${API_BASE_URL}/product/products/deals?page=1&limit=20`
+    `${API_BASE_URL}/product/deals?page=1&limit=20`
   );
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm khuyến mãi.");
@@ -343,13 +343,36 @@ export async function getRelatedProducts(
     return all.filter((p) => p.category.categories_id === categoryId);
   }
 
-  const res = await fetch(`${API_BASE_URL}/products?category=${categoryId}`);
+  const res = await fetch(`${API_BASE_URL}/product/related/${categoryId}?page=1&limit=8`);
   if (!res.ok) {
     throw new Error("Không thể lấy sản phẩm cùng loại.");
   }
 
-  const data: IProduct[] = await res.json();
-  return data;
+  const data = await res.json();
+  const related = data.relatedProducts;
+
+  return Array.isArray(related) ? related : [];
+}
+// lấy tất cả review theo product
+export async function getReviewProduct(productId: number): Promise<IReview[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể lấy review sản phẩm.");
+    }
+
+    const data: IReview[] = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Lỗi khi lấy đánh giá sản phẩm:", error);
+    return [];
+  }
 }
 
 // Thêm sản phẩm mới
@@ -433,4 +456,17 @@ export async function deleteProduct(id: number): Promise<void> {
   if (!res.ok) {
     throw new Error("Không thể xoá sản phẩm.");
   }
+}
+//search
+export async function searchProducts(keyword: string, page = 1, limit = 12) {
+  const res = await fetch(`${API_BASE_URL}/product/search?q=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`);
+  if (!res.ok) throw new Error("Lỗi khi tìm kiếm sản phẩm");
+  return await res.json();
+}
+//review
+export async function reviewProduct(productId:number) {
+  const res = await fetch( `${API_BASE_URL}/product/reviews/${productId}`);
+  if(!res.ok) throw new Error("Lỗi lấy review ");
+  return await res.json();
+  
 }

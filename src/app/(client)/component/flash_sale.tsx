@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import productSale from "../component/product_sale";
 import ProductSale from "../component/product_sale";
 
 export default function SalePage() {

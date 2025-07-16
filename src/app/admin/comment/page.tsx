@@ -1,8 +1,11 @@
 "use client";
 import "../css/comment_admin.css";
 import Link from "next/link";
-
+import { useState } from "react";
 export default function CommentPage() {
+    const [isSearching, setIsSearching] = useState(false);
+  const [searchText, setSearchText] = useState("");
+
   return (
       <div className="review-container">
         <h2>Quản lý bình luận sản phẩm</h2>
@@ -11,9 +14,28 @@ export default function CommentPage() {
           <button className="btn btn-refresh">
             <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
-          <button className="btn btn-search">
-            <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-          </button>
+         <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+              {isSearching ? (
+                <input
+                  type="text"
+                  className="search-input"
+                  autoFocus
+                  placeholder="Nhập từ khóa..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  onBlur={() => {
+                    if (searchText === "") setIsSearching(false);
+                  }}
+                />
+              ) : (
+                <button
+                  className="btn btn-search"
+                  onClick={() => setIsSearching(true)}
+                >
+                  <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+                </button>
+              )}
+            </div>
           <button className="btn btn-export">
             <i className="fa-solid fa-file-export"></i> Xuất Excel
           </button>

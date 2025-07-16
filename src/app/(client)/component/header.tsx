@@ -3,11 +3,16 @@ import React, { useEffect, useState, useRef } from "react";
 import Search from "./showsearch";
 import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
-import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
+import { useRouter } from "next/navigation";
 import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { ICategory } from "@/types/ICategory";
+import { IBrand } from "@/types/IBrand";
+import { getCategories } from "@/services/categoryService";
+import { getBrands } from "@/services/brandService";
+import { searchProducts } from "@/services/productService";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -21,10 +26,31 @@ export default function Header() {
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
   const { user } = useAuthUser();
   let hideTimeout = null;
+  const [keyword, setKeyword] = useState("");
+  const router = useRouter();
+
+  const handleSearch = () => {
+  if (!keyword.trim()) return;
+  router.push(`/product?q=${encodeURIComponent(keyword)}`);
+};
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
+  useEffect(() => {
+    getBrands().then(setBrands);
+  }, []);
   useEffect(() => {
     const cartIcon = cartIconRef.current;
     const cartPopup = cartPopupRef.current;
@@ -154,7 +180,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -243,21 +268,29 @@ export default function Header() {
                 >
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
-                      <h4>SẢN PHẨM MỚI NHẤT</h4>
-                      <a href="#">Giày chạy bộ</a>
-                      <a href="#">Giày Nike</a>
-                      <a href="#">Giày Adidas</a>
-                      <a href="#">Giày thể thao</a>
+                      <h4>DANH MỤC MỚI NHẤT</h4>
+                      {categories.map((cat) => (
+                        <a
+                          key={cat.categories_id}
+                          href={`/category/${cat.slug}`}
+                        >
+                          {cat.name}
+                        </a>
+                      ))}
                     </div>
+
                     <div className="mega-column">
-                      <h4>SẢN PHẨM NỔI BẬT</h4>
-                      <a href="#">Giày cho nam</a>
-                      <a href="#">Giày cho nữ</a>
-                    </div>
-                    <div className="mega-column">
-                      <h4>SẢN PHẨM BÁN CHẠY</h4>
-                      <a href="#">Giày Puma</a>
-                      <a href="#">Nike Air</a>
+                      <h4>NHÃN HIỆU MỚI NHẤT</h4>
+                      <div className="mega-brands">
+                        {brands.map((brand) => (
+                          <a
+                            key={brand.brand_id}
+                            href={`/brand/${brand.brand_id}`}
+                          >
+                            {brand.name}
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -283,8 +316,14 @@ export default function Header() {
                 type="text"
                 placeholder="Tìm kiếm sản phẩm"
                 className="input-search-nav !text-black"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={handleKeyPress}
               />
-              <i className="fa-solid fa-magnifying-glass"></i>
+              <i
+                className="fa-solid fa-magnifying-glass"
+                onClick={handleSearch}
+              ></i>
             </div>
           </div>
         </nav>

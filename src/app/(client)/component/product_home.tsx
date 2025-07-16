@@ -14,16 +14,24 @@ export default function Show1sanpham() {
   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);
 
   useEffect(() => {
-    const fetchDeals = async () => {
-      try {
-        const data = await getDealProducts();
+  const fetchDeals = async () => {
+    try {
+      const data = await getDealProducts();
+
+      if (Array.isArray(data)) {
         setDealProducts(data);
-      } catch (error) {
-        console.error("Không thể tải sản phẩm đang deal:", error);
+      } else {
+        console.error("❌ Dữ liệu trả về không đúng định dạng:", data);
+        setDealProducts([]); 
       }
-    };
-    fetchDeals();
-  }, []);
+    } catch (error) {
+      console.error("Không thể tải sản phẩm đang deal:", error);
+      setDealProducts([]); 
+    }
+  };
+  fetchDeals();
+}, []);
+
 
   return (
     <Swiper
@@ -40,11 +48,13 @@ export default function Show1sanpham() {
       }}
       className="product-slider-track"
     >
-      {dealProducts.map((product) => (
-        <SwiperSlide key={product.products_id}>
-          <ProductCardSlider product={product} />
-        </SwiperSlide>
-      ))}
+     {Array.isArray(dealProducts) &&
+  dealProducts.map((product) => (
+    <SwiperSlide key={product.products_id}>
+      <ProductCardSlider product={product} />
+    </SwiperSlide>
+))}
+
     </Swiper>
   );
 }
