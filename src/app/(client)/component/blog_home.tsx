@@ -14,8 +14,8 @@ export default function BlogHome() {
   useEffect(() => {
     const fetchDataBlog = async () => {
       try {
-        const data = await getPost();
-        setBlog(data);
+        const { posts } = await getPost(1);
+        setBlog(posts);
       } catch (err) {
         console.error("Lỗi khi lấy bài viết blog:", err);
       }
@@ -33,16 +33,13 @@ export default function BlogHome() {
         0: { slidesPerView: 2 },
         576: { slidesPerView: 3 },
         768: { slidesPerView: 3 },
-        992: { slidesPerView: 4 }
+        992: { slidesPerView: 4 },
       }}
     >
       {blog.map((item) => (
         <SwiperSlide key={item.post_id}>
           <div className="blog-item">
-            <img
-              src={`/images/blog/${item.images}`}
-              alt={item.title}
-            />
+            <img src={`/images/blog/${item.images}`} alt={item.title} />
             <div className="blog-info">
               <p className="blog-date">
                 {new Date(item.created_at).toLocaleDateString("vi-VN")}
@@ -50,9 +47,7 @@ export default function BlogHome() {
               <p className="blog-author">{item.author?.name || "Admin"}</p>
             </div>
             <h3 className="blog-title">{item.title}</h3>
-            <p className="blog-desc">
-              {item.content?.slice(0, 120)}...
-            </p>
+            <p className="blog-desc">{item.content?.slice(0, 120)}...</p>
           </div>
         </SwiperSlide>
       ))}

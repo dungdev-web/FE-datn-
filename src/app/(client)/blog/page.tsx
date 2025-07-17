@@ -1,10 +1,40 @@
 "use client";
 import "../css/blog.css";
+import "../css/pagination.css";
 import "../css/product.css";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import { IBlog } from "@/types/blog";
+import { getPost } from "@/services/blogService";
 export default function Blog() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [post, setPost] = useState<IBlog[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    const fetchDataBlog = async () => {
+      try {
+        const { posts, totalPages } = await getPost(page);
+        setPost(posts);
+        setTotalPages(totalPages);
+        setHasNext(page < totalPages);
+      } catch (err) {
+        console.error("Lỗi khi lấy bài viết blog:", err);
+        setPost([]);
+      }
+    };
+    fetchDataBlog();
+  }, [page]);
+  const handleNext = () => {
+    if (hasNext) setPage((prev) => prev + 1);
+  };
+
+  const handlePrev = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+  const handlePageChange = (pageNumber: number) => {
+    setPage(pageNumber);
+  };
   return (
     <>
       <section
@@ -46,7 +76,7 @@ export default function Blog() {
         ☰ Danh mục & Liên quan
       </button>
 
-      <main>
+      <main className="main_blog">
         <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`}>
           <button
             className="close-sidebar-btn"
@@ -137,98 +167,55 @@ export default function Blog() {
         </aside>
         <article>
           <div className="list-blog">
-            <div className="box-blog">
-              <img src="/images/blog/layer-1.webp" alt="" />
-              <div>
-                <h2>TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023</h2>
-                <p>
-                  <span>Nguyễn Hữu Mạnh -</span> 18/12/2023 - <span>0</span>{" "}
-                  bình luận
-                </p>
-                <p>
-                  {" "}
-                  Nike Dunk Low - một trong những dòng giày nổi tiếng và lâu đời
-                  của thương hiệu giày Nike, gây ấn tượng bởi phong cách thiết
-                  kế đơn giản, cổ điển đặc trưng nhưng vẫn mang một màu sắc
-                  đường phố hiện đại. Giày Nike Dunk vẫn luôn được săn đón khắp
-                  nơi bởi các tín đồ yêu thích giày sneakers và các tín đồ thời
-                  trang khắp thế giới. Tín...
-                </p>
+            {post.map((item) => (
+              <div className="box-blog" key={item.post_id}>
+                <img src={`/images/blog/${item.images}`} alt={item.title} />
+                <div>
+                  <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
+                  <p>
+                    <span>{item.author.name} -</span>{" "}
+                    {new Date(item.created_at).toLocaleDateString("vi-VN")}-{" "}
+                    <span>0</span> bình luận
+                  </p>
+                  <p>
+                    {" "}
+                    {item.content.length > 100
+                      ? item.content.slice(0, 500) + "..."
+                      : item.content}
+                  </p>
+                </div>
               </div>
-            </div>
+            ))}
+            <div className="flex justify-center items-center gap-2.5">
+              <button
+                onClick={handlePrev}
+                disabled={page === 1}
+                className=" bg-gray-300 disabled:opacity-50 page-btn"
+              >
+                <i className="fa-solid fa-chevron-left"></i>
+              </button>
 
-            <div className="box-blog">
-              <img src="/images/blog/layer-2.webp" alt="" />
-              <div>
-                <h2>ADIDAS CHO TRÌNH LÀNG MẪU GIÀY SUPERNOVA ĐẲNG CẤP MỚI</h2>
-                <p>
-                  <span>Nguyễn Hữu Mạnh -</span> 18/12/2023 - <span>0</span>{" "}
-                  bình luận
-                </p>
-                <p>
-                  SSau dịch bệnh covid -19 khiến mọi người bị cấm cửa và không
-                  được ra ngoài thời gian dài thì nhu cầu tập thể dục được khá
-                  nhiều người quan tâm. Bởi nắm bắt được xu thế hiện nay nên
-                  adidas đã cho ra mắt phiên bản Supernova. Mẫu giày này ra đời
-                  nhằm khuyến khích mọi người hoạt động nhiều hơn cũng như để
-                  chào đón một cuộc sống bình thường mới Quá trình h...
-                </p>
+              <div className="pagination !m-0 ">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={` border  page-btn   ${
+                      page === i + 1 ? "active" : ""
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
               </div>
-            </div>
 
-            <div className="box-blog">
-              <img src="/images/blog/layer-3.webp" alt="" />
-              <div>
-                <h2>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</h2>
-                <p>
-                  <span>Nguyễn Hữu Mạnh -</span> 18/12/2023 - <span>0</span>{" "}
-                  bình luận
-                </p>
-                <p>
-                  Giày là một món đồ không thể thiếu đối với tất cả mọi người
-                  (đặc biệt là giới trẻ hiện nay). Mọi người thường đi giày cho
-                  những ngày phải vận động nhiều và để dễ di chuyển hơn. Hay đơn
-                  giản là để thể hiện cá tính của bản thân.Vậy nên vệ sinh giày
-                  cho sạch cũng là vấn đề được khá nhiều người đi cũng như yêu
-                  giày quan tâm. Bài viết này sẽ chia sẻ một số&nbs...
-                </p>
-              </div>
-            </div>
-            <div className="box-blog">
-              <img src="/images/blog/layer-4.webp" alt="" />
-              <div>
-                <h2>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</h2>
-                <p>
-                  <span>Nguyễn Hữu Mạnh -</span> 18/12/2023 - <span>0</span>{" "}
-                  bình luận
-                </p>
-                <p>
-                  Thời tiết không ổn định có thể khiến đôi giày Adidas
-                  UltraBoost của bạn gặp phải tình trạng bám bẩn, ố vàng và hơn
-                  thế nữa, rất khó vệ sinh và bảo dưỡng. Tất nhiên, không ai
-                  trong chúng ta muốn tình huống này xảy ra với mình khi ra
-                  đường. Vì vậy, hãy nhanh chóng khôi phục vẻ đẹp cho đôi giày
-                  của bạn bằng cách tham khảo nội dung dưới đây. Nên bi...
-                </p>
-              </div>
-            </div>
-            <div className="box-blog">
-              <img src="/images/blog/layer-1.webp" alt="" />
-              <div>
-                <h2>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</h2>
-                <p>
-                  <span>Nguyễn Hữu Mạnh -</span> 18/12/2023 - <span>0</span>{" "}
-                  bình luận
-                </p>
-                <p>
-                  Thời tiết không ổn định có thể khiến đôi giày Adidas
-                  UltraBoost của bạn gặp phải tình trạng bám bẩn, ố vàng và hơn
-                  thế nữa, rất khó vệ sinh và bảo dưỡng. Tất nhiên, không ai
-                  trong chúng ta muốn tình huống này xảy ra với mình khi ra
-                  đường. Vì vậy, hãy nhanh chóng khôi phục vẻ đẹp cho đôi giày
-                  của bạn bằng cách tham khảo nội dung dưới đây. Nên bi...
-                </p>
-              </div>
+              <button
+                onClick={handleNext}
+                disabled={!hasNext}
+                className="px-4 py-2 rounded bg-blue-500 text-white disabled:opacity-50 page-btn"
+              >
+                <i className="fa-solid fa-chevron-right"></i>
+              </button>
             </div>
           </div>
         </article>

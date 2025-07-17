@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct,IReview } from "@/types/product";
+import { IProduct,IReview,IReviewPayload } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 type ProductIdentifier = { id: number } | { slug: string };
 
@@ -469,4 +469,24 @@ export async function reviewProduct(productId:number) {
   if(!res.ok) throw new Error("Lỗi lấy review ");
   return await res.json();
   
+}
+// add reviews
+export async function addReviewProduct(productId: number, payload: IReviewPayload) {
+  const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 409) {
+    throw new Error("Bạn đã đánh giá sản phẩm này rồi.");
+  }
+
+  if (!res.ok) {
+    throw new Error("Lỗi khi gửi đánh giá.");
+  }
+
+  return await res.json(); 
 }

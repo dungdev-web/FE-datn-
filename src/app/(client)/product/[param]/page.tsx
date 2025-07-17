@@ -1,6 +1,6 @@
 "use client";
 import "../../css/detail.css";
-import { IProduct, IReview } from "@/types/product";
+import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { ICartItem } from "@/types/cart";
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
@@ -8,15 +8,16 @@ import {
   getProductDetail,
   getBestSellingMockProducts,
   getReviewProduct,
+  addReviewProduct,
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 export default function Detail() {
-  const router = useRouter(); 
+  const router = useRouter();
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
@@ -31,6 +32,9 @@ export default function Detail() {
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [countdown, setCountdown] = useState("");
   const [views, setReviews] = useState<IReview[]>([]);
+  const [rating, setRating] = useState<number>(0);
+  const [content, setContent] = useState<string>("");
+
   const handleAddToCart = async () => {
     if (!selectedColorId) {
       Swal.fire({
@@ -60,19 +64,19 @@ export default function Detail() {
     setLoading(true);
     try {
       const tokenData = await checkToken();
- if (!tokenData?.user?.id) {
-      Swal.fire({
-        icon: "warning",
-        title: "Bạn chưa đăng nhập",
-        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
-        confirmButtonText: "Đăng nhập",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push("/login");
-        }
-      });
-      return;
-    }
+      if (!tokenData?.user?.id) {
+        Swal.fire({
+          icon: "warning",
+          title: "Bạn chưa đăng nhập",
+          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+          confirmButtonText: "Đăng nhập",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push("/login");
+          }
+        });
+        return;
+      }
       await addToMockCart(tokenData.user.id, variantId, quantity, price);
       console.log(variantId);
       console.log(quantity);
@@ -143,6 +147,7 @@ export default function Detail() {
 
     fetchData();
   }, [product?.products_id]);
+
   useEffect(() => {
     if (
       product &&
@@ -224,6 +229,40 @@ export default function Detail() {
       });
     });
   };
+  const handleSubmitReview = async () => {
+    const tokenData = await checkToken();
+    if (!tokenData?.user?.id) {
+      Swal.fire({
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        text: "Vui lòng đăng nhập để gửi đánh giá.",
+        confirmButtonText: "Đăng nhập",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
+      });
+      return;
+    }
+
+    try {
+      const userId = tokenData.user.id;
+      if (!product || !product.products_id) return;
+
+      const data = await addReviewProduct(product.products_id, {
+        user_id: userId,
+        rating,
+        content,
+      });
+
+      Swal.fire("Thành công!", "Bạn đã đánh giá sản phẩm.", "success");
+      setReviews((prev) => [...prev, data]); // nếu muốn cập nhật ngay
+    } catch (error: any) {
+      Swal.fire("Lỗi", error.message, "error");
+      console.error("Lỗi khi gửi đánh giá:", error);
+    }
+  };
+
   const totalReviews = Array.isArray(product?.product_reviews)
     ? product.product_reviews.length
     : 0;
@@ -693,7 +732,7 @@ export default function Detail() {
                                     <img
                                       className="!w-[35px] rounded-[50%]"
                                       src={
-                                        review.user.avatar ||
+                                        review.user?.avatar ||
                                         "/images/default.png"
                                       }
                                       alt=""
@@ -739,10 +778,12 @@ export default function Detail() {
                                   <button
                                     key={star}
                                     type="button"
-                                    className="text-yellow-400 text-xl hover:scale-110 transition-transform"
-                                    onClick={() =>
-                                      console.log(`Chọn sao: ${star}`)
-                                    }
+                                    className={`text-xl hover:scale-110 transition-transform ${
+                                      star <= rating
+                                        ? "text-yellow-400"
+                                        : "text-gray-300"
+                                    }`}
+                                    onClick={() => setRating(star)}
                                   >
                                     ★
                                   </button>
@@ -756,12 +797,17 @@ export default function Detail() {
                               </label>
                               <textarea
                                 placeholder="Nhận xét của bạn..."
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
                                 rows={4}
                                 className="!w-full border border-gray-300 rounded !px-3 !py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 !mb-[15px]"
                               ></textarea>
                             </div>
 
-                            <button className="!px-4 !py-2 bg-[#03177e] cursor-pointer text-white rounded hover:bg-blue-700 transition">
+                            <button
+                              onClick={handleSubmitReview}
+                              className="!px-4 !py-2 bg-[#03177e] cursor-pointer text-white rounded hover:bg-blue-700 transition"
+                            >
                               Gửi đánh giá
                             </button>
                           </div>
@@ -977,7 +1023,7 @@ export default function Detail() {
                                 </span>
                               </div>
                               <a
-                                href={`/san-pham/${product.slug}`}
+                                href={`/product/${product.slug}`}
                                 title={product.name}
                               >
                                 <img
@@ -994,7 +1040,7 @@ export default function Detail() {
                             <div className="product-info-text">
                               <h3 className="product-name">
                                 <a
-                                  href={`/san-pham/${product.slug}`}
+                                  href={`/product${product.slug}`}
                                   title={product.name}
                                 >
                                   {product.name}
