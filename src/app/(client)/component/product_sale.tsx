@@ -9,10 +9,11 @@ import "swiper/css/navigation";
 import { getDealProducts } from "@/services/productService";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 export default function ProductSale() {
   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);
-
+  const { handleAddToCart } = useAddToCart();
   useEffect(() => {
     const fetchDeals = async () => {
       try {
@@ -88,7 +89,7 @@ export default function ProductSale() {
                       <i className="fa-solid fa-heart always-show"></i>
                       <div className="hover-icons">
                         <i className="fa-solid fa-eye"></i>
-                        <i className="fa-solid fa-list"></i>
+                <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
                         <i className="fa fa-exchange"></i>
                       </div>
                     </div>

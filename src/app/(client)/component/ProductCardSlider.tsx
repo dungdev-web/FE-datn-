@@ -4,13 +4,14 @@ import { addToWishlist } from "@/services/wishlistService";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { checkToken } from "@/services/authService";
 import { useState, useEffect } from "react";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const reviews = product.reviews || [];
   const variants = product.variants || [];
   const images = product.images || [];
   const [isWished, setIsWished] = useState(false);
-
+const { handleAddToCart } = useAddToCart();
   const discount =
     product.sale_price && product.price
       ? Math.round(((product.price - product.sale_price) / product.price) * 100)
@@ -70,9 +71,9 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
               }}
             ></i>
 
-            <div className="hover-icons">
+           <div className="hover-icons">
               <i className="fa-solid fa-eye"></i>
-              <i className="fa-solid fa-list"></i>
+      <i className="fa fa-shopping-bag position-relative"  onClick={handleAddToCart}></i>
               <i className="fa fa-exchange"></i>
             </div>
           </div>

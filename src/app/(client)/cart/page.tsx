@@ -226,8 +226,7 @@ export default function Cart() {
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
                   <img
-                    src={`/images/products/chaybo/${
-                      item.variant.product.images[0].url}`}
+                    src={`/images/products/chaybo/${item.variant.product.images[0].url}`}
                     alt={`Sản phẩm ${item.variant?.product?.name || ""}`}
                   />
 
@@ -246,8 +245,9 @@ export default function Cart() {
                   </div>
                 </div>
                 <div className="cart-item-price">
-                  {item.price?.toLocaleString("vi")}₫
+                  {Number(item.price?.toLocaleString("vi"))}₫
                 </div>
+
                 <div className="quantity-control">
                   <button onClick={() => handleMinus(item.cart_items_id)}>
                     -
