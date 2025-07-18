@@ -1,6 +1,7 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { IProduct } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
+import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
 type ProductIdentifier = { id: number } | { slug: string };
 
 // Lấy tất cả sản phẩm
@@ -448,5 +449,33 @@ export const getProductsByGender = async (gender: string): Promise<IProduct[]> =
   } catch (error) {
     console.error("Lỗi getProductsByGender:", error);
     return [];
+  }
+};
+
+export const getFilteredProducts = async (
+  params: FilterParams
+): Promise<ProductFilterResponse> => {
+  try {
+    const query = new URLSearchParams();
+
+    if (params.keyword) query.append("keyword", params.keyword);
+    if (params.gender) query.append("gender", params.gender);
+    if (params.brand) query.append("brand", params.brand);
+    if (params.minPrice !== undefined) query.append("minPrice", params.minPrice.toString());
+    if (params.maxPrice !== undefined) query.append("maxPrice", params.maxPrice.toString());
+    if (params.status !== undefined) query.append("status", params.status.toString());
+    if (params.limit !== undefined) query.append("limit", params.limit.toString());
+    if (params.offset !== undefined) query.append("offset", params.offset.toString());
+
+    const response = await fetch(`${API_BASE_URL}/product/filter?${query.toString()}`);
+    if (!response.ok) {
+      throw new Error("Lỗi khi gọi API lọc sản phẩm");
+    }
+
+    const data: ProductFilterResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi getFilteredProducts:", error);
+    throw error;
   }
 };

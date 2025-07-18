@@ -12,9 +12,10 @@ interface Props {
   brandsList: IBrand[];
   selectedBrandIds: number[];
   handleBrandCheckboxChange: (brandId: number) => void;
-
   selectedGender: string | null;
   handleGenderChange: (gender: string) => void;
+  selectedPriceRange: { min: number; max: number } | null;
+  handlePriceChange: (range: { min: number; max: number } | null) => void;
 }
 
 export default function SidebarFilter({
@@ -26,6 +27,8 @@ export default function SidebarFilter({
   handleBrandCheckboxChange,
   selectedGender,
   handleGenderChange,
+  selectedPriceRange,
+  handlePriceChange,
 }: Props) {
   return (
     <div className="col-lg-3 col-test">
@@ -98,35 +101,44 @@ export default function SidebarFilter({
 
         <div className="filter-container">
           {/* Lọc theo giá */}
-          <aside className="aside-item filter-price">
-            <div className="module-title">
-              <h2 className="title-head margin-top-0">
-                <span>Giá sản phẩm</span>
-              </h2>
-            </div>
-            <div className="aside-content filter-group">
-              <ul>
-                {[
-                  { label: "Giá dưới 100.000đ", value: "(<100000)" },
-                  { label: "100.000đ - 200.000đ", value: "(>=100000 AND <200000)" },
-                  { label: "200.000đ - 300.000đ", value: "(>=200000 AND <300000)" },
-                  { label: "300.000đ - 500.000đ", value: "(>=300000 AND <500000)" },
-                  { label: "500.000đ - 1.000.000đ", value: "(>500000 AND <1000000)" },
-                  { label: "Giá trên 1.000.000đ", value: "(>1000000)" },
-                ].map((price, index) => (
-                  <li key={index} className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input type="checkbox" value={price.value} />
-                        <i className="fa"></i>
-                        {price.label}
-                      </label>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
+         <aside className="aside-item filter-price">
+  <div className="module-title">
+    <h2 className="title-head margin-top-0">
+      <span>Giá sản phẩm</span>
+    </h2>
+  </div>
+  <div className="aside-content filter-group">
+    <ul>
+      {[
+        { label: "Giá dưới 100.000đ", value: { min: 0, max: 100000 } },
+        { label: "100.000đ - 200.000đ", value: { min: 100000, max: 200000 } },
+        { label: "200.000đ - 300.000đ", value: { min: 200000, max: 300000 } },
+        { label: "300.000đ - 500.000đ", value: { min: 300000, max: 500000 } },
+        { label: "500.000đ - 1.000.000đ", value: { min: 500000, max: 1000000 } },
+        { label: "Giá trên 1.000.000đ", value: { min: 1000000, max: 100000000 } },
+      ].map((price, index) => (
+        <li key={index} className="filter-item filter-item--check-box filter-item--green">
+          <span>
+            <label>
+              <input
+                type="radio"
+                name="price"
+                checked={
+                  selectedPriceRange?.min === price.value.min &&
+                  selectedPriceRange?.max === price.value.max
+                }
+                onChange={() => handlePriceChange(price.value)}
+              />
+              <i className="fa"></i>
+              {price.label}
+            </label>
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</aside>
+
 
          {/* Lọc theo loại */}
 <aside className="aside-item filter-type">
