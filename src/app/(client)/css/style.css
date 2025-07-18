@@ -217,7 +217,7 @@ header.scrolled {
   content: "0";
 }
 .icon-header .data_wishlist::after {
-  content: "0";
+  content: attr(data-count);
 }
 nav {
   background-color: #00194b;

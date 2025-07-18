@@ -14,6 +14,7 @@ import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
 import { searchProducts } from "@/services/productService";
 import { getCartByUserId } from "@/services/cartService";
+import { getWishlistByUserId } from "@/services/wishlistService";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -35,6 +36,7 @@ export default function Header() {
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -119,7 +121,20 @@ export default function Header() {
 
     fetchCartCount();
   }, [user]);
+  useEffect(() => {
+    const fetchWishlistCount = async () => {
+      if (!user?.id) return;
 
+      try {
+        const wishlist = await getWishlistByUserId(user.id);
+        setWishlistCount(wishlist.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng yêu thích:", error);
+      }
+    };
+
+    fetchWishlistCount();
+  }, [user]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -243,24 +258,30 @@ export default function Header() {
               )}
             </div>
           </div>
-          <div className="iconheart-header div data_wishlist">
+          <div
+            className="iconheart-header div data_wishlist"
+            data-count={wishlistCount}
+          >
             <Link href="/wishlist">
               <i className="fa-solid fa-heart"></i>
             </Link>
           </div>
+
           <div className="iconcompare-header div data_compare_product">
             <Link href="/compare_product">
               <i className="fa fa-exchange"></i>
             </Link>
           </div>
           <div className="cart-wrapper">
-            <div className="iconcart-header div data_cart" data-count={cartItemCount}>
+            <div
+              className="iconcart-header div data_cart"
+              data-count={cartItemCount}
+            >
               <Link href="/cart">
                 <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
               </Link>
             </div>
           </div>
-          
         </div>
       </header>
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
