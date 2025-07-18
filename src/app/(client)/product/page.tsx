@@ -16,8 +16,12 @@ import {
 } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+
 import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
+import { searchProducts } from "@/services/productService";
+import { log } from "console";
 
 export default function Product() {
   const params = useParams();
@@ -33,11 +37,14 @@ export default function Product() {
   const [isActive, setIsActive] = useState(false);
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
-
   const productsPerPage = viewMode === "grid" ? 12 : 6;
   const totalPages = Math.ceil(total / productsPerPage);
-
-  // Gọi 1 lần để lấy danh sách brand và categories
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("q") || "";
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{
+    min: number;
+    max: number;
+  } | null>(null);
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -54,7 +61,6 @@ export default function Product() {
 
     fetchInitialData();
   }, []);
-
   // Gộp toàn bộ điều kiện lọc sản phẩm vào 1 useEffect duy nhất
   useEffect(() => {
     const fetchFilteredProducts = async () => {
@@ -89,6 +95,19 @@ export default function Product() {
   }, [selectedGender, selectedBrandIds, brandId, page, viewMode]);
 
   // --- HANDLERS ---
+useEffect(() => {
+    const fetchSearch = async () => {
+      if (!keyword) return;
+      try {
+        const res = await searchProducts(keyword);
+        setProducts(res.products || []);
+        console.log(res.products);
+        
+      } catch (err) {
+        console.error("Lỗi tìm kiếm:", err);      }
+    };
+    fetchSearch();
+  }, [keyword]);
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -96,6 +115,10 @@ export default function Product() {
         : [...prev, brandId]
     );
   };
+const handlePriceChange = (range: { min: number; max: number } | null) => {
+  setSelectedPriceRange(range);
+  setPage(1);
+};
 
   const handleGenderChange = (gender: string) => {
     setSelectedGender(gender);
@@ -152,16 +175,18 @@ export default function Product() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-              <SidebarFilter
-        categories={categories}
-        openCategoryId={openCategoryId}
-        toggleCategory={toggleCategory}
-        brandsList={brandsList}
-        selectedBrandIds={selectedBrandIds}
-        handleBrandCheckboxChange={handleBrandCheckboxChange}
-        selectedGender={selectedGender}
-        handleGenderChange={setSelectedGender}
-      />
+             <SidebarFilter
+  categories={categories}
+  openCategoryId={openCategoryId}
+  toggleCategory={toggleCategory}
+  brandsList={brandsList}
+  selectedBrandIds={selectedBrandIds}
+  handleBrandCheckboxChange={handleBrandCheckboxChange}
+  selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
+  selectedPriceRange={selectedPriceRange}
+  handlePriceChange={handlePriceChange}
+/>
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -342,12 +367,12 @@ export default function Product() {
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
-                                (sp.reviews?.length
+                                (sp.product_reviews?.length
                                   ? Math.round(
-                                      sp.reviews.reduce(
+                                      sp.product_reviews.reduce(
                                         (s, r) => s + Number(r.rating),
                                         0
-                                      ) / sp.reviews.length
+                                      ) / sp.product_reviews.length
                                     )
                                   : 0) ? (
                                   <i key={i} className="fa-solid fa-star"></i>
@@ -433,12 +458,12 @@ export default function Product() {
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
-                                (sp.reviews?.length
+                                (sp.product_reviews?.length
                                   ? Math.round(
-                                      sp.reviews.reduce(
+                                      sp.product_reviews.reduce(
                                         (s, r) => s + Number(r.rating),
                                         0
-                                      ) / sp.reviews.length
+                                      ) / sp.product_reviews.length
                                     )
                                   : 0) ? (
                                   <i key={i} className="fa-solid fa-star"></i>

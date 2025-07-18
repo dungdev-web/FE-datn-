@@ -12,10 +12,14 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
       try {
         const tokenData = await checkToken();
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
+        console.log("Token data:", tokenData);
 
         const userId = tokenData.user.id;
+        console.log(userId);
+        
         const cartData = await getMockCartByUser(userId);
         setCart(cartData);
+        console.log("sản oham63 giỏ hàng", cartData);
       } catch (error) {
         console.error("Lỗi khi lấy giỏ hàng:", error);
       }
@@ -28,17 +32,17 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
     <div className="top-cart-content hidden-sm hidden-xs" ref={ref}>
       <ul id="cart-sidebar" className="mini-products-list count_li">
         <ul className="list-item-cart">
-          {cart?.items.map((item: ICartItem) => (
+          {cart?.cart_items.map((item: ICartItem) => (
             <li className="item productid-105205720" key={item.cart_items_id}>
               <div className="wrap_item">
                 <a
                   className="product-image"
                   href="/giay-nam-nike-air-max"
-                  title={item.variant?.name}
+                  title={item.variant?.product.name}
                 >
                   <img
-                    alt={item.variant?.name}
-                    src={item.variant?.color.image}
+                    alt={item.variant?.product.name}
+                    src={`/images/products/chaybo/${item.variant?.product.images[0].url}`}
                     width="80"
                   />
                 </a>
@@ -55,9 +59,11 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                     <h3 className="product-name">
                       <a
                         href="/giay-nam-nike-air-max"
-                        title={item.variant?.name}
+                        title={item.variant?.product.name}
                       >
-                        {item.variant?.name} - {item.variant?.color.name_color} - {item.variant?.size.number_size}
+                        {item.variant?.product.name} -{" "}
+                        {item.variant?.color.name_color} -{" "}
+                        {item.variant?.size.number_size}
                       </a>
                     </h3>
                   </div>
@@ -112,9 +118,10 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
             Tổng tiền tạm tính:{" "}
             <span className="price">
               {cart
-                ? cart.items
+                ? cart.cart_items
                     .reduce(
-                      (total, item) => total + item.price * item.quantity,
+                      (total, cart_items) =>
+                        total + cart_items.price * cart_items.quantity,
                       0
                     )
                     .toLocaleString("vi-VN")

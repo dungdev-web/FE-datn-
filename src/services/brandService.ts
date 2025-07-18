@@ -7,7 +7,7 @@ export async function getBrands(): Promise<IBrand[]> {
   try {
     if (IS_MOCK) return getMockBrands();
 
-    const res = await fetch(`${API_BASE_URL}/brand`, {
+    const res = await fetch(`${API_BASE_URL}/dashboard/brands`, {
       cache: "no-store",
     });
 

@@ -20,10 +20,10 @@ export interface ICartItem {
   cart_id: number;
   variant_id: number;
   quantity: number;
-  price: string;
+  price: number;
   created_at: string;
   updated_at: string;
-  variant: {
+ variant: {
     product_variants_id: number;
     product_id: number;
     color_id: number;

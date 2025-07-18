@@ -17,7 +17,7 @@ export default function Cart() {
   // ✅ Tính tạm tính
   const subtotal =
     cart?.cart_items.reduce(
-      (sum, item) => sum + parseInt(item.price || "0", 10) * item.quantity,
+      (sum, item) => sum + Number(item.price || 0) * item.quantity,
       0
     ) || 0;
 
@@ -222,13 +222,13 @@ export default function Cart() {
               </div>
             </div>
 
-         {cart.cart_items.map((item: ICartItem) => (
-
+            {cart.cart_items.map((item: ICartItem) => (
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
                   <img
-                    src={item.variant?.color.images ?? "/images/no-image.jpg"}
-                    alt={`Sản phẩm ${item.variant?.product.name}`}
+                    src={`/images/products/chaybo/${
+                      item.variant.product.images[0].url}`}
+                    alt={`Sản phẩm ${item.variant?.product?.name || ""}`}
                   />
 
                   <div className="product-name">
@@ -236,7 +236,9 @@ export default function Cart() {
                   </div>
 
                   <div className="product-details">
-                    <div className="product-name">{item.variant?.name}</div>
+                    <div className="product-name">
+                      {item.variant?.product.name}
+                    </div>
                     <div className="product-desc">
                       Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
                       {item.variant?.size.number_size}
@@ -329,17 +331,18 @@ export default function Cart() {
                 <span className="total">{subtotal.toLocaleString("vi")}₫</span>
               </div>
               <div className="summary-row">
-  {subtotal >= FREE_SHIPPING_THRESHOLD ? (
-    <span>Miễn phí vận chuyển</span>
-  ) : (
-    <>
-      <span>Giao hàng: </span>
-      <span className="total">{shipprice.toLocaleString("vi")}₫</span>
-      <span> phí vận chuyển</span>
-    </>
-  )}
-</div>
-
+                {subtotal >= FREE_SHIPPING_THRESHOLD ? (
+                  <span>Miễn phí vận chuyển</span>
+                ) : (
+                  <>
+                    <span>Giao hàng: </span>
+                    <span className="total">
+                      {shipprice.toLocaleString("vi")}₫
+                    </span>
+                    <span> phí vận chuyển</span>
+                  </>
+                )}
+              </div>
 
               <p className="shipping-note">
                 Tùy chọn giao hàng sẽ được cập nhật trong quá trình thanh toán.

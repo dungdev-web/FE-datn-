@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct } from "@/types/product";
+import { IProduct,IReview,IReviewPayload } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
 type ProductIdentifier = { id: number } | { slug: string };
@@ -354,7 +354,27 @@ export async function getRelatedProducts(
 
   return Array.isArray(related) ? related : [];
 }
+// lấy tất cả review theo product
+export async function getReviewProduct(productId: number): Promise<IReview[]> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
+    if (!res.ok) {
+      throw new Error("Không thể lấy review sản phẩm.");
+    }
+
+    const data: IReview[] = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error("Lỗi khi lấy đánh giá sản phẩm:", error);
+    return [];
+  }
+}
 
 // Thêm sản phẩm mới
 export async function addProduct(newProduct: IProduct): Promise<IProduct> {
@@ -479,3 +499,37 @@ export const getFilteredProducts = async (
     throw error;
   }
 };
+
+//search
+export async function searchProducts(keyword: string, page = 1, limit = 12) {
+  const res = await fetch(`${API_BASE_URL}/product/search?q=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`);
+  if (!res.ok) throw new Error("Lỗi khi tìm kiếm sản phẩm");
+  return await res.json();
+}
+//review
+export async function reviewProduct(productId:number) {
+  const res = await fetch( `${API_BASE_URL}/product/reviews/${productId}`);
+  if(!res.ok) throw new Error("Lỗi lấy review ");
+  return await res.json();
+  
+}
+// add reviews
+export async function addReviewProduct(productId: number, payload: IReviewPayload) {
+  const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 409) {
+    throw new Error("Bạn đã đánh giá sản phẩm này rồi.");
+  }
+
+  if (!res.ok) {
+    throw new Error("Lỗi khi gửi đánh giá.");
+  }
+
+  return await res.json(); 
+}
