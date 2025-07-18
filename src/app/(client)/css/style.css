@@ -196,7 +196,7 @@ header.scrolled {
 
 
 .icon-header .div::after {
-  content: "0";
+ 
   position: absolute;
   top: -5px;
   right: -5px;
@@ -210,7 +210,15 @@ header.scrolled {
   justify-content: center;
   align-items: center;  
 }
-
+.icon-header .data_cart::after {
+  content: attr(data-count);
+}
+.icon-header .data_compare_product::after {
+  content: "0";
+}
+.icon-header .data_wishlist::after {
+  content: "0";
+}
 nav {
   background-color: #00194b;
   padding: 10px 30px;
