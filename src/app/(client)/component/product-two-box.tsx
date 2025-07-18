@@ -9,8 +9,10 @@ import "swiper/css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
+  const { handleAddToCart } = useAddToCart();
    const images = [
     "https://file.hstatic.net/200000581855/file/1_5d0aee5d42d245f395b3bfbc9d46e9f3.png",
     "https://file.hstatic.net/200000581855/file/2_5e1eb6264dce4a33b1c2ef620bd0232a.png",
@@ -87,7 +89,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                           <i className="fa-solid fa-heart always-show"></i>
                           <div className="hover-icons">
                             <i className="fa-solid fa-eye"></i>
-                            <i className="fa-solid fa-list"></i>
+                    <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
                             <i className="fa fa-exchange"></i>
                           </div>
                         </div>

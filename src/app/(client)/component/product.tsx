@@ -1,6 +1,13 @@
 "use client";
+import { useAddToCart } from "@/hooks/useAddToCart";
+import { checkToken } from "@/services/authService";
+import { addToWishlist } from "@/services/wishlistService";
+
 import { IProduct } from "@/types/product";
+import { useState } from "react";
+
 export default function Product4box(props: any) {
+  const { handleAddToCart } = useAddToCart();
   let sp = props.sp as IProduct;
   if (!sp) return null;
 
@@ -14,6 +21,7 @@ export default function Product4box(props: any) {
   const discountPercent = Math.round(
     ((sp.price - sp.sale_price) / sp.price) * 100
   );
+
   return (
     <>
       <div className="hot-product-card" style={{ width: "230px" }}>
@@ -24,10 +32,35 @@ export default function Product4box(props: any) {
           />
 
           <div className="hot-product-icons">
-            <i className="fa-solid fa-heart icon-favorite"></i>
+            <i
+              className="fa-solid fa-heart icon-favorite"
+              onClick={async () => {
+                try {
+                   console.log("sp:", sp); // 👈 kiểm tra product
+                  const tokenData = await checkToken();
+                  if (!tokenData?.user?.id) {
+                    alert("Vui lòng đăng nhập để thêm vào yêu thích");
+                    return;
+                  }
+
+                  const userId = tokenData.user.id;
+
+                  const result = await addToWishlist({
+                    user_id: userId,
+                    product_id: sp.id,
+                  });
+
+                  alert(result.message);
+                } catch (error) {
+                  console.error("Lỗi thêm vào wishlist:", error);
+                  alert("Thêm vào yêu thích thất bại!");
+                }
+              }}
+            ></i>
+
             <div className="icon-hover-group">
               <i className="fa-solid fa-eye"></i>
-              <i className="fa-solid fa-list"></i>
+      <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
               <i className="fa fa-exchange"></i>
             </div>
           </div>

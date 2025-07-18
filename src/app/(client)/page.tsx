@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
 import Banner3D from "./component/Banner3D";
+import { useAddToCart } from "@/hooks/useAddToCart";
 export default function Home({ product }: { product: IProduct }) {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,7 @@ export default function Home({ product }: { product: IProduct }) {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
+  const { handleAddToCart } = useAddToCart();
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
   const handlePlay = () => {
     setIsPlaying(true);
@@ -487,7 +489,7 @@ export default function Home({ product }: { product: IProduct }) {
                       <i className="fa-solid fa-heart icon-favorite"></i>
                       <div className="icon-hover-group">
                         <i className="fa-solid fa-eye"></i>
-                        <i className="fa-solid fa-list"></i>
+                <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
                         <i className="fa fa-exchange"></i>
                       </div>
                     </div>
@@ -601,7 +603,7 @@ export default function Home({ product }: { product: IProduct }) {
                       <i className="fa-solid fa-heart icon-favorite"></i>
                       <div className="icon-hover-group">
                         <i className="fa-solid fa-eye"></i>
-                        <i className="fa-solid fa-list"></i>
+                <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
                         <i className="fa fa-exchange"></i>
                       </div>
                     </div>

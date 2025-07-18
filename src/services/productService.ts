@@ -1,6 +1,7 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct,IReview } from "@/types/product";
+import { IProduct,IReview,IReviewPayload } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
+import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
 type ProductIdentifier = { id: number } | { slug: string };
 
 // Lấy tất cả sản phẩm
@@ -457,6 +458,48 @@ export async function deleteProduct(id: number): Promise<void> {
     throw new Error("Không thể xoá sản phẩm.");
   }
 }
+
+export const getProductsByGender = async (gender: string): Promise<IProduct[]> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product?gender=${gender}`);
+    if (!res.ok) throw new Error("Lỗi khi lấy danh sách sản phẩm theo giới tính");
+    
+    const data = await res.json();
+    return data.products as IProduct[];
+  } catch (error) {
+    console.error("Lỗi getProductsByGender:", error);
+    return [];
+  }
+};
+
+export const getFilteredProducts = async (
+  params: FilterParams
+): Promise<ProductFilterResponse> => {
+  try {
+    const query = new URLSearchParams();
+
+    if (params.keyword) query.append("keyword", params.keyword);
+    if (params.gender) query.append("gender", params.gender);
+    if (params.brand) query.append("brand", params.brand);
+    if (params.minPrice !== undefined) query.append("minPrice", params.minPrice.toString());
+    if (params.maxPrice !== undefined) query.append("maxPrice", params.maxPrice.toString());
+    if (params.status !== undefined) query.append("status", params.status.toString());
+    if (params.limit !== undefined) query.append("limit", params.limit.toString());
+    if (params.offset !== undefined) query.append("offset", params.offset.toString());
+
+    const response = await fetch(`${API_BASE_URL}/product/filter?${query.toString()}`);
+    if (!response.ok) {
+      throw new Error("Lỗi khi gọi API lọc sản phẩm");
+    }
+
+    const data: ProductFilterResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi getFilteredProducts:", error);
+    throw error;
+  }
+};
+
 //search
 export async function searchProducts(keyword: string, page = 1, limit = 12) {
   const res = await fetch(`${API_BASE_URL}/product/search?q=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`);
@@ -469,4 +512,24 @@ export async function reviewProduct(productId:number) {
   if(!res.ok) throw new Error("Lỗi lấy review ");
   return await res.json();
   
+}
+// add reviews
+export async function addReviewProduct(productId: number, payload: IReviewPayload) {
+  const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (res.status === 409) {
+    throw new Error("Bạn đã đánh giá sản phẩm này rồi.");
+  }
+
+  if (!res.ok) {
+    throw new Error("Lỗi khi gửi đánh giá.");
+  }
+
+  return await res.json(); 
 }

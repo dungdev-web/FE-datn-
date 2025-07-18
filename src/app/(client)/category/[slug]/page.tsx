@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   getCategories,
@@ -15,6 +16,7 @@ import { IBrand } from "@/types/IBrand";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import SidebarFilter from "../../component/products/SidebarFilter";
 import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
+
 interface Params {
   params: {
     slug: string;
@@ -23,52 +25,78 @@ interface Params {
 
 export default function CategoryPage({ params }: Params) {
   const { slug } = useParams();
-  
-   const brandId = Number(params.id);
+  const brandId = Number(params.id);
+
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [category, setCategory] = useState<ICategory | null>(null);
+  const [brandsList, setBrandsList] = useState<IBrand[]>([]);
+  const [brands, setBrand] = useState<IBrand | null>(null);
   const [isActive, setIsActive] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
-    const [brandsList, setBrandsList] = useState<IBrand[]>([]);
-     const [brands, setBrand] = useState<IBrand | null>(null); // thêm state cho brand
-const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const totalPages = Math.ceil(total / productsPerPage);
-   const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
-    const handleBrandCheckboxChange = (brandId: number) => {
-      setSelectedBrandIds((prev) =>
-        prev.includes(brandId)
-          ? prev.filter((id) => id !== brandId)
-          : [...prev, brandId]
-      );
-    };
-    useEffect(() => {
-      async function fetchFilteredProducts() {
-        if (selectedBrandIds.length === 0) {
-          // nếu không chọn brand nào -> hiện tất cả
-          const allProducts = await getProductsByBrandId(brandId); // hoặc get all nếu bạn có
-          setProducts(allProducts);
-          setTotal(allProducts.length);
-          return;
-        }
-  
-        let combinedProducts: IProduct[] = [];
-  
-        for (const id of selectedBrandIds) {
-          const brandProducts = await getProductsByBrandId(id);
-          combinedProducts = [...combinedProducts, ...brandProducts];
-        }
-  
-        setProducts(combinedProducts);
-        setTotal(combinedProducts.length);
+  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
+  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
+
+  // ✅ Thêm selectedGender
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+
+  const handleBrandCheckboxChange = (brandId: number) => {
+    setSelectedBrandIds((prev) =>
+      prev.includes(brandId)
+        ? prev.filter((id) => id !== brandId)
+        : [...prev, brandId]
+    );
+  };
+
+  const toggleSidebar = () => {
+    setIsActive(!isActive);
+  };
+
+  const toggleCategory = (id: number) => {
+    setOpenCategoryId(openCategoryId === id ? null : id);
+  };
+
+  const changeViewMode = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    setPage(1);
+  };
+  const handleGenderChange = (gender: string) => {
+    setSelectedGender(gender);
+    setSelectedBrandIds([]); // Reset brand khi chọn lại giới tính (tuỳ logic)
+  };
+
+  const paginatedProducts = products.slice(
+    (page - 1) * productsPerPage,
+    page * productsPerPage
+  );
+
+  useEffect(() => {
+    async function fetchFilteredProducts() {
+      if (selectedBrandIds.length === 0) {
+        const allProducts = await getProductsByBrandId(brandId);
+        setProducts(allProducts);
+        setTotal(allProducts.length);
+        return;
       }
-  
-      fetchFilteredProducts();
-    }, [selectedBrandIds]);
-  
+
+      let combinedProducts: IProduct[] = [];
+
+      for (const id of selectedBrandIds) {
+        const brandProducts = await getProductsByBrandId(id);
+        combinedProducts = [...combinedProducts, ...brandProducts];
+      }
+
+      setProducts(combinedProducts);
+      setTotal(combinedProducts.length);
+    }
+
+    fetchFilteredProducts();
+  }, [selectedBrandIds]);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -77,52 +105,34 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
             slug as string
           );
           const fetchedCategories = await getCategories();
-             const fetchedBrands = await getBrands();
+          const fetchedBrands = await getBrands();
+
           const productArray = Array.isArray(fetchedProducts)
             ? fetchedProducts
             : [];
           setProducts(productArray);
           setTotal(productArray.length);
-          setCategories(
-            Array.isArray(fetchedCategories) ? fetchedCategories : []
-          );
 
           const categoryList = Array.isArray(fetchedCategories)
             ? fetchedCategories
             : [];
           setCategories(categoryList);
 
-          // Tìm category theo slug
           const matched = categoryList.find((cat) => cat.slug === slug);
           setCategory(matched || null);
-          setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
-           const matchedBrand = fetchedBrands.find((b) => b.brand_id === brandId);
-        getBrands(matchedBrand || null);
 
+          setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
+          const matchedBrand = fetchedBrands.find(
+            (b) => b.brand_id === brandId
+          );
+          setBrand(matchedBrand || null);
         }
       } catch (error) {
         console.error("Lỗi khi fetch data:", error);
       }
     }
-
     fetchData();
   }, [slug]);
-
-  const toggleSidebar = () => {
-    setIsActive(!isActive);
-  };
-  const toggleCategory = (id: number) => {
-    setOpenCategoryId(openCategoryId === id ? null : id);
-  };
-  const changeViewMode = (mode: "grid" | "list") => {
-    setViewMode(mode);
-    setPage(1);
-  };
-
-  const paginatedProducts = products.slice(
-    (page - 1) * productsPerPage,
-    page * productsPerPage
-  );
 
   return (
     <>
@@ -161,14 +171,16 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-               <SidebarFilter
-  categories={categories}
-  openCategoryId={openCategoryId}
-  toggleCategory={toggleCategory}
-  brandsList={brandsList}
-  selectedBrandIds={selectedBrandIds}
-  handleBrandCheckboxChange={handleBrandCheckboxChange}
-/>
+              <SidebarFilter
+                categories={categories}
+                openCategoryId={openCategoryId}
+                toggleCategory={toggleCategory}
+                brandsList={brandsList}
+                selectedBrandIds={selectedBrandIds}
+                handleBrandCheckboxChange={handleBrandCheckboxChange}
+                selectedGender={selectedGender}
+                handleGenderChange={setSelectedGender}
+              />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -277,7 +289,7 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
                                 <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
+                        <i className="fa fa-shopping-bag position-relative"></i>
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
@@ -377,7 +389,7 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
                                 <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
+                        <i className="fa fa-shopping-bag position-relative"></i>
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
@@ -463,7 +475,7 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
                     ))}
                   </div>
                 )}
-                   <div className="pagination">
+                <div className="pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
                     className={`page-btn ${
@@ -510,16 +522,17 @@ const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
         ></i>
       </div>
       {/* <!-- Sidebar bộ lọc --> */}
-       <MobileSidebarFilter
-      isActive={isActive}
-      categories={categories}
-      openCategoryId={openCategoryId}
-      toggleCategory={toggleCategory}
-      brandsList={brandsList}
-      selectedBrandIds={selectedBrandIds}
-      handleBrandCheckboxChange={handleBrandCheckboxChange}
-    />
-
+      <MobileSidebarFilter
+        isActive={isActive}
+        categories={categories}
+        openCategoryId={openCategoryId}
+        toggleCategory={toggleCategory}
+        brandsList={brandsList}
+        selectedBrandIds={selectedBrandIds}
+        handleBrandCheckboxChange={handleBrandCheckboxChange}
+         selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
+      />
     </>
   );
 }

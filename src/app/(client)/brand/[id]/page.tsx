@@ -31,6 +31,8 @@ export default function CategoryPage() {
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const totalPages = Math.ceil(total / productsPerPage);
   const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -100,6 +102,11 @@ export default function CategoryPage() {
   const toggleCategory = (id: number) => {
     setOpenCategoryId(openCategoryId === id ? null : id);
   };
+    const handleGenderChange = (gender: string) => {
+    setSelectedGender(gender);
+    setSelectedBrandIds([]); // Reset brand khi chọn lại giới tính (tuỳ logic)
+  };
+
   return (
     <>
       <section
@@ -137,15 +144,17 @@ export default function CategoryPage() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-             <SidebarFilter
-  categories={categories}
-  openCategoryId={openCategoryId}
-  toggleCategory={toggleCategory}
-  brandsList={brandsList}
-  selectedBrandIds={selectedBrandIds}
-  handleBrandCheckboxChange={handleBrandCheckboxChange}
-/>
-
+       <SidebarFilter
+                categories={categories}
+                openCategoryId={openCategoryId}
+                toggleCategory={toggleCategory}
+                brandsList={brandsList}
+                selectedBrandIds={selectedBrandIds}
+                handleBrandCheckboxChange={handleBrandCheckboxChange}
+                selectedGender={selectedGender}
+                handleGenderChange={setSelectedGender}
+                
+              />
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
                   <div className="sortPagiBar">
@@ -253,7 +262,7 @@ export default function CategoryPage() {
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
                                 <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
+                        <i className="fa fa-shopping-bag position-relative"></i>
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
@@ -353,7 +362,7 @@ export default function CategoryPage() {
                               <i className="fa-solid fa-heart always-show"></i>
                               <div className="hover-icons">
                                 <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
+                        <i className="fa fa-shopping-bag position-relative"></i>
                                 <i className="fa fa-exchange"></i>
                               </div>
                             </div>
@@ -493,6 +502,8 @@ export default function CategoryPage() {
   brandsList={brandsList}
   selectedBrandIds={selectedBrandIds}
   handleBrandCheckboxChange={handleBrandCheckboxChange}
+   selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
 />
     </>
   );

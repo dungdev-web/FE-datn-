@@ -3,17 +3,21 @@ import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockBrands } from "@/mocks/mockBrands";
 import { IProduct } from "@/types/product";
 
+// Lấy danh sách thương hiệu
 export async function getBrands(): Promise<IBrand[]> {
   try {
     if (IS_MOCK) return getMockBrands();
 
-    const res = await fetch(`${API_BASE_URL}/dashboard/brands`, {
+    const res = await fetch(`${API_BASE_URL}/brand`, {
       cache: "no-store",
     });
 
-    const json = await res.json();
- 
+    if (!res.ok) {
+      console.error("Lỗi khi gọi API brand:", res.statusText);
+      return [];
+    }
 
+    const json = await res.json();
     return Array.isArray(json) ? json : [];
   } catch (err) {
     console.error("Lỗi khi gọi API brand:", err);
@@ -21,20 +25,24 @@ export async function getBrands(): Promise<IBrand[]> {
   }
 }
 
-// Gọi danh sách sản phẩm theo brand ID
+// Lấy danh sách sản phẩm theo brand ID
 export async function getProductsByBrandId(brandId: number): Promise<IProduct[]> {
   if (!brandId) return [];
 
-  const res = await fetch(`${API_BASE_URL}/product/brand/${brandId}`, {
-    cache: "no-store",
-  });
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/brand/${brandId}`, {
+      cache: "no-store",
+    });
 
-  if (!res.ok) {
-    console.error("Lỗi khi gọi API:", res.statusText);
+    if (!res.ok) {
+      console.error("Lỗi khi gọi API:", res.statusText);
+      return [];
+    }
+
+    const json = await res.json();
+    return json.products || [];
+  } catch (error) {
+    console.error("Lỗi khi gọi API sản phẩm theo brand:", error);
     return [];
   }
-
-  const json = await res.json();
-
-  return json.products || [];
 }

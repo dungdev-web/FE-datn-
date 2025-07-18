@@ -1,7 +1,45 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockCart, saveMockCart } from "@/mocks/mockCart";
 import { ICart, ICartItem, Addtocart } from "@/types/cart";
+interface AddToCartResponse {
+  message: string;
+  cart: ICartItem[]; // danh sách cart_items sau khi thêm
+}
 
+// Gọi API để thêm sản phẩm vào giỏ hàng
+export const addToCart = async ({
+  user_id,
+  variant_id,
+  quantity,
+}: Addtocart): Promise<AddToCartResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/addToCart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        variant_id,
+        quantity,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể thêm sản phẩm vào giỏ hàng.");
+    }
+
+    const data = await res.json();
+
+    return {
+      message: data.message,
+      cart: data.cart, // kiểu này khớp với ICartItem[]
+    };
+  } catch (error) {
+    console.error("Lỗi khi thêm giỏ hàng:", error);
+    throw error;
+  }
+};
 // Thêm sản phẩm vào giỏ mock
 export async function addToMockCart(
   user_id: number,

@@ -71,3 +71,8 @@ export interface IReview {
     avatar: string;
   };
 }
+export interface IReviewPayload {
+  user_id: number;
+  rating: number;
+  content: string;
+}
