@@ -34,7 +34,6 @@ export default function Header() {
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
-
   const handleSearch = () => {
   if (!keyword.trim()) return;
   router.push(`/product?q=${encodeURIComponent(keyword)}`);
