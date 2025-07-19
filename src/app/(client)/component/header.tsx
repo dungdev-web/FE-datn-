@@ -13,7 +13,8 @@ import { IBrand } from "@/types/IBrand";
 import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
 import { searchProducts } from "@/services/productService";
-
+import { getCartByUserId } from "@/services/cartService";
+import { getWishlistByUserId } from "@/services/wishlistService";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -34,10 +35,13 @@ export default function Header() {
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
   const handleSearch = () => {
-  if (!keyword.trim()) return;
-  router.push(`/product?q=${encodeURIComponent(keyword)}`);
-};
+    if (!keyword.trim()) return;
+    router.push(`/product?q=${encodeURIComponent(keyword)}`);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -101,6 +105,36 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (!user?.id) return;
+
+      try {
+        const cartData = await getCartByUserId(user.id);
+        const totalItems =
+          cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+        setCartItemCount(totalItems);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+      }
+    };
+
+    fetchCartCount();
+  }, [user]);
+  useEffect(() => {
+    const fetchWishlistCount = async () => {
+      if (!user?.id) return;
+
+      try {
+        const wishlist = await getWishlistByUserId(user.id);
+        setWishlistCount(wishlist.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng yêu thích:", error);
+      }
+    };
+
+    fetchWishlistCount();
+  }, [user]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -224,20 +258,25 @@ export default function Header() {
               )}
             </div>
           </div>
-
-          <div className="iconheart-header div">
+          <div
+            className="iconheart-header div data_wishlist"
+            data-count={wishlistCount}
+          >
             <Link href="/wishlist">
               <i className="fa-solid fa-heart"></i>
             </Link>
           </div>
-          <div className="iconcompare-header div">
+
+          <div className="iconcompare-header div data_compare_product">
             <Link href="/compare_product">
               <i className="fa fa-exchange"></i>
             </Link>
           </div>
-
           <div className="cart-wrapper">
-            <div className="iconcart-header div">
+            <div
+              className="iconcart-header div data_cart"
+              data-count={cartItemCount}
+            >
               <Link href="/cart">
                 <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
               </Link>

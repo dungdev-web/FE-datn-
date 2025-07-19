@@ -1,15 +1,13 @@
 "use client";
-import { useAddToCart } from "@/hooks/useAddToCart";
-import { checkToken } from "@/services/authService";
-import { addToWishlist } from "@/services/wishlistService";
 
 import { IProduct } from "@/types/product";
-import { useState } from "react";
+import ProductIcons from "./products/ProductIcons";
 
 export default function Product4box(props: any) {
-  const { handleAddToCart } = useAddToCart();
-  let sp = props.sp as IProduct;
+  const sp = props.sp as IProduct;
   if (!sp) return null;
+
+  const productId = sp.id ?? sp.products_id;
 
   const averageRating =
     sp?.product_reviews?.length > 0
@@ -18,9 +16,11 @@ export default function Product4box(props: any) {
             sp.product_reviews.length
         )
       : 0;
-  const discountPercent = Math.round(
-    ((sp.price - sp.sale_price) / sp.price) * 100
-  );
+
+  const discountPercent =
+    sp.price && sp.sale_price
+      ? Math.round(((sp.price - sp.sale_price) / sp.price) * 100)
+      : 0;
 
   return (
     <>
@@ -31,48 +31,21 @@ export default function Product4box(props: any) {
             alt={sp.images?.[0]?.alt_text || sp.name}
           />
 
+         
           <div className="hot-product-icons">
-            <i
-              className="fa-solid fa-heart icon-favorite"
-              onClick={async () => {
-                try {
-                   console.log("sp:", sp); // 👈 kiểm tra product
-                  const tokenData = await checkToken();
-                  if (!tokenData?.user?.id) {
-                    alert("Vui lòng đăng nhập để thêm vào yêu thích");
-                    return;
-                  }
-
-                  const userId = tokenData.user.id;
-
-                  const result = await addToWishlist({
-                    user_id: userId,
-                    product_id: sp.id,
-                  });
-
-                  alert(result.message);
-                } catch (error) {
-                  console.error("Lỗi thêm vào wishlist:", error);
-                  alert("Thêm vào yêu thích thất bại!");
-                }
-              }}
-            ></i>
-
-            <div className="icon-hover-group">
-              <i className="fa-solid fa-eye"></i>
-      <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
-              <i className="fa fa-exchange"></i>
-            </div>
+            <ProductIcons productId={productId} />
           </div>
-          <span className="tag-discount">-{discountPercent}%</span>
+
+          {discountPercent > 0 && (
+            <span className="tag-discount">-{discountPercent}%</span>
+          )}
         </div>
+
         <div className="hot-product-content">
           <div className="hot-product-colors">
-            {[
-              ...new Map(
-                (sp.product_variants ?? []).map((v) => [v.color.id, v.color])
-              ).values(),
-            ].map((color, index) => (
+            {[...new Map(
+              (sp.product_variants ?? []).map((v) => [v.color.id, v.color])
+            ).values()].map((color) => (
               <span
                 key={color.id}
                 className="color-item"
@@ -84,19 +57,23 @@ export default function Product4box(props: any) {
           </div>
 
           <h4 className="hot-product-title">{sp.name}</h4>
+
           <div className="hot-product-price">
             <span className="price-old">
-              <del>{sp.sale_price}đ</del>
+              <del>{Number(sp.sale_price).toLocaleString("vi")}đ</del>
             </span>
-            <span className="price-new">{sp.price.toLocaleString("vi")}đ</span>
+            <span className="price-new">
+              {Number(sp.price).toLocaleString("vi")}đ
+            </span>
           </div>
+
           <div className="hot-product-progress">
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: "87%" }}>
                 <span className="sold-info">
                   Đã bán{" "}
                   {(sp.product_variants ?? []).reduce(
-                    (sum, v) => sum + v.stock_quantity,
+                    (sum, v) => sum + (v.stock_quantity || 0),
                     0
                   )}{" "}
                   sản phẩm
@@ -104,6 +81,7 @@ export default function Product4box(props: any) {
               </div>
             </div>
           </div>
+
           <div className="hot-product-rating">
             {Array.from({ length: 5 }, (_, index) =>
               index < averageRating ? (

@@ -1,10 +1,33 @@
 "use client";
+import { useEffect, useState } from "react";
+import { getWishlistByUserId } from "@/services/wishlistService";
+import { IWishlistItemWithProduct } from "@/types/wishlist";
 import "../css/product.css";
 import "../css/wishlist.css";
+import { useAuthUser } from "@/hooks/useAuthUser";
+
 export default function Wishlist() {
-  return (
-    <>
-      <section
+  const [wishlist, setWishlist] = useState<IWishlistItemWithProduct[]>([]);
+  const { user } = useAuthUser();
+
+  useEffect(() => {
+    if (!user?.id) return; // 
+
+    const fetchWishlist = async () => {
+      try {
+        const data = await getWishlistByUserId(user.id);
+        setWishlist(data);
+      } catch (err) {
+        console.error("Lỗi:", err);
+      }
+    };
+
+    fetchWishlist();
+  }, [user?.id]); // 
+  if (!user) {
+    return (
+      <>
+       <section
         className="bread-crumb background-cover relative"
         style={{
           backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
@@ -12,9 +35,7 @@ export default function Wishlist() {
           backgroundSize: "cover",
         }}
       >
-        {/* Lớp phủ làm mờ nền */}
         <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
-
         <div className="breadcrumb-container">
           <div className="title-page">
             <h2>Sản phẩm yêu thích</h2>
@@ -31,362 +52,179 @@ export default function Wishlist() {
                 <span>Sản phẩm yêu thích</span>
               </strong>
             </li>
-            <li></li>
           </ul>
         </div>
       </section>
+        <div className="container1 py-10 px-4 text-center !mt-6 !mb-6">
+      <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
+        <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
+        <p className="text-lg font-medium text-red-600">
+          Vui lòng <a href="/login" className="underline hover:text-red-800">đăng nhập</a> để xem sản phẩm yêu thích.
+        </p>
+      </div>
+    </div>
+      </>
+     
+    );
+  }
+  return (
+    <>
+      <section
+        className="bread-crumb background-cover relative"
+        style={{
+          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }}
+      >
+        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+        <div className="breadcrumb-container">
+          <div className="title-page">
+            <h2>Sản phẩm yêu thích</h2>
+          </div>
+          <ul className="breadcrumb">
+            <li className="home">
+              <a href="/" title="Trang chủ">
+                <span>Trang chủ</span>
+              </a>
+              <i className="fa fa-angle-right" aria-hidden="true"></i>
+            </li>
+            <li>
+              <strong>
+                <span>Sản phẩm yêu thích</span>
+              </strong>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <main>
         <div className="container1">
           <div className="row">
+            {/* Desktop */}
             <div className="product-grid-wishlist">
-              <div className="product-itemlist-main !block ">
-                <div className="product-card" style={{ width: "238px" }}>
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                        <i className="fa fa-exchange"></i>
+              {wishlist.map((item) => {
+                const product = item.product;
+                const image = product.images.find(
+                  (img) => img.type === "main"
+                )?.url;
+
+                return (
+                  <div
+                    key={item.wishlist_items_id}
+                    className="product-itemlist-main !block"
+                  >
+                    <div className="product-card" style={{ width: "238px" }}>
+                      <div className="product-image">
+                        <img src={image} alt={product.name} />
+                        <div className="product-icons">
+                          <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
+                          <div className="hover-icons">
+                            <i className="fa-solid fa-eye"></i>
+                            <i className="fa fa-shopping-bag position-relative"></i>
+                          </div>
+                        </div>
+                        {product.price > product.sale_price && (
+                          <span className="discount-tag">
+                            -
+                            {Math.round(
+                              ((product.price - product.sale_price) /
+                                product.price) *
+                                100
+                            )}
+                            %
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="product-title">{product.name}</h4>
+                      <div className="product-price">
+                        {product.price !== product.sale_price && (
+                          <span className="old-price">
+                            <del>{product.price.toLocaleString()}₫</del>
+                          </span>
+                        )}
+                        <span className="new-price">
+                          {product.sale_price.toLocaleString()}₫
+                        </span>
+                      </div>
+                      <div className="product-rating">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <i
+                            key={i}
+                            className={`fa-${
+                              i <= 4 ? "solid" : "regular"
+                            } fa-star`}
+                          ></i>
+                        ))}
                       </div>
                     </div>
-
-                    <span className="discount-tag">-20%</span>
-
-                    <div className="product-colors">
-                      <span
-                        className="color blue"
-                        data-color="Xanh dương"
-                      ></span>
-                      <span className="color green" data-color="Xanh lá"></span>
-                      <span className="color pink" data-color="Hồng"></span>
-                    </div>
-
-                    <h4 className="product-title">
-                      Giày Converse Run Star Motion
-                    </h4>
-                    <div className="product-price">
-                      <span className="old-price">
-                        <del>1.500.000đ</del>
-                      </span>
-                      <span className="new-price">1.200.000đ</span>
-                    </div>
-
-                    <div className="product-rating">
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-regular fa-star"></i>
-                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="product-itemlist-main !block ">
-                <div className="product-card" style={{ width: "238px" }}>
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
-
-                    <span className="discount-tag">-20%</span>
-
-                    <div className="product-colors">
-                      <span
-                        className="color blue"
-                        data-color="Xanh dương"
-                      ></span>
-                      <span className="color green" data-color="Xanh lá"></span>
-                      <span className="color pink" data-color="Hồng"></span>
-                    </div>
-
-                    <h4 className="product-title">
-                      Giày Converse Run Star Motion
-                    </h4>
-                    <div className="product-price">
-                      <span className="old-price">
-                        <del>1.500.000đ</del>
-                      </span>
-                      <span className="new-price">1.200.000đ</span>
-                    </div>
-
-                    <div className="product-rating">
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-regular fa-star"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="product-itemlist-main !block ">
-                <div className="product-card" style={{ width: "238px" }}>
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
-
-                    <span className="discount-tag">-20%</span>
-
-                    <div className="product-colors">
-                      <span
-                        className="color blue"
-                        data-color="Xanh dương"
-                      ></span>
-                      <span className="color green" data-color="Xanh lá"></span>
-                      <span className="color pink" data-color="Hồng"></span>
-                    </div>
-
-                    <h4 className="product-title">
-                      Giày Converse Run Star Motion
-                    </h4>
-                    <div className="product-price">
-                      <span className="old-price">
-                        <del>1.500.000đ</del>
-                      </span>
-                      <span className="new-price">1.200.000đ</span>
-                    </div>
-
-                    <div className="product-rating">
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-regular fa-star"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="product-itemlist-main !block ">
-                <div className="product-card" style={{ width: "238px" }}>
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                       <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
-
-                    <span className="discount-tag">-20%</span>
-
-                    <div className="product-colors">
-                      <span
-                        className="color blue"
-                        data-color="Xanh dương"
-                      ></span>
-                      <span className="color green" data-color="Xanh lá"></span>
-                      <span className="color pink" data-color="Hồng"></span>
-                    </div>
-
-                    <h4 className="product-title">
-                      Giày Converse Run Star Motion
-                    </h4>
-                    <div className="product-price">
-                      <span className="old-price">
-                        <del>1.500.000đ</del>
-                      </span>
-                      <span className="new-price">1.200.000đ</span>
-                    </div>
-
-                    <div className="product-rating">
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-solid fa-star"></i>
-                      <i className="fa-regular fa-star"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
+
+            {/* Mobile */}
             <div className="product-grid-wishlist-list">
-              <div className="product-itemlist-main !flex ">
-                <div className="product-card">
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                        <i className="fa fa-shopping-bag position-relative"></i>
+              {wishlist.map((item) => {
+                const product = item.product;
+                const image = product.images.find(
+                  (img) => img.type === "main"
+                )?.url;
+
+                return (
+                  <div
+                    key={item.wishlist_items_id}
+                    className="product-itemlist-main"
+                  >
+                    <div className="product-card">
+                      <div className="product-image">
+                        <img src={image} alt={product.name} />
+                        <div className="product-icons">
+                          <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
+                          <div className="hover-icons">
+                            <i className="fa-solid fa-eye"></i>
+                            <i className="fa fa-shopping-bag position-relative"></i>
+                          </div>
+                        </div>
+                        {product.price > product.sale_price && (
+                          <span className="discount-tag">
+                            -
+                            {Math.round(
+                              ((product.price - product.sale_price) /
+                                product.price) *
+                                100
+                            )}
+                            %
+                          </span>
+                        )}
                       </div>
                     </div>
-
-                    <span className="discount-tag">-20%</span>
-                  </div>
-                </div>
-                <div className="product-content w-full">
-                  <h4 className="product-title">
-                    Giày Converse Run Star Motion
-                  </h4>
-                  <div className="product-price">
-                    <span className="old-price">
-                      <del>1.500.000đ</del>
-                    </span>
-                    <span className="new-price">1.200.000đ</span>
-                  </div>
-                  <div className="product-colors">
-                    <span className="color blue" data-color="Xanh dương"></span>
-                    <span className="color green" data-color="Xanh lá"></span>
-                    <span className="color pink" data-color="Hồng"></span>
-                  </div>
-
-                  <div className="product-rating">
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-regular fa-star"></i>
-                  </div>
-                  <div className="buton !pl-[10px]">
-                    <button
-                      style={{
-                        backgroundColor: "#ff4d4f",
-                        color: "#fff",
-                        padding: "5px 10px",
-                        fontSize: "13px",
-                        border: "none",
-                        borderRadius: "6px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        transition: "background-color 0.3s ease",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#e03e3f")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#ff4d4f")
-                      }
-                      type="submit"
-                    >
-                      Mua ngay
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="product-itemlist-main !flex ">
-                <div className="product-card">
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                        <i className="fa fa-exchange"></i>
+                    <div className="product-content w-full">
+                      <h4 className="product-title">{product.name}</h4>
+                      <div className="product-price">
+                        {product.price !== product.sale_price && (
+                          <span className="old-price">
+                            <del>{product.price.toLocaleString()}₫</del>
+                          </span>
+                        )}
+                        <span className="new-price">
+                          {product.sale_price.toLocaleString()}₫
+                        </span>
+                      </div>
+                      <div className="product-rating">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <i
+                            key={i}
+                            className={`fa-${
+                              i <= 4 ? "solid" : "regular"
+                            } fa-star`}
+                          ></i>
+                        ))}
                       </div>
                     </div>
-
-                    <span className="discount-tag">-20%</span>
                   </div>
-                </div>
-                <div className="product-content w-full">
-                  <div className="product-colors">
-                    <span className="color blue" data-color="Xanh dương"></span>
-                    <span className="color green" data-color="Xanh lá"></span>
-                    <span className="color pink" data-color="Hồng"></span>
-                  </div>
-
-                  <h4 className="product-title">
-                    Giày Converse Run Star Motion
-                  </h4>
-                  <div className="product-price">
-                    <span className="old-price">
-                      <del>1.500.000đ</del>
-                    </span>
-                    <span className="new-price">1.200.000đ</span>
-                  </div>
-
-                  <div className="product-rating">
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-regular fa-star"></i>
-                  </div>
-                </div>
-              </div>
-              <div className="product-itemlist-main !flex ">
-                <div className="product-card">
-                  <div className="product-image">
-                    <img
-                      src="/images/products/chaybo/ConverseRunStarMotion.webp"
-                      alt=""
-                    />
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative"></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
-
-                    <span className="discount-tag">-20%</span>
-                  </div>
-                </div>
-                <div className="product-content w-full">
-                  <div className="product-colors">
-                    <span className="color blue" data-color="Xanh dương"></span>
-                    <span className="color green" data-color="Xanh lá"></span>
-                    <span className="color pink" data-color="Hồng"></span>
-                  </div>
-
-                  <h4 className="product-title">
-                    Giày Converse Run Star Motion
-                  </h4>
-                  <div className="product-price">
-                    <span className="old-price">
-                      <del>1.500.000đ</del>
-                    </span>
-                    <span className="new-price">1.200.000đ</span>
-                  </div>
-
-                  <div className="product-rating">
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-solid fa-star"></i>
-                    <i className="fa-regular fa-star"></i>
-                  </div>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ import { IBrand } from "@/types/IBrand";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import SidebarFilter from "../../component/products/SidebarFilter";
 import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
+import ProductIcons from "../../component/products/ProductIcons";
 
 interface Params {
   params: {
@@ -43,7 +44,10 @@ export default function CategoryPage({ params }: Params) {
 
   // ✅ Thêm selectedGender
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
-
+   const [selectedPriceRange, setSelectedPriceRange] = useState<{
+    min: number;
+    max: number;
+  } | null>(null);
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -133,7 +137,10 @@ export default function CategoryPage({ params }: Params) {
     }
     fetchData();
   }, [slug]);
-
+const handlePriceChange = (range: { min: number; max: number } | null) => {
+  setSelectedPriceRange(range);
+  setPage(1);
+};
   return (
     <>
       <section
@@ -171,16 +178,18 @@ export default function CategoryPage({ params }: Params) {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-              <SidebarFilter
-                categories={categories}
-                openCategoryId={openCategoryId}
-                toggleCategory={toggleCategory}
-                brandsList={brandsList}
-                selectedBrandIds={selectedBrandIds}
-                handleBrandCheckboxChange={handleBrandCheckboxChange}
-                selectedGender={selectedGender}
-                handleGenderChange={setSelectedGender}
-              />
+                    <SidebarFilter
+            categories={categories}
+            openCategoryId={openCategoryId}
+            toggleCategory={toggleCategory}
+            brandsList={brandsList}
+            selectedBrandIds={selectedBrandIds}
+            handleBrandCheckboxChange={handleBrandCheckboxChange}
+            selectedGender={selectedGender}
+            handleGenderChange={handleGenderChange}
+            selectedPriceRange={selectedPriceRange}
+            handlePriceChange={handlePriceChange}
+          />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -285,14 +294,8 @@ export default function CategoryPage({ params }: Params) {
                                 className="w-full h-full object-cover rounded"
                               />
                             </Link>
-                            <div className="product-icons absolute top-1 right-1">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                        <i className="fa fa-shopping-bag position-relative"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
                             <span className="discount-tag absolute top-1 left-1 text-white text-xs px-2 py-0.5 rounded">
                               -
                               {Math.round(
@@ -371,8 +374,8 @@ export default function CategoryPage({ params }: Params) {
                         key={sp.products_id}
                       >
                         <div
-                          className="product-card-list flex bg-white p-4 border border-gray-200 rounded"
-                          style={{ width: "100%" }}
+                          className="product-card-list flex p-4 border border-gray-200 rounded"
+                          style={{ width: "50%" }}
                         >
                           <div className="product-image w-48 h-48 flex-shrink-0 relative">
                             <Link href={`/product/${sp.slug}`}>
@@ -385,14 +388,7 @@ export default function CategoryPage({ params }: Params) {
                                 className="w-full h-full object-cover rounded"
                               />
                             </Link>
-                            <div className="product-icons absolute top-1 right-1">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                        <i className="fa fa-shopping-bag position-relative"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
                           </div>
 
                           <div className="ml-4 flex flex-col justify-between flex-grow">

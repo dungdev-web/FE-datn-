@@ -1,21 +1,21 @@
+"use client";
+
 import { IProduct } from "@/types/product";
 import Link from "next/link";
-import { addToWishlist } from "@/services/wishlistService";
-import { useAuthUser } from "@/hooks/useAuthUser";
-import { checkToken } from "@/services/authService";
-import { useState, useEffect } from "react";
-import { useAddToCart } from "@/hooks/useAddToCart";
+import ProductIcons from "./products/ProductIcons";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const reviews = product.reviews || [];
   const variants = product.variants || [];
   const images = product.images || [];
-  const [isWished, setIsWished] = useState(false);
-const { handleAddToCart } = useAddToCart();
+
+  const productId = product.id ?? product.products_id;
+
   const discount =
     product.sale_price && product.price
       ? Math.round(((product.price - product.sale_price) / product.price) * 100)
       : 0;
+
   const averageRating = reviews.length
     ? Math.round(
         reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) /
@@ -42,41 +42,7 @@ const { handleAddToCart } = useAddToCart();
             />
           </Link>
 
-          <div className="product-icons">
-            <i
-              className={`fa-solid fa-heart icon-favorite ${
-                isWished ? "active" : ""
-              }`}
-              onClick={async () => {
-                try {
-                  const tokenData = await checkToken();
-                  if (!tokenData?.user?.id) {
-                    alert("Vui lòng đăng nhập để thêm vào yêu thích");
-                    return;
-                  }
-
-                  const userId = tokenData.user.id;
-                  const result = await addToWishlist({
-                    user_id: userId,
-                    product_id: product.id,
-                  });
-
-                  // ✅ Cập nhật trạng thái đã yêu thích
-                  setIsWished(true);
-                  alert(result.message);
-                } catch (error) {
-                  console.error("Lỗi thêm vào wishlist:", error);
-                  alert("Thêm vào yêu thích thất bại!");
-                }
-              }}
-            ></i>
-
-           <div className="hover-icons">
-              <i className="fa-solid fa-eye"></i>
-      <i className="fa fa-shopping-bag position-relative"  onClick={handleAddToCart}></i>
-              <i className="fa fa-exchange"></i>
-            </div>
-          </div>
+          <ProductIcons productId={productId} />
 
           {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 

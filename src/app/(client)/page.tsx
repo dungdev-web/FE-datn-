@@ -23,6 +23,8 @@ import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
 import Banner3D from "./component/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
+import ProductIcons from "./component/products/ProductIcons";
+import HotProductIcons from "./component/products/HotProductIcons";
 export default function Home({ product }: { product: IProduct }) {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -442,6 +444,7 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {newproducts.map((product) => {
+              const productId = product.id ?? product.products_id;
               const averageRating = product.product_reviews?.length
                 ? Math.round(
                     product.product_reviews.reduce(
@@ -466,13 +469,12 @@ export default function Home({ product }: { product: IProduct }) {
                   : 0;
 
               const uniqueColors = [
-  ...new Map(
-    (product.product_variants || [])
-      .filter((v) => v.color && v.color.id) // tránh undefined/null
-      .map((v) => [v.color.id, v.color])
-  ).values(),
-];
-
+                ...new Map(
+                  (product.product_variants || [])
+                    .filter((v) => v.color && v.color.id) // tránh undefined/null
+                    .map((v) => [v.color.id, v.color])
+                ).values(),
+              ];
 
               return (
                 <div className="hot-product-card" key={product.products_id}>
@@ -485,14 +487,7 @@ export default function Home({ product }: { product: IProduct }) {
                         alt={product.name}
                       />
                     </Link>
-                    <div className="hot-product-icons">
-                      <i className="fa-solid fa-heart icon-favorite"></i>
-                      <div className="icon-hover-group">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
+                    <HotProductIcons productId={productId} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -556,6 +551,8 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {featureproducts.map((product) => {
+              const productId = product.id ?? product.products_id;
+
               const averageRating = product.product_reviews?.length
                 ? Math.round(
                     product.product_reviews.reduce(
@@ -599,16 +596,14 @@ export default function Home({ product }: { product: IProduct }) {
                         alt={product.name}
                       />
                     </Link>
-                    <div className="hot-product-icons">
-                      <i className="fa-solid fa-heart icon-favorite"></i>
-                      <div className="icon-hover-group">
-                        <i className="fa-solid fa-eye"></i>
-                <i className="fa fa-shopping-bag position-relative" onClick={handleAddToCart}></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
-                    <span className="tag-discount">-{discount}%</span>
+
+                   <HotProductIcons productId={productId} />
+
+                    {discount > 0 && (
+                      <span className="tag-discount">-{discount}%</span>
+                    )}
                   </div>
+
                   <div className="hot-product-content">
                     <div className="hot-product-colors">
                       {uniqueColors.map((color) => (
@@ -620,7 +615,9 @@ export default function Home({ product }: { product: IProduct }) {
                         ></span>
                       ))}
                     </div>
+
                     <h4 className="hot-product-title">{product.name}</h4>
+
                     <div className="hot-product-price">
                       {product.sale_price > 0 && (
                         <span className="price-old">
@@ -635,6 +632,7 @@ export default function Home({ product }: { product: IProduct }) {
                         đ
                       </span>
                     </div>
+
                     <div className="hot-product-progress">
                       <div className="progress-bar">
                         <div className="progress-fill" style={{ width: "87%" }}>
@@ -644,6 +642,7 @@ export default function Home({ product }: { product: IProduct }) {
                         </div>
                       </div>
                     </div>
+
                     <div className="hot-product-rating">
                       {Array.from({ length: 5 }, (_, i) =>
                         i < averageRating ? (

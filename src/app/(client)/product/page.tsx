@@ -22,6 +22,7 @@ import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
 import { searchProducts } from "@/services/productService";
 import { log } from "console";
+import ProductIcons from "../component/products/ProductIcons";
 
 export default function Product() {
   const params = useParams();
@@ -294,14 +295,9 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                               />
                             </Link>
 
-                            <div className="product-icons">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                        <i className="fa fa-shopping-bag position-relative"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
+
 
                             <span className="discount-tag">
                               -
@@ -414,14 +410,8 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                               />
                             </Link>
 
-                            <div className="product-icons">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                        <i className="fa fa-shopping-bag position-relative"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
