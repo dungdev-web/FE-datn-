@@ -62,19 +62,18 @@ export default function Banner3D() {
     >
       <div className="max-w-[1280px] w-full grid grid-cols-1 md:grid-cols-2 items-center gap-10 py-12">
         <div className="flex flex-col items-center !text-center space-y-6 transition-all duration-500 ease-in-out">
-  <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold !leading-[1.3] sm:leading-snug md:leading-tight">
-    {slides[index].title}
-  </h1>
-  <p className="text-base sm:text-lg md:text-xl text-blue-600 max-w-md !leading-[1.8] sm:leading-relaxed md:leading-loose">
-    {slides[index].description}
-  </p>
-  <div className="flex justify-center">
-    <button className="border border-[#021688] text-[#021688] font-semibold text-base sm:text-lg !px-8 !py-2 rounded-full hover:bg-green-500 transition-all">
-      Mua ngay
-    </button>
-  </div>
-</div>
-
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold !leading-[1.3] sm:leading-snug md:leading-tight">
+            {slides[index].title}
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl text-blue-600 max-w-md !leading-[1.8] sm:leading-relaxed md:leading-loose">
+            {slides[index].description}
+          </p>
+          <div className="flex justify-center">
+            <button className="border border-[#021688] text-[#021688] font-semibold text-base sm:text-lg !px-8 !py-2 rounded-full hover:bg-green-500 transition-all">
+              Mua ngay
+            </button>
+          </div>
+        </div>
 
         <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] bg-transparent px-6 sm:px-8 md:px-12">
           <Canvas camera={{ position: [0, 1.5, 6], fov: 45 }}>
