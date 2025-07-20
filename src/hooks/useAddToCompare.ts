@@ -5,9 +5,11 @@ import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addCompareProduct } from "@/services/productService";
 import { useCompare } from "@/app/(client)/component/product_compare/compare_context";
+import { useGlobalStore } from "@/store/useGlobalStore";
 export const useAddToCompare = () => {
   const router = useRouter();
   const { refresh } = useCompare();
+  const { incrementCompare } = useGlobalStore();
 
   const handleAddCompare = async ({ productId }: { productId: number }) => {
     try {
@@ -37,6 +39,7 @@ export const useAddToCompare = () => {
       });
 
       await refresh();
+      incrementCompare();
     } catch (error) {
       console.error("Lỗi thêm sản phẩm so sánh:", error);
       Swal.fire({
