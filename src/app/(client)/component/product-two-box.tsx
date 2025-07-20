@@ -7,6 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
 import Link from "next/link";
+import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import ProductIcons from "./products/ProductIcons";
@@ -88,6 +89,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                             className="!h-[150px] !w-[100%]"
                           />
                         </Link>
+
 
                         {/* ✅ Đặt đúng productId tại đây */}
                         <ProductIcons productId={productId} />

@@ -14,6 +14,7 @@ import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
+import CompareButton from "./component/product_compare/button_compare";
 import {
   getNewestProducts,
   getFeaturedProducts,
@@ -469,12 +470,14 @@ export default function Home({ product }: { product: IProduct }) {
                   : 0;
 
               const uniqueColors = [
-                ...new Map(
-                  (product.product_variants || [])
-                    .filter((v) => v.color && v.color.id) // tránh undefined/null
-                    .map((v) => [v.color.id, v.color])
-                ).values(),
-              ];
+  ...new Map(
+    (product.product_variants || [])
+      .filter((v) => v.color && v.color.id) 
+      .map((v) => [v.color.id, v.color])
+  ).values(),
+];
+
+
 
               return (
                 <div className="hot-product-card" key={product.products_id}>
@@ -487,6 +490,7 @@ export default function Home({ product }: { product: IProduct }) {
                         alt={product.name}
                       />
                     </Link>
+
                     <HotProductIcons productId={productId} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>

@@ -548,6 +548,25 @@ export async function getCompareProduct(userId: number) {
 
   return await res.json();
 }
+// add compare
+export async function addCompareProduct(userId: number, productID: number) {
+  const res = await fetch(`${API_BASE_URL}/product/compare/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ user_id: userId, product_id: productID  }),
+  });
+
+  if (!res.ok) {
+     const text = await res.text();
+  console.error("API response text:", text);
+    throw new Error("Không thể thêm danh sách sản phẩm so sánh");
+  }
+
+  return await res.json();
+}
+
 // delete compare
 export async function deleteCompareProduct(userId: number, productID: number) {
   const res = await fetch(`${API_BASE_URL}/product/compare/remove`, {
@@ -555,10 +574,12 @@ export async function deleteCompareProduct(userId: number, productID: number) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userId, productID }),
+    body: JSON.stringify({ user_id: userId, product_id: productID  }),
   });
 
   if (!res.ok) {
+     const text = await res.text();
+  console.error("API response text:", text);
     throw new Error("Không thể xóa danh sách sản phẩm so sánh");
   }
 
