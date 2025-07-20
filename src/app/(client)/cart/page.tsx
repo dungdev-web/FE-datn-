@@ -245,7 +245,7 @@ export default function Cart() {
                   </div>
                 </div>
                 <div className="cart-item-price">
-                  {Number(item.price?.toLocaleString("vi"))}₫
+                  {item.price?.toLocaleString("vi")}₫
                 </div>
 
                 <div className="quantity-control">

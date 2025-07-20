@@ -2,14 +2,18 @@
 
 import { useAddToWishlist } from "@/hooks/useAddToWishlist";
 import { useAddToCart } from "@/hooks/useAddToCart";
+import { useAddToCompare } from "@/hooks/useAddToCompare";
 
 interface HotProductIconsProps {
   productId: number;
+  variant_id:number;
+  price:number
 }
 
-export default function HotProductIcons({ productId }: HotProductIconsProps) {
+export default function HotProductIcons({ productId,variant_id, price }: HotProductIconsProps) {
   const { isWished, handleAddToWishlist } = useAddToWishlist(productId);
   const { handleAddToCart } = useAddToCart();
+  const { isCompared, handleAddCompare, loading } = useAddToCompare(productId);
 
   return (
     <div className="hot-product-icons">
@@ -22,10 +26,16 @@ export default function HotProductIcons({ productId }: HotProductIconsProps) {
         <i className="fa-solid fa-eye"></i>
         <i
           className="fa fa-shopping-bag position-relative"
-          onClick={handleAddToCart}
+          onClick={() => handleAddToCart({ variant_id, price })}
         ></i>
-        <i className="fa fa-exchange"></i>
-      </div>
+ <button
+          className={`compare-btn ${isCompared ? "active" : ""}`}
+          onClick={handleAddCompare}
+          title={isCompared ? "Đã thêm vào so sánh" : "Thêm vào so sánh"}
+          disabled={loading}
+        >
+          <i className="fa fa-exchange" aria-hidden="true"></i>
+        </button>      </div>
     </div>
   );
 }

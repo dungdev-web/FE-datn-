@@ -470,14 +470,12 @@ export default function Home({ product }: { product: IProduct }) {
                   : 0;
 
               const uniqueColors = [
-  ...new Map(
-    (product.product_variants || [])
-      .filter((v) => v.color && v.color.id) 
-      .map((v) => [v.color.id, v.color])
-  ).values(),
-];
-
-
+                ...new Map(
+                  (product.product_variants || [])
+                    .filter((v) => v.color && v.color.id)
+                    .map((v) => [v.color.id, v.color])
+                ).values(),
+              ];
 
               return (
                 <div className="hot-product-card" key={product.products_id}>
@@ -491,7 +489,7 @@ export default function Home({ product }: { product: IProduct }) {
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -601,12 +599,12 @@ export default function Home({ product }: { product: IProduct }) {
                       />
                     </Link>
 
-                   <HotProductIcons productId={productId} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
                     )}
-                    </div>
+                  </div>
 
                   <div className="hot-product-content">
                     <div className="hot-product-colors">

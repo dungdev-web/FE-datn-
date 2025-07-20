@@ -291,7 +291,7 @@ export default function Product() {
                               />
                             </Link>
 
-                            <ProductIcons productId={sp.id ?? sp.products_id} />
+                            <ProductIcons productId={sp.products_id ?? sp.products_id} variant_id={sp.product_variants[0].product_variants_id} price={sp.sale_price}/>
 
                             <span className="discount-tag">
                               -
@@ -404,7 +404,7 @@ export default function Product() {
                               />
                             </Link>
 
-                            <ProductIcons productId={sp.id ?? sp.products_id} />
+                            <ProductIcons productId={sp.products_id ?? sp.products_id}  variant_id={sp.product_variants[0].product_variants_id} price={sp.sale_price} />
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
