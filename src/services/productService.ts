@@ -490,3 +490,34 @@ export async function addReviewProduct(productId: number, payload: IReviewPayloa
 
   return await res.json(); 
 }
+// compare product
+export async function getCompareProduct(userId: number) {
+  const res = await fetch(`${API_BASE_URL}/product/compare?user_id=${userId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm so sánh");
+  }
+
+  return await res.json();
+}
+// delete compare
+export async function deleteCompareProduct(userId: number, productID: number) {
+  const res = await fetch(`${API_BASE_URL}/product/compare/remove`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, productID }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Không thể xóa danh sách sản phẩm so sánh");
+  }
+
+  return await res.json();
+}

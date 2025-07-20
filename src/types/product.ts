@@ -76,3 +76,10 @@ export interface IReviewPayload {
   rating: number;
   content: string;
 }
+export interface ICompareProduct{
+  product_compare_id:number;
+  user_id:number;
+  created_at:Date;
+  product:IProduct;
+  
+}

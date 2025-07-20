@@ -47,7 +47,6 @@ export default function Product() {
     fetchBrands();
   }, []);
 
-
   useEffect(() => {
     async function fetchFilteredProducts() {
       try {
@@ -73,7 +72,6 @@ export default function Product() {
     fetchFilteredProducts();
   }, [selectedBrandIds, brandId]);
 
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -90,14 +88,13 @@ export default function Product() {
     fetchProducts();
   }, [page, viewMode]);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchSearch = async () => {
       if (!keyword) return;
       try {
         const res = await searchProducts(keyword);
         setProducts(res.products || []);
         console.log(res.products);
-        
       } catch (err) {
         console.error("Lỗi tìm kiếm:", err);
       }
@@ -163,13 +160,13 @@ useEffect(() => {
           <div className="row">
             <div className="wrapper">
               <SidebarFilter
-  categories={categories}
-  openCategoryId={openCategoryId}
-  toggleCategory={toggleCategory}
-  brandsList={brandsList}
-  selectedBrandIds={selectedBrandIds}
-  handleBrandCheckboxChange={handleBrandCheckboxChange}
-/>
+                categories={categories}
+                openCategoryId={openCategoryId}
+                toggleCategory={toggleCategory}
+                brandsList={brandsList}
+                selectedBrandIds={selectedBrandIds}
+                handleBrandCheckboxChange={handleBrandCheckboxChange}
+              />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -525,15 +522,15 @@ useEffect(() => {
         ></i>
       </div>
 
-                <MobileSidebarFilter
-  isActive={isActive}
-  categories={categories}
-  openCategoryId={openCategoryId}
-  toggleCategory={toggleCategory}
-  brandsList={brandsList}
-  selectedBrandIds={selectedBrandIds}
-  handleBrandCheckboxChange={handleBrandCheckboxChange}
-/>
+      <MobileSidebarFilter
+        isActive={isActive}
+        categories={categories}
+        openCategoryId={openCategoryId}
+        toggleCategory={toggleCategory}
+        brandsList={brandsList}
+        selectedBrandIds={selectedBrandIds}
+        handleBrandCheckboxChange={handleBrandCheckboxChange}
+      />
     </>
   );
 }
