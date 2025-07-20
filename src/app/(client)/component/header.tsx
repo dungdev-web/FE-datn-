@@ -15,6 +15,7 @@ import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
 import { useCompare } from "./product_compare/compare_context";
+import { useGlobalStore } from "@/store/useGlobalStore";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -35,10 +36,14 @@ export default function Header() {
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
-  const [cartItemCount, setCartItemCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [compareCount, setCompareCount] = useState(0);
-  const { count } = useCompare();
+   const {
+  wishlistCount,
+  compareCount,
+  cartCount: cartItemCount,
+  setWishlistCount,
+  setCompareCount,
+  setCartCount,
+} = useGlobalStore();
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -115,7 +120,7 @@ export default function Header() {
         const cartData = await getCartByUserId(user.id);
         const totalItems =
           cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-        setCartItemCount(totalItems);
+        setCartCount(totalItems);
       } catch (error) {
         console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
       }
@@ -285,7 +290,7 @@ export default function Header() {
 
           <div
             className="iconcompare-header div data_compare_product"
-            data-count={count}
+            data-count={compareCount}
           >
             <Link href="/compare_product">
               <i className="fa fa-exchange"></i>
