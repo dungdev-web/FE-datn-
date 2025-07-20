@@ -14,6 +14,7 @@ import { getBrands } from "@/services/brandService";
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
+import { useCompare } from "./product_compare/compare_context";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -37,6 +38,7 @@ export default function Header() {
   const [cartItemCount, setCartItemCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [compareCount, setCompareCount] = useState(0);
+  const { count } = useCompare();
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -283,7 +285,7 @@ export default function Header() {
 
           <div
             className="iconcompare-header div data_compare_product"
-            data-count={compareCount}
+            data-count={count}
           >
             <Link href="/compare_product">
               <i className="fa fa-exchange"></i>
