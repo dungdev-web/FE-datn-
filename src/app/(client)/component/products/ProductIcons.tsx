@@ -9,7 +9,7 @@ interface ProductIconsProps {
 export default function ProductIcons({ productId }: ProductIconsProps) {
   const { isWished, handleAddToWishlist } = useAddToWishlist(productId);
   const { handleAddToCart } = useAddToCart();
-  const { handleAddCompare } = useAddToCompare();
+  const { isCompared, handleAddCompare, loading } = useAddToCompare(productId);
 
   return (
     <div className="product-icons">
@@ -28,7 +28,7 @@ export default function ProductIcons({ productId }: ProductIconsProps) {
         ></i>
        <button
           className={`compare-btn ${isCompared ? "active" : ""}`}
-          onClick={handleAddToCompare}
+          onClick={handleAddCompare}
           title={isCompared ? "Đã thêm vào so sánh" : "Thêm vào so sánh"}
           disabled={loading}
         >

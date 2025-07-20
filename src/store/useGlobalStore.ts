@@ -10,6 +10,7 @@ interface GlobalStore {
   incrementWishlist: () => void;
   incrementCompare: () => void;
   incrementCart: () => void;
+  decrementCompare: () => void;
 }
 
 export const useGlobalStore = create<GlobalStore>((set) => ({
@@ -26,4 +27,8 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
   incrementCompare: () =>
     set((state) => ({ compareCount: state.compareCount + 1 })),
   incrementCart: () => set((state) => ({ cartCount: state.cartCount + 1 })),
+   decrementCompare: () =>
+    set((state) => ({
+      compareCount: Math.max(state.compareCount - 1, 0),
+    })),
 }));
