@@ -199,22 +199,16 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
     });
   }
 
-  const res = await fetch(
-    `${API_BASE_URL}/product/featured?page=1&limit=20`
-  );
+  const res = await fetch(`${API_BASE_URL}/product/featured?page=1&limit=20`);
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm nổi bật.");
   }
 
-  const json = await res.json();
-  const products: IProduct[] = json.products || json.data || [];
-
-  if (!Array.isArray(products)) {
-    throw new Error("Dữ liệu sản phẩm trả về không đúng định dạng.");
-  }
+  const products: IProduct[] = await res.json(); 
 
   return products;
 }
+
 
 //Lấy sản phẩm theo giới tính nam
 export async function getMenShoes(): Promise<IProduct[]> {
@@ -557,14 +551,13 @@ export async function addCompareProduct(userId: number, productID: number) {
     },
     body: JSON.stringify({ user_id: userId, product_id: productID  }),
   });
+  const data = await res.json();
 
   if (!res.ok) {
-     const text = await res.text();
-  console.error("API response text:", text);
-    throw new Error("Không thể thêm danh sách sản phẩm so sánh");
+    throw new Error(data.error || "Lỗi không xác định");
   }
 
-  return await res.json();
+  return data;
 }
 
 // delete compare
