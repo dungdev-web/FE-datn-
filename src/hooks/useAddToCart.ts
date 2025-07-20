@@ -4,17 +4,19 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { addToCart } from "@/services/cartService";
 import { checkToken } from "@/services/authService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export const useAddToCart = () => {
   const router = useRouter();
+  const { incrementCart } = useGlobalStore(); 
 
   const handleAddToCart = async ({
     variant_id,
-    quantity = 1, // ✅ mặc định là 1
+    quantity = 1,
     price,
   }: {
     variant_id: number;
-    quantity?: number; // ✅ quantity không bắt buộc truyền
+    quantity?: number;
     price: number;
   }) => {
     try {
@@ -39,6 +41,8 @@ export const useAddToCart = () => {
         quantity,
         price,
       });
+
+      incrementCart(); // ✅ tăng số lượng trong Zustand
 
       Swal.fire({
         icon: "success",

@@ -14,6 +14,7 @@ import { getBrands } from "@/services/brandService";
 import { getCompareProduct, searchProducts } from "@/services/productService";
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -34,9 +35,15 @@ export default function Header() {
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
-  const [cartItemCount, setCartItemCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [compareCount, setCompareCount] = useState(0);
+ const {
+  wishlistCount,
+  compareCount,
+  cartCount: cartItemCount,
+  setWishlistCount,
+  setCompareCount,
+  setCartCount,
+} = useGlobalStore();
+
   const handleSearch = () => {
     if (!keyword.trim()) return;
     router.push(`/product?q=${encodeURIComponent(keyword)}`);
@@ -104,49 +111,50 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
-  useEffect(() => {
-    const fetchCartCount = async () => {
-      if (!user?.id) return;
+useEffect(() => {
+  const fetchCartCount = async () => {
+    if (!user?.id) return;
+    try {
+      const cartData = await getCartByUserId(user.id);
+      const totalItems = cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+      setCartCount(totalItems);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+    }
+  };
 
-      try {
-        const cartData = await getCartByUserId(user.id);
-        const totalItems =
-          cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-        setCartItemCount(totalItems);
-      } catch (error) {
-        console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
-      }
-    };
+  fetchCartCount();
+}, [user]);
 
-    fetchCartCount();
-  }, [user]);
-  useEffect(() => {
-    const fetchWishlistCount = async () => {
-      if (!user?.id) return;
+useEffect(() => {
+  const fetchWishlistCount = async () => {
+    if (!user?.id) return;
 
-      try {
-        const wishlist = await getWishlistByUserId(user.id);
-        setWishlistCount(wishlist.length);
-      } catch (error) {
-        console.error("Lỗi khi lấy số lượng yêu thích:", error);
-      }
-    };
+    try {
+      const wishlist = await getWishlistByUserId(user.id);
+      setWishlistCount(wishlist.length);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng yêu thích:", error);
+    }
+  };
 
-    fetchWishlistCount();
-  }, [user]);
-  useEffect(() => {
-    const fetchCompareCount = async () => {
-      if (!user?.id) return;
-      try {
-        const compareList = await getCompareProduct(user.id);
-        setCompareCount(compareList.length || 0);
-      } catch (error) {
-        console.error("Lỗi khi lấy số lượng so sánh:", error);
-      }
-    };
+  fetchWishlistCount();
+}, [user]);
 
-    fetchCompareCount();
-  }, [user]);
+useEffect(() => {
+  const fetchCompareCount = async () => {
+    if (!user?.id) return;
+    try {
+      const compareList = await getCompareProduct(user.id);
+      setCompareCount(compareList.length || 0);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng so sánh:", error);
+    }
+  };
+
+  fetchCompareCount();
+}, [user]);
+
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);

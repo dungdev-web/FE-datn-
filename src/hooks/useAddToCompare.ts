@@ -3,11 +3,13 @@ import { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addCompareProduct, getCompareProduct } from "@/services/productService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export const useAddToCompare = (productId: number) => {
   const [userId, setUserId] = useState<number | null>(null);
   const [isCompared, setIsCompared] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { incrementCompare } = useGlobalStore();
 
   useEffect(() => {
     const fetchUserAndCheckCompared = async () => {
@@ -37,6 +39,7 @@ export const useAddToCompare = (productId: number) => {
     try {
       await addCompareProduct(userId, productId);
       setIsCompared(true);
+      incrementCompare();
       Swal.fire({
         icon: "success",
         title: "Đã thêm vào so sánh!",
