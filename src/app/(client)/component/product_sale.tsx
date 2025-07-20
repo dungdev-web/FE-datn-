@@ -7,6 +7,7 @@ import { IProduct } from "@/types/product";
 import "swiper/css";
 import "swiper/css/navigation";
 import { getDealProducts } from "@/services/productService";
+import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
@@ -47,12 +48,13 @@ export default function ProductSale() {
       >
         {dealProducts.map((product) => {
           const variants = product.product_variants || [];
-          const reviews = product.reviews || [];
+          const reviews = product.product_reviews || [];
           const images = product.images || [];
 
           const averageRating = reviews.length
             ? Math.round(
-                reviews.reduce((sum, r) => sum + Number(r.rating), 0) / reviews.length
+                reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+                  reviews.length
               )
             : 0;
 
@@ -60,7 +62,9 @@ export default function ProductSale() {
 
           const discount =
             product.price > 0
-              ? Math.round(((product.price - product.sale_price) / product.price) * 100)
+              ? Math.round(
+                  ((product.price - product.sale_price) / product.price) * 100
+                )
               : 0;
 
           const uniqueColors = [
@@ -89,7 +93,7 @@ export default function ProductSale() {
                       <div className="hover-icons">
                         <i className="fa-solid fa-eye"></i>
                         <i className="fa-solid fa-list"></i>
-                        <i className="fa fa-exchange"></i>
+                        <CompareButton productId={product.products_id} />
                       </div>
                     </div>
 

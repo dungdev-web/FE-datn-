@@ -6,14 +6,12 @@ import MenuRight from "./menu_right";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { useRouter } from "next/navigation";
-import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
-import { searchProducts } from "@/services/productService";
-
+import CompareBadge from "./product_compare/count_compare";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -36,9 +34,9 @@ export default function Header() {
   const router = useRouter();
 
   const handleSearch = () => {
-  if (!keyword.trim()) return;
-  router.push(`/product?q=${encodeURIComponent(keyword)}`);
-};
+    if (!keyword.trim()) return;
+    router.push(`/product?q=${encodeURIComponent(keyword)}`);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -233,7 +231,7 @@ export default function Header() {
           </div>
           <div className="iconcompare-header div">
             <Link href="/compare_product">
-              <i className="fa fa-exchange"></i>
+              {user?.id !== undefined && <CompareBadge userId={user.id} />}
             </Link>
           </div>
 

@@ -7,6 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
 import Link from "next/link";
+import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 
@@ -88,7 +89,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                           <div className="hover-icons">
                             <i className="fa-solid fa-eye"></i>
                             <i className="fa-solid fa-list"></i>
-                            <i className="fa fa-exchange"></i>
+                        <CompareButton productId={products[0].products_id} />
                           </div>
                         </div>
                         <span className="discount-tag">

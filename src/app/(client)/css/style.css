@@ -195,8 +195,7 @@ header.scrolled {
 }
 
 
-.icon-header .div::after {
-  content: "0";
+.icon-header span{
   position: absolute;
   top: -5px;
   right: -5px;

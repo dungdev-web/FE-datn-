@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { getCompareProduct } from "@/services/productService";
 import { ICompareProduct } from "@/types/product";
 import { checkToken } from "@/services/authService";
+import { useCompare } from "../component/product_compare/compare_context";
 import { deleteCompareProduct } from "@/services/productService";
 import Swal from "sweetalert2";
 import "../css/product.css";
@@ -10,31 +11,34 @@ import "../css/compare.css";
 import { useRouter } from "next/navigation";
 export default function Compare_product() {
   const [compare, setCompare] = useState<ICompareProduct[]>([]);
+  const { refresh, setCount } = useCompare();
+
   const router = useRouter();
-const handleRemoveCompare = async (productId: number) => {
-  try {
-       const tokenData = await checkToken();
-      const user_id = tokenData?.user?.id;
-    await deleteCompareProduct(user_id, productId);
+  const handleRemoveCompare = async (productId: number) => {
+    try {
+      const tokenData = await checkToken();
+      const user_id = Number(tokenData?.user?.id);
+      await deleteCompareProduct(user_id, productId);
+      refresh();
+      setCompare((prev) =>
+        prev.filter((item) => item?.product.products_id !== productId)
+      );
 
-    // Xoá sản phẩm khỏi state sau khi xoá thành công từ server
-    setCompare((prev) => prev.filter((item) => item?.product_id !== productId));
-
-    Swal.fire({
-      icon: "success",
-      title: "Đã xoá sản phẩm khỏi so sánh",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-  } catch (error) {
-    console.error("Lỗi khi xoá sản phẩm so sánh:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Không thể xoá sản phẩm",
-      text: "Đã xảy ra lỗi. Vui lòng thử lại.",
-    });
-  }
-};
+      Swal.fire({
+        icon: "success",
+        title: "Đã xoá sản phẩm khỏi so sánh",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (error) {
+      console.error("Lỗi khi xoá sản phẩm so sánh:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Không thể xoá sản phẩm",
+        text: "Đã xảy ra lỗi. Vui lòng thử lại.",
+      });
+    }
+  };
 
   useEffect(() => {
     if (compare.length > 0) {
@@ -42,10 +46,9 @@ const handleRemoveCompare = async (productId: number) => {
         (sum, v) => sum + (v?.stock_quantity || 0),
         0
       );
-      console.log("Sold count:", sold);
     }
   }, [compare]);
-  
+
   useEffect(() => {
     const fetchCompare = async () => {
       const tokenData = await checkToken();
@@ -67,13 +70,15 @@ const handleRemoveCompare = async (productId: number) => {
       try {
         const data = await getCompareProduct(user_id);
         setCompare(data || []);
+        setCount(data.length);
+
         console.log("sp so sánh", data);
       } catch (err) {
         console.error("Lỗi tìm kiếm:", err);
       }
     };
     fetchCompare();
-  }, []);
+  }, [ refresh]);
   console.log("Compare:", compare);
   console.log("Product:", compare[0]?.product);
   console.log("Variants:", compare[0]?.product?.product_variants);
@@ -207,8 +212,7 @@ const handleRemoveCompare = async (productId: number) => {
                         <td key={item.product_compare_id}>
                           <p>{item.product.short_desc || "Đang cập nhật..."}</p>
                           <a
-                            className="remove-item removeItem"
-                            href="javascript:;"
+                            className="remove-item removeItem cursor-pointer"
                             data-compare={item.product.slug}
                             onClick={() =>
                               handleRemoveCompare(item.product.products_id)

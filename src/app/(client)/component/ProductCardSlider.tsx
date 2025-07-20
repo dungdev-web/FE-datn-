@@ -1,16 +1,15 @@
 import { IProduct } from "@/types/product";
 import Link from "next/link";
-
+import CompareButton from "./product_compare/button_compare";
 export default function ProductCardSlider({ product }: { product: IProduct }) {
-  const reviews = product.reviews || [];
-  const variants = product.variants || [];
+  const reviews = product.product_reviews || [];
+  const variants = product.product_variants || [];
   const images = product.images || [];
 
-  
-    const discount =
-      product.sale_price && product.price
-        ? Math.round(((product.price - product.sale_price) / product.price) * 100)
-        : 0;
+  const discount =
+    product.sale_price && product.price
+      ? Math.round(((product.price - product.sale_price) / product.price) * 100)
+      : 0;
   const averageRating = reviews.length
     ? Math.round(
         reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) /
@@ -22,9 +21,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
 
   const uniqueColors = [
     ...new Map(
-      variants
-        .filter((v) => v.color?.id)
-        .map((v) => [v.color.id, v.color])
+      variants.filter((v) => v.color?.id).map((v) => [v.color.id, v.color])
     ).values(),
   ];
 
@@ -44,13 +41,11 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
             <div className="hover-icons">
               <i className="fa-solid fa-eye"></i>
               <i className="fa-solid fa-list"></i>
-              <i className="fa fa-exchange"></i>
+              <CompareButton productId={product.products_id} />
             </div>
           </div>
 
-          {discount > 0 && (
-            <span className="discount-tag">-{discount}%</span>
-          )}
+          {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 
           <div className="product-colors">
             {uniqueColors.map((color) => (
