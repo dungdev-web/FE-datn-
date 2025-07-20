@@ -7,6 +7,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { IProduct } from "@/types/product";
 import { getDealProducts } from "@/services/productService";
+import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import ProductIcons from "./products/ProductIcons";
@@ -49,12 +50,13 @@ export default function ProductSale() {
         {dealProducts.map((product) => {
           const productId = product.id ?? product.products_id;
           const variants = product.product_variants || [];
-          const reviews = product.reviews || [];
+          const reviews = product.product_reviews || [];
           const images = product.images || [];
 
           const averageRating = reviews.length
             ? Math.round(
-                reviews.reduce((sum, r) => sum + Number(r.rating), 0) / reviews.length
+                reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+                  reviews.length
               )
             : 0;
 
@@ -62,7 +64,9 @@ export default function ProductSale() {
 
           const discount =
             product.price > 0
-              ? Math.round(((product.price - product.sale_price) / product.price) * 100)
+              ? Math.round(
+                  ((product.price - product.sale_price) / product.price) * 100
+                )
               : 0;
 
           const uniqueColors = [
@@ -85,6 +89,7 @@ export default function ProductSale() {
                         className="!h-[100%]"
                       />
                     </Link>
+
 
                     {/* ✅ Sử dụng đúng productId */}
                     <ProductIcons productId={productId} />

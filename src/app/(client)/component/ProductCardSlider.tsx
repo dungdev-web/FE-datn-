@@ -2,12 +2,14 @@
 
 import { IProduct } from "@/types/product";
 import Link from "next/link";
+import CompareButton from "./product_compare/button_compare";
 import ProductIcons from "./products/ProductIcons";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
-  const reviews = product.reviews || [];
-  const variants = product.variants || [];
+  const reviews = product.product_reviews || [];
+  const variants = product.product_variants || [];
   const images = product.images || [];
+
 
   const productId = product.id ?? product.products_id;
 
@@ -41,6 +43,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
               alt={product.name}
             />
           </Link>
+
 
           <ProductIcons productId={productId} />
 

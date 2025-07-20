@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { addToWishlist, getWishlistByUserId } from "@/services/wishlistService";
 import { checkToken } from "@/services/authService";
+import { useGlobalStore } from "@/store/useGlobalStore";
+
 
 export const useAddToWishlist = (productId: number) => {
   const [isWished, setIsWished] = useState(false);
   const router = useRouter();
-
+  const { incrementWishlist } = useGlobalStore();
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
@@ -65,6 +67,8 @@ export const useAddToWishlist = (productId: number) => {
         response.message === "Sản phẩm đã có trong danh sách yêu thích."
       ) {
         setIsWished(true);
+        incrementWishlist();
+
       }
 
       Swal.fire({

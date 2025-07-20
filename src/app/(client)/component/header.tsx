@@ -6,15 +6,15 @@ import MenuRight from "./menu_right";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { useRouter } from "next/navigation";
-import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
-import { searchProducts } from "@/services/productService";
+import { getCompareProduct, searchProducts } from "@/services/productService";
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -35,8 +35,14 @@ export default function Header() {
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
-  const [cartItemCount, setCartItemCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
+ const {
+  wishlistCount,
+  compareCount,
+  cartCount: cartItemCount,
+  setWishlistCount,
+  setCompareCount,
+  setCartCount,
+} = useGlobalStore();
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -105,36 +111,50 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
-  useEffect(() => {
-    const fetchCartCount = async () => {
-      if (!user?.id) return;
+useEffect(() => {
+  const fetchCartCount = async () => {
+    if (!user?.id) return;
+    try {
+      const cartData = await getCartByUserId(user.id);
+      const totalItems = cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+      setCartCount(totalItems);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+    }
+  };
 
-      try {
-        const cartData = await getCartByUserId(user.id);
-        const totalItems =
-          cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-        setCartItemCount(totalItems);
-      } catch (error) {
-        console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
-      }
-    };
+  fetchCartCount();
+}, [user]);
 
-    fetchCartCount();
-  }, [user]);
-  useEffect(() => {
-    const fetchWishlistCount = async () => {
-      if (!user?.id) return;
+useEffect(() => {
+  const fetchWishlistCount = async () => {
+    if (!user?.id) return;
 
-      try {
-        const wishlist = await getWishlistByUserId(user.id);
-        setWishlistCount(wishlist.length);
-      } catch (error) {
-        console.error("Lỗi khi lấy số lượng yêu thích:", error);
-      }
-    };
+    try {
+      const wishlist = await getWishlistByUserId(user.id);
+      setWishlistCount(wishlist.length);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng yêu thích:", error);
+    }
+  };
 
-    fetchWishlistCount();
-  }, [user]);
+  fetchWishlistCount();
+}, [user]);
+
+useEffect(() => {
+  const fetchCompareCount = async () => {
+    if (!user?.id) return;
+    try {
+      const compareList = await getCompareProduct(user.id);
+      setCompareCount(compareList.length || 0);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng so sánh:", error);
+    }
+  };
+
+  fetchCompareCount();
+}, [user]);
+
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -237,52 +257,57 @@ export default function Header() {
             <span className="sdt-header">0338538203</span>
           </div>
         </div>
-        <div className="icon-header">
-          <div
-            className={`iconuser-header div1 ${
-              user ? "logged-in" : "logged-out"
-            }`}
-          >
-            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {user ? (
-                <Link
-                  href="/account"
-                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
-                >
-                  Chào {user.name}
-                </Link>
-              ) : (
-                <Link href="/login">
-                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
-                </Link>
-              )}
-            </div>
-          </div>
-          <div
-            className="iconheart-header div data_wishlist"
-            data-count={wishlistCount}
-          >
-            <Link href="/wishlist">
-              <i className="fa-solid fa-heart"></i>
-            </Link>
-          </div>
-
-          <div className="iconcompare-header div data_compare_product">
-            <Link href="/compare_product">
-              <i className="fa fa-exchange"></i>
-            </Link>
-          </div>
-          <div className="cart-wrapper">
-            <div
-              className="iconcart-header div data_cart"
-              data-count={cartItemCount}
+         <div className="icon-header">
+      <div
+        className={`iconuser-header div1 ${
+          user ? "logged-in" : "logged-out"
+        }`}
+      >
+        <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+          {user ? (
+            <Link
+              href="/account"
+              className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
             >
-              <Link href="/cart">
-                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
-              </Link>
-            </div>
-          </div>
+              Chào {user.name}
+            </Link>
+          ) : (
+            <Link href="/login">
+              <i className="fa-solid fa-user cursor-pointer text-white"></i>
+            </Link>
+          )}
         </div>
+      </div>
+
+      <div
+        className="iconheart-header div data_wishlist"
+        data-count={wishlistCount}
+      >
+        <Link href="/wishlist">
+          <i className="fa-solid fa-heart"></i>
+        </Link>
+      </div>
+
+      <div
+        className="iconcompare-header div data_compare_product"
+        data-count={compareCount}
+      >
+        <Link href="/compare_product">
+          <i className="fa fa-exchange"></i>
+        </Link>
+      </div>
+
+      <div className="cart-wrapper">
+        <div
+          className="iconcart-header div data_cart"
+          data-count={cartItemCount}
+        >
+          <Link href="/cart">
+            <i className="fa fa-shopping-bag"></i>
+          </Link>
+        </div>
+      </div>
+    </div>
       </header>
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
