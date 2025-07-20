@@ -4,9 +4,11 @@ import { useAddToCompare } from "@/hooks/useAddToCompare";
 import CompareButton from "../product_compare/button_compare";
 interface ProductIconsProps {
   productId: number;
+  variant_id:number;
+  price:number
 }
 
-export default function ProductIcons({ productId }: ProductIconsProps) {
+export default function ProductIcons({ productId,variant_id, price  }: ProductIconsProps) {
   const { isWished, handleAddToWishlist } = useAddToWishlist(productId);
   const { handleAddToCart } = useAddToCart();
   const { isCompared, handleAddCompare, loading } = useAddToCompare(productId);
@@ -24,7 +26,8 @@ export default function ProductIcons({ productId }: ProductIconsProps) {
         <i className="fa-solid fa-eye"></i>
         <i
           className="fa fa-shopping-bag position-relative"
-          onClick={handleAddToCart}
+          onClick={() => handleAddToCart({ variant_id, price })}
+
         ></i>
        <button
           className={`compare-btn ${isCompared ? "active" : ""}`}

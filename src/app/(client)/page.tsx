@@ -445,7 +445,7 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {newproducts.map((product) => {
-              const productId = product.id ?? product.products_id;
+              const productId = product.products_id ?? product.products_id;
               const averageRating = product.product_reviews?.length
                 ? Math.round(
                     product.product_reviews.reduce(
@@ -555,7 +555,7 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {featureproducts.map((product) => {
-              const productId = product.id ?? product.products_id;
+              const productId = product.products_id ?? product.products_id;
 
               const averageRating = product.product_reviews?.length
                 ? Math.round(

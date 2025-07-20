@@ -11,7 +11,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
   const images = product.images || [];
 
 
-  const productId = product.id ?? product.products_id;
+  const productId = product.products_id ?? product.products_id;
 
   const discount =
     product.sale_price && product.price
@@ -45,7 +45,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
           </Link>
 
 
-          <ProductIcons productId={productId} />
+          <ProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
 
           {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 
