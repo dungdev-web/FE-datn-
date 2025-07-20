@@ -15,6 +15,8 @@ import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";
 import { useRouter } from "next/navigation";
+// Đang dùng mock, hãy thay bằng API thật:
+import { addToCart } from "@/services/cartService";
 
 export default function Detail() {
   const router = useRouter();
@@ -34,71 +36,82 @@ export default function Detail() {
   const [views, setReviews] = useState<IReview[]>([]);
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
-
   const handleAddToCart = async () => {
-    if (!selectedColorId) {
+  if (!selectedColorId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Vui lòng chọn màu sắc",
+      text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
+    });
+    return;
+  }
+
+  if (!selectedSizeId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Vui lòng chọn kích thước",
+      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+    });
+    return;
+  }
+
+  if (!variantId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Vui lòng chọn biến thể",
+      text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
+    });
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const tokenData = await checkToken();
+    if (!tokenData?.user?.id) {
       Swal.fire({
         icon: "warning",
-        title: "Vui lòng chọn màu sắc",
-        text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
+        title: "Bạn chưa đăng nhập",
+        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+        confirmButtonText: "Đăng nhập",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
       });
       return;
     }
 
-    if (!selectedSizeId) {
-      Swal.fire({
-        icon: "warning",
-        title: "Vui lòng chọn kích thước",
-        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-      });
-      return;
-    }
-    if (!variantId) {
-      Swal.fire({
-        icon: "warning",
-        title: "Vui lòng chọn kích thước",
-        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-      });
-      return;
-    }
-    setLoading(true);
-    try {
-      const tokenData = await checkToken();
-      if (!tokenData?.user?.id) {
-        Swal.fire({
-          icon: "warning",
-          title: "Bạn chưa đăng nhập",
-          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
-          confirmButtonText: "Đăng nhập",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            router.push("/login");
-          }
-        });
-        return;
-      }
-      await addToMockCart(tokenData.user.id, variantId, quantity, price);
-      console.log(variantId);
-      console.log(quantity);
-      console.log(price);
+    const response = await addToCart({
+      user_id: tokenData.user.id,
+      variant_id: variantId,
+      quantity,
+      price,
+    });
 
-      Swal.fire({
-        icon: "success",
-        title: "Đã thêm vào giỏ hàng!",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Lỗi!",
-        text: (error as Error).message || "Thêm sản phẩm thất bại",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    console.log("Đã thêm vào giỏ hàng:", response);
+
+    Swal.fire({
+      icon: "success",
+      title: "Đã thêm vào giỏ hàng!",
+      text: response.message,
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    router.push("/cart");
+
+  } catch (error) {
+    console.error("Lỗi khi thêm vào giỏ hàng:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Lỗi!",
+      text: (error as Error).message || "Thêm sản phẩm thất bại",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
   const [showSidebar, setShowSidebar] = useState(false);
   const toggleSidebar = () => setShowSidebar(!showSidebar);
 

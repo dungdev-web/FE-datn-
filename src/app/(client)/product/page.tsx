@@ -1,13 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-import { getAllProducts } from "@/services/productService";
+import {
+  getAllProducts,
+  getProductsByGender,
+} from "@/services/productService";
 import Link from "next/link";
 import { ICategory } from "@/types/ICategory";
 import { getCategories } from "@/services/categoryService";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { getBrands, getProductsByBrandId } from "@/services/brandService";
+import {
+  getBrands,
+  getProductsByBrandId,
+} from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -16,6 +22,7 @@ import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
 import { searchProducts } from "@/services/productService";
 import { log } from "console";
+import ProductIcons from "../component/products/ProductIcons";
 
 export default function Product() {
   const params = useParams();
@@ -30,65 +37,68 @@ export default function Product() {
   const [viewMode, setViewMode] = useState("grid");
   const [isActive, setIsActive] = useState(false);
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
   const totalPages = Math.ceil(total / productsPerPage);
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{
+    min: number;
+    max: number;
+  } | null>(null);
   useEffect(() => {
-    async function fetchBrands() {
+    const fetchInitialData = async () => {
       try {
-        const fetchedBrands = await getBrands();
+        const [fetchedBrands, fetchedCategories] = await Promise.all([
+          getBrands(),
+          getCategories(),
+        ]);
         setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
+        setCategories(Array.isArray(fetchedCategories) ? fetchedCategories : []);
       } catch (error) {
-        console.error("Lỗi khi lấy danh sách brand:", error);
-      }
-    }
 
-    fetchBrands();
-  }, []);
-
-  useEffect(() => {
-    async function fetchFilteredProducts() {
-      try {
-        if (selectedBrandIds.length === 0) {
-          // Không chọn brand nào → lấy theo brandId
-          const allProducts = await getProductsByBrandId(brandId);
-          setProducts(allProducts);
-          setTotal(allProducts.length);
-        } else {
-          let combined: IProduct[] = [];
-          for (const id of selectedBrandIds) {
-            const brandProducts = await getProductsByBrandId(id);
-            combined = [...combined, ...brandProducts];
-          }
-          setProducts(combined);
-          setTotal(combined.length);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lọc sản phẩm theo brand:", error);
-      }
-    }
-
-    fetchFilteredProducts();
-  }, [selectedBrandIds, brandId]);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await getAllProducts(page, productsPerPage);
-        const fetched = await getCategories();
-        setCategories(Array.isArray(fetched) ? fetched : []);
-        setProducts(res.data);
-        setTotal(res.total);
-      } catch (err) {
-        console.error("Lỗi lấy sản phẩm hoặc danh mục:", err);
+        console.error("Lỗi khi lấy dữ liệu ban đầu:", error);
       }
     };
 
-    fetchProducts();
-  }, [page, viewMode]);
-
+    fetchInitialData();
+  }, []);
+  // Gộp toàn bộ điều kiện lọc sản phẩm vào 1 useEffect duy nhất
   useEffect(() => {
+    const fetchFilteredProducts = async () => {
+      try {
+        let result: IProduct[] = [];
+
+
+        if (selectedGender) {
+          result = await getProductsByGender(selectedGender);
+        } else if (selectedBrandIds.length > 0) {
+          for (const id of selectedBrandIds) {
+            const brandProducts = await getProductsByBrandId(id);
+            result = [...result, ...brandProducts];
+          }
+        } else if (brandId) {
+          result = await getProductsByBrandId(brandId);
+        } else {
+          const res = await getAllProducts(page, productsPerPage);
+          result = res.data;
+          setTotal(res.total); // Chỉ getAllProducts có total
+        }
+          
+        setProducts(result);
+        if (selectedGender || selectedBrandIds.length > 0 || brandId) {
+          setTotal(result.length);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lọc sản phẩm:", error);
+      }
+    };
+
+    fetchFilteredProducts();
+  }, [selectedGender, selectedBrandIds, brandId, page, viewMode]);
+
+  // --- HANDLERS ---
+useEffect(() => {
     const fetchSearch = async () => {
       if (!keyword) return;
       try {
@@ -96,8 +106,7 @@ export default function Product() {
         setProducts(res.products || []);
         console.log(res.products);
       } catch (err) {
-        console.error("Lỗi tìm kiếm:", err);
-      }
+        console.error("Lỗi tìm kiếm:", err);      }
     };
     fetchSearch();
   }, [keyword]);
@@ -107,6 +116,15 @@ export default function Product() {
         ? prev.filter((id) => id !== brandId)
         : [...prev, brandId]
     );
+  };
+const handlePriceChange = (range: { min: number; max: number } | null) => {
+  setSelectedPriceRange(range);
+  setPage(1);
+};
+
+  const handleGenderChange = (gender: string) => {
+    setSelectedGender(gender);
+    setSelectedBrandIds([]); // Reset brand khi chọn lại giới tính (tuỳ logic)
   };
 
   const toggleSidebar = () => {
@@ -159,14 +177,19 @@ export default function Product() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-              <SidebarFilter
-                categories={categories}
-                openCategoryId={openCategoryId}
-                toggleCategory={toggleCategory}
-                brandsList={brandsList}
-                selectedBrandIds={selectedBrandIds}
-                handleBrandCheckboxChange={handleBrandCheckboxChange}
-              />
+
+             <SidebarFilter
+  categories={categories}
+  openCategoryId={openCategoryId}
+  toggleCategory={toggleCategory}
+  brandsList={brandsList}
+  selectedBrandIds={selectedBrandIds}
+  handleBrandCheckboxChange={handleBrandCheckboxChange}
+  selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
+  selectedPriceRange={selectedPriceRange}
+  handlePriceChange={handlePriceChange}
+/>
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -274,14 +297,9 @@ export default function Product() {
                               />
                             </Link>
 
-                            <div className="product-icons">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
+
 
                             <span className="discount-tag">
                               -
@@ -394,14 +412,8 @@ export default function Product() {
                               />
                             </Link>
 
-                            <div className="product-icons">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -522,15 +534,18 @@ export default function Product() {
         ></i>
       </div>
 
-      <MobileSidebarFilter
-        isActive={isActive}
-        categories={categories}
-        openCategoryId={openCategoryId}
-        toggleCategory={toggleCategory}
-        brandsList={brandsList}
-        selectedBrandIds={selectedBrandIds}
-        handleBrandCheckboxChange={handleBrandCheckboxChange}
-      />
+
+                <MobileSidebarFilter
+  isActive={isActive}
+  categories={categories}
+  openCategoryId={openCategoryId}
+  toggleCategory={toggleCategory}
+  brandsList={brandsList}
+  selectedBrandIds={selectedBrandIds}
+  handleBrandCheckboxChange={handleBrandCheckboxChange}
+   selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
+/>
     </>
   );
 }

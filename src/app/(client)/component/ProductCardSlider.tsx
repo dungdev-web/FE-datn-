@@ -1,15 +1,23 @@
+"use client";
+
 import { IProduct } from "@/types/product";
 import Link from "next/link";
 import CompareButton from "./product_compare/button_compare";
+import ProductIcons from "./products/ProductIcons";
+
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const reviews = product.product_reviews || [];
   const variants = product.product_variants || [];
   const images = product.images || [];
 
+
+  const productId = product.id ?? product.products_id;
+
   const discount =
     product.sale_price && product.price
       ? Math.round(((product.price - product.sale_price) / product.price) * 100)
       : 0;
+
   const averageRating = reviews.length
     ? Math.round(
         reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) /
@@ -36,14 +44,8 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
             />
           </Link>
 
-          <div className="product-icons">
-            <i className="fa-solid fa-heart always-show"></i>
-            <div className="hover-icons">
-              <i className="fa-solid fa-eye"></i>
-              <i className="fa-solid fa-list"></i>
-              <CompareButton productId={product.products_id} />
-            </div>
-          </div>
+
+          <ProductIcons productId={productId} />
 
           {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 

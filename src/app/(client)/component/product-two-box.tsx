@@ -10,12 +10,12 @@ import Link from "next/link";
 import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
+import ProductIcons from "./products/ProductIcons";
 
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
-   const images = [
+  const images = [
     "https://file.hstatic.net/200000581855/file/1_5d0aee5d42d245f395b3bfbc9d46e9f3.png",
     "https://file.hstatic.net/200000581855/file/2_5e1eb6264dce4a33b1c2ef620bd0232a.png",
-    // Bạn có thể thêm nhiều ảnh ở đây
   ];
 
   const [randomImage, setRandomImage] = useState(images[0]);
@@ -24,7 +24,9 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
     const index = Math.floor(Math.random() * images.length);
     setRandomImage(images[index]);
   }, []);
+
   if (!products?.length) return null;
+
   return (
     <div className="w-[47%] float-left box-container">
       <div className="content">
@@ -34,9 +36,10 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
         </p>
       </div>
       <div className="flex w-full">
-         <div className="images">
-      <img src={randomImage} alt="Ảnh ngẫu nhiên" />
-    </div>
+        <div className="images">
+          <img src={randomImage} alt="Ảnh ngẫu nhiên" />
+        </div>
+
         <div className="slider-wrapper w-full">
           <Swiper
             modules={[Navigation, Pagination]}
@@ -48,6 +51,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
             className="product-two-box"
           >
             {products.map((sp) => {
+              const productId = sp.id ?? sp.products_id;
               const averageRating =
                 Array.isArray(sp.product_reviews) && sp.product_reviews.length > 0
                   ? Math.round(
@@ -55,11 +59,14 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                         sp.product_reviews.length
                     )
                   : 0;
-              const discountPercent = Math.round(
-                ((sp.price - sp.sale_price) / sp.price) * 100
-              );
+
+              const discountPercent =
+                sp.price && sp.sale_price
+                  ? Math.round(((sp.price - sp.sale_price) / sp.price) * 100)
+                  : 0;
+
               const sold = Array.isArray(sp.product_variants)
-                ? sp.product_variants.reduce((sum, v) => sum + v.stock_quantity, 0)
+                ? sp.product_variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0)
                 : 0;
 
               const uniqueColors = Array.isArray(sp.product_variants)
@@ -71,30 +78,26 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                 : [];
 
               return (
-                <SwiperSlide key={sp.products_id}>
+                <SwiperSlide key={productId}>
                   <div className="product-itemlist-main">
                     <div className="product-card">
                       <div className="product-image">
                         <Link href={`product/${sp.slug}`}>
                           <img
-                            src={
-                              sp.images?.[0]?.url || "/images/placeholder.png"
-                            }
+                            src={sp.images?.[0]?.url || "/images/placeholder.png"}
                             alt={sp.name}
                             className="!h-[150px] !w-[100%]"
                           />
                         </Link>
-                        <div className="product-icons">
-                          <i className="fa-solid fa-heart always-show"></i>
-                          <div className="hover-icons">
-                            <i className="fa-solid fa-eye"></i>
-                            <i className="fa-solid fa-list"></i>
-                        <CompareButton productId={products[0].products_id} />
-                          </div>
-                        </div>
-                        <span className="discount-tag">
-                          -{discountPercent}%
-                        </span>
+
+
+                        {/* ✅ Đặt đúng productId tại đây */}
+                        <ProductIcons productId={productId} />
+
+                        {discountPercent > 0 && (
+                          <span className="discount-tag">-{discountPercent}%</span>
+                        )}
+
                         <span className="new-tag">
                           <img
                             src="/images/logo/title_image_1_tag.webp"
@@ -102,6 +105,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                           />
                           Mới
                         </span>
+
                         <div className="product-colors">
                           {uniqueColors.map((color) => (
                             <span
@@ -113,34 +117,28 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                             ></span>
                           ))}
                         </div>
+
                         <h4 className="product-title">{sp.name}</h4>
+
                         <div className="product-price">
                           {sp.sale_price > 0 && (
                             <span className="old-price">
                               <del>{sp.price.toLocaleString("vi")}đ</del>
                             </span>
                           )}
-
                           <span className="new-price">
-                            {(sp.sale_price > 0
-                              ? sp.sale_price
-                              : sp.price
-                            ).toLocaleString("vi")}
-                            đ
+                            {(sp.sale_price > 0 ? sp.sale_price : sp.price).toLocaleString("vi")}đ
                           </span>
                         </div>
+
                         <div className="product-progress">
                           <div className="progress-bar">
-                            <div
-                              className="progress-fill"
-                              style={{ width: "87%" }}
-                            >
-                              <span className="sold">
-                                Đã bán {sold} sản phẩm
-                              </span>
+                            <div className="progress-fill" style={{ width: "87%" }}>
+                              <span className="sold">Đã bán {sold} sản phẩm</span>
                             </div>
                           </div>
                         </div>
+
                         <div className="product-rating">
                           {Array.from({ length: 5 }, (_, i) =>
                             i < averageRating ? (

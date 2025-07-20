@@ -3,13 +3,14 @@ import "../css/product.css";
 import "../css/home.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import { IProduct } from "@/types/product";
 import "swiper/css";
 import "swiper/css/navigation";
+import { IProduct } from "@/types/product";
 import { getDealProducts } from "@/services/productService";
 import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import ProductIcons from "./products/ProductIcons";
 
 export default function ProductSale() {
   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);
@@ -47,6 +48,7 @@ export default function ProductSale() {
         className="product-slider-track"
       >
         {dealProducts.map((product) => {
+          const productId = product.id ?? product.products_id;
           const variants = product.product_variants || [];
           const reviews = product.product_reviews || [];
           const images = product.images || [];
@@ -58,7 +60,7 @@ export default function ProductSale() {
               )
             : 0;
 
-          const sold = variants.reduce((sum, v) => sum + v.stock_quantity, 0);
+          const sold = variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0);
 
           const discount =
             product.price > 0
@@ -76,7 +78,7 @@ export default function ProductSale() {
           ];
 
           return (
-            <SwiperSlide key={product.products_id}>
+            <SwiperSlide key={productId}>
               <div className="product-itemlist-main !block">
                 <div className="product-card11">
                   <div className="product-image">
@@ -88,16 +90,13 @@ export default function ProductSale() {
                       />
                     </Link>
 
-                    <div className="product-icons">
-                      <i className="fa-solid fa-heart always-show"></i>
-                      <div className="hover-icons">
-                        <i className="fa-solid fa-eye"></i>
-                        <i className="fa-solid fa-list"></i>
-                        <CompareButton productId={product.products_id} />
-                      </div>
-                    </div>
 
-                    <span className="discount-tag">-{discount}%</span>
+                    {/* ✅ Sử dụng đúng productId */}
+                    <ProductIcons productId={productId} />
+
+                    {discount > 0 && (
+                      <span className="discount-tag">-{discount}%</span>
+                    )}
 
                     <div className="product-colors">
                       {uniqueColors.map((color) => (
@@ -111,6 +110,7 @@ export default function ProductSale() {
                     </div>
 
                     <h4 className="product-title">{product.name}</h4>
+
                     <div className="product-price">
                       {product.sale_price > 0 && (
                         <span className="old-price">
@@ -118,13 +118,10 @@ export default function ProductSale() {
                         </span>
                       )}
                       <span className="new-price">
-                        {(product.sale_price > 0
-                          ? product.sale_price
-                          : product.price
-                        ).toLocaleString("vi")}
-                        đ
+                        {(product.sale_price > 0 ? product.sale_price : product.price).toLocaleString("vi")}đ
                       </span>
                     </div>
+
                     <div className="product-progress">
                       <div className="progress-bar">
                         <div className="progress-fill" style={{ width: "87%" }}>
@@ -132,6 +129,7 @@ export default function ProductSale() {
                         </div>
                       </div>
                     </div>
+
                     <div className="product-rating">
                       {Array.from({ length: 5 }, (_, i) =>
                         i < averageRating ? (

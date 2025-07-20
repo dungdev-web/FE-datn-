@@ -15,6 +15,7 @@ import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import SidebarFilter from "../../component/products/SidebarFilter";
 import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
+import ProductIcons from "../../component/products/ProductIcons";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -31,6 +32,11 @@ export default function CategoryPage() {
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const totalPages = Math.ceil(total / productsPerPage);
   const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{
+    min: number;
+    max: number;
+  } | null>(null);
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -100,6 +106,14 @@ export default function CategoryPage() {
   const toggleCategory = (id: number) => {
     setOpenCategoryId(openCategoryId === id ? null : id);
   };
+    const handleGenderChange = (gender: string) => {
+    setSelectedGender(gender);
+    setSelectedBrandIds([]); // Reset brand khi chọn lại giới tính (tuỳ logic)
+  };
+const handlePriceChange = (range: { min: number; max: number } | null) => {
+  setSelectedPriceRange(range);
+  setPage(1);
+};
   return (
     <>
       <section
@@ -137,15 +151,18 @@ export default function CategoryPage() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-             <SidebarFilter
+               <SidebarFilter
   categories={categories}
   openCategoryId={openCategoryId}
   toggleCategory={toggleCategory}
   brandsList={brandsList}
   selectedBrandIds={selectedBrandIds}
   handleBrandCheckboxChange={handleBrandCheckboxChange}
+  selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
+  selectedPriceRange={selectedPriceRange}
+  handlePriceChange={handlePriceChange}
 />
-
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
                   <div className="sortPagiBar">
@@ -249,14 +266,8 @@ export default function CategoryPage() {
                                 className="w-full h-full object-cover rounded"
                               />
                             </Link>
-                            <div className="product-icons absolute top-1 right-1">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
                             <span className="discount-tag absolute top-1 left-1 text-white text-xs px-2 py-0.5 rounded">
                               -
                               {Math.round(
@@ -349,14 +360,8 @@ export default function CategoryPage() {
                                 className="w-full h-full object-cover rounded"
                               />
                             </Link>
-                            <div className="product-icons absolute top-1 right-1">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
+
                           </div>
 
                           <div className="ml-4 flex flex-col justify-between flex-grow">
@@ -493,6 +498,8 @@ export default function CategoryPage() {
   brandsList={brandsList}
   selectedBrandIds={selectedBrandIds}
   handleBrandCheckboxChange={handleBrandCheckboxChange}
+   selectedGender={selectedGender}
+  handleGenderChange={handleGenderChange}
 />
     </>
   );
