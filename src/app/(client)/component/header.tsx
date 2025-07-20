@@ -11,8 +11,7 @@ import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
-import CompareBadge from "./product_compare/count_compare";
-import { searchProducts } from "@/services/productService";
+import { getCompareProduct, searchProducts } from "@/services/productService";
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 export default function Header() {
@@ -37,7 +36,7 @@ export default function Header() {
   const router = useRouter();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
-
+  const [compareCount, setCompareCount] = useState(0);
   const handleSearch = () => {
     if (!keyword.trim()) return;
     router.push(`/product?q=${encodeURIComponent(keyword)}`);
@@ -134,6 +133,19 @@ export default function Header() {
     };
 
     fetchWishlistCount();
+  }, [user]);
+  useEffect(() => {
+    const fetchCompareCount = async () => {
+      if (!user?.id) return;
+      try {
+        const compareList = await getCompareProduct(user.id);
+        setCompareCount(compareList.length || 0);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng so sánh:", error);
+      }
+    };
+
+    fetchCompareCount();
   }, [user]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
@@ -237,52 +249,57 @@ export default function Header() {
             <span className="sdt-header">0338538203</span>
           </div>
         </div>
-        <div className="icon-header">
-          <div
-            className={`iconuser-header div1 ${
-              user ? "logged-in" : "logged-out"
-            }`}
-          >
-            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {user ? (
-                <Link
-                  href="/account"
-                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
-                >
-                  Chào {user.name}
-                </Link>
-              ) : (
-                <Link href="/login">
-                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
-                </Link>
-              )}
-            </div>
-          </div>
-          <div
-            className="iconheart-header div data_wishlist"
-            data-count={wishlistCount}
-          >
-            <Link href="/wishlist">
-              <i className="fa-solid fa-heart"></i>
-            </Link>
-          </div>
-
-          <div className="iconcompare-header div data_compare_product">
-            <Link href="/compare_product">
-              {user?.id !== undefined && <CompareBadge userId={user.id} />}
-            </Link>
-          </div>
-          <div className="cart-wrapper">
-            <div
-              className="iconcart-header div data_cart"
-              data-count={cartItemCount}
+         <div className="icon-header">
+      <div
+        className={`iconuser-header div1 ${
+          user ? "logged-in" : "logged-out"
+        }`}
+      >
+        <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+          {user ? (
+            <Link
+              href="/account"
+              className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
             >
-              <Link href="/cart">
-                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
-              </Link>
-            </div>
-          </div>
+              Chào {user.name}
+            </Link>
+          ) : (
+            <Link href="/login">
+              <i className="fa-solid fa-user cursor-pointer text-white"></i>
+            </Link>
+          )}
         </div>
+      </div>
+
+      <div
+        className="iconheart-header div data_wishlist"
+        data-count={wishlistCount}
+      >
+        <Link href="/wishlist">
+          <i className="fa-solid fa-heart"></i>
+        </Link>
+      </div>
+
+      <div
+        className="iconcompare-header div data_compare_product"
+        data-count={compareCount}
+      >
+        <Link href="/compare_product">
+          <i className="fa fa-exchange"></i>
+        </Link>
+      </div>
+
+      <div className="cart-wrapper">
+        <div
+          className="iconcart-header div data_cart"
+          data-count={cartItemCount}
+        >
+          <Link href="/cart">
+            <i className="fa fa-shopping-bag"></i>
+          </Link>
+        </div>
+      </div>
+    </div>
       </header>
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
