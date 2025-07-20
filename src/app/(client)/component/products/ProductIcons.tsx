@@ -26,10 +26,14 @@ export default function ProductIcons({ productId }: ProductIconsProps) {
           className="fa fa-shopping-bag position-relative"
           onClick={handleAddToCart}
         ></i>
-        <i
-          className="fa fa-exchange"
-          onClick={() => handleAddCompare({ productId })}
-        />
+       <button
+          className={`compare-btn ${isCompared ? "active" : ""}`}
+          onClick={handleAddToCompare}
+          title={isCompared ? "Đã thêm vào so sánh" : "Thêm vào so sánh"}
+          disabled={loading}
+        >
+          <i className="fa fa-exchange" aria-hidden="true"></i>
+        </button>
       </div>
     </div>
   );
