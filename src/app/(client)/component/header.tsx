@@ -11,10 +11,9 @@ import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getCategories } from "@/services/categoryService";
 import { getBrands } from "@/services/brandService";
-import CompareBadge from "./product_compare/count_compare";
-import { searchProducts } from "@/services/productService";
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
+import { getCompareProduct } from "@/services/productService";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -37,6 +36,7 @@ export default function Header() {
   const router = useRouter();
   const [cartItemCount, setCartItemCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [compareCount, setCompareCount] = useState(0);
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -134,6 +134,20 @@ export default function Header() {
     };
 
     fetchWishlistCount();
+  }, [user]);
+  useEffect(() => {
+    const fetchCompareCount = async () => {
+      if (!user?.id) return;
+
+      try {
+        const compare = await getCompareProduct(user.id);
+        setCompareCount(compare.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng yêu thích:", error);
+      }
+    };
+
+    fetchCompareCount();
   }, [user]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
@@ -267,9 +281,12 @@ export default function Header() {
             </Link>
           </div>
 
-          <div className="iconcompare-header div data_compare_product">
+          <div
+            className="iconcompare-header div data_compare_product"
+            data-count={compareCount}
+          >
             <Link href="/compare_product">
-              {user?.id !== undefined && <CompareBadge userId={user.id} />}
+              <i className="fa fa-exchange"></i>
             </Link>
           </div>
           <div className="cart-wrapper">

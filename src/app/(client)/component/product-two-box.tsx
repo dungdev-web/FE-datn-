@@ -51,7 +51,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
             className="product-two-box"
           >
             {products.map((sp) => {
-              const productId = sp.id ?? sp.products_id;
+              const productId = sp.products_id ?? sp.products_id;
               const averageRating =
                 Array.isArray(sp.product_reviews) && sp.product_reviews.length > 0
                   ? Math.round(
@@ -89,9 +89,6 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                             className="!h-[150px] !w-[100%]"
                           />
                         </Link>
-
-
-                        {/* ✅ Đặt đúng productId tại đây */}
                         <ProductIcons productId={productId} />
 
                         {discountPercent > 0 && (

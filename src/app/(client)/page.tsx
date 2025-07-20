@@ -606,7 +606,7 @@ export default function Home({ product }: { product: IProduct }) {
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
                     )}
-                  </div>
+                    </div>
 
                   <div className="hot-product-content">
                     <div className="hot-product-colors">

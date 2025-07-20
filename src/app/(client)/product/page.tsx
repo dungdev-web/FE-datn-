@@ -1,19 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-import {
-  getAllProducts,
-  getProductsByGender,
-} from "@/services/productService";
+import { getAllProducts, getProductsByGender } from "@/services/productService";
 import Link from "next/link";
 import { ICategory } from "@/types/ICategory";
 import { getCategories } from "@/services/categoryService";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import {
-  getBrands,
-  getProductsByBrandId,
-} from "@/services/brandService";
+import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
@@ -54,9 +48,10 @@ export default function Product() {
           getCategories(),
         ]);
         setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
-        setCategories(Array.isArray(fetchedCategories) ? fetchedCategories : []);
+        setCategories(
+          Array.isArray(fetchedCategories) ? fetchedCategories : []
+        );
       } catch (error) {
-
         console.error("Lỗi khi lấy dữ liệu ban đầu:", error);
       }
     };
@@ -68,7 +63,6 @@ export default function Product() {
     const fetchFilteredProducts = async () => {
       try {
         let result: IProduct[] = [];
-
 
         if (selectedGender) {
           result = await getProductsByGender(selectedGender);
@@ -84,7 +78,7 @@ export default function Product() {
           result = res.data;
           setTotal(res.total); // Chỉ getAllProducts có total
         }
-          
+
         setProducts(result);
         if (selectedGender || selectedBrandIds.length > 0 || brandId) {
           setTotal(result.length);
@@ -98,7 +92,7 @@ export default function Product() {
   }, [selectedGender, selectedBrandIds, brandId, page, viewMode]);
 
   // --- HANDLERS ---
-useEffect(() => {
+  useEffect(() => {
     const fetchSearch = async () => {
       if (!keyword) return;
       try {
@@ -106,7 +100,8 @@ useEffect(() => {
         setProducts(res.products || []);
         console.log(res.products);
       } catch (err) {
-        console.error("Lỗi tìm kiếm:", err);      }
+        console.error("Lỗi tìm kiếm:", err);
+      }
     };
     fetchSearch();
   }, [keyword]);
@@ -117,10 +112,10 @@ useEffect(() => {
         : [...prev, brandId]
     );
   };
-const handlePriceChange = (range: { min: number; max: number } | null) => {
-  setSelectedPriceRange(range);
-  setPage(1);
-};
+  const handlePriceChange = (range: { min: number; max: number } | null) => {
+    setSelectedPriceRange(range);
+    setPage(1);
+  };
 
   const handleGenderChange = (gender: string) => {
     setSelectedGender(gender);
@@ -177,19 +172,18 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-
-             <SidebarFilter
-  categories={categories}
-  openCategoryId={openCategoryId}
-  toggleCategory={toggleCategory}
-  brandsList={brandsList}
-  selectedBrandIds={selectedBrandIds}
-  handleBrandCheckboxChange={handleBrandCheckboxChange}
-  selectedGender={selectedGender}
-  handleGenderChange={handleGenderChange}
-  selectedPriceRange={selectedPriceRange}
-  handlePriceChange={handlePriceChange}
-/>
+              <SidebarFilter
+                categories={categories}
+                openCategoryId={openCategoryId}
+                toggleCategory={toggleCategory}
+                brandsList={brandsList}
+                selectedBrandIds={selectedBrandIds}
+                handleBrandCheckboxChange={handleBrandCheckboxChange}
+                selectedGender={selectedGender}
+                handleGenderChange={handleGenderChange}
+                selectedPriceRange={selectedPriceRange}
+                handlePriceChange={handlePriceChange}
+              />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -298,8 +292,6 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                             </Link>
 
                             <ProductIcons productId={sp.id ?? sp.products_id} />
-
-
 
                             <span className="discount-tag">
                               -
@@ -413,7 +405,6 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                             </Link>
 
                             <ProductIcons productId={sp.id ?? sp.products_id} />
-
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -534,18 +525,17 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
         ></i>
       </div>
 
-
-                <MobileSidebarFilter
-  isActive={isActive}
-  categories={categories}
-  openCategoryId={openCategoryId}
-  toggleCategory={toggleCategory}
-  brandsList={brandsList}
-  selectedBrandIds={selectedBrandIds}
-  handleBrandCheckboxChange={handleBrandCheckboxChange}
-   selectedGender={selectedGender}
-  handleGenderChange={handleGenderChange}
-/>
+      <MobileSidebarFilter
+        isActive={isActive}
+        categories={categories}
+        openCategoryId={openCategoryId}
+        toggleCategory={toggleCategory}
+        brandsList={brandsList}
+        selectedBrandIds={selectedBrandIds}
+        handleBrandCheckboxChange={handleBrandCheckboxChange}
+        selectedGender={selectedGender}
+        handleGenderChange={handleGenderChange}
+      />
     </>
   );
 }

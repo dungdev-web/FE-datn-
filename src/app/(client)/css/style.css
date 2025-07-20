@@ -195,7 +195,7 @@ header.scrolled {
 }
 
 
-.icon-header span{
+.icon-header .div::after{
 
   position: absolute;
   top: -5px;
@@ -214,7 +214,7 @@ header.scrolled {
   content: attr(data-count);
 }
 .icon-header .data_compare_product::after {
-  content: "0";
+  content:  attr(data-count);
 }
 .icon-header .data_wishlist::after {
   content: attr(data-count);
