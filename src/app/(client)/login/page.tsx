@@ -79,6 +79,7 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
         toast.success("Đăng nhập thành công!");
         window.location.href = "/account";
       }, 7000);
+      router.refresh(); // <-- ép Next.js fetch lại dữ liệu của toàn bộ Server Components / Client layout
 
       return () => clearTimeout(timer);
     }

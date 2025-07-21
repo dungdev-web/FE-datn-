@@ -14,7 +14,6 @@ import { getBrands } from "@/services/brandService";
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
-import { useCompare } from "./product_compare/compare_context";
 import { useGlobalStore } from "@/store/useGlobalStore";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
