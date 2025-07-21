@@ -1,10 +1,11 @@
 import {
   AddToWishlistPayload,
   IAddToWishlistResponse,
-  IWishlistItem,
+  IWishlistItemWithProduct,
 } from "@/types/wishlist";
 import { API_BASE_URL } from "@/config/env";
-import { IWishlistItemWithProduct } from "@/types/wishlist";
+
+// Lấy danh sách yêu thích của người dùng
 export const getWishlistByUserId = async (
   userId: number
 ): Promise<IWishlistItemWithProduct[]> => {
@@ -22,6 +23,8 @@ export const getWishlistByUserId = async (
   const data: IWishlistItemWithProduct[] = await response.json();
   return data;
 };
+
+// Thêm sản phẩm vào wishlist
 export const addToWishlist = async (
   payload: AddToWishlistPayload
 ): Promise<IAddToWishlistResponse> => {
@@ -38,5 +41,25 @@ export const addToWishlist = async (
   }
 
   const data: IAddToWishlistResponse = await response.json();
+  return data;
+};
+
+// Xóa sản phẩm khỏi wishlist
+export const removeFromWishlist = async (
+  payload: { userId: number; productId: number }
+): Promise<{ message: string }> => {
+  const response = await fetch(`${API_BASE_URL}/product/wishlist`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error("Không thể xóa sản phẩm khỏi danh sách yêu thích.");
+  }
+
+  const data = await response.json();
   return data;
 };

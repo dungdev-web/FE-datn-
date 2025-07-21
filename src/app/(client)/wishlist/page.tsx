@@ -5,13 +5,14 @@ import { IWishlistItemWithProduct } from "@/types/wishlist";
 import "../css/product.css";
 import "../css/wishlist.css";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import ProductIcons from "../component/products/ProductIcons";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState<IWishlistItemWithProduct[]>([]);
   const { user } = useAuthUser();
 
   useEffect(() => {
-    if (!user?.id) return; // 
+    if (!user?.id) return; //
 
     const fetchWishlist = async () => {
       try {
@@ -23,48 +24,51 @@ export default function Wishlist() {
     };
 
     fetchWishlist();
-  }, [user?.id]); // 
+  }, [user?.id]); //
   if (!user) {
     return (
       <>
-       <section
-        className="bread-crumb background-cover relative"
-        style={{
-          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-        }}
-      >
-        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
-        <div className="breadcrumb-container">
-          <div className="title-page">
-            <h2>Sản phẩm yêu thích</h2>
+        <section
+          className="bread-crumb background-cover relative"
+          style={{
+            backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        >
+          <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+          <div className="breadcrumb-container">
+            <div className="title-page">
+              <h2>Sản phẩm yêu thích</h2>
+            </div>
+            <ul className="breadcrumb">
+              <li className="home">
+                <a href="/" title="Trang chủ">
+                  <span>Trang chủ</span>
+                </a>
+                <i className="fa fa-angle-right" aria-hidden="true"></i>
+              </li>
+              <li>
+                <strong>
+                  <span>Sản phẩm yêu thích</span>
+                </strong>
+              </li>
+            </ul>
           </div>
-          <ul className="breadcrumb">
-            <li className="home">
-              <a href="/" title="Trang chủ">
-                <span>Trang chủ</span>
-              </a>
-              <i className="fa fa-angle-right" aria-hidden="true"></i>
-            </li>
-            <li>
-              <strong>
-                <span>Sản phẩm yêu thích</span>
-              </strong>
-            </li>
-          </ul>
-        </div>
-      </section>
+        </section>
         <div className="container1 py-10 px-4 text-center !mt-6 !mb-6">
-      <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
-        <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
-        <p className="text-lg font-medium text-red-600">
-          Vui lòng <a href="/login" className="underline hover:text-red-800">đăng nhập</a> để xem sản phẩm yêu thích.
-        </p>
-      </div>
-    </div>
+          <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
+            <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
+            <p className="text-lg font-medium text-red-600">
+              Vui lòng{" "}
+              <a href="/login" className="underline hover:text-red-800">
+                đăng nhập
+              </a>{" "}
+              để xem sản phẩm yêu thích.
+            </p>
+          </div>
+        </div>
       </>
-     
     );
   }
   return (
@@ -105,6 +109,13 @@ export default function Wishlist() {
             <div className="product-grid-wishlist">
               {wishlist.map((item) => {
                 const product = item.product;
+                const variant = product.product_variants?.[0];
+
+                // Nếu không có variant thì bỏ qua
+                if (!variant) {
+                  console.warn("Không có variant cho sản phẩm:", product.name);
+                  return null;
+                }
                 const image = product.images.find(
                   (img) => img.type === "main"
                 )?.url;
@@ -117,13 +128,15 @@ export default function Wishlist() {
                     <div className="product-card" style={{ width: "238px" }}>
                       <div className="product-image">
                         <img src={image} alt={product.name} />
-                        <div className="product-icons">
-                          <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
-                          <div className="hover-icons">
-                            <i className="fa-solid fa-eye"></i>
-                            <i className="fa fa-shopping-bag position-relative"></i>
-                          </div>
-                        </div>
+                        <ProductIcons
+                          productId={product.products_id}
+                          variant_id={
+                            product.product_variants?.[0]
+                              ?.product_variants_id ?? null
+                          }
+                          price={product.sale_price}
+                        />
+
                         {product.price > product.sale_price && (
                           <span className="discount-tag">
                             -
@@ -179,13 +192,15 @@ export default function Wishlist() {
                     <div className="product-card">
                       <div className="product-image">
                         <img src={image} alt={product.name} />
-                        <div className="product-icons">
-                          <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
-                          <div className="hover-icons">
-                            <i className="fa-solid fa-eye"></i>
-                            <i className="fa fa-shopping-bag position-relative"></i>
-                          </div>
-                        </div>
+                        <ProductIcons
+                          productId={product.product_id}
+                          variant_id={
+                            product.product_variants?.[0]
+                              ?.product_variants_id ?? null
+                          }
+                          price={product.sale_price}
+                        />
+
                         {product.price > product.sale_price && (
                           <span className="discount-tag">
                             -

@@ -1,7 +1,7 @@
 import { useAddToWishlist } from "@/hooks/useAddToWishlist";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import { useAddToCompare } from "@/hooks/useAddToCompare";
-import CompareButton from "../product_compare/button_compare";
+
 interface ProductIconsProps {
   productId: number;
   variant_id:number;

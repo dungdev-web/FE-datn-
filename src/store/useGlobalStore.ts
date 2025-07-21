@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 interface GlobalStore {
+  decrementWishlist: any;
   wishlistCount: number;
   compareCount: number;
   cartCount: number;
@@ -24,11 +25,17 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
 
   incrementWishlist: () =>
     set((state) => ({ wishlistCount: state.wishlistCount + 1 })),
+  decrementWishlist: () =>
+    set((state) => ({
+      wishlistCount: Math.max(state.wishlistCount - 1, 0),
+    })),
+
   incrementCompare: () =>
     set((state) => ({ compareCount: state.compareCount + 1 })),
-  incrementCart: () => set((state) => ({ cartCount: state.cartCount + 1 })),
-   decrementCompare: () =>
+  decrementCompare: () =>
     set((state) => ({
       compareCount: Math.max(state.compareCount - 1, 0),
     })),
+
+  incrementCart: () => set((state) => ({ cartCount: state.cartCount + 1 })),
 }));
