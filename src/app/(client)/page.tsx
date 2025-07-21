@@ -14,6 +14,7 @@ import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
+import CompareButton from "./component/product_compare/button_compare";
 import {
   getNewestProducts,
   getFeaturedProducts,
@@ -21,6 +22,10 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
+import Banner3D from "./component/Banner3D";
+import { useAddToCart } from "@/hooks/useAddToCart";
+import ProductIcons from "./component/products/ProductIcons";
+import HotProductIcons from "./component/products/HotProductIcons";
 export default function Home({ product }: { product: IProduct }) {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,8 +37,8 @@ export default function Home({ product }: { product: IProduct }) {
   const [cateproducts1, serCateProducts1] = useState<IProduct[]>([]);
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
-
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
+  const { handleAddToCart } = useAddToCart();
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
   const handlePlay = () => {
     setIsPlaying(true);
@@ -120,19 +125,43 @@ export default function Home({ product }: { product: IProduct }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await getProductsByCategory("giày thể thao");
-        const data1 = await getProductsByCategory("giày chạy bộ");
-        serCateProducts(data.slice(0, 10));
-        serCateProducts1(data1.slice(0, 10));
+        const data = await getProductsByCategory("giày chạy bộ");
+        const data1 = await getProductsByCategory("giày bóng rổ");
+        const data2 = await getProductsByCategory("sneaker");
+        const data3 = await getProductsByCategory("giày tập gym");
+        if (Array.isArray(data)) {
+          serCateProducts(data.slice(0, 10));
+        } else {
+          console.error("data.products không đúng định dạng:", data);
+        }
+
+        if (Array.isArray(data1)) {
+          serCateProducts1(data1.slice(0, 10));
+        } else {
+          console.error("data1.products không đúng định dạng:", data1);
+        }
+
+        if (Array.isArray(data2)) {
+          serCateProducts2(data2.slice(0, 10));
+        } else {
+          console.error("data2.products không đúng định dạng:", data2);
+        }
+        if (Array.isArray(data3)) {
+          serCateProducts3(data3.slice(0, 10));
+        } else {
+          console.error("data3.products không đúng định dạng:", data3);
+        }
       } catch (err) {
         console.error("Lỗi khi lấy sản phẩm theo danh mục:", err);
       }
     };
+
     fetchData();
   }, []);
+
   return (
     <div>
-      <div className="banner-home relative">
+      {/* <div className="banner-home relative">
         <Swiper
           modules={[Autoplay]}
           autoplay={{ delay: 3000 }}
@@ -171,8 +200,8 @@ export default function Home({ product }: { product: IProduct }) {
             </div>
           </SwiperSlide>
         </Swiper>
-      </div>
-
+      </div> */}
+      <Banner3D />
       <main>
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
@@ -416,17 +445,18 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {newproducts.map((product) => {
-              const averageRating = product.reviews?.length
+              const productId = product.id ?? product.products_id;
+              const averageRating = product.product_reviews?.length
                 ? Math.round(
-                    product.reviews.reduce(
+                    product.product_reviews.reduce(
                       (sum, r) => sum + Number(r.rating),
                       0
-                    ) / product.reviews.length
+                    ) / product.product_reviews.length
                   )
                 : 0;
 
               const sold =
-                product.variants?.reduce(
+                product.product_variants?.reduce(
                   (sum, v) => sum + v.stock_quantity,
                   0
                 ) ?? 0;
@@ -440,10 +470,14 @@ export default function Home({ product }: { product: IProduct }) {
                   : 0;
 
               const uniqueColors = [
-                ...new Map(
-                  (product.variants || []).map((v) => [v.color.id, v.color])
-                ).values(),
-              ];
+  ...new Map(
+    (product.product_variants || [])
+      .filter((v) => v.color && v.color.id) 
+      .map((v) => [v.color.id, v.color])
+  ).values(),
+];
+
+
 
               return (
                 <div className="hot-product-card" key={product.products_id}>
@@ -456,14 +490,8 @@ export default function Home({ product }: { product: IProduct }) {
                         alt={product.name}
                       />
                     </Link>
-                    <div className="hot-product-icons">
-                      <i className="fa-solid fa-heart icon-favorite"></i>
-                      <div className="icon-hover-group">
-                        <i className="fa-solid fa-eye"></i>
-                        <i className="fa-solid fa-list"></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
+
+                    <HotProductIcons productId={productId} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -527,17 +555,19 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {featureproducts.map((product) => {
-              const averageRating = product.reviews?.length
+              const productId = product.id ?? product.products_id;
+
+              const averageRating = product.product_reviews?.length
                 ? Math.round(
-                    product.reviews.reduce(
+                    product.product_reviews.reduce(
                       (sum, r) => sum + Number(r.rating),
                       0
-                    ) / product.reviews.length
+                    ) / product.product_reviews.length
                   )
                 : 0;
 
               const sold =
-                product.variants?.reduce(
+                product.product_variants?.reduce(
                   (sum, v) => sum + v.stock_quantity,
                   0
                 ) ?? 0;
@@ -552,7 +582,10 @@ export default function Home({ product }: { product: IProduct }) {
 
               const uniqueColors = [
                 ...new Map(
-                  (product.variants || []).map((v) => [v.color.id, v.color])
+                  (product.product_variants || []).map((v) => [
+                    v.color.id,
+                    v.color,
+                  ])
                 ).values(),
               ];
 
@@ -567,16 +600,14 @@ export default function Home({ product }: { product: IProduct }) {
                         alt={product.name}
                       />
                     </Link>
-                    <div className="hot-product-icons">
-                      <i className="fa-solid fa-heart icon-favorite"></i>
-                      <div className="icon-hover-group">
-                        <i className="fa-solid fa-eye"></i>
-                        <i className="fa-solid fa-list"></i>
-                        <i className="fa fa-exchange"></i>
-                      </div>
-                    </div>
-                    <span className="tag-discount">-{discount}%</span>
+
+                   <HotProductIcons productId={productId} />
+
+                    {discount > 0 && (
+                      <span className="tag-discount">-{discount}%</span>
+                    )}
                   </div>
+
                   <div className="hot-product-content">
                     <div className="hot-product-colors">
                       {uniqueColors.map((color) => (
@@ -588,7 +619,9 @@ export default function Home({ product }: { product: IProduct }) {
                         ></span>
                       ))}
                     </div>
+
                     <h4 className="hot-product-title">{product.name}</h4>
+
                     <div className="hot-product-price">
                       {product.sale_price > 0 && (
                         <span className="price-old">
@@ -603,6 +636,7 @@ export default function Home({ product }: { product: IProduct }) {
                         đ
                       </span>
                     </div>
+
                     <div className="hot-product-progress">
                       <div className="progress-bar">
                         <div className="progress-fill" style={{ width: "87%" }}>
@@ -612,6 +646,7 @@ export default function Home({ product }: { product: IProduct }) {
                         </div>
                       </div>
                     </div>
+
                     <div className="hot-product-rating">
                       {Array.from({ length: 5 }, (_, i) =>
                         i < averageRating ? (
@@ -629,16 +664,14 @@ export default function Home({ product }: { product: IProduct }) {
         </div>
 
         <div className="product-two-box-main">
-          <h1 className="h1">
-            SẢN PHẨM THEO DANH MỤC
-          </h1>
+          <h1 className="h1">SẢN PHẨM THEO DANH MỤC</h1>
           <div className="product-two-box-container flex gap-[75px] flex-wrap">
-            <>
-              <Show2sanpham products={cateproducts} />
-              <Show2sanpham products={cateproducts1} />
-            </>
-            <img src="/images/banner/session_cate.jpg" alt="" />
             <Show2sanpham products={cateproducts} />
+            <Show2sanpham products={cateproducts1} />
+
+            <img src="/images/banner/session_cate.jpg" alt="" />
+            <Show2sanpham products={cateproducts2} />
+            <Show2sanpham products={cateproducts3} />
           </div>
         </div>
 

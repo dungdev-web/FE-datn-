@@ -1,20 +1,36 @@
+"use client";
+
 import { IProduct } from "@/types/product";
 import Link from "next/link";
+import CompareButton from "./product_compare/button_compare";
+import ProductIcons from "./products/ProductIcons";
+
 export default function ProductCardSlider({ product }: { product: IProduct }) {
-  const averageRating = product.reviews?.length
+  const reviews = product.product_reviews || [];
+  const variants = product.product_variants || [];
+  const images = product.images || [];
+
+
+  const productId = product.id ?? product.products_id;
+
+  const discount =
+    product.sale_price && product.price
+      ? Math.round(((product.price - product.sale_price) / product.price) * 100)
+      : 0;
+
+  const averageRating = reviews.length
     ? Math.round(
-        product.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-          product.reviews.length
+        reviews.reduce((sum, r) => sum + Number(r.rating || 0), 0) /
+          reviews.length
       )
     : 0;
 
-  const sold = product.variants?.reduce((sum, v) => sum + v.stock_quantity, 0);
-  const discount = Math.round(
-    ((product.price - product.sale_price) / product.price) * 100
-  );
+  const sold = variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0);
 
   const uniqueColors = [
-    ...new Map(product.variants.map((v) => [v.color.id, v.color])).values(),
+    ...new Map(
+      variants.filter((v) => v.color?.id).map((v) => [v.color.id, v.color])
+    ).values(),
   ];
 
   return (
@@ -23,20 +39,15 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
         <div className="product-image">
           <Link href={`/product/${product.slug}`}>
             <img
-              src={product.images[0].url || "/images/placeholder.png"}
+              src={images[0]?.url || "/images/placeholder.png"}
               alt={product.name}
             />
           </Link>
-          <div className="product-icons">
-            <i className="fa-solid fa-heart always-show"></i>
-            <div className="hover-icons">
-              <i className="fa-solid fa-eye"></i>
-              <i className="fa-solid fa-list"></i>
-              <i className="fa fa-exchange"></i>
-            </div>
-          </div>
 
-          <span className="discount-tag">-{discount}%</span>
+
+          <ProductIcons productId={productId} />
+
+          {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 
           <div className="product-colors">
             {uniqueColors.map((color) => (
@@ -50,21 +61,21 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
           </div>
 
           <h4 className="product-title">{product.name}</h4>
+
           <div className="product-price">
             {product.sale_price > 0 && (
               <span className="old-price">
-                <del>{product.price.toLocaleString("vi")}đ</del>
+                <del>{Number(product.price).toLocaleString("vi")}đ</del>
               </span>
             )}
-
             <span className="new-price">
-              {(product.sale_price > 0
-                ? product.sale_price
-                : product.price
+              {Number(
+                product.sale_price > 0 ? product.sale_price : product.price
               ).toLocaleString("vi")}
               đ
             </span>
           </div>
+
           <div className="product-progress">
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: "87%" }}>
@@ -72,6 +83,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
               </div>
             </div>
           </div>
+
           <div className="product-rating">
             {Array.from({ length: 5 }, (_, i) =>
               i < averageRating ? (

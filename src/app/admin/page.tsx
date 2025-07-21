@@ -87,8 +87,7 @@ export default function Home_admin() {
         </div>
         <div className="card">
           <div className="icon">
-            <i className="fa-solid fa-cart-shopping"></i>
-          </div>
+            <i className="fa fa-shopping-bag position-relative"></i>          </div>
           <div className="info">
             <p className="title">Tổng số đơn hàng</p>
             <p className="number">7</p>

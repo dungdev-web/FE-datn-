@@ -1,38 +1,139 @@
 "use client";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-import { getAllProducts } from "@/services/productService";
+import { getAllProducts, getProductsByGender } from "@/services/productService";
 import Link from "next/link";
+import { ICategory } from "@/types/ICategory";
+import { getCategories } from "@/services/categoryService";
+import "@/app/(client)/css/pagination.css";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { getBrands, getProductsByBrandId } from "@/services/brandService";
+import { IBrand } from "@/types/IBrand";
+import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+
+import SidebarFilter from "../component/products/SidebarFilter";
+import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
+import { searchProducts } from "@/services/productService";
+import { log } from "console";
+import ProductIcons from "../component/products/ProductIcons";
+
 export default function Product() {
-  const [isActive, setIsActive] = useState(false);
-  const [viewMode, setViewMode] = useState("grid");
+  const params = useParams();
+  const brandId = Number(params.id);
+
+  const [brandsList, setBrandsList] = useState<IBrand[]>([]);
+  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
   const [products, setProducts] = useState<IProduct[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [viewMode, setViewMode] = useState("grid");
+  const [isActive, setIsActive] = useState(false);
+  const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
+  const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
-
   const totalPages = Math.ceil(total / productsPerPage);
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("q") || "";
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{
+    min: number;
+    max: number;
+  } | null>(null);
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const [fetchedBrands, fetchedCategories] = await Promise.all([
+          getBrands(),
+          getCategories(),
+        ]);
+        setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
+        setCategories(
+          Array.isArray(fetchedCategories) ? fetchedCategories : []
+        );
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu ban đầu:", error);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
+  // Gộp toàn bộ điều kiện lọc sản phẩm vào 1 useEffect duy nhất
+  useEffect(() => {
+    const fetchFilteredProducts = async () => {
+      try {
+        let result: IProduct[] = [];
+        if (selectedGender) {
+          result = await getProductsByGender(selectedGender);
+        } else if (selectedBrandIds.length > 0) {
+          for (const id of selectedBrandIds) {
+            const brandProducts = await getProductsByBrandId(id);
+            result = [...result, ...brandProducts];
+          }
+        } else if (brandId) {
+          result = await getProductsByBrandId(brandId);
+        } else {
+          const res = await getAllProducts(page, productsPerPage);
+          result = res.data;
+          setTotal(res.total); // Chỉ getAllProducts có total
+        }
+
+        setProducts(result);
+        if (selectedGender || selectedBrandIds.length > 0 || brandId) {
+          setTotal(result.length);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lọc sản phẩm:", error);
+      }
+    };
+
+    fetchFilteredProducts();
+  }, [selectedGender, selectedBrandIds, brandId, page, viewMode]);
+
+  // --- HANDLERS ---
+  useEffect(() => {
+    const fetchSearch = async () => {
+      if (!keyword) return;
+      try {
+        const res = await searchProducts(keyword);
+        setProducts(res.products || []);
+        console.log(res.products);
+      } catch (err) {
+        console.error("Lỗi tìm kiếm:", err);
+      }
+    };
+    fetchSearch();
+  }, [keyword]);
+  const handleBrandCheckboxChange = (brandId: number) => {
+    setSelectedBrandIds((prev) =>
+      prev.includes(brandId)
+        ? prev.filter((id) => id !== brandId)
+        : [...prev, brandId]
+    );
+  };
+  const handlePriceChange = (range: { min: number; max: number } | null) => {
+    setSelectedPriceRange(range);
+    setPage(1);
+  };
+
+  const handleGenderChange = (gender: string) => {
+    setSelectedGender(gender);
+    setSelectedBrandIds([]); // Reset brand khi chọn lại giới tính (tuỳ logic)
+  };
+
   const toggleSidebar = () => {
     setIsActive(!isActive);
   };
+
   const changeViewMode = (mode: "grid" | "list") => {
     setViewMode(mode);
     setPage(1);
   };
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await getAllProducts(page, productsPerPage);
-        setProducts(res.data);
-        setTotal(res.total);
-      } catch (err) {
-        console.error("Lỗi lấy sản phẩm:", err);
-      }
-    };
+  const toggleCategory = (id: number) => {
+    setOpenCategoryId(openCategoryId === id ? null : id);
+  };
 
-    fetchProducts();
-  }, [page, viewMode]);
   return (
     <>
       <section
@@ -70,288 +171,19 @@ export default function Product() {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-              <div className="col-lg-3 col-test">
-                <aside className="aside-item collection-category">
-                  <div className="aside-title">
-                    <h2 className="title-head margin-top-0">
-                      <span>Danh mục</span>
-                    </h2>
-                  </div>
-                  <div className="categories-box">
-                    <ul className="lv1">
-                      <li className="nav-item nav-items">
-                        <a href="/" title="Trang chủ">
-                          {" "}
-                          Trang chủ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/gioi-thieu" title="Giới thiệu">
-                          {" "}
-                          Giới thiệu
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items active">
-                        <a
-                          href="/collections/all"
-                          className="nav-link"
-                          title="Sản phẩm"
-                        >
-                          Sản phẩm
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/tin-tuc" className="nav-link" title="Tin tức">
-                          Tin tức
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/lien-he" title="Liên hệ">
-                          {" "}
-                          Liên hệ
-                        </a>
-                      </li>
-                      <li className="nav-item nav-items">
-                        <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
-                          Hệ thống cửa hàng
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </aside>
-                <div className="aside-filter">
-                  <div className="aside-title">
-                    <h2 className="title-head margin-top-0">
-                      <span>Bộ lọc</span>
-                    </h2>
-                  </div>
-                  <div className="filter-container">
-                    <aside className="aside-item filter-price">
-                      <div className="module-title">
-                        <h2 className="title-head margin-top-0">
-                          <span>Giá sản phẩm</span>
-                        </h2>
-                      </div>
-                      <div className="aside-content filter-group">
-                        <ul>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-duoi-100-000d"
-                                  data-group="Khoảng giá"
-                                  data-field="price_min"
-                                  data-text="Dưới 100.000đ"
-                                  value="(<100000)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                Giá dưới 100.000đ
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-100-000d-200-000d"
-                                  data-group="Khoảng giá"
-                                  data-field="price_min"
-                                  data-text="100.000đ - 200.000đ"
-                                  value="(>=100000 AND <200000)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                100.000đ - 200.000đ
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-200-000d-300-000d"
-                                  data-group="Khoảng giá"
-                                  data-field="price_min"
-                                  data-text="200.000đ - 300.000đ"
-                                  value="(>=200000 AND <300000)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                200.000đ - 300.000đ
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-300-000d-500-000d"
-                                  data-group="Khoảng giá"
-                                  data-field="price_min"
-                                  data-text="300.000đ - 500.000đ"
-                                  value="(>=300000 AND <500000)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                300.000đ - 500.000đ
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-500-000d-1-000-000d"
-                                  data-group="Khoảng giá"
-                                  data-field="price_min"
-                                  data-text="500.000đ - 1.000.000đ"
-                                  value="(>500000 AND <1000000)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                500.000đ - 1.000.000đ
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-tren1-000-000d"
-                                  data-group="Khoảng giá"
-                                  data-field="price_min"
-                                  data-text="Trên 1.000.000đ"
-                                  value="(>1000000)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                Giá trên 1.000.000đ
-                              </label>
-                            </span>
-                          </li>
-                        </ul>
-                      </div>
-                    </aside>
-                    <aside className="aside-item filter-type">
-                      <div className="module-title">
-                        <h2 className="title-head margin-top-0">
-                          <span>Loại</span>
-                        </h2>
-                      </div>
-                      <div className="aside-content filter-group">
-                        <ul>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-giay-nam"
-                                  data-group="Loại"
-                                  data-field="product_type"
-                                  data-text="Giày Nam"
-                                  value="(Giày Nam)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                Giày Nam
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label>
-                                <input
-                                  type="checkbox"
-                                  id="filter-giay-nu"
-                                  data-group="Loại"
-                                  data-field="product_type"
-                                  data-text="Giày Nữ"
-                                  value="(Giày Nữ)"
-                                  data-operator="OR"
-                                />
-                                <i className="fa"></i>
-                                Giày Nữ
-                              </label>
-                            </span>
-                          </li>
-                        </ul>
-                      </div>
-                    </aside>
-                    <aside className="aside-item filter-vendor">
-                      <div className="module-title">
-                        <h2 className="title-head margin-top-0">
-                          <span>Thương hiệu</span>
-                        </h2>
-                      </div>
-                      <div className="aside-content filter-group aside_vendor">
-                        <ul>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input type="checkbox" id="filter-nike-air" />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Nike Air</span>
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input
-                                  type="checkbox"
-                                  id="filter-nike-air-max"
-                                />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Nike Air Max</span>
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input
-                                  type="checkbox"
-                                  id="filter-nike-jordan"
-                                />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Nike Jordan</span>
-                              </label>
-                            </span>
-                          </li>
-                          <li className="filter-item filter-item--check-box filter-item--green">
-                            <span>
-                              <label className="label_relative">
-                                <input type="checkbox" id="filter-puma" />
-                                <i className="fa"></i>
-                                <span className="filter_tt">Puma</span>
-                              </label>
-                            </span>
-                          </li>
-                        </ul>
-                      </div>
-                    </aside>
-                  </div>
-                </div>
-                <aside className="aside-item hidden-767">
-                  <div className="aside-content">
-                    <a href="#" title="Thời trang nam">
-                      <img
-                        className="img-responsive center-block"
-                        src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
-                        data-lazyload="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/aside_banner.png?1730865096645"
-                        alt="Thời trang nam"
-                      />
-                    </a>
-                  </div>
-                </aside>
-              </div>
+              <SidebarFilter
+                categories={categories}
+                openCategoryId={openCategoryId}
+                toggleCategory={toggleCategory}
+                brandsList={brandsList}
+                selectedBrandIds={selectedBrandIds}
+                handleBrandCheckboxChange={handleBrandCheckboxChange}
+                selectedGender={selectedGender}
+                handleGenderChange={handleGenderChange}
+                selectedPriceRange={selectedPriceRange}
+                handlePriceChange={handlePriceChange}
+              />
+
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
                   <div className="sortPagiBar">
@@ -448,9 +280,7 @@ export default function Product() {
                           style={{ width: "230px" }}
                         >
                           <div className="product-image">
-                            <Link
-                              href={`/product/${sp.slug}`}
-                            >
+                            <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
                                   sp.images?.[0]?.url ||
@@ -460,19 +290,14 @@ export default function Product() {
                               />
                             </Link>
 
-                            <div className="product-icons">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
 
                             <span className="discount-tag">
                               -
                               {Math.round(
-                                ((sp.price - sp.sale_price) / sp.price) * 100
+                                ((Number(sp.price) - Number(sp.sale_price)) /
+                                  Number(sp.price)) *
+                                  100
                               )}
                               %
                             </span>
@@ -480,7 +305,10 @@ export default function Product() {
                             <div className="product-colors">
                               {[
                                 ...new Map(
-                                  sp.variants.map((v) => [v.color.id, v.color])
+                                  sp.product_variants.map((v) => [
+                                    v.color.id,
+                                    v.color,
+                                  ])
                                 ).values(),
                               ].map((color) => (
                                 <span
@@ -493,12 +321,15 @@ export default function Product() {
                             </div>
 
                             <h4 className="product-title">{sp.name}</h4>
+
                             <div className="product-price">
                               <span className="old-price">
-                                <del>{sp.price.toLocaleString("vi")}đ</del>
+                                <del>
+                                  {Number(sp.price).toLocaleString("vi")}đ
+                                </del>
                               </span>
                               <span className="new-price">
-                                {sp.sale_price.toLocaleString("vi")}đ
+                                {Number(sp.sale_price).toLocaleString("vi")}đ
                               </span>
                             </div>
 
@@ -512,7 +343,7 @@ export default function Product() {
                                 >
                                   <span className="sold-info">
                                     Đã bán{" "}
-                                    {sp.variants.reduce(
+                                    {sp.product_variants.reduce(
                                       (sum, v) => sum + v.stock_quantity,
                                       0
                                     )}{" "}
@@ -525,12 +356,12 @@ export default function Product() {
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
-                                (sp.reviews?.length
+                                (sp.product_reviews?.length
                                   ? Math.round(
-                                      sp.reviews.reduce(
+                                      sp.product_reviews.reduce(
                                         (s, r) => s + Number(r.rating),
                                         0
-                                      ) / sp.reviews.length
+                                      ) / sp.product_reviews.length
                                     )
                                   : 0) ? (
                                   <i key={i} className="fa-solid fa-star"></i>
@@ -545,6 +376,7 @@ export default function Product() {
                     ))}
                   </div>
                 )}
+
                 {viewMode === "list" && (
                   <div className="product-grid-column">
                     {products.map((sp) => (
@@ -555,15 +387,13 @@ export default function Product() {
                         <div
                           className="product-card-list"
                           style={{
-                           width: "100% !important",
+                            width: "100% !important",
                             display: "flex",
                             background: "none",
                           }}
                         >
                           <div className="product-image">
-                            <Link
-                              href={`/product/${sp.slug}`}
-                            >
+                            <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
                                   sp.images?.[0]?.url ||
@@ -572,16 +402,8 @@ export default function Product() {
                                 alt={sp.name}
                               />
                             </Link>
-                           
-                            <div className="product-icons">
-                              <i className="fa-solid fa-heart always-show"></i>
-                              <div className="hover-icons">
-                                <i className="fa-solid fa-eye"></i>
-                                <i className="fa-solid fa-list"></i>
-                                <i className="fa fa-exchange"></i>
-                              </div>
-                            </div>
-                            
+
+                            <ProductIcons productId={sp.id ?? sp.products_id} />
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -618,12 +440,12 @@ export default function Product() {
                             <div className="product-rating">
                               {Array.from({ length: 5 }, (_, i) =>
                                 i <
-                                (sp.reviews?.length
+                                (sp.product_reviews?.length
                                   ? Math.round(
-                                      sp.reviews.reduce(
+                                      sp.product_reviews.reduce(
                                         (s, r) => s + Number(r.rating),
                                         0
-                                      ) / sp.reviews.length
+                                      ) / sp.product_reviews.length
                                     )
                                   : 0) ? (
                                   <i key={i} className="fa-solid fa-star"></i>
@@ -635,7 +457,10 @@ export default function Product() {
                             <div className="product-colors">
                               {[
                                 ...new Map(
-                                  sp.variants.map((v) => [v.color.id, v.color])
+                                  sp.product_variants.map((v) => [
+                                    v.color.id,
+                                    v.color,
+                                  ])
                                 ).values(),
                               ].map((color) => (
                                 <span
@@ -652,10 +477,12 @@ export default function Product() {
                     ))}
                   </div>
                 )}
-                <div className="flex justify-center items-center gap-2 mt-6">
+                <div className="pagination">
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === 1}
                   >
                     <i className="fa-solid fa-chevron-left"></i>
@@ -665,11 +492,7 @@ export default function Product() {
                     <button
                       key={i + 1}
                       onClick={() => setPage(i + 1)}
-                      className={`!p-[7px]  rounded ${
-                        page === i + 1
-                          ? "bg-blue-600 text-white"
-                          : "bg-gray-200 hover:bg-gray-300"
-                      }`}
+                      className={`page-btn ${page === i + 1 ? "active" : ""}`}
                     >
                       {i + 1}
                     </button>
@@ -677,7 +500,9 @@ export default function Product() {
 
                   <button
                     onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                    className="!p-[7px] py-1 rounded bg-gray-200 hover:bg-gray-300"
+                    className={`page-btn ${
+                      page === totalPages ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     disabled={page === totalPages}
                   >
                     <i className="fa-solid fa-chevron-right"></i>
@@ -698,284 +523,17 @@ export default function Product() {
           className={`fa ${isActive ? "fa-times" : "fa-filter"}`}
         ></i>
       </div>
-
-      {/* <!-- Sidebar bộ lọc --> */}
-      <div id="filter-sidebar" className={isActive ? "active" : ""}>
-        <aside className="aside-item collection-category">
-          <div className="aside-title">
-            <h2 className="title-head margin-top-0">
-              <span>Danh mục</span>
-            </h2>
-          </div>
-          <div className="categories-box">
-            <ul className="lv1">
-              <li className="nav-item nav-items">
-                <a href="/" title="Trang chủ">
-                  {" "}
-                  Trang chủ
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/gioi-thieu" title="Giới thiệu">
-                  {" "}
-                  Giới thiệu
-                </a>
-              </li>
-              <li className="nav-item nav-items active">
-                <a
-                  href="/collections/all"
-                  className="nav-link"
-                  title="Sản phẩm"
-                >
-                  Sản phẩm
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/tin-tuc" className="nav-link" title="Tin tức">
-                  Tin tức
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/lien-he" title="Liên hệ">
-                  {" "}
-                  Liên hệ
-                </a>
-              </li>
-              <li className="nav-item nav-items">
-                <a href="/he-thong-cua-hang" title="Hệ thống cửa hàng">
-                  Hệ thống cửa hàng
-                </a>
-              </li>
-            </ul>
-          </div>
-        </aside>
-        <div className="aside-filter">
-          <div className="aside-title">
-            <h2 className="title-head margin-top-0">
-              <span>Bộ lọc</span>
-            </h2>
-          </div>
-          <div className="filter-container">
-            <aside className="aside-item filter-price">
-              <div className="module-title">
-                <h2 className="title-head margin-top-0">
-                  <span>Giá sản phẩm</span>
-                </h2>
-              </div>
-              <div className="aside-content filter-group">
-                <ul>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-duoi-100-000d"
-                          data-group="Khoảng giá"
-                          data-field="price_min"
-                          data-text="Dưới 100.000đ"
-                          value="(<100000)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        Giá dưới 100.000đ
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-100-000d-200-000d"
-                          data-group="Khoảng giá"
-                          data-field="price_min"
-                          data-text="100.000đ - 200.000đ"
-                          value="(>=100000 AND <200000)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        100.000đ - 200.000đ
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-200-000d-300-000d"
-                          data-group="Khoảng giá"
-                          data-field="price_min"
-                          data-text="200.000đ - 300.000đ"
-                          value="(>=200000 AND <300000)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        200.000đ - 300.000đ
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-300-000d-500-000d"
-                          data-group="Khoảng giá"
-                          data-field="price_min"
-                          data-text="300.000đ - 500.000đ"
-                          value="(>=300000 AND <500000)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        300.000đ - 500.000đ
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-500-000d-1-000-000d"
-                          data-group="Khoảng giá"
-                          data-field="price_min"
-                          data-text="500.000đ - 1.000.000đ"
-                          value="(>500000 AND <1000000)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        500.000đ - 1.000.000đ
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-tren1-000-000d"
-                          data-group="Khoảng giá"
-                          data-field="price_min"
-                          data-text="Trên 1.000.000đ"
-                          value="(>1000000)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        Giá trên 1.000.000đ
-                      </label>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </aside>
-            <aside className="aside-item filter-type">
-              <div className="module-title">
-                <h2 className="title-head margin-top-0">
-                  <span>Loại</span>
-                </h2>
-              </div>
-              <div className="aside-content filter-group">
-                <ul>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-giay-nam"
-                          data-group="Loại"
-                          data-field="product_type"
-                          data-text="Giày Nam"
-                          value="(Giày Nam)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        Giày Nam
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label>
-                        <input
-                          type="checkbox"
-                          id="filter-giay-nu"
-                          data-group="Loại"
-                          data-field="product_type"
-                          data-text="Giày Nữ"
-                          value="(Giày Nữ)"
-                          data-operator="OR"
-                        />
-                        <i className="fa"></i>
-                        Giày Nữ
-                      </label>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </aside>
-            <aside className="aside-item filter-vendor">
-              <div className="module-title">
-                <h2 className="title-head margin-top-0">
-                  <span>Thương hiệu</span>
-                </h2>
-              </div>
-              <div className="aside-content filter-group aside_vendor">
-                <ul>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-nike-air" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Nike Air</span>
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-nike-air-max" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Nike Air Max</span>
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-nike-jordan" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Nike Jordan</span>
-                      </label>
-                    </span>
-                  </li>
-                  <li className="filter-item filter-item--check-box filter-item--green">
-                    <span>
-                      <label className="label_relative">
-                        <input type="checkbox" id="filter-puma" />
-                        <i className="fa"></i>
-                        <span className="filter_tt">Puma</span>
-                      </label>
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </aside>
-          </div>
-        </div>
-        <aside className="aside-item hidden-767">
-          <div className="aside-content">
-            <a href="#" title="Thời trang nam">
-              <img
-                className="img-responsive center-block"
-                src="/images/banner/aside_banner.webp"
-                data-lazyload="/images/banner/aside_banner.webp"
-                alt="Thời trang nam"
-              />
-            </a>
-          </div>
-        </aside>
-      </div>
+      <MobileSidebarFilter
+        isActive={isActive}
+        categories={categories}
+        openCategoryId={openCategoryId}
+        toggleCategory={toggleCategory}
+        brandsList={brandsList}
+        selectedBrandIds={selectedBrandIds}
+        handleBrandCheckboxChange={handleBrandCheckboxChange}
+        selectedGender={selectedGender}
+        handleGenderChange={handleGenderChange}
+      />
     </>
   );
 }

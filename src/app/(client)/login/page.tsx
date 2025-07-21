@@ -1,5 +1,6 @@
 "use client";
 import "../css/login.css";
+import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,6 @@ import Loader from "../component/loader";
 import { Eye, EyeOff } from "lucide-react";
 import { validateField } from "@/hooks/validate_login_register";
 import Link from "next/link";
-import { useAuthCookie } from "@/hooks/useAuthCookie";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -18,7 +18,7 @@ export default function Login() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-const { getUserFromCookies } = useAuthCookie();
+const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -41,22 +41,23 @@ const { getUserFromCookies } = useAuthCookie();
     return Object.keys(newErrors).length === 0;
   };
 
- const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
 
-  if (!validateForm()) return;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    const res = await loginUser({ usernameOrEmail, password });
-    console.log(res)
-    getUserFromCookies().token;
+    if (!validateForm()) return;
 
-    setShowLoader(true);
-    setLoginSuccess(true);
-  } catch (err: any) {
-    toast.error(err.message || "Đăng nhập thất bại");
-  }
-};
+    try {
+      const res = await loginUser({ usernameOrEmail, password });
+
+      saveUserToCookies(res.token);
+
+      setShowLoader(true);
+      setLoginSuccess(true);
+    } catch (err: any) {
+      toast.error(err.message || "Đăng nhập thất bại");
+    }
+  };
 
   const googleLogin = () => {
     const clientId =
@@ -76,7 +77,7 @@ const { getUserFromCookies } = useAuthCookie();
       const timer = setTimeout(() => {
         setShowLoader(false);
         toast.success("Đăng nhập thành công!");
-        router.push("/account");
+        window.location.href = "/account";
       }, 7000);
 
       return () => clearTimeout(timer);

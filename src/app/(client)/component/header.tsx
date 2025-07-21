@@ -3,12 +3,18 @@ import React, { useEffect, useState, useRef } from "react";
 import Search from "./showsearch";
 import TopCart from "./top_cart";
 import MenuRight from "./menu_right";
-import LoginMenu from "./login_regis_forgot_modal";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
-import { useAuthCookie } from "@/hooks/useAuthCookie";
+import { useRouter } from "next/navigation";
 import { useAuthUser } from "@/hooks/useAuthUser";
-
+import { ICategory } from "@/types/ICategory";
+import { IBrand } from "@/types/IBrand";
+import { getCategories } from "@/services/categoryService";
+import { getBrands } from "@/services/brandService";
+import { getCompareProduct, searchProducts } from "@/services/productService";
+import { getCartByUserId } from "@/services/cartService";
+import { getWishlistByUserId } from "@/services/wishlistService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -21,10 +27,39 @@ export default function Header() {
   const [showNav, setShowNav] = useState(true);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
   const { user } = useAuthUser();
   let hideTimeout = null;
+  const [keyword, setKeyword] = useState("");
+  const router = useRouter();
+ const {
+  wishlistCount,
+  compareCount,
+  cartCount: cartItemCount,
+  setWishlistCount,
+  setCompareCount,
+  setCartCount,
+} = useGlobalStore();
+
+  const handleSearch = () => {
+    if (!keyword.trim()) return;
+    router.push(`/product?q=${encodeURIComponent(keyword)}`);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
+  useEffect(() => {
+    getBrands().then(setBrands);
+  }, []);
   useEffect(() => {
     const cartIcon = cartIconRef.current;
     const cartPopup = cartPopupRef.current;
@@ -76,6 +111,50 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+useEffect(() => {
+  const fetchCartCount = async () => {
+    if (!user?.id) return;
+    try {
+      const cartData = await getCartByUserId(user.id);
+      const totalItems = cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+      setCartCount(totalItems);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+    }
+  };
+
+  fetchCartCount();
+}, [user]);
+
+useEffect(() => {
+  const fetchWishlistCount = async () => {
+    if (!user?.id) return;
+
+    try {
+      const wishlist = await getWishlistByUserId(user.id);
+      setWishlistCount(wishlist.length);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng yêu thích:", error);
+    }
+  };
+
+  fetchWishlistCount();
+}, [user]);
+
+useEffect(() => {
+  const fetchCompareCount = async () => {
+    if (!user?.id) return;
+    try {
+      const compareList = await getCompareProduct(user.id);
+      setCompareCount(compareList.length || 0);
+    } catch (error) {
+      console.error("Lỗi khi lấy số lượng so sánh:", error);
+    }
+  };
+
+  fetchCompareCount();
+}, [user]);
+
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -154,7 +233,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -179,47 +257,57 @@ export default function Header() {
             <span className="sdt-header">0338538203</span>
           </div>
         </div>
-        <div className="icon-header">
-          <div
-            className={`iconuser-header div1 ${
-              user ? "logged-in" : "logged-out"
-            }`}
-          >
-            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {user ? (
-                <Link
-                  href="/account"
-                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
-                >
-                  Chào {user.name}
-                </Link>
-              ) : (
-                <Link href="/login">
-                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
-                </Link>
-              )}
-            </div>
-          </div>
-
-          <div className="iconheart-header div">
-            <Link href="/wishlist">
-              <i className="fa-solid fa-heart"></i>
+         <div className="icon-header">
+      <div
+        className={`iconuser-header div1 ${
+          user ? "logged-in" : "logged-out"
+        }`}
+      >
+        <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+          {user ? (
+            <Link
+              href="/account"
+              className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
+            >
+              Chào {user.name}
             </Link>
-          </div>
-          <div className="iconcompare-header div">
-            <Link href="/compare_product">
-              <i className="fa fa-exchange"></i>
+          ) : (
+            <Link href="/login">
+              <i className="fa-solid fa-user cursor-pointer text-white"></i>
             </Link>
-          </div>
-
-          <div className="cart-wrapper">
-            <div className="iconcart-header div">
-              <Link href="/cart">
-                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
-              </Link>
-            </div>
-          </div>
+          )}
         </div>
+      </div>
+
+      <div
+        className="iconheart-header div data_wishlist"
+        data-count={wishlistCount}
+      >
+        <Link href="/wishlist">
+          <i className="fa-solid fa-heart"></i>
+        </Link>
+      </div>
+
+      <div
+        className="iconcompare-header div data_compare_product"
+        data-count={compareCount}
+      >
+        <Link href="/compare_product">
+          <i className="fa fa-exchange"></i>
+        </Link>
+      </div>
+
+      <div className="cart-wrapper">
+        <div
+          className="iconcart-header div data_cart"
+          data-count={cartItemCount}
+        >
+          <Link href="/cart">
+            <i className="fa fa-shopping-bag"></i>
+          </Link>
+        </div>
+      </div>
+    </div>
       </header>
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
@@ -243,21 +331,29 @@ export default function Header() {
                 >
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
-                      <h4>SẢN PHẨM MỚI NHẤT</h4>
-                      <a href="#">Giày chạy bộ</a>
-                      <a href="#">Giày Nike</a>
-                      <a href="#">Giày Adidas</a>
-                      <a href="#">Giày thể thao</a>
+                      <h4>DANH MỤC MỚI NHẤT</h4>
+                      {categories.map((cat) => (
+                        <a
+                          key={cat.categories_id}
+                          href={`/category/${cat.slug}`}
+                        >
+                          {cat.name}
+                        </a>
+                      ))}
                     </div>
+
                     <div className="mega-column">
-                      <h4>SẢN PHẨM NỔI BẬT</h4>
-                      <a href="#">Giày cho nam</a>
-                      <a href="#">Giày cho nữ</a>
-                    </div>
-                    <div className="mega-column">
-                      <h4>SẢN PHẨM BÁN CHẠY</h4>
-                      <a href="#">Giày Puma</a>
-                      <a href="#">Nike Air</a>
+                      <h4>NHÃN HIỆU MỚI NHẤT</h4>
+                      <div className="mega-brands">
+                        {brands.map((brand) => (
+                          <a
+                            key={brand.brand_id}
+                            href={`/brand/${brand.brand_id}`}
+                          >
+                            {brand.name}
+                          </a>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
@@ -283,8 +379,14 @@ export default function Header() {
                 type="text"
                 placeholder="Tìm kiếm sản phẩm"
                 className="input-search-nav !text-black"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={handleKeyPress}
               />
-              <i className="fa-solid fa-magnifying-glass"></i>
+              <i
+                className="fa-solid fa-magnifying-glass"
+                onClick={handleSearch}
+              ></i>
             </div>
           </div>
         </nav>
