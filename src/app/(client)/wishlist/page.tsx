@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { IWishlistItemWithProduct } from "@/types/wishlist";
@@ -6,25 +7,37 @@ import "../css/product.css";
 import "../css/wishlist.css";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import ProductIcons from "../component/products/ProductIcons";
+import Link  from "next/link";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState<IWishlistItemWithProduct[]>([]);
   const { user } = useAuthUser();
 
+  // Cập nhật wishlist sau khi xóa sản phẩm
+  const handleRemoveWishlistItem = (productId: number) => {
+    setWishlist((prev) =>
+      Array.isArray(prev)
+        ? prev.filter((item) => item.product.products_id !== productId)
+        : []
+    );
+  };
+
   useEffect(() => {
-    if (!user?.id) return; //
+    if (!user?.id) return;
 
     const fetchWishlist = async () => {
       try {
         const data = await getWishlistByUserId(user.id);
-        setWishlist(data);
+        setWishlist(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Lỗi:", err);
+        console.error("Lỗi khi lấy danh sách yêu thích:", err);
+        setWishlist([]);
       }
     };
 
     fetchWishlist();
-  }, [user?.id]); //
+  }, [user?.id]);
+
   if (!user) {
     return (
       <>
@@ -71,6 +84,7 @@ export default function Wishlist() {
       </>
     );
   }
+
   return (
     <>
       <section
@@ -105,142 +119,161 @@ export default function Wishlist() {
       <main>
         <div className="container1">
           <div className="row">
+            {/* Nếu không có sản phẩm */}
+            {Array.isArray(wishlist) && wishlist.length === 0 && (
+              <div className="w-full flex flex-col items-center justify-center py-10 text-gray-600">
+                <i className="fa-regular fa-heart text-6xl text-[#021688] mb-4"></i>
+                <h3 className="text-xl font-semibold mb-2 text-[#021688] ">
+                  Danh sách yêu thích trống
+                </h3>
+                <p className="text-center max-w-sm text-gray-500">
+                  Bạn chưa có sản phẩm nào trong danh sách yêu thích. Hãy khám
+                  phá và thêm sản phẩm bạn yêu thích!
+                </p> 
+                <Link
+                  href="/"
+                  className="mt-5 px-6 py-2 !text-[#4bd963] rounded hover:bg-gray-800 transition-all"
+                >
+                  Quay lại trang chủ
+                </Link>
+              </div>
+            )}
+
             {/* Desktop */}
-            <div className="product-grid-wishlist">
-              {wishlist.map((item) => {
-                const product = item.product;
-                const variant = product.product_variants?.[0];
+            {Array.isArray(wishlist) && wishlist.length > 0 && (
+              <div className="product-grid-wishlist">
+                {wishlist.map((item) => {
+                  const product = item.product;
+                  const variant = product.product_variants?.[0];
+                  const image = product.images.find(
+                    (img) => img.type === "main"
+                  )?.url;
 
-                // Nếu không có variant thì bỏ qua
-                if (!variant) {
-                  console.warn("Không có variant cho sản phẩm:", product.name);
-                  return null;
-                }
-                const image = product.images.find(
-                  (img) => img.type === "main"
-                )?.url;
+                  if (!variant) return null;
 
-                return (
-                  <div
-                    key={item.wishlist_items_id}
-                    className="product-itemlist-main !block"
-                  >
-                    <div className="product-card" style={{ width: "238px" }}>
-                      <div className="product-image">
-                        <img src={image} alt={product.name} />
-                        <ProductIcons
-                          productId={product.products_id}
-                          variant_id={
-                            product.product_variants?.[0]
-                              ?.product_variants_id ?? null
-                          }
-                          price={product.sale_price}
-                        />
-
-                        {product.price > product.sale_price && (
-                          <span className="discount-tag">
-                            -
-                            {Math.round(
-                              ((product.price - product.sale_price) /
-                                product.price) *
-                                100
-                            )}
-                            %
+                  return (
+                    <div
+                      key={item.wishlist_items_id}
+                      className="product-itemlist-main !block"
+                    >
+                      <div className="product-card" style={{ width: "238px" }}>
+                        <div className="product-image">
+                          <img src={image} alt={product.name} />
+                          <ProductIcons
+                            productId={product.products_id}
+                            variant_id={variant.product_variants_id ?? null}
+                            price={product.sale_price}
+                            onWishlistChange={() =>
+                              handleRemoveWishlistItem(product.products_id)
+                            }
+                          />
+                          {product.price > product.sale_price && (
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((product.price - product.sale_price) /
+                                  product.price) *
+                                  100
+                              )}
+                              %
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="product-title">{product.name}</h4>
+                        <div className="product-price">
+                          {product.price !== product.sale_price && (
+                            <span className="old-price">
+                              <del>{product.price.toLocaleString()}₫</del>
+                            </span>
+                          )}
+                          <span className="new-price">
+                            {product.sale_price.toLocaleString()}₫
                           </span>
-                        )}
-                      </div>
-                      <h4 className="product-title">{product.name}</h4>
-                      <div className="product-price">
-                        {product.price !== product.sale_price && (
-                          <span className="old-price">
-                            <del>{product.price.toLocaleString()}₫</del>
-                          </span>
-                        )}
-                        <span className="new-price">
-                          {product.sale_price.toLocaleString()}₫
-                        </span>
-                      </div>
-                      <div className="product-rating">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <i
-                            key={i}
-                            className={`fa-${
-                              i <= 4 ? "solid" : "regular"
-                            } fa-star`}
-                          ></i>
-                        ))}
+                        </div>
+                        <div className="product-rating">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <i
+                              key={i}
+                              className={`fa-${
+                                i <= 4 ? "solid" : "regular"
+                              } fa-star`}
+                            ></i>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Mobile */}
-            <div className="product-grid-wishlist-list">
-              {wishlist.map((item) => {
-                const product = item.product;
-                const image = product.images.find(
-                  (img) => img.type === "main"
-                )?.url;
+            {Array.isArray(wishlist) && wishlist.length > 0 && (
+              <div className="product-grid-wishlist-list">
+                {wishlist.map((item) => {
+                  const product = item.product;
+                  const variant = product.product_variants?.[0];
+                  const image = product.images.find(
+                    (img) => img.type === "main"
+                  )?.url;
 
-                return (
-                  <div
-                    key={item.wishlist_items_id}
-                    className="product-itemlist-main"
-                  >
-                    <div className="product-card">
-                      <div className="product-image">
-                        <img src={image} alt={product.name} />
-                        <ProductIcons
-                          productId={product.product_id}
-                          variant_id={
-                            product.product_variants?.[0]
-                              ?.product_variants_id ?? null
-                          }
-                          price={product.sale_price}
-                        />
-
-                        {product.price > product.sale_price && (
-                          <span className="discount-tag">
-                            -
-                            {Math.round(
-                              ((product.price - product.sale_price) /
-                                product.price) *
-                                100
-                            )}
-                            %
+                  return (
+                    <div
+                      key={item.wishlist_items_id}
+                      className="product-itemlist-main"
+                    >
+                      <div className="product-card">
+                        <div className="product-image">
+                          <img src={image} alt={product.name} />
+                          <ProductIcons
+                            productId={product.products_id}
+                            variant_id={variant?.product_variants_id ?? null}
+                            price={product.sale_price}
+                            onWishlistChange={() =>
+                              handleRemoveWishlistItem(product.products_id)
+                            }
+                          />
+                          {product.price > product.sale_price && (
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((product.price - product.sale_price) /
+                                  product.price) *
+                                  100
+                              )}
+                              %
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="product-content w-full">
+                        <h4 className="product-title">{product.name}</h4>
+                        <div className="product-price">
+                          {product.price !== product.sale_price && (
+                            <span className="old-price">
+                              <del>{product.price.toLocaleString()}₫</del>
+                            </span>
+                          )}
+                          <span className="new-price">
+                            {product.sale_price.toLocaleString()}₫
                           </span>
-                        )}
+                        </div>
+                        <div className="product-rating">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <i
+                              key={i}
+                              className={`fa-${
+                                i <= 4 ? "solid" : "regular"
+                              } fa-star`}
+                            ></i>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <div className="product-content w-full">
-                      <h4 className="product-title">{product.name}</h4>
-                      <div className="product-price">
-                        {product.price !== product.sale_price && (
-                          <span className="old-price">
-                            <del>{product.price.toLocaleString()}₫</del>
-                          </span>
-                        )}
-                        <span className="new-price">
-                          {product.sale_price.toLocaleString()}₫
-                        </span>
-                      </div>
-                      <div className="product-rating">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <i
-                            key={i}
-                            className={`fa-${
-                              i <= 4 ? "solid" : "regular"
-                            } fa-star`}
-                          ></i>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </main>

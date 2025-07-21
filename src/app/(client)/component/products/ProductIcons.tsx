@@ -4,12 +4,21 @@ import { useAddToCompare } from "@/hooks/useAddToCompare";
 
 interface ProductIconsProps {
   productId: number;
-  variant_id:number;
-  price:number
+  variant_id: number;
+  price: number;
+  onWishlistChange?: () => void; // Callback khi thay đổi trạng thái yêu thích
 }
 
-export default function ProductIcons({ productId,variant_id, price  }: ProductIconsProps) {
-  const { isWished, handleAddToWishlist } = useAddToWishlist(productId);
+export default function ProductIcons({
+  productId,
+  variant_id,
+  price,
+  onWishlistChange,
+}: ProductIconsProps) {
+  const { handleAddToWishlist, isWished } = useAddToWishlist(
+    productId,
+    onWishlistChange // 👈 truyền callback từ cha
+  );
   const { handleAddToCart } = useAddToCart();
   const { isCompared, handleAddCompare, loading } = useAddToCompare(productId);
 
@@ -27,9 +36,8 @@ export default function ProductIcons({ productId,variant_id, price  }: ProductIc
         <i
           className="fa fa-shopping-bag position-relative"
           onClick={() => handleAddToCart({ variant_id, price })}
-
         ></i>
-       <button
+        <button
           className={`compare-btn ${isCompared ? "active" : ""}`}
           onClick={handleAddCompare}
           title={isCompared ? "Đã thêm vào so sánh" : "Thêm vào so sánh"}

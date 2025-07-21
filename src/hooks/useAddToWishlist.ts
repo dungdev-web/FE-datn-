@@ -11,7 +11,7 @@ import {
 import { checkToken } from "@/services/authService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
-export const useAddToWishlist = (productId: number) => {
+export const useAddToWishlist = (productId: number, onRemoveSuccess?: () => void) => {
   const [isWished, setIsWished] = useState(false);
   const router = useRouter();
 
@@ -62,7 +62,7 @@ export const useAddToWishlist = (productId: number) => {
         await removeFromWishlist({ userId, productId });
         setIsWished(false);
         decrementWishlist(); //  Trừ count
-
+       if (onRemoveSuccess) onRemoveSuccess();
         Swal.fire({
           icon: "success",
           title: "Đã xóa",
