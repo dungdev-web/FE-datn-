@@ -387,10 +387,10 @@ form {
   -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
-
+/* 
 .hidden {
   display: none !important;
-}
+} */
 
 .details-pro .custom-btn-number .qtyminus {
   position: absolute;
@@ -1531,9 +1531,9 @@ input[type="submit"] {
 .tt {
   display: inline-block;
 }
-.hidden {
+/* .hidden {
   display: none !important;
-}
+} */
 .tt span {
   color: #4bd963;
   font-weight: 500;
@@ -1730,6 +1730,9 @@ input[type="submit"] {
   }
 }
 @media (max-width: 768px) {
+  .sidebar-des{
+    display: none !important;
+  }
   .main_container {
     padding: 10px 30px;
   }
@@ -1758,6 +1761,7 @@ input[type="submit"] {
   }
 } */
 @media (min-width: 1024px) {
+  
   .open-filters,
   .filter-sidebar {
     display: none;

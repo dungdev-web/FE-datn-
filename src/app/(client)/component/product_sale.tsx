@@ -60,7 +60,10 @@ export default function ProductSale() {
               )
             : 0;
 
-          const sold = variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0);
+          const sold = variants.reduce(
+            (sum, v) => sum + (v.stock_quantity || 0),
+            0
+          );
 
           const discount =
             product.price > 0
@@ -84,15 +87,24 @@ export default function ProductSale() {
                   <div className="product-image">
                     <Link href={`/product/${product.slug}`}>
                       <img
-                        src={`/images/products/chaybo/${images?.[0]?.url}` || "/images/placeholder.png"}
+                        src={
+                          `/images/products/chaybo/${images?.[0]?.url}` ||
+                          "/images/placeholder.png"
+                        }
                         alt={product.name}
                         className="!h-[100%]"
                       />
                     </Link>
 
-
                     {/* ✅ Sử dụng đúng productId */}
-                    <ProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <ProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants?.[0]?.product_variants_id ??
+                        null
+                      }
+                      price={product.sale_price}
+                    />
 
                     {discount > 0 && (
                       <span className="discount-tag">-{discount}%</span>
@@ -118,7 +130,11 @@ export default function ProductSale() {
                         </span>
                       )}
                       <span className="new-price">
-                        {(product.sale_price > 0 ? product.sale_price : product.price).toLocaleString("vi")}đ
+                        {(product.sale_price > 0
+                          ? product.sale_price
+                          : product.price
+                        ).toLocaleString("vi")}
+                        đ
                       </span>
                     </div>
 

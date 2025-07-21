@@ -116,7 +116,7 @@ export default function Wishlist() {
                   >
                     <div className="product-card" style={{ width: "238px" }}>
                       <div className="product-image">
-                        <img src={image} alt={product.name} />
+                        <img src={`/images/products/chaybo/${image}`} alt={product.name} />
                         <div className="product-icons">
                           <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
                           <div className="hover-icons">

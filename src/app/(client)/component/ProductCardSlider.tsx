@@ -10,7 +10,6 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
   const variants = product.product_variants || [];
   const images = product.images || [];
 
-
   const productId = product.products_id ?? product.products_id;
 
   const discount =
@@ -39,13 +38,21 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
         <div className="product-image">
           <Link href={`/product/${product.slug}`}>
             <img
-              src={`/images/products/chaybo/${images[0]?.url}` || "/images/placeholder.png"}
+              src={
+                `/images/products/chaybo/${images[0]?.url}` ||
+                "/images/placeholder.png"
+              }
               alt={product.name}
             />
           </Link>
 
-
-          <ProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+          <ProductIcons
+            productId={productId}
+            variant_id={
+              product.product_variants?.[0]?.product_variants_id ?? null
+            }
+            price={product.sale_price}
+          />
 
           {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 
