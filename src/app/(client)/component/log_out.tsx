@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { logoutUser } from "@/services/authService";
+import { logoutUser as apiLogoutUser } from "@/services/authService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export default function LogoutLink() {
   const router = useRouter();
@@ -11,9 +12,12 @@ export default function LogoutLink() {
     e.preventDefault();
 
     try {
-      const result = await logoutUser();
+      const result = await apiLogoutUser();
+
+      // ✅ Cập nhật Zustand store để header tự động re-render
+      useGlobalStore.getState().logoutUser();
+
       toast.success(result.message || "Đăng xuất thành công!");
-      // Chuyển hướng về trang đăng nhập
       router.push("/login");
     } catch (error: any) {
       toast.error(error.message || "Đăng xuất thất bại");
