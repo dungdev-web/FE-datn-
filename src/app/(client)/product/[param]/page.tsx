@@ -2,6 +2,7 @@
 import "../../css/detail.css";
 import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { ICartItem } from "@/types/cart";
+import { ICoupon } from "@/types/coupon";
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
@@ -15,9 +16,8 @@ import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";
 import { useRouter } from "next/navigation";
-// Đang dùng mock, hãy thay bằng API thật:
 import { addToCart } from "@/services/cartService";
-
+import { getCouponList } from "@/services/couponService";
 export default function Detail() {
   const router = useRouter();
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -36,81 +36,81 @@ export default function Detail() {
   const [views, setReviews] = useState<IReview[]>([]);
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
+  const [coupon, setCoupon] = useState<ICoupon[]>([]);
   const handleAddToCart = async () => {
-  if (!selectedColorId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn màu sắc",
-      text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-
-  if (!selectedSizeId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn kích thước",
-      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-
-  if (!variantId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn biến thể",
-      text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const tokenData = await checkToken();
-    if (!tokenData?.user?.id) {
+    if (!selectedColorId) {
       Swal.fire({
         icon: "warning",
-        title: "Bạn chưa đăng nhập",
-        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
-        confirmButtonText: "Đăng nhập",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push("/login");
-        }
+        title: "Vui lòng chọn màu sắc",
+        text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
       });
       return;
     }
 
-    const response = await addToCart({
-      user_id: tokenData.user.id,
-      variant_id: variantId,
-      quantity,
-      price,
-    });
+    if (!selectedSizeId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn kích thước",
+        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
 
-    console.log("Đã thêm vào giỏ hàng:", response);
+    if (!variantId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn biến thể",
+        text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
 
-    Swal.fire({
-      icon: "success",
-      title: "Đã thêm vào giỏ hàng!",
-      text: response.message,
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    router.push("/cart");
+    setLoading(true);
 
-  } catch (error) {
-    console.error("Lỗi khi thêm vào giỏ hàng:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Lỗi!",
-      text: (error as Error).message || "Thêm sản phẩm thất bại",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const tokenData = await checkToken();
+      if (!tokenData?.user?.id) {
+        Swal.fire({
+          icon: "warning",
+          title: "Bạn chưa đăng nhập",
+          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+          confirmButtonText: "Đăng nhập",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push("/login");
+          }
+        });
+        return;
+      }
+
+      const response = await addToCart({
+        user_id: tokenData.user.id,
+        variant_id: variantId,
+        quantity,
+        price,
+      });
+
+      console.log("Đã thêm vào giỏ hàng:", response);
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã thêm vào giỏ hàng!",
+        text: response.message,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      router.push("/cart");
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: (error as Error).message || "Thêm sản phẩm thất bại",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [showSidebar, setShowSidebar] = useState(false);
   const toggleSidebar = () => setShowSidebar(!showSidebar);
@@ -138,6 +138,14 @@ export default function Detail() {
 
     fetchData();
   }, [params]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getCouponList();
+      setCoupon(data);
+    };
+
+    fetchData();
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       const data = await getBestSellingMockProducts(5);
@@ -930,83 +938,32 @@ export default function Detail() {
                     </div>
                     <div className="wrap-coupon_item">
                       <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: HLU10</h3>
-                            <div className="coupon_desc">
-                              Mã giảm 10% cho đơn hàng tối thiểu 500k.
+                        {coupon.map((item, index) => (
+                          <div key={index} className="coupon_body">
+                            <div className="coupon_head">
+                              <h3 className="coupon_title">
+                                NHẬP MÃ: {item.code}
+                              </h3>
+                              <div className="coupon_desc">
+                                Mã giảm {item.discount_value} c
+                              </div>
                             </div>
-                          </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              onClick={() => handleCopy("HLU10")}
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                            <span className="coupon_info_toggle">
-                              Điều kiện
-                              <span className="tooltip-text">
-                                Mã giảm 10% cho đơn tối thiểu 500k. Mỗi khách
-                                hàng được sử dụng tối đa 1 lần.
+                            <div className="d-flex items-center flex-wrap justify-between">
+                              <button
+                                className="btn btn-main btn-sm coupon_copy"
+                                onClick={() => handleCopy(item.code)}
+                              >
+                                <span>Sao chép mã</span>
+                              </button>
+                              <span className="coupon_info_toggle">
+                                Điều kiện
+                                <span className="tooltip-text">
+                                  {item.condition}
+                                </span>
                               </span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: HLU15</h3>
-                            <div className="coupon_desc">
-                              Mã giảm 15% cho đơn hàng tối thiểu 700k.
                             </div>
                           </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              data-ega-coupon="HLU15"
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: HLU99K</h3>
-                            <div className="coupon_desc">
-                              Mã giảm 99k cho đơn hàng tối thiểu 600k.
-                            </div>
-                          </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              data-ega-coupon="HLU99K"
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: FREESHIP</h3>
-                            <div className="coupon_desc">
-                              Miễn phí vận chuyển cho đơn tối thiểu 500k.
-                            </div>
-                          </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              data-ega-coupon="HLUF03"
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                          </div>
-                        </div>
+                        ))}
                       </div>
                     </div>
                     <div className="aside-item sticky-aside">
