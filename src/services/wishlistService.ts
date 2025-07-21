@@ -19,8 +19,12 @@ export const getWishlistByUserId = async (
   if (!response.ok) {
     throw new Error("Không thể lấy danh sách yêu thích.");
   }
+  const data = await response.json();
+  if (!Array.isArray(data)) {
+    console.warn("Danh sách yêu thích không phải array:", data);
+    return [];
+  }
 
-  const data: IWishlistItemWithProduct[] = await response.json();
   return data;
 };
 

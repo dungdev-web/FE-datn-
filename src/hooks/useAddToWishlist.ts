@@ -19,24 +19,29 @@ export const useAddToWishlist = (productId: number, onRemoveSuccess?: () => void
   const incrementWishlist = useGlobalStore((state) => state.incrementWishlist);
   const decrementWishlist = useGlobalStore((state) => state.decrementWishlist);
 
-  useEffect(() => {
-    const fetchWishlist = async () => {
-      try {
-        const tokenData = await checkToken();
-        if (tokenData?.user?.id) {
-          const wishlist = await getWishlistByUserId(tokenData.user.id);
+ useEffect(() => {
+  const fetchWishlist = async () => {
+    try {
+      const tokenData = await checkToken();
+      if (tokenData?.user?.id) {
+        const wishlist = await getWishlistByUserId(tokenData.user.id);
+
+        if (Array.isArray(wishlist)) {
           const wished = wishlist.some(
             (item) => Number(item.product_id) === Number(productId)
           );
           setIsWished(wished);
+        } else {
+          console.warn("getWishlistByUserId trả về không phải mảng:", wishlist);
         }
-      } catch (error) {
-        console.error("Lỗi khi lấy wishlist:", error);
       }
-    };
+    } catch (error) {
+      console.error("Lỗi khi lấy wishlist:", error);
+    }
+  };
 
-    fetchWishlist();
-  }, [productId]);
+  fetchWishlist();
+}, [productId]);
 
   const handleAddToWishlist = async () => {
     const tokenData = await checkToken();
