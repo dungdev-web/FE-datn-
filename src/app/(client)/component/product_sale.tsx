@@ -48,7 +48,7 @@ export default function ProductSale() {
         className="product-slider-track"
       >
         {dealProducts.map((product) => {
-          const productId = product.id ?? product.products_id;
+          const productId = product.products_id ?? product.products_id;
           const variants = product.product_variants || [];
           const reviews = product.product_reviews || [];
           const images = product.images || [];
@@ -84,7 +84,7 @@ export default function ProductSale() {
                   <div className="product-image">
                     <Link href={`/product/${product.slug}`}>
                       <img
-                        src={images?.[0]?.url || "/images/placeholder.png"}
+                        src={`/images/products/chaybo/${images?.[0]?.url}` || "/images/placeholder.png"}
                         alt={product.name}
                         className="!h-[100%]"
                       />
@@ -92,7 +92,7 @@ export default function ProductSale() {
 
 
                     {/* ✅ Sử dụng đúng productId */}
-                    <ProductIcons productId={productId} />
+                    <ProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
 
                     {discount > 0 && (
                       <span className="discount-tag">-{discount}%</span>

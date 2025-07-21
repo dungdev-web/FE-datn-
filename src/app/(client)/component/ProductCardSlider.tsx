@@ -39,7 +39,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
         <div className="product-image">
           <Link href={`/product/${product.slug}`}>
             <img
-              src={images[0]?.url || "/images/placeholder.png"}
+              src={`/images/products/chaybo/${images[0]?.url}` || "/images/placeholder.png"}
               alt={product.name}
             />
           </Link>

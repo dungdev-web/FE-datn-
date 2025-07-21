@@ -84,12 +84,12 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                       <div className="product-image">
                         <Link href={`product/${sp.slug}`}>
                           <img
-                            src={sp.images?.[0]?.url || "/images/placeholder.png"}
+                            src={`/images/products/chaybo/${sp.images?.[0]?.url}` || "/images/placeholder.png"}
                             alt={sp.name}
                             className="!h-[150px] !w-[100%]"
                           />
                         </Link>
-                        <ProductIcons productId={productId} />
+                        <ProductIcons productId={productId} variant_id={sp.product_variants[0].product_variants_id} price={sp.sale_price}/>
 
                         {discountPercent > 0 && (
                           <span className="discount-tag">-{discountPercent}%</span>

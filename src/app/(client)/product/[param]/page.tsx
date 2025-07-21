@@ -175,7 +175,11 @@ export default function Detail() {
       Array.isArray(product.images) &&
       product.images?.length > 0
     ) {
-      setSelectedImage(product.images[0]?.url ?? "/images/placeholder.png");
+      setSelectedImage(
+        product.images?.[0]?.url
+          ? `/images/products/chaybo/${product.images[0].url}`
+          : "/images/placeholder.png"
+      );
     } else {
       setSelectedImage("/images/placeholder.png");
     }
@@ -220,6 +224,29 @@ export default function Detail() {
     }, 1000);
 
     return () => clearInterval(interval);
+  }, [product]);
+  useEffect(() => {
+    if (!selectedColorId && product?.product_variants?.length) {
+      const colorIds = [
+        ...new Set(
+          product.product_variants
+            .filter((v) => v?.color?.id)
+            .map((v) => v.color.id)
+        ),
+      ];
+      if (colorIds.length === 1) {
+        setSelectedColorId(colorIds[0]);
+      }
+    }
+  }, [product]);
+  useEffect(() => {
+    const defaultImage =
+      product?.product_variants?.[0]?.color?.images ||
+      product?.images?.find((img) => img.type === "side")?.url;
+
+    if (defaultImage) {
+      setSelectedImage(`/images/products/chaybo/${defaultImage}`);
+    }
   }, [product]);
 
   const handleMinus = () => {
@@ -399,30 +426,40 @@ export default function Detail() {
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            {product.product_variants.map((img, index) => (
-                              <div
-                                key={index}
-                                className={`space-item-tsn tns-item tns-slide-active ${
-                                  selectedImage === img.color.images
-                                    ? "active"
-                                    : ""
-                                }`}
-                                onClick={() =>
-                                  setSelectedImage(img.color.images)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                <div className="item">
-                                  <img
-                                    src={
-                                      img.color.images || "/images/logo/1.png"
-                                    }
-                                    className="img-responsive"
-                                    alt={product.name}
-                                  />
+                            {product.product_variants.map((variant, index) => {
+                              const colorImage = variant.color?.images;
+                              const fallbackImage = product.images?.find(
+                                (img) =>
+                                  img.type === "side" )?.url;
+
+                              const imageUrl =
+                                colorImage || fallbackImage || "logo/1.png";
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`space-item-tsn tns-item tns-slide-active ${
+                                    selectedImage === imageUrl ? "active" : ""
+                                  }`}
+                                  onClick={() =>
+                                    setSelectedImage(
+                                      `/images/products/chaybo/${imageUrl}`
+                                    )
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <div className="item">
+                                    <img
+                                      src={`/images/products/chaybo/${imageUrl}`}
+                                      className="img-responsive"
+                                      alt={`${product.name} - ${
+                                        variant.color?.name_color || ""
+                                      }`}
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -462,7 +499,10 @@ export default function Detail() {
                         </p>
                         <p className="inventory_quantity">
                           <span className="a-stock">Tình trạng:</span>{" "}
-                          {product.status === "active"
+                          {product.product_variants.reduce(
+                            (sum, v) => sum + v.stock_quantity,
+                            0
+                          ) > 0
                             ? "Còn hàng"
                             : "Hết hàng"}
                         </p>
@@ -490,8 +530,8 @@ export default function Detail() {
                           {[
                             ...new Map(
                               product.product_variants
-                                .filter((v) => v?.color?.id)
-                                .map((v) => [v.color.id, v.color])
+                                .filter((v) => v?.color?.code_color)
+                                .map((v) => [v.color.code_color, v.color])
                             ).values(),
                           ].map((color) => (
                             <div
@@ -532,7 +572,7 @@ export default function Detail() {
                                 : product.product_variants
                               ).map((v) => [v.size.id, v])
                             ).values(),
-                          ].map((variant) => (
+                          ].sort((a, b) => Number(a.size.number_size) - Number(b.size.number_size)).map((variant) => (
                             <button
                               key={variant.size.id}
                               className="size-button"

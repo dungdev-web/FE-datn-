@@ -484,7 +484,7 @@ export default function Home({ product }: { product: IProduct }) {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          product.images?.[0]?.url || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
@@ -594,7 +594,7 @@ export default function Home({ product }: { product: IProduct }) {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          product.images?.[0]?.url || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
