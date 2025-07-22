@@ -64,7 +64,10 @@ export default function EditAddressForm({
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = e.target;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const { name, value, type } = target;
+    const checked = type === "checkbox" ? target.checked : undefined;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
