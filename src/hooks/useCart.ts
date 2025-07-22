@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getCartByUserId, removeFromCart, updateCartItem } from "@/services/cartService";
+import {
+  getCartByUserId,
+  removeFromCart,
+  updateCartItem,
+} from "@/services/cartService";
 import { checkToken } from "@/services/authService";
 import { ICart, ICartItem } from "@/types/cart";
 import { useGlobalStore } from "@/store/useGlobalStore";
@@ -10,7 +14,7 @@ export const useCart = () => {
   const [cart, setCart] = useState<ICart | null>(null);
   const incrementCart = useGlobalStore((state) => state.incrementCart);
   const decrementCart = useGlobalStore((state) => state.decrementCart);
-
+  const cartCount = useGlobalStore((state) => state.cartCount);
   const SHIPPING_COST = 30000;
   const FREE_SHIPPING_THRESHOLD = 7000000;
 
@@ -60,8 +64,12 @@ export const useCart = () => {
       });
 
       delta > 0
-        ? Array(delta).fill(0).forEach(() => incrementCart())
-        : Array(Math.abs(delta)).fill(0).forEach(() => decrementCart());
+        ? Array(delta)
+            .fill(0)
+            .forEach(() => incrementCart())
+        : Array(Math.abs(delta))
+            .fill(0)
+            .forEach(() => decrementCart());
 
       setCart((prev) => {
         if (!prev) return prev;
@@ -101,7 +109,11 @@ export const useCart = () => {
 
       if (res.data.count > 0) {
         for (let i = 0; i < item.quantity; i++) decrementCart();
-        await Swal.fire("Đã xoá!", "Sản phẩm đã được xoá khỏi giỏ hàng.", "success");
+        await Swal.fire(
+          "Đã xoá!",
+          "Sản phẩm đã được xoá khỏi giỏ hàng.",
+          "success"
+        );
         await fetchCart();
       } else {
         Swal.fire("Không tìm thấy!", "Sản phẩm đã bị xoá trước đó.", "info");
@@ -136,7 +148,7 @@ export const useCart = () => {
 
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [cartCount]);
 
   return {
     cart,

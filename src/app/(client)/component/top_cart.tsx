@@ -3,13 +3,8 @@ import React, { forwardRef } from "react";
 import { useCart } from "@/hooks/useCart";
 
 const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
-  const {
-    cart,
-    subtotal,
-    handlePlus,
-    handleMinus,
-    handleRemoveItem,
-  } = useCart();
+  const { cart, subtotal, handlePlus, handleMinus, handleRemoveItem } =
+    useCart();
 
   return (
     <div className="top-cart-content hidden-sm hidden-xs" ref={ref}>
@@ -37,15 +32,13 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                   <div className="product-details">
                     <button
                       title="Xoá"
-                      className="remove-item-cart fa fa-close"
+                      className="remove-item-cart"
                       onClick={() => handleRemoveItem(item.cart_items_id)}
                     >
-                      &nbsp;
+                      <i className="fa-solid fa-trash text-red-600"></i>
                     </button>
                     <h3 className="product-name">
-                      <a
-                        href={`/product/${item.variant?.product.product_id}`}
-                      >
+                      <a href={`/product/${item.variant?.product.product_id}`}>
                         {item.variant?.product.name} -{" "}
                         {item.variant?.color.name_color} -{" "}
                         {item.variant?.size.number_size}

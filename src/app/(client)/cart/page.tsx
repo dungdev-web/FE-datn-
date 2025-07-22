@@ -178,7 +178,7 @@ export default function Cart() {
                 <div className="cart-item-total">
                   {(item.price! * item.quantity).toLocaleString("vi")}₫
                   <span className="remove-btn" onClick={() => handleRemoveItem(item.cart_items_id)}>
-                    <i className="fa-solid fa-trash"></i>
+                    <i className="fa-solid fa-trash text-red-600"></i>
                   </span>
                 </div>
               </div>
