@@ -1,11 +1,21 @@
-
-export interface Addtocart{
+export interface Addtocart {
   user_id: number;
-  variant_id:number;
-  quantity:number;
-  price:number;
+  variant_id: number;
+  quantity: number;
+  price: number;
 }
-// src/types/cart.ts
+
+export interface RemoveFromCartRequest {
+  user_id: number;
+  variant_id: number;
+}
+
+export interface RemoveFromCartResponse {
+  message: string;
+  data: {
+    count: number;
+  };
+}
 
 export interface ICart {
   carts_id: number;
@@ -23,7 +33,7 @@ export interface ICartItem {
   price: number;
   created_at: string;
   updated_at: string;
- variant: {
+  variant: {
     product_variants_id: number;
     product_id: number;
     color_id: number;

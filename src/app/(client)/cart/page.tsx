@@ -3,11 +3,15 @@ import "../css/style.css";
 import "../css/cart.css";
 import "../css/product.css";
 import Link from "next/link";
-import { getCartByUserId } from "@/services/cartService";
+import {
+  getCartByUserId,
+  removeFromCart,
+  updateCartItem,
+} from "@/services/cartService";
 import { useEffect, useState } from "react";
 import { ICart, ICartItem } from "@/types/cart";
 import { checkToken } from "@/services/authService";
-
+import Swal from "sweetalert2";
 export default function Cart() {
   const [cart, setCart] = useState<ICart | null>(null);
 
@@ -30,29 +34,45 @@ export default function Cart() {
     100,
     Math.floor((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
   );
+  const handleUpdateQuantity = async (
+    cartItemId: number,
+    newQuantity: number
+  ) => {
+    try {
+      const userId = cart?.user_id;
+      const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
+      if (!userId || !item) return;
 
+      const updatedItem = await updateCartItem({
+        user_id: userId,
+        variant_id: item.variant_id,
+        quantity: newQuantity,
+      });
+
+      // Cập nhật state
+      setCart((prev) => {
+        if (!prev) return prev;
+        const newItems = prev.cart_items.map((i) =>
+          i.cart_items_id === cartItemId ? { ...i, quantity: newQuantity } : i
+        );
+        return { ...prev, cart_items: newItems };
+      });
+    } catch (error) {
+      console.error("Lỗi khi cập nhật số lượng:", error);
+    }
+  };
   const handleMinus = (itemId: number) => {
-    setCart((prevCart) => {
-      if (!prevCart) return prevCart;
-      const newItems = prevCart.cart_items.map((item) =>
-        item.cart_items_id === itemId
-          ? { ...item, quantity: Math.max(1, item.quantity - 1) }
-          : item
-      );
-      return { ...prevCart, cart_items: newItems };
-    });
+    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
+    if (!item) return;
+    const newQuantity = Math.max(1, item.quantity - 1);
+    handleUpdateQuantity(itemId, newQuantity);
   };
 
   const handlePlus = (itemId: number) => {
-    setCart((prevCart) => {
-      if (!prevCart) return prevCart;
-      const newItems = prevCart.cart_items.map((item) =>
-        item.cart_items_id === itemId
-          ? { ...item, quantity: Math.min(999, item.quantity + 1) }
-          : item
-      );
-      return { ...prevCart, cart_items: newItems };
-    });
+    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
+    if (!item) return;
+    const newQuantity = Math.min(999, item.quantity + 1);
+    handleUpdateQuantity(itemId, newQuantity);
   };
 
   const handleChange = (
@@ -61,24 +81,66 @@ export default function Cart() {
   ) => {
     const value = e.target.value;
     const num = parseInt(value, 10);
-    setCart((prevCart) => {
-      if (!prevCart) return prevCart;
-      const newItems = prevCart.cart_items.map((item) =>
-        item.cart_items_id === itemId
-          ? {
-              ...item,
-              quantity:
-                value === ""
-                  ? 1
-                  : !isNaN(num) && num >= 1 && num <= 999
-                  ? num
-                  : item.quantity,
-            }
-          : item
-      );
-      return { ...prevCart, cart_items: newItems };
-    });
+
+    if (!isNaN(num) && num >= 1 && num <= 999) {
+      handleUpdateQuantity(itemId, num);
+    }
   };
+  const handleRemoveItem = async (cartItemId: number) => {
+  const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
+  const userId = cart?.user_id;
+
+  if (!item || !userId) return;
+
+  // ❗ Hiển thị hộp thoại xác nhận bằng SweetAlert2
+  const confirmResult = await Swal.fire({
+    title: "Bạn có chắc muốn xoá?",
+    text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Xoá",
+    cancelButtonText: "Huỷ",
+  });
+
+  if (!confirmResult.isConfirmed) return;
+
+  try {
+    const res = await removeFromCart({
+      user_id: userId,
+      variant_id: item.variant_id,
+    });
+
+    if (res.data.count > 0) {
+      // ✅ Hiển thị toast Swal thành công
+      await Swal.fire({
+        icon: "success",
+        title: "Đã xoá",
+        text: "Sản phẩm đã được xoá khỏi giỏ hàng.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      // Cập nhật lại giỏ hàng
+      const newCart = await getCartByUserId(userId);
+      setCart(newCart);
+    } else {
+      Swal.fire({
+        icon: "info",
+        title: "Không tìm thấy sản phẩm",
+        text: "Có thể sản phẩm đã bị xoá khỏi giỏ hàng trước đó.",
+      });
+    }
+  } catch (error) {
+    console.error("Lỗi khi xoá sản phẩm:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Lỗi!",
+      text: "Không thể xoá sản phẩm. Vui lòng thử lại.",
+    });
+  }
+};
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -230,7 +292,7 @@ export default function Cart() {
                     src={
                       item.variant?.product.images?.[0]?.url
                         ? `/images/products/chaybo/${item.variant.product.images[0].url}`
-                        : "/images/placeholder.png" 
+                        : "/images/placeholder.png"
                     }
                     width="80"
                   />
@@ -268,7 +330,10 @@ export default function Cart() {
                 </div>
                 <div className="cart-item-total">
                   {(item.price! * item.quantity).toLocaleString("vi")}₫
-                  <span className="remove-btn">
+                  <span
+                    className="remove-btn"
+                    onClick={() => handleRemoveItem(item.cart_items_id)}
+                  >
                     <i className="fa-solid fa-trash"></i>
                   </span>
                 </div>
