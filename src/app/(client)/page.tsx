@@ -26,7 +26,7 @@ import Banner3D from "./component/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "./component/products/ProductIcons";
 import HotProductIcons from "./component/products/HotProductIcons";
-export default function Home({ product }: { product: IProduct }) {
+export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);

@@ -7,7 +7,7 @@ import {
 } from "@/services/categoryService";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -24,9 +24,10 @@ interface Params {
   };
 }
 
-export default function CategoryPage({ params }: Params) {
+export default function CategoryPage() {
   const { slug } = useParams();
-  const brandId = Number(params.id);
+  const searchParams = useSearchParams();
+  const brandId = Number(searchParams.get("brandId"));
 
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
