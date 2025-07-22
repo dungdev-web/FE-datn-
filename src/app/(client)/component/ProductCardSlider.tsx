@@ -2,7 +2,6 @@
 
 import { IProduct } from "@/types/product";
 import Link from "next/link";
-import CompareButton from "./product_compare/button_compare";
 import ProductIcons from "./products/ProductIcons";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
