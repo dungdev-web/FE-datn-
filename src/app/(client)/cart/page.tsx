@@ -17,6 +17,7 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 export default function Cart() {
   const [cart, setCart] = useState<ICart | null>(null);
   const decrementCart = useGlobalStore((state) => state.decrementCart);
+  const incrementCart = useGlobalStore((state) => state.incrementCart);
 
   const SHIPPING_COST = 30000;
   const FREE_SHIPPING_THRESHOLD = 7000000;
@@ -37,6 +38,7 @@ export default function Cart() {
     100,
     Math.floor((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
   );
+
   const handleUpdateQuantity = async (
     cartItemId: number,
     newQuantity: number
@@ -46,13 +48,19 @@ export default function Cart() {
       const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
       if (!userId || !item) return;
 
+      const oldQuantity = item.quantity;
+      const delta = newQuantity - oldQuantity;
+
       const updatedItem = await updateCartItem({
         user_id: userId,
         variant_id: item.variant_id,
         quantity: newQuantity,
       });
-
-      // Cập nhật state
+      if (delta > 0) {
+        for (let i = 0; i < delta; i++) incrementCart();
+      } else if (delta < 0) {
+        for (let i = 0; i < Math.abs(delta); i++) decrementCart();
+      }
       setCart((prev) => {
         if (!prev) return prev;
         const newItems = prev.cart_items.map((i) =>
