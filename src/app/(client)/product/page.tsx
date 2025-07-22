@@ -284,7 +284,7 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  sp.images?.[0]?.url ||
+                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
@@ -397,7 +397,7 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  sp.images?.[0]?.url ||
+                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}

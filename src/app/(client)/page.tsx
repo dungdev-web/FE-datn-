@@ -116,6 +116,7 @@ export default function Home({ product }: { product: IProduct }) {
       try {
         const data = await getFeaturedProducts();
         serFretureProducts(data.slice(0, 10));
+        
       } catch (err) {
         console.error("Lỗi khi lấy sản phẩm nổi bậtt:", err);
       }
@@ -483,7 +484,7 @@ export default function Home({ product }: { product: IProduct }) {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          product.images?.[0]?.url || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
@@ -593,7 +594,7 @@ export default function Home({ product }: { product: IProduct }) {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          product.images?.[0]?.url || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />

@@ -140,7 +140,7 @@ export default function Compare_product(productId: number) {
                           <img
                             className="img-fluid"
                             src={
-                              item.product.images?.[0]?.url || "/default.jpg"
+                              `/images/products/chaybo/${item.product.images?.[0]?.url}` || "/default.jpg"
                             }
                             alt={
                               item.product.images?.[0]?.alt_text ||
@@ -156,7 +156,7 @@ export default function Compare_product(productId: number) {
                       {compare.map((item) => (
                         <td key={item.product_compare_id}>
                           <h3>
-                            <a href={`/san-pham/${item.product.slug}`}>
+                            <a href={`/product/${item.product.slug}`}>
                               {item.product.name}
                             </a>
                           </h3>

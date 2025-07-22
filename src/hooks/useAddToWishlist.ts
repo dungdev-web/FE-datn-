@@ -14,7 +14,6 @@ import { useGlobalStore } from "@/store/useGlobalStore";
 export const useAddToWishlist = (productId: number, onRemoveSuccess?: () => void) => {
   const [isWished, setIsWished] = useState(false);
   const router = useRouter();
-
   // 👉 Lấy các action từ store Zustand
   const incrementWishlist = useGlobalStore((state) => state.incrementWishlist);
   const decrementWishlist = useGlobalStore((state) => state.decrementWishlist);
@@ -27,6 +26,7 @@ export const useAddToWishlist = (productId: number, onRemoveSuccess?: () => void
         const wishlist = await getWishlistByUserId(tokenData.user.id);
 
         if (Array.isArray(wishlist)) {
+
           const wished = wishlist.some(
             (item) => Number(item.product_id) === Number(productId)
           );
@@ -89,7 +89,7 @@ export const useAddToWishlist = (productId: number, onRemoveSuccess?: () => void
         response.message === "Sản phẩm đã có trong danh sách yêu thích."
       ) {
         setIsWished(true);
-        incrementWishlist(); //  Cộng count
+        incrementWishlist();
       }
 
       Swal.fire({

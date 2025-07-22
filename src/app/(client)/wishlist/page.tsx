@@ -138,7 +138,6 @@ export default function Wishlist() {
                 </Link>
               </div>
             )}
-
             {/* Desktop */}
             {Array.isArray(wishlist) && wishlist.length > 0 && (
               <div className="product-grid-wishlist">

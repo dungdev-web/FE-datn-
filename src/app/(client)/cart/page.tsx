@@ -226,8 +226,13 @@ export default function Cart() {
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
                   <img
-                    src={`/images/products/chaybo/${item.variant.product.images[0].url}`}
-                    alt={`Sản phẩm ${item.variant?.product?.name || ""}`}
+                    alt={item.variant?.product.name}
+                    src={
+                      item.variant?.product.images?.[0]?.url
+                        ? `/images/products/chaybo/${item.variant.product.images[0].url}`
+                        : "/images/placeholder.png" 
+                    }
+                    width="80"
                   />
 
                   <div className="product-name">
