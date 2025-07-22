@@ -102,6 +102,7 @@ export default function Cart() {
     const userId = cart?.user_id;
 
     if (!item || !userId) return;
+
     const confirmResult = await Swal.fire({
       title: "Bạn có chắc muốn xoá?",
       text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng.",
@@ -122,7 +123,8 @@ export default function Cart() {
       });
 
       if (res.data.count > 0) {
-        decrementCart();
+        for (let i = 0; i < item.quantity; i++) decrementCart();
+
         await Swal.fire({
           icon: "success",
           title: "Đã xoá",
