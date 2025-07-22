@@ -19,6 +19,8 @@ interface GlobalStore {
   incrementCompare: () => void;
   decrementCompare: () => void;
   incrementCart: () => void;
+  decrementCart: () => void;
+
 }
 
 
@@ -50,6 +52,10 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
   decrementCompare: () =>
     set((state) => ({ compareCount: Math.max(state.compareCount - 1, 0) })),
   incrementCart: () => set((state) => ({ cartCount: state.cartCount + 1 })),
-}));
+  decrementCart: () =>
+  set((state) => ({
+    cartCount: Math.max(state.cartCount - 1, 0),
+  })),
 
+}));
 

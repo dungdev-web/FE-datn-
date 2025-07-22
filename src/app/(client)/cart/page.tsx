@@ -12,8 +12,11 @@ import { useEffect, useState } from "react";
 import { ICart, ICartItem } from "@/types/cart";
 import { checkToken } from "@/services/authService";
 import Swal from "sweetalert2";
+import { useGlobalStore } from "@/store/useGlobalStore";
+
 export default function Cart() {
   const [cart, setCart] = useState<ICart | null>(null);
+  const decrementCart = useGlobalStore((state) => state.decrementCart);
 
   const SHIPPING_COST = 30000;
   const FREE_SHIPPING_THRESHOLD = 7000000;
@@ -87,60 +90,58 @@ export default function Cart() {
     }
   };
   const handleRemoveItem = async (cartItemId: number) => {
-  const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
-  const userId = cart?.user_id;
+    const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
+    const userId = cart?.user_id;
 
-  if (!item || !userId) return;
-
-  // ❗ Hiển thị hộp thoại xác nhận bằng SweetAlert2
-  const confirmResult = await Swal.fire({
-    title: "Bạn có chắc muốn xoá?",
-    text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Xoá",
-    cancelButtonText: "Huỷ",
-  });
-
-  if (!confirmResult.isConfirmed) return;
-
-  try {
-    const res = await removeFromCart({
-      user_id: userId,
-      variant_id: item.variant_id,
+    if (!item || !userId) return;
+    const confirmResult = await Swal.fire({
+      title: "Bạn có chắc muốn xoá?",
+      text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xoá",
+      cancelButtonText: "Huỷ",
     });
 
-    if (res.data.count > 0) {
-      // ✅ Hiển thị toast Swal thành công
-      await Swal.fire({
-        icon: "success",
-        title: "Đã xoá",
-        text: "Sản phẩm đã được xoá khỏi giỏ hàng.",
-        timer: 1500,
-        showConfirmButton: false,
+    if (!confirmResult.isConfirmed) return;
+
+    try {
+      const res = await removeFromCart({
+        user_id: userId,
+        variant_id: item.variant_id,
       });
 
-      // Cập nhật lại giỏ hàng
-      const newCart = await getCartByUserId(userId);
-      setCart(newCart);
-    } else {
+      if (res.data.count > 0) {
+        decrementCart();
+        await Swal.fire({
+          icon: "success",
+          title: "Đã xoá",
+          text: "Sản phẩm đã được xoá khỏi giỏ hàng.",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+
+        // Cập nhật lại giỏ hàng
+        const newCart = await getCartByUserId(userId);
+        setCart(newCart);
+      } else {
+        Swal.fire({
+          icon: "info",
+          title: "Không tìm thấy sản phẩm",
+          text: "Có thể sản phẩm đã bị xoá khỏi giỏ hàng trước đó.",
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi xoá sản phẩm:", error);
       Swal.fire({
-        icon: "info",
-        title: "Không tìm thấy sản phẩm",
-        text: "Có thể sản phẩm đã bị xoá khỏi giỏ hàng trước đó.",
+        icon: "error",
+        title: "Lỗi!",
+        text: "Không thể xoá sản phẩm. Vui lòng thử lại.",
       });
     }
-  } catch (error) {
-    console.error("Lỗi khi xoá sản phẩm:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Lỗi!",
-      text: "Không thể xoá sản phẩm. Vui lòng thử lại.",
-    });
-  }
-};
+  };
 
   useEffect(() => {
     const fetchCart = async () => {
