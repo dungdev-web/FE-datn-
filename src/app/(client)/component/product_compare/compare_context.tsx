@@ -34,7 +34,7 @@ export const CompareProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    refresh(); // load ban đầ
+    refresh();
   }, []);
 
   return (

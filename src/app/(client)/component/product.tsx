@@ -7,7 +7,7 @@ export default function Product4box(props: any) {
   const sp = props.sp as IProduct;
   if (!sp) return null;
 
-  const productId = sp.id ?? sp.products_id;
+  const productId = sp.products_id ?? sp.products_id;
 
   const averageRating =
     sp?.product_reviews?.length > 0
@@ -27,13 +27,24 @@ export default function Product4box(props: any) {
       <div className="hot-product-card" style={{ width: "230px" }}>
         <div className="hot-product-image">
           <img
-            src={sp.images?.[0]?.url || "/images/placeholder.png"}
-            alt={sp.images?.[0]?.alt_text || sp.name}
+            src={
+              Array.isArray(sp.images) && sp.images.length > 0
+                ? `/images/products/chaybo/${sp.images[0].url}`
+                : "/images/placeholder.png"
+            }
+            alt={
+              Array.isArray(sp.images) && sp.images.length > 0
+                ? sp.images[0].alt_text
+                : sp.name
+            }
           />
 
-         
           <div className="hot-product-icons">
-            <ProductIcons productId={productId} />
+            <ProductIcons
+              productId={productId}
+              variant_id={sp.product_variants?.[0]?.product_variants_id}
+              price={sp.sale_price}
+            />
           </div>
 
           {discountPercent > 0 && (
@@ -43,9 +54,11 @@ export default function Product4box(props: any) {
 
         <div className="hot-product-content">
           <div className="hot-product-colors">
-            {[...new Map(
-              (sp.product_variants ?? []).map((v) => [v.color.id, v.color])
-            ).values()].map((color) => (
+            {[
+              ...new Map(
+                (sp.product_variants ?? []).map((v) => [v.color.id, v.color])
+              ).values(),
+            ].map((color) => (
               <span
                 key={color.id}
                 className="color-item"

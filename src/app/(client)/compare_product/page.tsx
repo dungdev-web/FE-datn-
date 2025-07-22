@@ -5,40 +5,41 @@ import { ICompareProduct } from "@/types/product";
 import { checkToken } from "@/services/authService";
 import { useCompare } from "../component/product_compare/compare_context";
 import { deleteCompareProduct } from "@/services/productService";
+import { useRemoveCompare } from "@/hooks/useAddToCompare";
 import Swal from "sweetalert2";
 import "../css/product.css";
 import "../css/compare.css";
 import { useRouter } from "next/navigation";
-export default function Compare_product() {
+export default function Compare_product(productId: number) {
   const [compare, setCompare] = useState<ICompareProduct[]>([]);
   const { refresh, setCount } = useCompare();
-
   const router = useRouter();
-  const handleRemoveCompare = async (productId: number) => {
-    try {
-      const tokenData = await checkToken();
-      const user_id = Number(tokenData?.user?.id);
-      await deleteCompareProduct(user_id, productId);
-      refresh();
-      setCompare((prev) =>
-        prev.filter((item) => item?.product.products_id !== productId)
-      );
+  const { handleRemoveCompare } = useRemoveCompare();
+  // const handleRemoveCompare = async (productId: number) => {
+  //   try {
+  //     const tokenData = await checkToken();
+  //     const user_id = Number(tokenData?.user?.id);
+  //     await deleteCompareProduct(user_id, productId);
+  //     refresh();
+  //     setCompare((prev) =>
+  //       prev.filter((item) => item?.product.products_id !== productId)
+  //     );
 
-      Swal.fire({
-        icon: "success",
-        title: "Đã xoá sản phẩm khỏi so sánh",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    } catch (error) {
-      console.error("Lỗi khi xoá sản phẩm so sánh:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Không thể xoá sản phẩm",
-        text: "Đã xảy ra lỗi. Vui lòng thử lại.",
-      });
-    }
-  };
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Đã xoá sản phẩm khỏi so sánh",
+  //       showConfirmButton: false,
+  //       timer: 1500,
+  //     });
+  //   } catch (error) {
+  //     console.error("Lỗi khi xoá sản phẩm so sánh:", error);
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Không thể xoá sản phẩm",
+  //       text: "Đã xảy ra lỗi. Vui lòng thử lại.",
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     if (compare.length > 0) {
@@ -78,7 +79,7 @@ export default function Compare_product() {
       }
     };
     fetchCompare();
-  }, [ refresh]);
+  }, [refresh]);
   console.log("Compare:", compare);
   console.log("Product:", compare[0]?.product);
   console.log("Variants:", compare[0]?.product?.product_variants);
@@ -139,7 +140,7 @@ export default function Compare_product() {
                           <img
                             className="img-fluid"
                             src={
-                              item.product.images?.[0]?.url || "/default.jpg"
+                              `/images/products/chaybo/${item.product.images?.[0]?.url}` || "/default.jpg"
                             }
                             alt={
                               item.product.images?.[0]?.alt_text ||
@@ -155,7 +156,7 @@ export default function Compare_product() {
                       {compare.map((item) => (
                         <td key={item.product_compare_id}>
                           <h3>
-                            <a href={`/san-pham/${item.product.slug}`}>
+                            <a href={`/product/${item.product.slug}`}>
                               {item.product.name}
                             </a>
                           </h3>

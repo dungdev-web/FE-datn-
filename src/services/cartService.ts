@@ -1,6 +1,6 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockCart, saveMockCart } from "@/mocks/mockCart";
-import { ICart, ICartItem, Addtocart } from "@/types/cart";
+import { ICart, ICartItem, Addtocart, RemoveFromCartRequest, RemoveFromCartResponse } from "@/types/cart";
 interface AddToCartResponse {
   message: string;
   cart: ICartItem[]; // danh sách cart_items sau khi thêm
@@ -155,7 +155,9 @@ export async function clearMockCart(userId: number): Promise<ICart | null> {
   if (!res.ok) throw new Error("Không thể xóa giỏ hàng.");
   return null;
 }
-export const getCartByUserId = async (userId: number): Promise<(ICart & { items: ICartItem[] }) | null> => {
+export const getCartByUserId = async (
+  userId: number
+): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
     const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`);
     if (!res.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
@@ -174,5 +176,68 @@ export const getCartByUserId = async (userId: number): Promise<(ICart & { items:
   } catch (error) {
     console.error("Lỗi lấy giỏ hàng:", error);
     return null;
+  }
+};
+
+export const updateCartItem = async ({
+  user_id,
+  variant_id,
+  quantity,
+}: {
+  user_id: number;
+  variant_id: number;
+  quantity: number;
+}): Promise<ICartItem> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/cart/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        variant_id,
+        quantity,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể cập nhật sản phẩm trong giỏ hàng.");
+    }
+
+    const data: ICartItem = await res.json();
+
+    // Nếu cần ép kiểu `price` từ string -> number (nếu backend trả string)
+    data.price = Number(data.price);
+
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật giỏ hàng:", error);
+    throw error;
+  }
+};
+export const removeFromCart = async ({
+  user_id,
+  variant_id,
+}: RemoveFromCartRequest): Promise<RemoveFromCartResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/cart/remove`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id, variant_id }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể xóa sản phẩm khỏi giỏ hàng.");
+    }
+
+    const data: RemoveFromCartResponse = await res.json();
+
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
+    throw error;
   }
 };

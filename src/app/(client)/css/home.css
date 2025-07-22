@@ -1228,6 +1228,10 @@
     opacity: 1;
     transform: translateY(0);
   }
+  .product-icons .hover-icons:hover{
+    opacity: 1;
+    transform: translateY(0);
+  } 
   /* Hiển thị icon group khi hover thẻ chứa */
   .hot-product-card:hover .hot-product-icons .icon-hover-group {
     transition: all 3s ease-in;

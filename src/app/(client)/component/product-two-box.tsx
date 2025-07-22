@@ -51,12 +51,15 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
             className="product-two-box"
           >
             {products.map((sp) => {
-              const productId = sp.id ?? sp.products_id;
+              const productId = sp.products_id ?? sp.products_id;
               const averageRating =
-                Array.isArray(sp.product_reviews) && sp.product_reviews.length > 0
+                Array.isArray(sp.product_reviews) &&
+                sp.product_reviews.length > 0
                   ? Math.round(
-                      sp.product_reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-                        sp.product_reviews.length
+                      sp.product_reviews.reduce(
+                        (sum, r) => sum + Number(r.rating),
+                        0
+                      ) / sp.product_reviews.length
                     )
                   : 0;
 
@@ -66,7 +69,10 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                   : 0;
 
               const sold = Array.isArray(sp.product_variants)
-                ? sp.product_variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0)
+                ? sp.product_variants.reduce(
+                    (sum, v) => sum + (v.stock_quantity || 0),
+                    0
+                  )
                 : 0;
 
               const uniqueColors = Array.isArray(sp.product_variants)
@@ -84,18 +90,27 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                       <div className="product-image">
                         <Link href={`product/${sp.slug}`}>
                           <img
-                            src={sp.images?.[0]?.url || "/images/placeholder.png"}
+                            src={
+                              `/images/products/chaybo/${sp.images?.[0]?.url}` ||
+                              "/images/placeholder.png"
+                            }
                             alt={sp.name}
                             className="!h-[150px] !w-[100%]"
                           />
                         </Link>
-
-
-                        {/* ✅ Đặt đúng productId tại đây */}
-                        <ProductIcons productId={productId} />
+                        <ProductIcons
+                          productId={productId}
+                          variant_id={
+                            sp.product_variants?.[0]
+                              ?.product_variants_id ?? null
+                          }
+                          price={sp.sale_price}
+                        />
 
                         {discountPercent > 0 && (
-                          <span className="discount-tag">-{discountPercent}%</span>
+                          <span className="discount-tag">
+                            -{discountPercent}%
+                          </span>
                         )}
 
                         <span className="new-tag">
@@ -127,14 +142,23 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                             </span>
                           )}
                           <span className="new-price">
-                            {(sp.sale_price > 0 ? sp.sale_price : sp.price).toLocaleString("vi")}đ
+                            {(sp.sale_price > 0
+                              ? sp.sale_price
+                              : sp.price
+                            ).toLocaleString("vi")}
+                            đ
                           </span>
                         </div>
 
                         <div className="product-progress">
                           <div className="progress-bar">
-                            <div className="progress-fill" style={{ width: "87%" }}>
-                              <span className="sold">Đã bán {sold} sản phẩm</span>
+                            <div
+                              className="progress-fill"
+                              style={{ width: "87%" }}
+                            >
+                              <span className="sold">
+                                Đã bán {sold} sản phẩm
+                              </span>
                             </div>
                           </div>
                         </div>

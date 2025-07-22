@@ -116,6 +116,7 @@ export default function Home({ product }: { product: IProduct }) {
       try {
         const data = await getFeaturedProducts();
         serFretureProducts(data.slice(0, 10));
+        
       } catch (err) {
         console.error("Lỗi khi lấy sản phẩm nổi bậtt:", err);
       }
@@ -445,7 +446,7 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {newproducts.map((product) => {
-              const productId = product.id ?? product.products_id;
+              const productId = product.products_id ?? product.products_id;
               const averageRating = product.product_reviews?.length
                 ? Math.round(
                     product.product_reviews.reduce(
@@ -470,14 +471,12 @@ export default function Home({ product }: { product: IProduct }) {
                   : 0;
 
               const uniqueColors = [
-  ...new Map(
-    (product.product_variants || [])
-      .filter((v) => v.color && v.color.id) 
-      .map((v) => [v.color.id, v.color])
-  ).values(),
-];
-
-
+                ...new Map(
+                  (product.product_variants || [])
+                    .filter((v) => v.color && v.color.id)
+                    .map((v) => [v.color.id, v.color])
+                ).values(),
+              ];
 
               return (
                 <div className="hot-product-card" key={product.products_id}>
@@ -485,13 +484,13 @@ export default function Home({ product }: { product: IProduct }) {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          product.images?.[0]?.url || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -555,7 +554,7 @@ export default function Home({ product }: { product: IProduct }) {
 
           <div className="hot-products-list">
             {featureproducts.map((product) => {
-              const productId = product.id ?? product.products_id;
+              const productId = product.products_id ?? product.products_id;
 
               const averageRating = product.product_reviews?.length
                 ? Math.round(
@@ -595,13 +594,13 @@ export default function Home({ product }: { product: IProduct }) {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          product.images?.[0]?.url || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                   <HotProductIcons productId={productId} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
