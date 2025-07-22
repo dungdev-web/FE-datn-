@@ -157,7 +157,16 @@ export default function Wishlist() {
                     >
                       <div className="product-card" style={{ width: "238px" }}>
                         <div className="product-image">
-                          <img src={image} alt={product.name} />
+                          <Link href={`/product/${product.slug}`}>
+                            <img
+                              src={
+                                image
+                                  ? `/images/products/chaybo/${image}`
+                                  : "/images/placeholder.png"
+                              }
+                              alt={product.name}
+                            />
+                          </Link>
                           <ProductIcons
                             productId={product.products_id}
                             variant_id={variant.product_variants_id ?? null}
