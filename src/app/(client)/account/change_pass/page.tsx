@@ -39,8 +39,13 @@ export default function Change_pass() {
     }
 
     try {
+      if (!user?.id) {
+        toast.error("Không tìm thấy thông tin người dùng.");
+        return;
+      }
+
       await changePasswordService({
-        userId: user?.id || "",
+        userId: String(user.id),
         oldPassword: form.oldPassword,
         newPassword: form.newPassword,
       });
