@@ -45,7 +45,7 @@ export default function Change_pass() {
       }
 
       await changePasswordService({
-        userId: String(user.id),
+        userId: Number(user?.id),
         oldPassword: form.oldPassword,
         newPassword: form.newPassword,
       });

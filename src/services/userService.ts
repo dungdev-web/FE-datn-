@@ -2,7 +2,7 @@ import { API_BASE_URL } from "@/config/env";
 
 
 export async function changePasswordService(data: {
-  userId: string;
+  userId: number;
   oldPassword: string;
   newPassword: string;
 }) {

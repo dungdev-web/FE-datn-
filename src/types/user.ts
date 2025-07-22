@@ -17,9 +17,6 @@ export interface StoredUser {
 
 export interface UserData {
   token: string;
-  user: {
-    userId: string;
-    username: string;
-    email: string;
-  };
+  user: IUser;
 }
+
