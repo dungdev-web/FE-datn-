@@ -14,7 +14,6 @@ import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
-import CompareButton from "./component/product_compare/button_compare";
 import {
   getNewestProducts,
   getFeaturedProducts,

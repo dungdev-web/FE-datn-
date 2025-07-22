@@ -7,7 +7,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css";
 import Link from "next/link";
-import CompareButton from "./product_compare/button_compare";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import ProductIcons from "./products/ProductIcons";
