@@ -1,6 +1,12 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockCart, saveMockCart } from "@/mocks/mockCart";
-import { ICart, ICartItem, Addtocart, RemoveFromCartRequest, RemoveFromCartResponse } from "@/types/cart";
+import {
+  ICart,
+  ICartItem,
+  Addtocart,
+  RemoveFromCartRequest,
+  RemoveFromCartResponse,
+} from "@/types/cart";
 interface AddToCartResponse {
   message: string;
   cart: ICartItem[]; // danh sách cart_items sau khi thêm
@@ -57,13 +63,13 @@ export async function addToMockCart(
         user_id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        items: [],
+        cart_items: [],
       };
       carts.push(cart);
     }
 
-    const existingItem = cart.items.find(
-      (item) => item.variant?.variant_id === variant_id
+    const existingItem = cart.cart_items.find(
+      (item) => item.variant?.product_variants_id === variant_id
     );
 
     if (existingItem) {
@@ -73,13 +79,15 @@ export async function addToMockCart(
       const newItem = {
         cart_items_id: Date.now(),
         cart_id: cart.carts_id,
-        variant: cart.items[0]?.variant,
+        variant_id: variant_id,
+        variant: cart.cart_items[0]?.variant,
         quantity,
         price,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      cart.items.push(newItem);
+
+      cart.cart_items.push(newItem);
     }
 
     cart.updated_at = new Date().toISOString();
