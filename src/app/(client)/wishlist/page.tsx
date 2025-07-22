@@ -1,72 +1,90 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { IWishlistItemWithProduct } from "@/types/wishlist";
 import "../css/product.css";
 import "../css/wishlist.css";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import ProductIcons from "../component/products/ProductIcons";
+import Link  from "next/link";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState<IWishlistItemWithProduct[]>([]);
   const { user } = useAuthUser();
 
+  // Cập nhật wishlist sau khi xóa sản phẩm
+  const handleRemoveWishlistItem = (productId: number) => {
+    setWishlist((prev) =>
+      Array.isArray(prev)
+        ? prev.filter((item) => item.product.products_id !== productId)
+        : []
+    );
+  };
+
   useEffect(() => {
-    if (!user?.id) return; // 
+    if (!user?.id) return;
 
     const fetchWishlist = async () => {
       try {
         const data = await getWishlistByUserId(user.id);
-        setWishlist(data);
+        setWishlist(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Lỗi:", err);
+        console.error("Lỗi khi lấy danh sách yêu thích:", err);
+        setWishlist([]);
       }
     };
 
     fetchWishlist();
-  }, [user?.id]); // 
+  }, [user?.id]);
+
   if (!user) {
     return (
       <>
-       <section
-        className="bread-crumb background-cover relative"
-        style={{
-          backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-        }}
-      >
-        <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
-        <div className="breadcrumb-container">
-          <div className="title-page">
-            <h2>Sản phẩm yêu thích</h2>
+        <section
+          className="bread-crumb background-cover relative"
+          style={{
+            backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        >
+          <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+          <div className="breadcrumb-container">
+            <div className="title-page">
+              <h2>Sản phẩm yêu thích</h2>
+            </div>
+            <ul className="breadcrumb">
+              <li className="home">
+                <a href="/" title="Trang chủ">
+                  <span>Trang chủ</span>
+                </a>
+                <i className="fa fa-angle-right" aria-hidden="true"></i>
+              </li>
+              <li>
+                <strong>
+                  <span>Sản phẩm yêu thích</span>
+                </strong>
+              </li>
+            </ul>
           </div>
-          <ul className="breadcrumb">
-            <li className="home">
-              <a href="/" title="Trang chủ">
-                <span>Trang chủ</span>
-              </a>
-              <i className="fa fa-angle-right" aria-hidden="true"></i>
-            </li>
-            <li>
-              <strong>
-                <span>Sản phẩm yêu thích</span>
-              </strong>
-            </li>
-          </ul>
-        </div>
-      </section>
+        </section>
         <div className="container1 py-10 px-4 text-center !mt-6 !mb-6">
-      <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
-        <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
-        <p className="text-lg font-medium text-red-600">
-          Vui lòng <a href="/login" className="underline hover:text-red-800">đăng nhập</a> để xem sản phẩm yêu thích.
-        </p>
-      </div>
-    </div>
+          <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
+            <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
+            <p className="text-lg font-medium text-red-600">
+              Vui lòng{" "}
+              <a href="/login" className="underline hover:text-red-800">
+                đăng nhập
+              </a>{" "}
+              để xem sản phẩm yêu thích.
+            </p>
+          </div>
+        </div>
       </>
-     
     );
   }
+
   return (
     <>
       <section
@@ -101,131 +119,169 @@ export default function Wishlist() {
       <main>
         <div className="container1">
           <div className="row">
+            {/* Nếu không có sản phẩm */}
+            {Array.isArray(wishlist) && wishlist.length === 0 && (
+              <div className="w-full flex flex-col items-center justify-center py-10 text-gray-600">
+                <i className="fa-regular fa-heart text-6xl text-[#021688] mb-4"></i>
+                <h3 className="text-xl font-semibold mb-2 text-[#021688] ">
+                  Danh sách yêu thích trống
+                </h3>
+                <p className="text-center max-w-sm text-gray-500">
+                  Bạn chưa có sản phẩm nào trong danh sách yêu thích. Hãy khám
+                  phá và thêm sản phẩm bạn yêu thích!
+                </p> 
+                <Link
+                  href="/"
+                  className="mt-5 px-6 py-2 !text-[#4bd963] rounded hover:bg-gray-800 transition-all"
+                >
+                  Quay lại trang chủ
+                </Link>
+              </div>
+            )}
             {/* Desktop */}
-            <div className="product-grid-wishlist">
-              {wishlist.map((item) => {
-                const product = item.product;
-                const image = product.images.find(
-                  (img) => img.type === "main"
-                )?.url;
+            {Array.isArray(wishlist) && wishlist.length > 0 && (
+              <div className="product-grid-wishlist">
+                {wishlist.map((item) => {
+                  const product = item.product;
+                  const variant = product.product_variants?.[0];
+                  const image = product.images.find(
+                    (img) => img.type === "main"
+                  )?.url;
 
-                return (
-                  <div
-                    key={item.wishlist_items_id}
-                    className="product-itemlist-main !block"
-                  >
-                    <div className="product-card" style={{ width: "238px" }}>
-                      <div className="product-image">
-                        <img src={image} alt={product.name} />
-                        <div className="product-icons">
-                          <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
-                          <div className="hover-icons">
-                            <i className="fa-solid fa-eye"></i>
-                            <i className="fa fa-shopping-bag position-relative"></i>
-                          </div>
+                  if (!variant) return null;
+
+                  return (
+                    <div
+                      key={item.wishlist_items_id}
+                      className="product-itemlist-main !block"
+                    >
+                      <div className="product-card" style={{ width: "238px" }}>
+                        <div className="product-image">
+                          <Link href={`/product/${product.slug}`}>
+                            <img
+                              src={
+                                image
+                                  ? `/images/products/chaybo/${image}`
+                                  : "/images/placeholder.png"
+                              }
+                              alt={product.name}
+                            />
+                          </Link>
+                          <ProductIcons
+                            productId={product.products_id}
+                            variant_id={variant.product_variants_id ?? null}
+                            price={product.sale_price}
+                            onWishlistChange={() =>
+                              handleRemoveWishlistItem(product.products_id)
+                            }
+                          />
+                          {product.price > product.sale_price && (
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((product.price - product.sale_price) /
+                                  product.price) *
+                                  100
+                              )}
+                              %
+                            </span>
+                          )}
                         </div>
-                        {product.price > product.sale_price && (
-                          <span className="discount-tag">
-                            -
-                            {Math.round(
-                              ((product.price - product.sale_price) /
-                                product.price) *
-                                100
-                            )}
-                            %
+                        <h4 className="product-title">{product.name}</h4>
+                        <div className="product-price">
+                          {product.price !== product.sale_price && (
+                            <span className="old-price">
+                              <del>{product.price.toLocaleString()}₫</del>
+                            </span>
+                          )}
+                          <span className="new-price">
+                            {product.sale_price.toLocaleString()}₫
                           </span>
-                        )}
-                      </div>
-                      <h4 className="product-title">{product.name}</h4>
-                      <div className="product-price">
-                        {product.price !== product.sale_price && (
-                          <span className="old-price">
-                            <del>{product.price.toLocaleString()}₫</del>
-                          </span>
-                        )}
-                        <span className="new-price">
-                          {product.sale_price.toLocaleString()}₫
-                        </span>
-                      </div>
-                      <div className="product-rating">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <i
-                            key={i}
-                            className={`fa-${
-                              i <= 4 ? "solid" : "regular"
-                            } fa-star`}
-                          ></i>
-                        ))}
+                        </div>
+                        <div className="product-rating">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <i
+                              key={i}
+                              className={`fa-${
+                                i <= 4 ? "solid" : "regular"
+                              } fa-star`}
+                            ></i>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Mobile */}
-            <div className="product-grid-wishlist-list">
-              {wishlist.map((item) => {
-                const product = item.product;
-                const image = product.images.find(
-                  (img) => img.type === "main"
-                )?.url;
+            {Array.isArray(wishlist) && wishlist.length > 0 && (
+              <div className="product-grid-wishlist-list">
+                {wishlist.map((item) => {
+                  const product = item.product;
+                  const variant = product.product_variants?.[0];
+                  const image = product.images.find(
+                    (img) => img.type === "main"
+                  )?.url;
 
-                return (
-                  <div
-                    key={item.wishlist_items_id}
-                    className="product-itemlist-main"
-                  >
-                    <div className="product-card">
-                      <div className="product-image">
-                        <img src={image} alt={product.name} />
-                        <div className="product-icons">
-                          <i className="fa-solid fa-heart text-red-600 cursor-pointer"></i>
-                          <div className="hover-icons">
-                            <i className="fa-solid fa-eye"></i>
-                            <i className="fa fa-shopping-bag position-relative"></i>
-                          </div>
+                  return (
+                    <div
+                      key={item.wishlist_items_id}
+                      className="product-itemlist-main"
+                    >
+                      <div className="product-card">
+                        <div className="product-image">
+                          <img src={image} alt={product.name} />
+                          <ProductIcons
+                            productId={product.products_id}
+                            variant_id={variant?.product_variants_id ?? null}
+                            price={product.sale_price}
+                            onWishlistChange={() =>
+                              handleRemoveWishlistItem(product.products_id)
+                            }
+                          />
+                          {product.price > product.sale_price && (
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((product.price - product.sale_price) /
+                                  product.price) *
+                                  100
+                              )}
+                              %
+                            </span>
+                          )}
                         </div>
-                        {product.price > product.sale_price && (
-                          <span className="discount-tag">
-                            -
-                            {Math.round(
-                              ((product.price - product.sale_price) /
-                                product.price) *
-                                100
-                            )}
-                            %
+                      </div>
+                      <div className="product-content w-full">
+                        <h4 className="product-title">{product.name}</h4>
+                        <div className="product-price">
+                          {product.price !== product.sale_price && (
+                            <span className="old-price">
+                              <del>{product.price.toLocaleString()}₫</del>
+                            </span>
+                          )}
+                          <span className="new-price">
+                            {product.sale_price.toLocaleString()}₫
                           </span>
-                        )}
+                        </div>
+                        <div className="product-rating">
+                          {[1, 2, 3, 4, 5].map((i) => (
+                            <i
+                              key={i}
+                              className={`fa-${
+                                i <= 4 ? "solid" : "regular"
+                              } fa-star`}
+                            ></i>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <div className="product-content w-full">
-                      <h4 className="product-title">{product.name}</h4>
-                      <div className="product-price">
-                        {product.price !== product.sale_price && (
-                          <span className="old-price">
-                            <del>{product.price.toLocaleString()}₫</del>
-                          </span>
-                        )}
-                        <span className="new-price">
-                          {product.sale_price.toLocaleString()}₫
-                        </span>
-                      </div>
-                      <div className="product-rating">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <i
-                            key={i}
-                            className={`fa-${
-                              i <= 4 ? "solid" : "regular"
-                            } fa-star`}
-                          ></i>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </main>

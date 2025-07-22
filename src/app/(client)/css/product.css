@@ -562,9 +562,9 @@ input[type="submit"] {
 .tt {
   display: inline-block;
 }
-.hidden {
+/* .hidden {
   display: none !important;
-}
+} */
 .tt span {
   color: #4bd963;
   font-weight: 500;

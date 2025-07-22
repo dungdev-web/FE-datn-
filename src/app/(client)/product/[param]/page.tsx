@@ -2,6 +2,7 @@
 import "../../css/detail.css";
 import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { ICartItem } from "@/types/cart";
+import { ICoupon } from "@/types/coupon";
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
@@ -15,9 +16,8 @@ import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";
 import { useRouter } from "next/navigation";
-// Đang dùng mock, hãy thay bằng API thật:
 import { addToCart } from "@/services/cartService";
-
+import { getCouponList } from "@/services/couponService";
 export default function Detail() {
   const router = useRouter();
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -36,81 +36,81 @@ export default function Detail() {
   const [views, setReviews] = useState<IReview[]>([]);
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
+  const [coupon, setCoupon] = useState<ICoupon[]>([]);
   const handleAddToCart = async () => {
-  if (!selectedColorId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn màu sắc",
-      text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-
-  if (!selectedSizeId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn kích thước",
-      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-
-  if (!variantId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn biến thể",
-      text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const tokenData = await checkToken();
-    if (!tokenData?.user?.id) {
+    if (!selectedColorId) {
       Swal.fire({
         icon: "warning",
-        title: "Bạn chưa đăng nhập",
-        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
-        confirmButtonText: "Đăng nhập",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push("/login");
-        }
+        title: "Vui lòng chọn màu sắc",
+        text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
       });
       return;
     }
 
-    const response = await addToCart({
-      user_id: tokenData.user.id,
-      variant_id: variantId,
-      quantity,
-      price,
-    });
+    if (!selectedSizeId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn kích thước",
+        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
 
-    console.log("Đã thêm vào giỏ hàng:", response);
+    if (!variantId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn biến thể",
+        text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
 
-    Swal.fire({
-      icon: "success",
-      title: "Đã thêm vào giỏ hàng!",
-      text: response.message,
-      showConfirmButton: false,
-      timer: 1500,
-    });
-    router.push("/cart");
+    setLoading(true);
 
-  } catch (error) {
-    console.error("Lỗi khi thêm vào giỏ hàng:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Lỗi!",
-      text: (error as Error).message || "Thêm sản phẩm thất bại",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      const tokenData = await checkToken();
+      if (!tokenData?.user?.id) {
+        Swal.fire({
+          icon: "warning",
+          title: "Bạn chưa đăng nhập",
+          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+          confirmButtonText: "Đăng nhập",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push("/login");
+          }
+        });
+        return;
+      }
+
+      const response = await addToCart({
+        user_id: tokenData.user.id,
+        variant_id: variantId,
+        quantity,
+        price,
+      });
+
+      console.log("Đã thêm vào giỏ hàng:", response);
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã thêm vào giỏ hàng!",
+        text: response.message,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      router.push("/cart");
+    } catch (error) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: (error as Error).message || "Thêm sản phẩm thất bại",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const [showSidebar, setShowSidebar] = useState(false);
   const toggleSidebar = () => setShowSidebar(!showSidebar);
@@ -140,6 +140,14 @@ export default function Detail() {
   }, [params]);
   useEffect(() => {
     const fetchData = async () => {
+      const data = await getCouponList();
+      setCoupon(data);
+    };
+
+    fetchData();
+  }, []);
+  useEffect(() => {
+    const fetchData = async () => {
       const data = await getBestSellingMockProducts(5);
       setBestSellProducts(data);
     };
@@ -167,7 +175,11 @@ export default function Detail() {
       Array.isArray(product.images) &&
       product.images?.length > 0
     ) {
-      setSelectedImage(product.images[0]?.url ?? "/images/placeholder.png");
+      setSelectedImage(
+        product.images?.[0]?.url
+          ? `/images/products/chaybo/${product.images[0].url}`
+          : "/images/placeholder.png"
+      );
     } else {
       setSelectedImage("/images/placeholder.png");
     }
@@ -212,6 +224,29 @@ export default function Detail() {
     }, 1000);
 
     return () => clearInterval(interval);
+  }, [product]);
+  useEffect(() => {
+    if (!selectedColorId && product?.product_variants?.length) {
+      const colorIds = [
+        ...new Set(
+          product.product_variants
+            .filter((v) => v?.color?.id)
+            .map((v) => v.color.id)
+        ),
+      ];
+      if (colorIds.length === 1) {
+        setSelectedColorId(colorIds[0]);
+      }
+    }
+  }, [product]);
+  useEffect(() => {
+    const defaultImage =
+      product?.product_variants?.[0]?.color?.images ||
+      product?.images?.find((img) => img.type === "side")?.url;
+
+    if (defaultImage) {
+      setSelectedImage(`/images/products/chaybo/${defaultImage}`);
+    }
   }, [product]);
 
   const handleMinus = () => {
@@ -391,30 +426,40 @@ export default function Detail() {
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            {product.product_variants.map((img, index) => (
-                              <div
-                                key={index}
-                                className={`space-item-tsn tns-item tns-slide-active ${
-                                  selectedImage === img.color.images
-                                    ? "active"
-                                    : ""
-                                }`}
-                                onClick={() =>
-                                  setSelectedImage(img.color.images)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                <div className="item">
-                                  <img
-                                    src={
-                                      img.color.images || "/images/logo/1.png"
-                                    }
-                                    className="img-responsive"
-                                    alt={product.name}
-                                  />
+                            {product.product_variants.map((variant, index) => {
+                              const colorImage = variant.color?.images;
+                              const fallbackImage = product.images?.find(
+                                (img) => img.type === "side"
+                              )?.url;
+
+                              const imageUrl =
+                                colorImage || fallbackImage || "logo/1.png";
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`space-item-tsn tns-item tns-slide-active ${
+                                    selectedImage === imageUrl ? "active" : ""
+                                  }`}
+                                  onClick={() =>
+                                    setSelectedImage(
+                                      `/images/products/chaybo/${imageUrl}`
+                                    )
+                                  }
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <div className="item">
+                                    <img
+                                      src={`/images/products/chaybo/${imageUrl}`}
+                                      className="img-responsive"
+                                      alt={`${product.name} - ${
+                                        variant.color?.name_color || ""
+                                      }`}
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -454,7 +499,10 @@ export default function Detail() {
                         </p>
                         <p className="inventory_quantity">
                           <span className="a-stock">Tình trạng:</span>{" "}
-                          {product.status === "active"
+                          {product.product_variants.reduce(
+                            (sum, v) => sum + v.stock_quantity,
+                            0
+                          ) > 0
                             ? "Còn hàng"
                             : "Hết hàng"}
                         </p>
@@ -482,8 +530,8 @@ export default function Detail() {
                           {[
                             ...new Map(
                               product.product_variants
-                                .filter((v) => v?.color?.id)
-                                .map((v) => [v.color.id, v.color])
+                                .filter((v) => v?.color?.code_color)
+                                .map((v) => [v.color.code_color, v.color])
                             ).values(),
                           ].map((color) => (
                             <div
@@ -524,25 +572,31 @@ export default function Detail() {
                                 : product.product_variants
                               ).map((v) => [v.size.id, v])
                             ).values(),
-                          ].map((variant) => (
-                            <button
-                              key={variant.size.id}
-                              className="size-button"
-                              style={{
-                                padding: "8px 12px",
-                                marginRight: "5px",
-                                border: "1px solid #ccc",
-                                borderRadius: "4px",
-                                background: "#fff",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => {
-                                setSelectedSizeId(variant.size.id);
-                              }}
-                            >
-                              {variant.size.number_size}
-                            </button>
-                          ))}
+                          ]
+                            .sort(
+                              (a, b) =>
+                                Number(a.size.number_size) -
+                                Number(b.size.number_size)
+                            )
+                            .map((variant) => (
+                              <button
+                                key={variant.size.id}
+                                className="size-button"
+                                style={{
+                                  padding: "8px 12px",
+                                  marginRight: "5px",
+                                  border: "1px solid #ccc",
+                                  borderRadius: "4px",
+                                  background: "#fff",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                  setSelectedSizeId(variant.size.id);
+                                }}
+                              >
+                                {variant.size.number_size}
+                              </button>
+                            ))}
                         </div>
                       </div>
 
@@ -841,7 +895,175 @@ export default function Detail() {
 
                 <RelatedProductList categoryId={product.products_id} />
               </div>
+              <div className="sidebar sidebar-des left left-content col-lg-3 col-md-3 ">
+                <div className="khuyen-mai">
+                  <div className="title">
+                    <img
+                      width="64"
+                      height="64"
+                      src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/khuyen_mai_title.png?1730865096645"
+                      alt="vouver"
+                    />
+                    <span>Khuyến mãi đặc biệt !!!</span>
+                  </div>
+                  <div className="content">
+                    <ul>
+                      <li className="!flex gap-[10px]">
+                        <img
+                          className="!h-[20px]"
+                          width="20"
+                          height="20"
+                          src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai1.png?1730865096645"
+                          alt="Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng."
+                        />
+                        <p className="text-left">
+                          Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng.
+                        </p>
+                      </li>
+                      <li className="!flex gap-[10px]">
+                        <img
+                          className="!h-[20px]"
+                          width="20"
+                          height="20"
+                          src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai2.png?1730865096645"
+                          alt="Giảm giá 10% khi mua từ 5 sản phẩm trở lên."
+                        />
+                        <p className="text-left">
+                          Giảm giá 10% khi mua từ 5 sản phẩm trở lên.
+                        </p>
+                      </li>
+                      <li className="!flex gap-[10px]">
+                        <img
+                          className="!h-[20px]"
+                          width="20"
+                          height="20"
+                          src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai3.png?1730865096645"
+                          alt="Tặng 100.000₫ mua hàng tại website thành viên Halu Cosmetics, áp dụng khi mua Online tại Hà Nội và 1 số khu vực khác."
+                        />
+                        <p className="text-left">
+                          Tặng 100.000₫ mua hàng tại website thành viên Halu
+                          Cosmetics, áp dụng khi mua Online tại Hà Nội và 1 số
+                          khu vực khác.
+                        </p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="wrap-coupon_item">
+                  {coupon.map((item, index) => (
+                    <div key={index} className="coupon_item no-icon">
+                      <div className="coupon_body">
+                        <div className="coupon_head">
+                          <h3 className="coupon_title">NHẬP MÃ: {item.code}</h3>
+                          <div className="coupon_desc">
+                            Mã giảm{" "}
+                            {item.discount_type === "percentage"
+                              ? `${item.discount_value}% `
+                              : `${Number(item.discount_value).toLocaleString(
+                                  "vi"
+                                )}₫ `}
+                            cho đơn hàng tối thiểu 500K
+                          </div>
+                        </div>
+                        <div className="d-flex items-center flex-wrap justify-between">
+                          <button
+                            className="btn btn-main btn-sm coupon_copy"
+                            onClick={() => handleCopy(item.code)}
+                          >
+                            <span>Sao chép mã</span>
+                          </button>
+                          <span className="coupon_info_toggle">
+                            Điều kiện
+                            <span className="tooltip-text">
+                              Mã giảm{" "}
+                              {item.discount_type === "percentage"
+                                ? `${item.discount_value}% `
+                                : `${Number(item.discount_value).toLocaleString(
+                                    "vi"
+                                  )}₫ `}
+                              cho đơn hàng tối thiểu 500K cho đơn tối thiểu
+                              500k. Mỗi khách hàng được sử dụng tối đa{" "}
+                              {item.usage_limit} lần. Áp dụng từ{" "}
+                              {new Date(item.start_date).toLocaleDateString(
+                                "vi-VN"
+                              )}{" "}
+                              đến{" "}
+                              {new Date(item.end_date).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="aside-item sticky-aside">
+                  <div className="aside-title">
+                    <h2 className="title-head margin-top-0">
+                      <a href="san-pham-noi-bat" title="Có thể bạn sẽ thích">
+                        <span>Có thể bạn sẽ thích</span>
+                      </a>
+                    </h2>
+                  </div>
 
+                  <div className="list-product-slidebar">
+                    {bestsellproducts.map((product) => (
+                      <div className="list-item" key={product.products_id}>
+                        <div className="thumb-imagtes">
+                          <div className="sale-flash">
+                            <span>
+                              -
+                              {Math.round(
+                                100 - (product.sale_price / product.price) * 100
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <a
+                            href={`/product/${product.slug}`}
+                            title={product.name}
+                          >
+                            <img
+                              src={product.images?.[0]?.url || "/default.jpg"}
+                              alt={
+                                product.images?.[0]?.alt_text || product.name
+                              }
+                            />
+                          </a>
+                        </div>
+                        <div className="product-info-text">
+                          <h3 className="product-name">
+                            <a
+                              href={`/product${product.slug}`}
+                              title={product.name}
+                            >
+                              {product.name}
+                            </a>
+                          </h3>
+                          <div className="price-box clearfix flex items-center !m-0 ">
+                            <div className="special-price f-left">
+                              <span className="price product-price !m-0">
+                                {product.sale_price.toLocaleString()}₫
+                              </span>
+                            </div>
+
+                            <div className="old-price">
+                              <span className="price product-price-old">
+                                {product.price.toLocaleString()}₫
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            className="bizweb-product-reviews-badge"
+                            data-id={product.products_id}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
               {/* Nút mở sidebar (hiện trên mobile) */}
               <button
                 onClick={toggleSidebar}
@@ -852,9 +1074,9 @@ export default function Detail() {
 
               {/* Sidebar – Trượt trên mobile, cố định desktop */}
               <div
-                className={`bg-white shadow-lg h-full z-40 overflow-y-auto transition-transform duration-300 ease-in-out 
+                className={`bg-white  shadow-lg h-full z-40 overflow-y-auto transition-transform duration-300 ease-in-out 
           fixed top-0 w-[320px]
-          md:relative md:translate-x-0 md:block
+          md:relative md:translate-x-0 md:hidden
           ${
             showSidebar
               ? "translate-x-0 right-0"
@@ -929,85 +1151,55 @@ export default function Detail() {
                       </div>
                     </div>
                     <div className="wrap-coupon_item">
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: HLU10</h3>
-                            <div className="coupon_desc">
-                              Mã giảm 10% cho đơn hàng tối thiểu 500k.
+                      {coupon.map((item, index) => (
+                        <div key={index} className="coupon_item no-icon">
+                          <div className="coupon_body">
+                            <div className="coupon_head">
+                              <h3 className="coupon_title">
+                                NHẬP MÃ: {item.code}
+                              </h3>
+                              <div className="coupon_desc">
+                                Mã giảm{" "}
+                                {item.discount_type === "percentage"
+                                  ? `${item.discount_value}% `
+                                  : `${Number(
+                                      item.discount_value
+                                    ).toLocaleString("vi")}₫ `}
+                                cho đơn hàng tối thiểu 500K
+                              </div>
                             </div>
-                          </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              onClick={() => handleCopy("HLU10")}
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                            <span className="coupon_info_toggle">
-                              Điều kiện
-                              <span className="tooltip-text">
-                                Mã giảm 10% cho đơn tối thiểu 500k. Mỗi khách
-                                hàng được sử dụng tối đa 1 lần.
+                            <div className="d-flex items-center flex-wrap justify-between">
+                              <button
+                                className="btn btn-main btn-sm coupon_copy"
+                                onClick={() => handleCopy(item.code)}
+                              >
+                                <span>Sao chép mã</span>
+                              </button>
+                              <span className="coupon_info_toggle">
+                                Điều kiện
+                                <span className="tooltip-text">
+                                  Mã giảm{" "}
+                                  {item.discount_type === "percentage"
+                                    ? `${item.discount_value}% `
+                                    : `${Number(
+                                        item.discount_value
+                                      ).toLocaleString("vi")}₫ `}
+                                  cho đơn hàng tối thiểu 500K cho đơn tối thiểu
+                                  500k. Mỗi khách hàng được sử dụng tối đa{" "}
+                                  {item.usage_limit} lần. Áp dụng từ{" "}
+                                  {new Date(item.start_date).toLocaleDateString(
+                                    "vi-VN"
+                                  )}{" "}
+                                  đến{" "}
+                                  {new Date(item.end_date).toLocaleDateString(
+                                    "vi-VN"
+                                  )}
+                                </span>
                               </span>
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: HLU15</h3>
-                            <div className="coupon_desc">
-                              Mã giảm 15% cho đơn hàng tối thiểu 700k.
                             </div>
                           </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              data-ega-coupon="HLU15"
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                          </div>
                         </div>
-                      </div>
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: HLU99K</h3>
-                            <div className="coupon_desc">
-                              Mã giảm 99k cho đơn hàng tối thiểu 600k.
-                            </div>
-                          </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              data-ega-coupon="HLU99K"
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="coupon_item no-icon">
-                        <div className="coupon_body">
-                          <div className="coupon_head">
-                            <h3 className="coupon_title">NHẬP MÃ: FREESHIP</h3>
-                            <div className="coupon_desc">
-                              Miễn phí vận chuyển cho đơn tối thiểu 500k.
-                            </div>
-                          </div>
-                          <div className="d-flex items-center flex-wrap justify-between">
-                            <button
-                              className="btn btn-main btn-sm coupon_copy"
-                              data-ega-coupon="HLUF03"
-                            >
-                              <span>Sao chép mã</span>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                     <div className="aside-item sticky-aside">
                       <div className="aside-title">

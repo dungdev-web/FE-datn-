@@ -226,6 +226,7 @@
     text-align: center;
     line-height: 20px;
     font-size: 14px;
+    transition: all .5s ease-in-out;
 }
 
 .progress-text p {
