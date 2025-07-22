@@ -45,7 +45,7 @@ export default function CategoryPage() {
 
   // ✅ Thêm selectedGender
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
-   const [selectedPriceRange, setSelectedPriceRange] = useState<{
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{
     min: number;
     max: number;
   } | null>(null);
@@ -138,10 +138,10 @@ export default function CategoryPage() {
     }
     fetchData();
   }, [slug]);
-const handlePriceChange = (range: { min: number; max: number } | null) => {
-  setSelectedPriceRange(range);
-  setPage(1);
-};
+  const handlePriceChange = (range: { min: number; max: number } | null) => {
+    setSelectedPriceRange(range);
+    setPage(1);
+  };
   return (
     <>
       <section
@@ -179,18 +179,18 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
         <div className="container1">
           <div className="row">
             <div className="wrapper">
-                    <SidebarFilter
-            categories={categories}
-            openCategoryId={openCategoryId}
-            toggleCategory={toggleCategory}
-            brandsList={brandsList}
-            selectedBrandIds={selectedBrandIds}
-            handleBrandCheckboxChange={handleBrandCheckboxChange}
-            selectedGender={selectedGender}
-            handleGenderChange={handleGenderChange}
-            selectedPriceRange={selectedPriceRange}
-            handlePriceChange={handlePriceChange}
-          />
+              <SidebarFilter
+                categories={categories}
+                openCategoryId={openCategoryId}
+                toggleCategory={toggleCategory}
+                brandsList={brandsList}
+                selectedBrandIds={selectedBrandIds}
+                handleBrandCheckboxChange={handleBrandCheckboxChange}
+                selectedGender={selectedGender}
+                handleGenderChange={handleGenderChange}
+                selectedPriceRange={selectedPriceRange}
+                handlePriceChange={handlePriceChange}
+              />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
@@ -295,7 +295,13 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                                 className="w-full h-full object-cover rounded"
                               />
                             </Link>
-                            <ProductIcons productId={sp.id ?? sp.products_id} />
+                            <ProductIcons
+                              productId={sp.products_id}
+                              variant_id={
+                                sp.product_variants[0]?.product_variants_id ?? 0
+                              } // lấy biến thể đầu tiên
+                              price={sp.price}
+                            />
 
                             <span className="discount-tag absolute top-1 left-1 text-white text-xs px-2 py-0.5 rounded">
                               -
@@ -341,12 +347,12 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                           <div className="product-rating mt-1">
                             {Array.from({ length: 5 }, (_, i) =>
                               i <
-                              (sp.reviews?.length
+                              (sp.product_reviews?.length
                                 ? Math.round(
-                                    sp.reviews.reduce(
+                                    sp.product_reviews.reduce(
                                       (s, r) => s + Number(r.rating),
                                       0
-                                    ) / sp.reviews.length
+                                    ) / sp.product_reviews.length
                                   )
                                 : 0) ? (
                                 <i
@@ -389,7 +395,13 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                                 className="w-full h-full object-cover rounded"
                               />
                             </Link>
-                            <ProductIcons productId={sp.id ?? sp.products_id} />
+                            <ProductIcons
+                              productId={sp.products_id}
+                              variant_id={
+                                sp.product_variants[0]?.product_variants_id ?? 0
+                              } // lấy biến thể đầu tiên
+                              price={sp.price}
+                            />
                           </div>
 
                           <div className="ml-4 flex flex-col justify-between flex-grow">
@@ -426,12 +438,12 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
                               <div className="product-rating">
                                 {Array.from({ length: 5 }, (_, i) =>
                                   i <
-                                  (sp.reviews?.length
+                                  (sp.product_reviews?.length
                                     ? Math.round(
-                                        sp.reviews.reduce(
+                                        sp.product_reviews.reduce(
                                           (s, r) => s + Number(r.rating),
                                           0
-                                        ) / sp.reviews.length
+                                        ) / sp.product_reviews.length
                                       )
                                     : 0) ? (
                                     <i
@@ -527,8 +539,8 @@ const handlePriceChange = (range: { min: number; max: number } | null) => {
         brandsList={brandsList}
         selectedBrandIds={selectedBrandIds}
         handleBrandCheckboxChange={handleBrandCheckboxChange}
-         selectedGender={selectedGender}
-  handleGenderChange={handleGenderChange}
+        selectedGender={selectedGender}
+        handleGenderChange={handleGenderChange}
       />
     </>
   );
