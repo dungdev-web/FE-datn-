@@ -318,12 +318,12 @@ export default function CategoryPage() {
                           <div className="product-rating mt-1">
                             {Array.from({ length: 5 }, (_, i) =>
                               i <
-                              (sp.reviews?.length
+                              (sp.product_reviews?.length
                                 ? Math.round(
-                                    sp.reviews.reduce(
+                                    sp.product_reviews.reduce(
                                       (s, r) => s + Number(r.rating),
                                       0
-                                    ) / sp.reviews.length
+                                    ) / sp.product_reviews.length
                                   )
                                 : 0) ? (
                                 <i
@@ -409,12 +409,12 @@ export default function CategoryPage() {
                               <div className="product-rating">
                                 {Array.from({ length: 5 }, (_, i) =>
                                   i <
-                                  (sp.reviews?.length
+                                  (sp.product_reviews?.length
                                     ? Math.round(
-                                        sp.reviews.reduce(
+                                        sp.product_reviews.reduce(
                                           (s, r) => s + Number(r.rating),
                                           0
-                                        ) / sp.reviews.length
+                                        ) / sp.product_reviews.length
                                       )
                                     : 0) ? (
                                     <i
