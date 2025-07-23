@@ -14,7 +14,6 @@ import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
-import CompareButton from "./component/product_compare/button_compare";
 import {
   getNewestProducts,
   getFeaturedProducts,
@@ -26,7 +25,7 @@ import Banner3D from "./component/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "./component/products/ProductIcons";
 import HotProductIcons from "./component/products/HotProductIcons";
-export default function Home({ product }: { product: IProduct }) {
+export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);

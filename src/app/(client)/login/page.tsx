@@ -50,7 +50,7 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
     try {
       const res = await loginUser({ usernameOrEmail, password });
 
-      saveUserToCookies(res.token);
+      saveUserToCookies(res);
 
       setShowLoader(true);
       setLoginSuccess(true);

@@ -14,7 +14,9 @@ export default function Blog_View() {
       const Tagify = (await import("@yaireo/tagify")).default;
 
       // Khởi tạo Quill editor
-      const editorElement = document.querySelector("#editor");
+      const editorElement = document.querySelector(
+        "#editor"
+      ) as HTMLElement | null;
       if (editorElement) {
         new Quill(editorElement, {
           theme: "snow",
@@ -173,5 +175,6 @@ export default function Blog_View() {
           className="min-h-[300px] border border-gray-300 rounded-md p-4 bg-white"
         ></div>
       </div>
-    </form>  );
+    </form>
+  );
 }
