@@ -144,11 +144,11 @@ export default function Cart() {
             {cart.cart_items.map((item: ICartItem) => (
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
-                  <img
+                 <img
                     alt={item.variant?.product.name}
                     src={
-                      item.variant?.product.images?.[0]?.url
-                        ? `/images/products/chaybo/${item.variant.product.images[0].url}`
+                      item.variant?.color.images
+                        ? `/images/products/chaybo/${item.variant.color.images}`
                         : "/images/placeholder.png"
                     }
                     width="80"
