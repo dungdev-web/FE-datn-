@@ -25,6 +25,7 @@ import Banner3D from "./component/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "./component/products/ProductIcons";
 import HotProductIcons from "./component/products/HotProductIcons";
+import HotspotLookbook from "./component/home/HotspotProduct";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,6 +40,8 @@ export default function Home() {
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
   const { handleAddToCart } = useAddToCart();
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
+  const [products, setProducts] = useState<IProduct[]>([]);
+
   const handlePlay = () => {
     setIsPlaying(true);
   };
@@ -66,6 +69,18 @@ export default function Home() {
     e.stopPropagation();
     setOpenIndex((prev) => (prev === id ? null : id));
   };
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setOpenIndex(null);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (!marqueeRef.current) return;
@@ -115,7 +130,6 @@ export default function Home() {
       try {
         const data = await getFeaturedProducts();
         serFretureProducts(data.slice(0, 10));
-        
       } catch (err) {
         console.error("Lỗi khi lấy sản phẩm nổi bậtt:", err);
       }
@@ -272,151 +286,12 @@ export default function Home() {
               <button className="btn-lookbook">GIÀY NỮ</button>
             </div>
           </div>
-          <div className="lookbook-images" ref={containerRef}>
-            {/* Image 1 */}
-            <div className="image-container">
-              <img
-                src="/images/blog/section_home_banner1.webp"
-                alt="Hình ảnh giày nam"
-              />
-
-              <div
-                className="product-hotspot"
-                style={{ top: "71%", left: "71%", position: "absolute" }}
-              >
-                <button
-                  className="hotspot-btn"
-                  onClick={(e) => togglePopup("1-1", e)}
-                >
-                  +
-                </button>
-                {openIndex === "1-1" && (
-                  <div className="product-popup">
-                    <a href="/index.html">
-                      <img
-                        src="/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp"
-                        alt="Jordan 14"
-                      />
-                    </a>
-                    <div className="product-info">
-                      <h4>Giày Nam Air Jordan 14 Retro</h4>
-                      <p>2.200.000₫</p>
-                    </div>
-                    <span
-                      className="close-popup"
-                      onClick={() => setOpenIndex(null)}
-                    >
-                      &times;
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div
-                className="product-hotspot"
-                style={{ top: "86%", left: "30%", position: "absolute" }}
-              >
-                <button
-                  className="hotspot-btn"
-                  onClick={(e) => togglePopup("1-2", e)}
-                >
-                  +
-                </button>
-                {openIndex === "1-2" && (
-                  <div className="product-popup">
-                    <a href="/index.html">
-                      <img
-                        src="/images/products/chaybo/GiàyNamAirJordan14Retro(do).webp"
-                        alt="Air Max 97"
-                      />
-                    </a>
-                    <div className="product-info">
-                      <h4>Giày Nam Air Max 97</h4>
-                      <p>3.500.000₫</p>
-                    </div>
-                    <span
-                      className="close-popup"
-                      onClick={() => setOpenIndex(null)}
-                    >
-                      &times;
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Image 2 */}
-            <div className="image-container">
-              <img
-                src="/images/blog/section_home_banner2.webp"
-                alt="Hình ảnh giày nữ"
-              />
-
-              <div
-                className="product-hotspot"
-                style={{ top: "90%", left: "85%", position: "absolute" }}
-              >
-                <button
-                  className="hotspot-btn"
-                  onClick={(e) => togglePopup("2-1", e)}
-                >
-                  +
-                </button>
-                {openIndex === "2-1" && (
-                  <div className="product-popup">
-                    <a href="/index.html">
-                      <img
-                        src="/images/products/chaybo/NeumelGRAYBROWNSnow(vang).webp"
-                        alt="Ultra Boost"
-                      />
-                    </a>
-                    <div className="product-info">
-                      <h4>Giày Nữ Ultra Boost</h4>
-                      <p>2.000.000₫</p>
-                    </div>
-                    <span
-                      className="close-popup"
-                      onClick={() => setOpenIndex(null)}
-                    >
-                      &times;
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div
-                className="product-hotspot"
-                style={{ top: "70%", left: "46%", position: "absolute" }}
-              >
-                <button
-                  className="hotspot-btn"
-                  onClick={(e) => togglePopup("2-2", e)}
-                >
-                  +
-                </button>
-                {openIndex === "2-2" && (
-                  <div className="product-popup">
-                    <a href="/index.html">
-                      <img
-                        src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
-                        alt="Nike Pegasus Trail"
-                      />
-                    </a>
-                    <div className="product-info">
-                      <h4>Giày Nữ Nike Pegasus Trail 4</h4>
-                      <p>2.800.000₫</p>
-                    </div>
-                    <span
-                      className="close-popup"
-                      onClick={() => setOpenIndex(null)}
-                    >
-                      &times;
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <HotspotLookbook
+        openIndex={openIndex}
+        setOpenIndex={setOpenIndex}
+        togglePopup={togglePopup}
+        containerRef={containerRef}
+      />
         </div>
         <div className="shipping-main">
           <div className="shipping1">
@@ -483,13 +358,20 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` ||
+                          "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <HotProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants[0].product_variants_id
+                      }
+                      price={product.sale_price}
+                    />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -593,13 +475,20 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
+                          `/images/products/chaybo/${product.images?.[0]?.url}` ||
+                          "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <HotProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants[0].product_variants_id
+                      }
+                      price={product.sale_price}
+                    />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
