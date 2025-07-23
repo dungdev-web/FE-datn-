@@ -11,6 +11,7 @@ type AddressFormData = {
   district: string;
   ward: string;
   is_default: boolean;
+  address_line?: string;
 };
 
 type Province = { name: string; code: number };
@@ -20,12 +21,7 @@ type Ward = { name: string; code: number };
 type Props = {
   initialData: AddressFormData;
   onClose: () => void;
-  onSubmit: (data: {
-    full_name: string;
-    phone: string;
-    address_line: string;
-    is_default: boolean;
-  }) => void;
+  onSubmit: (data: AddressFormData) => void;
 };
 
 export default function EditAddressForm({
@@ -68,7 +64,10 @@ export default function EditAddressForm({
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = e.target;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const { name, value, type } = target;
+    const checked = type === "checkbox" ? target.checked : undefined;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
@@ -81,10 +80,8 @@ export default function EditAddressForm({
     e.preventDefault();
     const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
     onSubmit({
-      full_name: formData.full_name,
-      phone: formData.phone,
+      ...formData,
       address_line: fullAddress,
-      is_default: formData.is_default,
     });
   };
 
@@ -116,7 +113,9 @@ export default function EditAddressForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Số điện thoại</label>
+          <label className="block text-sm font-medium mb-1">
+            Số điện thoại
+          </label>
           <input
             type="text"
             name="phone"
@@ -176,7 +175,9 @@ export default function EditAddressForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Quận / Huyện</label>
+            <label className="block text-sm font-medium mb-1">
+              Quận / Huyện
+            </label>
             <select
               name="district"
               className="w-full border border-gray-300 rounded !px-3 !py-2"
@@ -194,7 +195,9 @@ export default function EditAddressForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Phường / Xã</label>
+            <label className="block text-sm font-medium mb-1">
+              Phường / Xã
+            </label>
             <select
               name="ward"
               className="w-full border border-gray-300 rounded !px-3 !py-2"

@@ -1,43 +1,21 @@
 "use client";
-import React, { forwardRef, useEffect, useState } from "react";
-import { ICart, ICartItem } from "@/types/cart";
-import { checkToken } from "@/services/authService";
-import { getMockCartByUser } from "@/services/cartService";
+import React, { forwardRef } from "react";
+import { useCart } from "@/hooks/useCart";
 
 const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
-  const [cart, setCart] = useState<ICart | null>(null);
-
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const tokenData = await checkToken();
-        if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
-        console.log("Token data:", tokenData);
-
-        const userId = tokenData.user.id;
-        console.log(userId);
-
-        const cartData = await getMockCartByUser(userId);
-        setCart(cartData);
-        console.log("sản oham63 giỏ hàng", cartData);
-      } catch (error) {
-        console.error("Lỗi khi lấy giỏ hàng:", error);
-      }
-    };
-
-    fetchCart();
-  }, []);
+  const { cart, subtotal, handlePlus, handleMinus, handleRemoveItem } =
+    useCart();
 
   return (
     <div className="top-cart-content hidden-sm hidden-xs" ref={ref}>
       <ul id="cart-sidebar" className="mini-products-list count_li">
         <ul className="list-item-cart">
-          {cart?.cart_items.map((item: ICartItem) => (
-            <li className="item productid-105205720" key={item.cart_items_id}>
+          {cart?.cart_items.map((item) => (
+            <li className="item" key={item.cart_items_id}>
               <div className="wrap_item">
                 <a
                   className="product-image"
-                  href="/giay-nam-nike-air-max"
+                  href={`/product/${item.variant?.product.products_id}`}
                   title={item.variant?.product.name}
                 >
                   <img
@@ -52,19 +30,15 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                 </a>
                 <div className="detail-item">
                   <div className="product-details">
-                    <a
-                      href="javascript:;"
-                      data-id="105205720"
-                      title="Xóa"
-                      className="remove-item-cart fa fa-close"
+                    <button
+                      title="Xoá"
+                      className="remove-item-cart"
+                      onClick={() => handleRemoveItem(item.cart_items_id)}
                     >
-                      &nbsp;
-                    </a>
+                      <i className="fa-solid fa-trash text-red-600"></i>
+                    </button>
                     <h3 className="product-name">
-                      <a
-                        href="/giay-nam-nike-air-max"
-                        title={item.variant?.product.name}
-                      >
+                      <a href={`/product/${item.variant?.product.products_id}`}>
                         {item.variant?.product.name} -{" "}
                         {item.variant?.color.name_color} -{" "}
                         {item.variant?.size.number_size}
@@ -75,33 +49,24 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                     <span className="price">
                       {item.price.toLocaleString("vi-VN")}₫
                     </span>
-                    <span className="hidden quaty item_quanty_count">
-                      x {item.quantity}
-                    </span>
                     <div className="quantity-select qty_drop_cart">
-                      <input
-                        className="variantID"
-                        type="hidden"
-                        name="variantId"
-                      />
                       <button
-                        className="btn_reduced reduced items-count btn-minus"
+                        className="btn_reduced items-count btn-minus"
                         type="button"
+                        onClick={() => handleMinus(item.cart_items_id)}
                       >
                         <i className="fa fa-minus"></i>
                       </button>
                       <input
                         type="text"
-                        maxLength={12}
-                        className="input-text number-sidebar"
-                        name="Lines"
-                        size={4}
-                        value={item.quantity}
                         readOnly
+                        className="input-text number-sidebar"
+                        value={item.quantity}
                       />
                       <button
-                        className="btn_increase increase items-count btn-plus"
+                        className="btn_increase items-count btn-plus"
                         type="button"
+                        onClick={() => handlePlus(item.cart_items_id)}
                       >
                         <i className="fa fa-plus"></i>
                       </button>
@@ -115,23 +80,11 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
 
         <div className="wrap_total">
           <div className="top-subtotal hidden">
-            Phí vận chuyển:
-            <span className="pricex">Tính khi thanh toán</span>
+            Phí vận chuyển: <span className="pricex">Tính khi thanh toán</span>
           </div>
           <div className="top-subtotal">
             Tổng tiền tạm tính:{" "}
-            <span className="price">
-              {cart
-                ? cart.cart_items
-                    .reduce(
-                      (total, cart_items) =>
-                        total + cart_items.price * cart_items.quantity,
-                      0
-                    )
-                    .toLocaleString("vi-VN")
-                : "0"}
-              ₫
-            </span>
+            <span className="price">{subtotal.toLocaleString("vi-VN")}₫</span>
           </div>
         </div>
 
