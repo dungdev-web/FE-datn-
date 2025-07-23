@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import "../css/product.css";
 import "../css/compare.css";
 import { useRouter } from "next/navigation";
-export default function Compare_product(productId: number) {
+export default function Compare_product() {
   const [compare, setCompare] = useState<ICompareProduct[]>([]);
   const { refresh, setCount } = useCompare();
   const router = useRouter();
