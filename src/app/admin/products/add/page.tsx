@@ -3,10 +3,18 @@ import React from "react";
 import "../../css/product_add.css";
 import { useEffect, useState, useRef  } from "react";
 import dynamic from "next/dynamic";
-const CKEditor = dynamic(() => import("@ckeditor/ckeditor5-react").then(mod => mod.CKEditor), {
-  ssr: false,
-});
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+const CKEditor = dynamic(
+  () =>
+    import("@ckeditor/ckeditor5-react").then(async ({ CKEditor }) => {
+      const ClassicEditor = (await import("@ckeditor/ckeditor5-build-classic"))
+        .default;
+
+      return function CustomEditor(props: any) {
+        return <CKEditor editor={ClassicEditor} {...props} />;
+      };
+    }),
+  { ssr: false }
+);
 export default function Add_pro() {
   const editorRef = useRef<any>(null);
 
@@ -278,19 +286,18 @@ export default function Add_pro() {
                   <label htmlFor="mo_ta">Mô tả *</label>
 
                   <CKEditor
-                    editor={ClassicEditor}
                     data={`🔸 Chất lượng Rep 1:1 - Nên mang lên 1 size
 so với tiêu chuẩn - Vận chuyển toàn quốc | Kiểm Tra Hàng
 Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
 - Bảo Hành Trọn Đời Sản Phẩm - Đổi Trả 7 Ngày Không Kể Lý Do`}
-                    onReady={(editor) => {
-                      editorRef.current = editor;
-                      const el = editor.ui.view.editable.element;
-                      if (el) el.style.height = "300px";
-                    }}
-                    onChange={(_, editor) => {
-                      console.log("Nội dung mới:", editor.getData());
-                    }}
+                    onReady={(editor: any) => {
+                    editorRef.current = editor;
+                    const el = editor.ui.view.editable.element;
+                    if (el) el.style.height = "300px";
+                  }}
+                  onChange={(_: any, editor: any) => {
+                    console.log("Nội dung mới:", editor.getData());
+                  }}
                   />
                 </div>
               </div>
