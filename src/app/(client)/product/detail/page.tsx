@@ -5,7 +5,7 @@ import { IProduct } from "@/types/product";
 import RelatedProductList from "../../component/RelatedProductList";
 import { useState,useEffect } from "react";
 import { useParams } from "next/navigation";
-import { getMockProducts } from "@/mock/mockProduct";
+import { getMockProducts } from "@/mocks/mockProduct";
 export default function Detail() {
   const [product, setProduct] = useState<IProduct | null>(null);
   const { slug } = useParams();

@@ -9,6 +9,7 @@ import Footer from "./component/footer";
 import ButtonToTop from "./component/ButtonToTop";
 import { CompareProvider } from "./component/product_compare/compare_context";
 import { LoaderProvider } from "./component/LinkWithLoader";
+import ContactFloatingButton from "./component/ContactFloatingButton";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -24,6 +25,7 @@ export default function RootLayout({
               {children}
               <Footer></Footer>
               <ButtonToTop />
+              <ContactFloatingButton />
             </CompareProvider>
           </LoaderProvider>
         </div>
