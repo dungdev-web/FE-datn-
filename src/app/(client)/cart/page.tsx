@@ -153,7 +153,10 @@ export default function Cart() {
                     }
                     width="80"
                   />
-                  <div className="product-name">{item.variant?.product.name}</div>
+
+                  <div className="product-name">
+                    {item.variant?.product.name}
+                  </div>
                   <div className="product-details">
                     <div className="product-desc">
                       Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
@@ -166,18 +169,27 @@ export default function Cart() {
                 </div>
 
                 <div className="quantity-control">
-                  <button onClick={() => handleMinus(item.cart_items_id)}>-</button>
+                  <button onClick={() => handleMinus(item.cart_items_id)}>
+                    -
+                  </button>
                   <input
                     type="text"
                     value={item.quantity}
-                    onChange={(e) => handleChangeQuantity(item.cart_items_id, e)}
+                    onChange={(e) =>
+                      handleChangeQuantity(item.cart_items_id, e)
+                    }
                   />
-                  <button onClick={() => handlePlus(item.cart_items_id)}>+</button>
+                  <button onClick={() => handlePlus(item.cart_items_id)}>
+                    +
+                  </button>
                 </div>
 
                 <div className="cart-item-total">
                   {(item.price! * item.quantity).toLocaleString("vi")}₫
-                  <span className="remove-btn" onClick={() => handleRemoveItem(item.cart_items_id)}>
+                  <span
+                    className="remove-btn"
+                    onClick={() => handleRemoveItem(item.cart_items_id)}
+                  >
                     <i className="fa-solid fa-trash text-red-600"></i>
                   </span>
                 </div>
@@ -185,13 +197,20 @@ export default function Cart() {
             ))}
 
             <div className="cart-actions">
-              <a href="#" className="continue-shopping">Tiếp Tục Mua Hàng</a>
-              <a href="#" className="update-cart">Cập Nhật Giỏ Hàng</a>
+              <a href="#" className="continue-shopping">
+                Tiếp Tục Mua Hàng
+              </a>
+              <a href="#" className="update-cart">
+                Cập Nhật Giỏ Hàng
+              </a>
             </div>
 
             <div className="free-shipping-progress">
               <div className="progress-bar">
-                <div className="progress" style={{ width: `${progressPercent}%` }}>
+                <div
+                  className="progress"
+                  style={{ width: `${progressPercent}%` }}
+                >
                   {progressPercent}%
                 </div>
               </div>
@@ -206,7 +225,8 @@ export default function Cart() {
                       để được <strong>MIỄN PHÍ VẬN CHUYỂN!</strong>
                     </p>
                     <p>
-                      để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận giao hàng miễn phí
+                      để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận
+                      giao hàng miễn phí
                       <br />
                       <span className="target-price">9.000.000₫</span>.
                     </p>
@@ -242,7 +262,9 @@ export default function Cart() {
                 ) : (
                   <>
                     <span>Giao hàng: </span>
-                    <span className="total">{shipprice.toLocaleString("vi")}₫</span>
+                    <span className="total">
+                      {shipprice.toLocaleString("vi")}₫
+                    </span>
                     <span> phí vận chuyển</span>
                   </>
                 )}
