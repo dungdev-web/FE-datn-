@@ -144,7 +144,8 @@ export default function Cart() {
             {cart.cart_items.map((item: ICartItem) => (
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
-                  <img
+                  <Link href={`/product/${item.variant?.product.slug}`}>
+                     <img
                     alt={item.variant?.product.name}
                     src={
                       item.variant?.color.images
@@ -153,10 +154,12 @@ export default function Cart() {
                     }
                     width="80"
                   />
-
+                  </Link>
+                 <Link href={`/product/${item.variant?.product.slug}`}>
                   <div className="product-name">
                     {item.variant?.product.name}
                   </div>
+                  </Link>
                   <div className="product-details">
                     <div className="product-desc">
                       Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
