@@ -1,20 +1,25 @@
 "use client";
 import "../../css/detail.css";
-import { IProduct } from "@/types/product";
+import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { ICartItem } from "@/types/cart";
+import { ICoupon } from "@/types/coupon";
 import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import {
   getProductDetail,
   getBestSellingMockProducts,
+  getReviewProduct,
+  addReviewProduct,
 } from "@/services/productService";
 import RelatedProductList from "../../component/RelatedProductList";
 import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";
-
-
+import { useRouter } from "next/navigation";
+import { addToCart } from "@/services/cartService";
+import { getCouponList } from "@/services/couponService";
 export default function Detail() {
+  const router = useRouter();
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const params = useParams();
@@ -28,49 +33,73 @@ export default function Detail() {
   const [selectedColorId, setSelectedColorId] = useState<number | null>(null);
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const [countdown, setCountdown] = useState("");
-
+  const [views, setReviews] = useState<IReview[]>([]);
+  const [rating, setRating] = useState<number>(0);
+  const [content, setContent] = useState<string>("");
+  const [coupon, setCoupon] = useState<ICoupon[]>([]);
   const handleAddToCart = async () => {
     if (!selectedColorId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn màu sắc",
-      text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn màu sắc",
+        text: "Bạn cần chọn màu trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
 
-  if (!selectedSizeId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn kích thước",
-      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
-     if (!variantId) {
-    Swal.fire({
-      icon: "warning",
-      title: "Vui lòng chọn kích thước",
-      text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
-    });
-    return;
-  }
+    if (!selectedSizeId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn kích thước",
+        text: "Bạn cần chọn size trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
+
+    if (!variantId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn biến thể",
+        text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
+      });
+      return;
+    }
+
     setLoading(true);
+
     try {
       const tokenData = await checkToken();
-      if (!tokenData?.user?.id) throw new Error("Không có người dùng");
+      if (!tokenData?.user?.id) {
+        Swal.fire({
+          icon: "warning",
+          title: "Bạn chưa đăng nhập",
+          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+          confirmButtonText: "Đăng nhập",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push("/login");
+          }
+        });
+        return;
+      }
 
-      await addToMockCart(tokenData.user.id, variantId, quantity, price);
-      console.log(variantId);
-      console.log(quantity);
-      console.log(price);
+      const response = await addToCart({
+        user_id: tokenData.user.id,
+        variant_id: variantId,
+        quantity,
+        price,
+      });
+
+      console.log("Đã thêm vào giỏ hàng:", response);
 
       Swal.fire({
         icon: "success",
         title: "Đã thêm vào giỏ hàng!",
+        text: response.message,
         showConfirmButton: false,
         timer: 1500,
       });
+      router.push("/cart");
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
       Swal.fire({
@@ -81,52 +110,10 @@ export default function Detail() {
     } finally {
       setLoading(false);
     }
+  };
+
   const [showSidebar, setShowSidebar] = useState(false);
   const toggleSidebar = () => setShowSidebar(!showSidebar);
-const handleAddToCart = async () => {
-  setLoading(true);
-  try {
-    const tokenData = await checkToken();
-    if (!tokenData?.user?.id) {
-      throw new Error("bạn chưa đăng nhập");
-
-    }
-
-    await addToMockCart(tokenData.user.id, variantId, quantity, price);
-
-    Swal.fire({
-      icon: "success",
-      title: "Đã thêm vào giỏ hàng",
-      text: "Sản phẩm đã được thêm thành công!",
-      timer: 2000,
-      showConfirmButton: false,
-    });
-  } catch (error: any) {
-    console.error("Lỗi khi thêm vào giỏ hàng:", error);
-
-    if (error.message === "bạn chưa đăng nhập") {
-      Swal.fire({
-        icon: "warning",
-        title: "Bạn chưa đăng nhập",
-        text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
-        confirmButtonText: "Đăng nhập ngay",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/login"; // Chuyển hướng đến trang đăng nhập
-        }
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Thêm giỏ hàng thất bại",
-        text: error.message || "Đã có lỗi xảy ra!",
-      });
-    }
-  } finally {
-    setLoading(false);
-  }
-};
-
 
   useEffect(() => {
     const param = params.param;
@@ -153,15 +140,47 @@ const handleAddToCart = async () => {
   }, [params]);
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getBestSellingMockProducts(5);
-      setBestSellProducts(data);
+      const data = await getCouponList();
+      setCoupon(data);
     };
 
     fetchData();
   }, []);
   useEffect(() => {
-    if (product && Array.isArray(product.images) && product.images.length > 0) {
-      setSelectedImage(product.images[0]?.url ?? "/images/placeholder.png");
+    const fetchData = async () => {
+      const data = await getBestSellingMockProducts(5);
+      setBestSellProducts(data);
+      console.log("Product images:", data);
+    };
+
+    fetchData();
+  }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!product?.products_id) return;
+
+      try {
+        const data = await getReviewProduct(product.products_id);
+        setReviews(data);
+      } catch (error) {
+        console.error("Lỗi khi lấy đánh giá sản phẩm:", error);
+      }
+    };
+
+    fetchData();
+  }, [product?.products_id]);
+
+  useEffect(() => {
+    if (
+      product &&
+      Array.isArray(product.images) &&
+      product.images?.length > 0
+    ) {
+      setSelectedImage(
+        product.images?.[0]?.url
+          ? `/images/products/chaybo/${product.images[0].url}`
+          : "/images/placeholder.png"
+      );
     } else {
       setSelectedImage("/images/placeholder.png");
     }
@@ -174,9 +193,11 @@ const handleAddToCart = async () => {
 
   useEffect(() => {
     if (selectedColorId && selectedSizeId && product) {
-      const match = product.variants.find(
-        (v) => v.color.id === selectedColorId && v.size.id === selectedSizeId
+      const match = product.product_variants.find(
+        (v) =>
+          v?.color?.id === selectedColorId && v?.size?.id === selectedSizeId
       );
+
       if (match) {
         setVariantId(match.product_variants_id);
         // setPrice(match.sale_price || match.);
@@ -204,6 +225,29 @@ const handleAddToCart = async () => {
     }, 1000);
 
     return () => clearInterval(interval);
+  }, [product]);
+  useEffect(() => {
+    if (!selectedColorId && product?.product_variants?.length) {
+      const colorIds = [
+        ...new Set(
+          product.product_variants
+            .filter((v) => v?.color?.id)
+            .map((v) => v.color.id)
+        ),
+      ];
+      if (colorIds.length === 1) {
+        setSelectedColorId(colorIds[0]);
+      }
+    }
+  }, [product]);
+  useEffect(() => {
+    const defaultImage =
+      product?.product_variants?.[0]?.color?.images ||
+      product?.images?.find((img) => img.type === "side")?.url;
+
+    if (defaultImage) {
+      setSelectedImage(`/images/products/chaybo/${defaultImage}`);
+    }
   }, [product]);
 
   const handleMinus = () => {
@@ -234,12 +278,50 @@ const handleAddToCart = async () => {
       });
     });
   };
-  const totalReviews = product?.reviews.length ?? 0;
+  const handleSubmitReview = async () => {
+    const tokenData = await checkToken();
+    if (!tokenData?.user?.id) {
+      Swal.fire({
+        icon: "warning",
+        title: "Bạn chưa đăng nhập",
+        text: "Vui lòng đăng nhập để gửi đánh giá.",
+        confirmButtonText: "Đăng nhập",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push("/login");
+        }
+      });
+      return;
+    }
+
+    try {
+      const userId = tokenData.user.id;
+      if (!product || !product.products_id) return;
+
+      const data = await addReviewProduct(product.products_id, {
+        user_id: userId,
+        rating,
+        content,
+      });
+
+      Swal.fire("Thành công!", "Bạn đã đánh giá sản phẩm.", "success");
+      setReviews((prev) => [...prev, data]); // nếu muốn cập nhật ngay
+    } catch (error: any) {
+      Swal.fire("Lỗi", error.message, "error");
+      console.error("Lỗi khi gửi đánh giá:", error);
+    }
+  };
+
+  const totalReviews = Array.isArray(product?.product_reviews)
+    ? product.product_reviews.length
+    : 0;
 
   const averageRating =
     totalReviews > 0
-      ? product!.reviews.reduce((sum, r) => sum + parseFloat(r.rating), 0) /
-        totalReviews
+      ? product!.product_reviews!.reduce(
+          (sum, r) => sum + parseFloat(r.rating),
+          0
+        ) / totalReviews
       : 0;
 
   const roundedRating = Math.round(averageRating);
@@ -255,10 +337,9 @@ const handleAddToCart = async () => {
       </div>
     );
   }
- 
+
   return (
     <>
-
       <section
         className="bread-crumb background-cover relative"
         style={{
@@ -298,9 +379,8 @@ const handleAddToCart = async () => {
           </ul>
         </div>
       </section>
-   
-  
-         <main>
+
+      <main>
         <section className="product">
           <div className="container1">
             <div className="row row-flex-detail">
@@ -347,28 +427,39 @@ const handleAddToCart = async () => {
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            {product.variants.map((img, index) => (
-                              <div
-                                key={index}
-                                className={`space-item-tsn tns-item tns-slide-active ${
-                                  selectedImage === img.color.image
-                                    ? "active"
-                                    : ""
-                                }`}
-                                onClick={() =>
-                                  setSelectedImage(img.color.image)
-                                }
-                                style={{ cursor: "pointer" }}
-                              >
-                                <div className="item">
-                                  <img
-                                    src={img.color.image}
-                                    className="img-responsive"
-                                    alt={product.name}
-                                  />
+                            {product.product_variants.map((variant, index) => {
+                              const colorImage = variant.color?.images;
+                              const fallbackImage = product.images?.find(
+                                (img) => img.type === "side"
+                              )?.url;
+
+                              const imageUrl =
+                                colorImage || fallbackImage || "logo/1.png";
+                              const fullImageUrl = `/images/products/chaybo/${imageUrl}`;
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`space-item-tsn tns-item tns-slide-active ${
+                                    selectedImage === fullImageUrl
+                                      ? "active"
+                                      : ""
+                                  }`}
+                                  onClick={() => setSelectedImage(fullImageUrl)}
+                                  style={{ cursor: "pointer" }}
+                                >
+                                  <div className="item">
+                                    <img
+                                      src={fullImageUrl}
+                                      className="img-responsive"
+                                      alt={`${product.name} - ${
+                                        variant.color?.name_color || ""
+                                      }`}
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -408,7 +499,10 @@ const handleAddToCart = async () => {
                         </p>
                         <p className="inventory_quantity">
                           <span className="a-stock">Tình trạng:</span>{" "}
-                          {product.status === "active"
+                          {product.product_variants.reduce(
+                            (sum, v) => sum + v.stock_quantity,
+                            0
+                          ) > 0
                             ? "Còn hàng"
                             : "Hết hàng"}
                         </p>
@@ -431,74 +525,98 @@ const handleAddToCart = async () => {
                     </div>
                     <div className="form-product">
                       <div className="swatch-color swatch clearfix">
-                        <div className="header posintion-fixed">Màu sắc</div>
+                        <div className="header position-fixed">Màu sắc</div>
                         <div className="color-options">
                           {[
                             ...new Map(
-                              product.variants.map((v) => [v.color.id, v.color])
+                              product.product_variants
+                                .filter((v) => v?.color?.code_color)
+                                .map((v) => [v.color.code_color, v.color])
                             ).values(),
-                          ].map((color) => (
-                            <div
-                              key={color.id}
-                              className="color-circle"
-                              onClick={() => {
-                                setSelectedColorId(color.id);
-                              }}
-                              style={{
-                                backgroundColor: color.code_color,
-                                width: 24,
-                                height: 24,
-                                borderRadius: "50%",
-                                border:
-                                  selectedColorId === color.id
-                                    ? "2px solid #facc15"
-                                    : "1px solid #ccc",
-                                cursor: "pointer",
-                              }}
-                              title={color.name_color}
-                            ></div>
-                          ))}
+                          ].map((color) => {
+                            return (
+                              <div
+                                key={color.id}
+                                className="color-circle"
+                                onClick={() => {
+                                  setSelectedColorId(color.id);
+                                  setSelectedSizeId(null);
+
+                                  // Tìm variant theo màu đã chọn
+                                  const matchedVariant =
+                                    product.product_variants.find(
+                                      (v) => v.color?.id === color.id
+                                    );
+
+                                  // Ưu tiên ảnh theo màu, nếu không có thì fallback ảnh phụ
+                                  const imageUrl =
+                                    matchedVariant?.color?.images ||
+                                    product.images?.find(
+                                      (img) => img.type === "side"
+                                    )?.url ||
+                                    "logo/1.png";
+
+                                  setSelectedImage(
+                                    `/images/products/chaybo/${imageUrl}`
+                                  );
+                                }}
+                                style={{
+                                  backgroundColor: color.code_color,
+                                  width: 24,
+                                  height: 24,
+                                  borderRadius: "50%",
+                                  border:
+                                    selectedColorId === color.id
+                                      ? "2px solid #facc15"
+                                      : "1px solid #ccc",
+                                  cursor: "pointer",
+                                }}
+                                title={color.name_color}
+                              ></div>
+                            );
+                          })}
                         </div>
                       </div>
+
                       <div className="swatch-size swatch clearfix">
-                        <div
-                          className="header"
-                          style={{
-                            background: "#fff",
-                          }}
-                        >
+                        <div className="header" style={{ background: "#fff" }}>
                           Kích thước
                         </div>
-
                         <div className="size-options">
-                          {(selectedColorId
-                            ? product.variants.filter(
-                                (v) => v.color.id === selectedColorId
-                              )
-                            : product.variants
-                          ).map((variant, index) => (
-                            <button
-                              key={index}
-                              className="size-button"
-                              style={{
-                                padding: "8px 12px",
-                                marginRight: "5px",
-                                border: "1px solid #ccc",
-                                borderRadius: "4px",
-                                background: "#fff",
-                                cursor: "pointer",
-                              }}
-                              onClick={() => {
-                                console.log(
-                                  "Selected size ID:",
-                                  variant.size.id
-                                );
-                                setSelectedSizeId(variant.size.id);
-                              }}
-                            >
-                              {variant.size.number_size}
-                            </button>
-                          ))}
+                          {[
+                            ...new Map(
+                              (selectedColorId
+                                ? product.product_variants.filter(
+                                    (v) => v?.color?.id === selectedColorId
+                                  )
+                                : product.product_variants
+                              ).map((v) => [v.size.id, v])
+                            ).values(),
+                          ]
+                            .sort(
+                              (a, b) =>
+                                Number(a.size.number_size) -
+                                Number(b.size.number_size)
+                            )
+                            .map((variant) => (
+                              <button
+                                key={variant.size.id}
+                                className="size-button"
+                                style={{
+                                  padding: "8px 12px",
+                                  marginRight: "5px",
+                                  border: "1px solid #ccc",
+                                  borderRadius: "4px",
+                                  background: "#fff",
+                                  cursor: "pointer",
+                                }}
+                                onClick={() => {
+                                  setSelectedSizeId(variant.size.id);
+                                }}
+                              >
+                                {variant.size.number_size}
+                              </button>
+                            ))}
                         </div>
                       </div>
 
@@ -519,7 +637,6 @@ const handleAddToCart = async () => {
                             id="qty"
                             name="quantity"
                           />
-
                           <span className="qtyplus" onClick={handlePlus}>
                             +
                           </span>
@@ -534,6 +651,7 @@ const handleAddToCart = async () => {
                         </button>
                       </div>
 
+                      {/* CHÍNH SÁCH */}
                       <ul className="chinhsach-pro">
                         <li>
                           <img
@@ -689,8 +807,8 @@ const handleAddToCart = async () => {
                           </div>
 
                           <div className="space-y-4">
-                            {product.reviews.map((review, index) => {
-                              const rating = parseInt(review.rating);
+                            {views.map((review, index) => {
+                              const rating = review.rating;
 
                               return (
                                 <div
@@ -700,7 +818,10 @@ const handleAddToCart = async () => {
                                   <div className="flex items-center gap-2 !mb-1">
                                     <img
                                       className="!w-[35px] rounded-[50%]"
-                                      src={review.user.avatar}
+                                      src={
+                                        review.user?.avatar ||
+                                        "/images/default.png"
+                                      }
                                       alt=""
                                     />
                                     <strong className="text-sm">
@@ -737,17 +858,6 @@ const handleAddToCart = async () => {
 
                             <div>
                               <label className="block text-sm font-medium !mb-1">
-                                Tên của bạn
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Nhập tên..."
-                                className="!w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium !mb-1">
                                 Số sao
                               </label>
                               <div className="flex gap-1">
@@ -755,10 +865,12 @@ const handleAddToCart = async () => {
                                   <button
                                     key={star}
                                     type="button"
-                                    className="text-yellow-400 text-xl hover:scale-110 transition-transform"
-                                    onClick={() =>
-                                      console.log(`Chọn sao: ${star}`)
-                                    }
+                                    className={`text-xl hover:scale-110 transition-transform ${
+                                      star <= rating
+                                        ? "text-yellow-400"
+                                        : "text-gray-300"
+                                    }`}
+                                    onClick={() => setRating(star)}
                                   >
                                     ★
                                   </button>
@@ -772,12 +884,17 @@ const handleAddToCart = async () => {
                               </label>
                               <textarea
                                 placeholder="Nhận xét của bạn..."
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
                                 rows={4}
                                 className="!w-full border border-gray-300 rounded !px-3 !py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 !mb-[15px]"
                               ></textarea>
                             </div>
 
-                            <button className="!px-4 !py-2 bg-[#03177e] cursor-pointer text-white rounded hover:bg-blue-700 transition">
+                            <button
+                              onClick={handleSubmitReview}
+                              className="!px-4 !py-2 bg-[#03177e] cursor-pointer text-white rounded hover:bg-blue-700 transition"
+                            >
                               Gửi đánh giá
                             </button>
                           </div>
@@ -796,42 +913,9 @@ const handleAddToCart = async () => {
                   </div>
                 </div>
 
-                <RelatedProductList categoryId={10} />
+                <RelatedProductList categoryId={product.products_id} />
               </div>
-      
-        
-             {/* Nút mở sidebar (hiện trên mobile) */}
-      <button
-        onClick={toggleSidebar}
-        className="open-filters block md:hidden fixed top-4 right-4 z-50 bg-white p-2 border rounded shadow"
-      >
-        <i className="fa fa-filter"></i>
-      </button>
-
-      {/* Sidebar – Trượt trên mobile, cố định desktop */}
-      <div
-        className={`bg-white shadow-lg h-full z-40 overflow-y-auto transition-transform duration-300 ease-in-out 
-          fixed top-0 w-[320px]
-          md:relative md:translate-x-0 md:block
-          ${
-            showSidebar
-              ? "translate-x-0 right-0"
-              : "translate-x-full right-0 md:translate-x-0"
-          }`}
-      >
-        {/* Nút đóng (chỉ mobile) */}
-        <div className="text-right p-4 block md:hidden">
-          <button
-            onClick={toggleSidebar}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <i className="fa fa-times text-xl"></i>
-          </button>
-        </div>
-
-        {/* Nội dung sidebar */}
-        <div className="sidebar-content">
-              <div className="sidebar left left-content ">
+              <div className="sidebar sidebar-des left left-content col-lg-3 col-md-3 ">
                 <div className="khuyen-mai">
                   <div className="title">
                     <img
@@ -886,85 +970,53 @@ const handleAddToCart = async () => {
                   </div>
                 </div>
                 <div className="wrap-coupon_item">
-                  <div className="coupon_item no-icon">
-                    <div className="coupon_body">
-                      <div className="coupon_head">
-                        <h3 className="coupon_title">NHẬP MÃ: HLU10</h3>
-                        <div className="coupon_desc">
-                          Mã giảm 10% cho đơn hàng tối thiểu 500k.
+                  {coupon.map((item, index) => (
+                    <div key={index} className="coupon_item no-icon">
+                      <div className="coupon_body">
+                        <div className="coupon_head">
+                          <h3 className="coupon_title">NHẬP MÃ: {item.code}</h3>
+                          <div className="coupon_desc">
+                            Mã giảm{" "}
+                            {item.discount_type === "percentage"
+                              ? `${item.discount_value}% `
+                              : `${Number(item.discount_value).toLocaleString(
+                                  "vi"
+                                )}₫ `}
+                            cho đơn hàng tối thiểu 500K
+                          </div>
                         </div>
-                      </div>
-                      <div className="d-flex items-center flex-wrap justify-between">
-                        <button
-                          className="btn btn-main btn-sm coupon_copy"
-                          onClick={() => handleCopy("HLU10")}
-                        >
-                          <span>Sao chép mã</span>
-                        </button>
-                        <span className="coupon_info_toggle">
-                          Điều kiện
-                          <span className="tooltip-text">
-                            Mã giảm 10% cho đơn tối thiểu 500k. Mỗi khách hàng
-                            được sử dụng tối đa 1 lần.
+                        <div className="d-flex items-center flex-wrap justify-between">
+                          <button
+                            className="btn btn-main btn-sm coupon_copy"
+                            onClick={() => handleCopy(item.code)}
+                          >
+                            <span>Sao chép mã</span>
+                          </button>
+                          <span className="coupon_info_toggle">
+                            Điều kiện
+                            <span className="tooltip-text">
+                              Mã giảm{" "}
+                              {item.discount_type === "percentage"
+                                ? `${item.discount_value}% `
+                                : `${Number(item.discount_value).toLocaleString(
+                                    "vi"
+                                  )}₫ `}
+                              cho đơn hàng tối thiểu 500K cho đơn tối thiểu
+                              500k. Mỗi khách hàng được sử dụng tối đa{" "}
+                              {item.usage_limit} lần. Áp dụng từ{" "}
+                              {new Date(item.start_date).toLocaleDateString(
+                                "vi-VN"
+                              )}{" "}
+                              đến{" "}
+                              {new Date(item.end_date).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </span>
                           </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="coupon_item no-icon">
-                    <div className="coupon_body">
-                      <div className="coupon_head">
-                        <h3 className="coupon_title">NHẬP MÃ: HLU15</h3>
-                        <div className="coupon_desc">
-                          Mã giảm 15% cho đơn hàng tối thiểu 700k.
                         </div>
                       </div>
-                      <div className="d-flex items-center flex-wrap justify-between">
-                        <button
-                          className="btn btn-main btn-sm coupon_copy"
-                          data-ega-coupon="HLU15"
-                        >
-                          <span>Sao chép mã</span>
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                  <div className="coupon_item no-icon">
-                    <div className="coupon_body">
-                      <div className="coupon_head">
-                        <h3 className="coupon_title">NHẬP MÃ: HLU99K</h3>
-                        <div className="coupon_desc">
-                          Mã giảm 99k cho đơn hàng tối thiểu 600k.
-                        </div>
-                      </div>
-                      <div className="d-flex items-center flex-wrap justify-between">
-                        <button
-                          className="btn btn-main btn-sm coupon_copy"
-                          data-ega-coupon="HLU99K"
-                        >
-                          <span>Sao chép mã</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="coupon_item no-icon">
-                    <div className="coupon_body">
-                      <div className="coupon_head">
-                        <h3 className="coupon_title">NHẬP MÃ: FREESHIP</h3>
-                        <div className="coupon_desc">
-                          Miễn phí vận chuyển cho đơn tối thiểu 500k.
-                        </div>
-                      </div>
-                      <div className="d-flex items-center flex-wrap justify-between">
-                        <button
-                          className="btn btn-main btn-sm coupon_copy"
-                          data-ega-coupon="HLUF03"
-                        >
-                          <span>Sao chép mã</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
                 <div className="aside-item sticky-aside">
                   <div className="aside-title">
@@ -989,11 +1041,15 @@ const handleAddToCart = async () => {
                             </span>
                           </div>
                           <a
-                            href={`/san-pham/${product.slug}`}
+                            href={`/product/${product.slug}`}
                             title={product.name}
                           >
                             <img
-                              src={product.images?.[0]?.url || "/default.jpg"}
+                              src={
+                                product.images?.[0]?.url
+                                  ? `/images/products/chaybo/${product.images[0].url}`
+                                  : "/default.jpg"
+                              }
                               alt={
                                 product.images?.[0]?.alt_text || product.name
                               }
@@ -1003,7 +1059,7 @@ const handleAddToCart = async () => {
                         <div className="product-info-text">
                           <h3 className="product-name">
                             <a
-                              href={`/san-pham/${product.slug}`}
+                              href={`/product${product.slug}`}
                               title={product.name}
                             >
                               {product.name}
@@ -1032,18 +1088,227 @@ const handleAddToCart = async () => {
                   </div>
                 </div>
               </div>
-        </div>
+              {/* Nút mở sidebar (hiện trên mobile) */}
+              <button
+                onClick={toggleSidebar}
+                className="open-filters block md:hidden fixed top-4 right-4 z-50 bg-white p-2 border rounded shadow"
+              >
+                <i className="fa fa-filter"></i>
+              </button>
 
-        {/* KHÔNG THAY ĐỔI phần nội dung gốc của bạn – giữ nguyên tất cả khuyến mãi, mã giảm giá và sản phẩm */}
-        {/* Copy phần "div.sidebar left-content" của bạn vào đây như cũ */}
-      </div>
-         
+              {/* Sidebar – Trượt trên mobile, cố định desktop */}
+              <div
+                className={`bg-white  shadow-lg h-full z-40 overflow-y-auto transition-transform duration-300 ease-in-out 
+          fixed top-0 w-[320px]
+          md:relative md:translate-x-0 md:hidden
+          ${
+            showSidebar
+              ? "translate-x-0 right-0"
+              : "translate-x-full right-0 md:translate-x-0"
+          }`}
+              >
+                {/* Nút đóng (chỉ mobile) */}
+                <div className="text-right p-4 block md:hidden">
+                  <button
+                    onClick={toggleSidebar}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <i className="fa fa-times text-xl"></i>
+                  </button>
+                </div>
+
+                {/* Nội dung sidebar */}
+                <div className="sidebar-content">
+                  <div className="sidebar left left-content ">
+                    <div className="khuyen-mai">
+                      <div className="title">
+                        <img
+                          width="64"
+                          height="64"
+                          src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/khuyen_mai_title.png?1730865096645"
+                          alt="vouver"
+                        />
+                        <span>Khuyến mãi đặc biệt !!!</span>
+                      </div>
+                      <div className="content">
+                        <ul>
+                          <li className="!flex gap-[10px]">
+                            <img
+                              className="!h-[20px]"
+                              width="20"
+                              height="20"
+                              src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai1.png?1730865096645"
+                              alt="Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành hàng."
+                            />
+                            <p className="text-left">
+                              Áp dụng Phiếu quà tặng/ Mã giảm giá theo ngành
+                              hàng.
+                            </p>
+                          </li>
+                          <li className="!flex gap-[10px]">
+                            <img
+                              className="!h-[20px]"
+                              width="20"
+                              height="20"
+                              src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai2.png?1730865096645"
+                              alt="Giảm giá 10% khi mua từ 5 sản phẩm trở lên."
+                            />
+                            <p className="text-left">
+                              Giảm giá 10% khi mua từ 5 sản phẩm trở lên.
+                            </p>
+                          </li>
+                          <li className="!flex gap-[10px]">
+                            <img
+                              className="!h-[20px]"
+                              width="20"
+                              height="20"
+                              src="//bizweb.dktcdn.net/100/505/077/themes/934930/assets/product_khuyen_mai3.png?1730865096645"
+                              alt="Tặng 100.000₫ mua hàng tại website thành viên Halu Cosmetics, áp dụng khi mua Online tại Hà Nội và 1 số khu vực khác."
+                            />
+                            <p className="text-left">
+                              Tặng 100.000₫ mua hàng tại website thành viên Halu
+                              Cosmetics, áp dụng khi mua Online tại Hà Nội và 1
+                              số khu vực khác.
+                            </p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="wrap-coupon_item">
+                      {coupon.map((item, index) => (
+                        <div key={index} className="coupon_item no-icon">
+                          <div className="coupon_body">
+                            <div className="coupon_head">
+                              <h3 className="coupon_title">
+                                NHẬP MÃ: {item.code}
+                              </h3>
+                              <div className="coupon_desc">
+                                Mã giảm{" "}
+                                {item.discount_type === "percentage"
+                                  ? `${item.discount_value}% `
+                                  : `${Number(
+                                      item.discount_value
+                                    ).toLocaleString("vi")}₫ `}
+                                cho đơn hàng tối thiểu 500K
+                              </div>
+                            </div>
+                            <div className="d-flex items-center flex-wrap justify-between">
+                              <button
+                                className="btn btn-main btn-sm coupon_copy"
+                                onClick={() => handleCopy(item.code)}
+                              >
+                                <span>Sao chép mã</span>
+                              </button>
+                              <span className="coupon_info_toggle">
+                                Điều kiện
+                                <span className="tooltip-text">
+                                  Mã giảm{" "}
+                                  {item.discount_type === "percentage"
+                                    ? `${item.discount_value}% `
+                                    : `${Number(
+                                        item.discount_value
+                                      ).toLocaleString("vi")}₫ `}
+                                  cho đơn hàng tối thiểu 500K cho đơn tối thiểu
+                                  500k. Mỗi khách hàng được sử dụng tối đa{" "}
+                                  {item.usage_limit} lần. Áp dụng từ{" "}
+                                  {new Date(item.start_date).toLocaleDateString(
+                                    "vi-VN"
+                                  )}{" "}
+                                  đến{" "}
+                                  {new Date(item.end_date).toLocaleDateString(
+                                    "vi-VN"
+                                  )}
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="aside-item sticky-aside">
+                      <div className="aside-title">
+                        <h2 className="title-head margin-top-0">
+                          <a
+                            href="san-pham-noi-bat"
+                            title="Có thể bạn sẽ thích"
+                          >
+                            <span>Có thể bạn sẽ thích</span>
+                          </a>
+                        </h2>
+                      </div>
+
+                      <div className="list-product-slidebar">
+                        {bestsellproducts.map((product) => (
+                          <div className="list-item" key={product.products_id}>
+                            <div className="thumb-imagtes">
+                              <div className="sale-flash">
+                                <span>
+                                  -
+                                  {Math.round(
+                                    100 -
+                                      (product.sale_price / product.price) * 100
+                                  )}
+                                  %
+                                </span>
+                              </div>
+                              <a
+                                href={`/product/${product.slug}`}
+                                title={product.name}
+                              >
+                                <img
+                                  src={
+                                    product.images?.[0]?.url
+                                      ? `/images/products/chaybo/${product.images[0].url}`
+                                      : "/default.jpg"
+                                  }
+                                  alt={
+                                    product.images?.[0]?.alt_text ||
+                                    product.name
+                                  }
+                                />
+                              </a>
+                            </div>
+                            <div className="product-info-text">
+                              <h3 className="product-name">
+                                <a
+                                  href={`/product${product.slug}`}
+                                  title={product.name}
+                                >
+                                  {product.name}
+                                </a>
+                              </h3>
+                              <div className="price-box clearfix flex items-center !m-0 ">
+                                <div className="special-price f-left">
+                                  <span className="price product-price !m-0">
+                                    {product.sale_price.toLocaleString()}₫
+                                  </span>
+                                </div>
+
+                                <div className="old-price">
+                                  <span className="price product-price-old">
+                                    {product.price.toLocaleString()}₫
+                                  </span>
+                                </div>
+                              </div>
+                              <div
+                                className="bizweb-product-reviews-badge"
+                                data-id={product.products_id}
+                              ></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* KHÔNG THAY ĐỔI phần nội dung gốc của bạn – giữ nguyên tất cả khuyến mãi, mã giảm giá và sản phẩm */}
+                {/* Copy phần "div.sidebar left-content" của bạn vào đây như cũ */}
+              </div>
             </div>
           </div>
-         
         </section>
       </main>
     </>
-    
   );
 }

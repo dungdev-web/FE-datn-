@@ -3,165 +3,95 @@ import "../css/style.css";
 import "../css/cart.css";
 import "../css/product.css";
 import Link from "next/link";
-import { getMockCartByUser } from "@/services/cartService";
-import { useEffect, useState } from "react";
-import { ICart, ICartItem } from "@/types/cart";
-import { checkToken } from "@/services/authService";
+import { ICartItem } from "@/types/cart";
+import { useCart } from "@/hooks/useCart";
+
 export default function Cart() {
-  const [cart, setCart] = useState<ICart | null>(null);
-  const FREE_SHIPPING_THRESHOLD = 9000000;
-  const subtotal =
-    cart?.items.reduce(
-      (sum, item) => sum + (item.price || 0) * item.quantity,
-      0
-    ) || 0;
-  const remainingAmount = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const progressPercent = Math.min(
-    100,
-    Math.floor((subtotal / FREE_SHIPPING_THRESHOLD) * 100)
-  );
-const shipprice = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-const handleMinus = (itemId: number) => {
-  setCart((prevCart) => {
-    if (!prevCart) return prevCart;
-    const newItems = prevCart.items.map((item) =>
-      item.cart_items_id === itemId
-        ? { ...item, quantity: Math.max(1, item.quantity - 1) }
-        : item
-    );
-    return { ...prevCart, items: newItems };
-  });
-};
+  const {
+    cart,
+    subtotal,
+    shipprice,
+    progressPercent,
+    remainingAmount,
+    isFreeShipping,
+    handleMinus,
+    handlePlus,
+    handleChangeQuantity,
+    handleRemoveItem,
+  } = useCart();
 
-const handlePlus = (itemId: number) => {
-  setCart((prevCart) => {
-    if (!prevCart) return prevCart;
-    const newItems = prevCart.items.map((item) =>
-      item.cart_items_id === itemId
-        ? { ...item, quantity: Math.min(999, item.quantity + 1) }
-        : item
-    );
-    return { ...prevCart, items: newItems };
-  });
-};
-
-const handleChange = (
-  itemId: number,
-  e: React.ChangeEvent<HTMLInputElement>
-) => {
-  const value = e.target.value;
-  const num = parseInt(value, 10);
-  setCart((prevCart) => {
-    if (!prevCart) return prevCart;
-    const newItems = prevCart.items.map((item) =>
-      item.cart_items_id === itemId
-        ? {
-            ...item,
-            quantity:
-              value === ""
-                ? 1
-                : !isNaN(num) && num >= 1 && num <= 999
-                ? num
-                : item.quantity,
-          }
-        : item
-    );
-    return { ...prevCart, items: newItems };
-  });
-};
-
-
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const tokenData = await checkToken();
-        if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
-
-        const userId = tokenData.user.id;
-        const cartData = await getMockCartByUser(userId);
-        setCart(cartData);
-      } catch (error) {
-        console.error("Lỗi khi lấy giỏ hàng:", error);
-      }
-    };
-
-    fetchCart();
-  }, []);
   if (!cart) {
-return (
-  <>
-    <section
-      className="bread-crumb background-cover relative"
-      style={{
-        backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
-        backgroundPosition: "center",
-        backgroundSize: "cover",
-      }}
-    >
-      <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+    return (
+      <>
+        <section
+          className="bread-crumb background-cover relative"
+          style={{
+            backgroundImage: "url(/images/banner/banner_dieuhuong1.png)",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+          }}
+        >
+          <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
+          <div className="breadcrumb-container relative z-10">
+            <div className="title-page">
+              <h2>Giỏ hàng của bạn</h2>
+            </div>
+            <ul className="breadcrumb">
+              <li className="home">
+                <Link href="/" title="Trang chủ">
+                  <span>Trang chủ</span>
+                </Link>
+                <i className="fa fa-angle-right" aria-hidden="true"></i>
+              </li>
+              <li>
+                <strong>
+                  <span>Giỏ hàng</span>
+                </strong>
+              </li>
+            </ul>
+          </div>
+        </section>
 
-      <div className="breadcrumb-container relative z-10">
-        <div className="title-page">
-          <h2>Giỏ hàng của bạn</h2>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="mb-6"
+            viewBox="0 0 64 64"
+            fill="none"
+            width="100"
+            height="100"
+          >
+            <path
+              d="M20 22V18C20 13.5817 23.5817 10 28 10H36C40.4183 10 44 13.5817 44 18V22"
+              stroke="#00C853"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M12 22H52L58 54C58 56.2091 56.2091 58 54 58H10C7.79086 58 6 56.2091 6 54L12 22Z"
+              stroke="#00C853"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+            <circle cx="24" cy="30" r="2" fill="#00C853" />
+            <circle cx="40" cy="30" r="2" fill="#00C853" />
+          </svg>
+
+          <p className="text-gray-700 text-lg font-medium">
+            Không có sản phẩm nào trong giỏ hàng của bạn
+          </p>
+
+          <Link
+            href="/"
+            className="mt-6 inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+          >
+            Tiếp tục mua sắm
+          </Link>
         </div>
-        <ul className="breadcrumb">
-          <li className="home">
-            <Link href="/" title="Trang chủ">
-              <span>Trang chủ</span>
-            </Link>
-            <i className="fa fa-angle-right" aria-hidden="true"></i>
-          </li>
-          <li>
-            <strong>
-              <span>Giỏ hàng</span>
-            </strong>
-          </li>
-        </ul>
-      </div>
-    </section>
-
-    {/* Layout trống giỏ hàng căn giữa toàn màn hình */}
-    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="mb-6"
-        viewBox="0 0 64 64"
-        fill="none"
-        width="100"
-        height="100"
-      >
-        <path
-          d="M20 22V18C20 13.5817 23.5817 10 28 10H36C40.4183 10 44 13.5817 44 18V22"
-          stroke="#00C853"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M12 22H52L58 54C58 56.2091 56.2091 58 54 58H10C7.79086 58 6 56.2091 6 54L12 22Z"
-          stroke="#00C853"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
-        <circle cx="24" cy="30" r="2" fill="#00C853" />
-        <circle cx="40" cy="30" r="2" fill="#00C853" />
-      </svg>
-
-      <p className="text-gray-700 text-lg font-medium">
-        Không có sản phẩm nào trong giỏ hàng của bạn
-      </p>
-
-      <Link
-        href="/"
-        className="mt-6 inline-block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded-lg transition"
-      >
-        Tiếp tục mua sắm
-      </Link>
-    </div>
-  </>
-);
-
-
+      </>
+    );
   }
+
   return (
     <>
       <section
@@ -172,9 +102,7 @@ return (
           backgroundSize: "cover",
         }}
       >
-        {/* Lớp phủ làm mờ nền */}
         <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
-
         <div className="breadcrumb-container">
           <div className="title-page">
             <h2>Giỏ hàng của bạn</h2>
@@ -191,10 +119,10 @@ return (
                 <span>Giỏ hàng</span>
               </strong>
             </li>
-            <li></li>
           </ul>
         </div>
       </section>
+
       <main className="main-cart">
         <div className="cart-container">
           <div className="cart-items">
@@ -213,34 +141,56 @@ return (
               </div>
             </div>
 
-            {cart.items.map((item: ICartItem) => (
+            {cart.cart_items.map((item: ICartItem) => (
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
-                  <img
-                    src={item.variant.color.image}
-                    alt={`Sản phẩm ${item.variant.name}`}
+                 <img
+                    alt={item.variant?.product.name}
+                    src={
+                      item.variant?.color.images
+                        ? `/images/products/chaybo/${item.variant.color.images}`
+                        : "/images/placeholder.png"
+                    }
+                    width="80"
                   />
+
+                  <div className="product-name">
+                    {item.variant?.product.name}
+                  </div>
                   <div className="product-details">
-                    <div className="product-name">
-                       {item.variant.name}
-                    </div>
                     <div className="product-desc">
-                      Màu sắc: {item.variant.color.name_color} - Kích thước: {item.variant.size.number_size}
+                      Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
+                      {item.variant?.size.number_size}
                     </div>
                   </div>
                 </div>
                 <div className="cart-item-price">
                   {item.price?.toLocaleString("vi")}₫
                 </div>
+
                 <div className="quantity-control">
-                  <button  onClick={() => handleMinus(item.cart_items_id)}>-</button>
-                  <input type="text" value={item.quantity } onChange={(e) => handleChange(item.cart_items_id, e)}  />
-                  <button onClick={() => handlePlus(item.cart_items_id)}>+</button>
+                  <button onClick={() => handleMinus(item.cart_items_id)}>
+                    -
+                  </button>
+                  <input
+                    type="text"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      handleChangeQuantity(item.cart_items_id, e)
+                    }
+                  />
+                  <button onClick={() => handlePlus(item.cart_items_id)}>
+                    +
+                  </button>
                 </div>
+
                 <div className="cart-item-total">
                   {(item.price! * item.quantity).toLocaleString("vi")}₫
-                  <span className="remove-btn">
-                    <i className="fa-solid fa-trash"></i>
+                  <span
+                    className="remove-btn"
+                    onClick={() => handleRemoveItem(item.cart_items_id)}
+                  >
+                    <i className="fa-solid fa-trash text-red-600"></i>
                   </span>
                 </div>
               </div>
@@ -254,6 +204,7 @@ return (
                 Cập Nhật Giỏ Hàng
               </a>
             </div>
+
             <div className="free-shipping-progress">
               <div className="progress-bar">
                 <div
@@ -263,7 +214,6 @@ return (
                   {progressPercent}%
                 </div>
               </div>
-
               <div className="progress-text">
                 {remainingAmount > 0 ? (
                   <>
@@ -276,7 +226,7 @@ return (
                     </p>
                     <p>
                       để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận
-                      giao hàng miễn phí cho đơn hàng
+                      giao hàng miễn phí
                       <br />
                       <span className="target-price">9.000.000₫</span>.
                     </p>
@@ -304,19 +254,20 @@ return (
               <h3>Cộng Giỏ Hàng</h3>
               <div className="summary-row">
                 <span>Tạm tính:</span>
-                <span className="total">7,070,000₫</span>
+                <span className="total">{subtotal.toLocaleString("vi")}₫</span>
               </div>
               <div className="summary-row">
-                <span>Giao hàng:</span>
-                <span>
-                  {subtotal >= FREE_SHIPPING_THRESHOLD ? (
-                    <b>Free Shipping</b>
-                  ) : (
-                    <span>
-                      {shipprice.toLocaleString('vi')}₫
+                {isFreeShipping ? (
+                  <span>Miễn phí vận chuyển</span>
+                ) : (
+                  <>
+                    <span>Giao hàng: </span>
+                    <span className="total">
+                      {shipprice.toLocaleString("vi")}₫
                     </span>
-                  )}
-                </span>
+                    <span> phí vận chuyển</span>
+                  </>
+                )}
               </div>
 
               <p className="shipping-note">
@@ -330,7 +281,9 @@ return (
 
               <div className="summary-row">
                 <span>Tổng:</span>
-                <span className="total">{(subtotal+shipprice).toLocaleString("vi")}₫</span>
+                <span className="total">
+                  {(subtotal + shipprice).toLocaleString("vi")}₫
+                </span>
               </div>
             </div>
 

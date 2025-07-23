@@ -1,45 +1,64 @@
 "use client";
+
 import { IProduct } from "@/types/product";
+import ProductIcons from "./products/ProductIcons";
+
 export default function Product4box(props: any) {
-  let sp = props.sp as IProduct;
+  const sp = props.sp as IProduct;
   if (!sp) return null;
 
+  const productId = sp.products_id ?? sp.products_id;
+
   const averageRating =
-    sp?.reviews?.length > 0
+    sp?.product_reviews?.length > 0
       ? Math.round(
-          sp.reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
-            sp.reviews.length
+          sp.product_reviews.reduce((sum, r) => sum + Number(r.rating), 0) /
+            sp.product_reviews.length
         )
       : 0;
-  const discountPercent = Math.round(
-    ((sp.price - sp.sale_price) / sp.price) * 100
-  );
+
+  const discountPercent =
+    sp.price && sp.sale_price
+      ? Math.round(((sp.price - sp.sale_price) / sp.price) * 100)
+      : 0;
+
   return (
     <>
       <div className="hot-product-card" style={{ width: "230px" }}>
         <div className="hot-product-image">
           <img
-            src={sp.images?.[0]?.url || "/images/placeholder.png"}
-            alt={sp.images?.[0]?.alt_text || sp.name}
+            src={
+              Array.isArray(sp.images) && sp.images.length > 0
+                ? `/images/products/chaybo/${sp.images[0].url}`
+                : "/images/placeholder.png"
+            }
+            alt={
+              Array.isArray(sp.images) && sp.images.length > 0
+                ? sp.images[0].alt_text
+                : sp.name
+            }
           />
 
           <div className="hot-product-icons">
-            <i className="fa-solid fa-heart icon-favorite"></i>
-            <div className="icon-hover-group">
-              <i className="fa-solid fa-eye"></i>
-              <i className="fa-solid fa-list"></i>
-              <i className="fa fa-exchange"></i>
-            </div>
+            <ProductIcons
+              productId={productId}
+              variant_id={sp.product_variants?.[0]?.product_variants_id}
+              price={sp.sale_price}
+            />
           </div>
-          <span className="tag-discount">-{discountPercent}%</span>
+
+          {discountPercent > 0 && (
+            <span className="tag-discount">-{discountPercent}%</span>
+          )}
         </div>
+
         <div className="hot-product-content">
           <div className="hot-product-colors">
             {[
               ...new Map(
-                sp.variants.map((v) => [v.color.id, v.color])
+                (sp.product_variants ?? []).map((v) => [v.color.id, v.color])
               ).values(),
-            ].map((color, index) => (
+            ].map((color) => (
               <span
                 key={color.id}
                 className="color-item"
@@ -51,23 +70,31 @@ export default function Product4box(props: any) {
           </div>
 
           <h4 className="hot-product-title">{sp.name}</h4>
+
           <div className="hot-product-price">
             <span className="price-old">
-              <del>{sp.sale_price}đ</del>
+              <del>{Number(sp.sale_price).toLocaleString("vi")}đ</del>
             </span>
-            <span className="price-new">{sp.price.toLocaleString("vi")}đ</span>
+            <span className="price-new">
+              {Number(sp.price).toLocaleString("vi")}đ
+            </span>
           </div>
+
           <div className="hot-product-progress">
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: "87%" }}>
                 <span className="sold-info">
                   Đã bán{" "}
-                  {sp.variants.reduce((sum, v) => sum + v.stock_quantity, 0)}{" "}
+                  {(sp.product_variants ?? []).reduce(
+                    (sum, v) => sum + (v.stock_quantity || 0),
+                    0
+                  )}{" "}
                   sản phẩm
                 </span>
               </div>
             </div>
           </div>
+
           <div className="hot-product-rating">
             {Array.from({ length: 5 }, (_, index) =>
               index < averageRating ? (

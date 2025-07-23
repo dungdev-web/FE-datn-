@@ -29,34 +29,36 @@ export async function loginUser(
     return { token: "mock-token-123", user };
   }
   const res = await fetch(`${API_BASE_URL}/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(credentials), // Không typo: credentialss ❌
-  credentials: "include", // Chỉ cần nếu dùng cookie/session
-});
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials), // Không typo: credentialss ❌
+    credentials: "include", // Chỉ cần nếu dùng cookie/session
+  });
 
-const data = await res.json();
+  const data = await res.json();
 
-if (!res.ok) {
-  const errorMessage = data.error || data.message || "Đăng nhập thất bại";
-  throw new Error(errorMessage);
-}
+  if (!res.ok) {
+    const errorMessage = data.error || data.message || "Đăng nhập thất bại";
+    throw new Error(errorMessage);
+  }
 
-// Lưu token nếu dùng JWT
-// localStorage.setItem("token", data.token);
+  // Lưu token nếu dùng JWT
+  // localStorage.setItem("token", data.token);
 
-return data;
-
+  return data;
 }
 // --------- LOGIN GOOGLE -------
-export async function loginWithGoogle(): Promise<{ message: string; user: IUser }> {
+export async function loginWithGoogle(): Promise<{
+  message: string;
+  user: IUser;
+}> {
   const users = getMockUsers();
 
   // Giả lập thông tin Google trả về
   const googleEmail = "user.google@gmail.com";
   const googleName = "Google User";
 
-  let user = users.find(u => u.email === googleEmail);
+  let user = users.find((u) => u.email === googleEmail);
 
   if (!user) {
     // Nếu chưa có, tạo mới user
@@ -82,8 +84,8 @@ export async function loginWithGoogle(): Promise<{ message: string; user: IUser 
 // --------- CHECKTOKEN ---------
 export async function checkToken(): Promise<{ user: IUser } | null> {
   const res = await fetch(`${API_BASE_URL}/check-token`, {
-    method: 'GET',
-    credentials: 'include'
+    method: "GET",
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -111,7 +113,7 @@ export async function logoutUser(): Promise<{ message: string }> {
     const errorMessage = data.error || data.message || "Đăng xuất thất bại";
     throw new Error(errorMessage);
   }
-  localStorage.removeItem("token")
+  localStorage.removeItem("token");
   const data = await res.json();
   return data;
 }
@@ -268,7 +270,7 @@ export async function resetPassword(
     }
 
     user.password_hash = newPassword;
-    user.updated_at = new Date().toISOString();
+    user.updated_at = new Date();
     delete user.reset_otp;
     delete user.otp_created_at;
 

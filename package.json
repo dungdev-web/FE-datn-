@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 3001",
-    "build": "next build",
+    "build": "npm install --legacy-peer-deps && next build",
     "start": "next start -p 3001",
     "lint": "next lint"
   },
@@ -15,6 +15,8 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
+    "@react-three/drei": "^10.5.0",
+    "@react-three/fiber": "^9.2.0",
     "@yaireo/tagify": "^4.35.1",
     "bootstrap": "^5.3.6",
     "chart": "^0.1.2",
@@ -39,10 +41,13 @@
     "react-phone-input-2": "^2.15.1",
     "react-toastify": "^11.0.5",
     "sweetalert2": "^11.6.13",
-    "swiper": "^11.2.6"
+    "swiper": "^11.2.10",
+    "three": "^0.178.0",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

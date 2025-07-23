@@ -32,7 +32,7 @@ export interface IProduct {
     alt_text: string;
     type: string;
   }[];
-  reviews: {
+  product_reviews: {
     product_reviews_id: number;
     rating: string;
     content: string;
@@ -41,7 +41,7 @@ export interface IProduct {
       avatar: string;
     };
   }[];
-  variants: {
+  product_variants: {
     product_variants_id: number;
     sku: string;
     stock_quantity: number;
@@ -49,11 +49,37 @@ export interface IProduct {
       id: number;
       code_color: string;
       name_color: string;
-      image: string;
+      images: string;
     };
     size: {
       id: number;
       number_size: string;
     };
   }[];
+}
+export interface IReview {
+  product_reviews_id: number;
+  user_id: number;
+  product_id: number;
+  rating: number;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  user: {
+    user_id: number;
+    name: string;
+    avatar: string;
+  };
+}
+export interface IReviewPayload {
+  user_id: number;
+  rating: number;
+  content: string;
+}
+export interface ICompareProduct{
+  product_compare_id:number;
+  user_id:number;
+  created_at:Date;
+  product:IProduct;
+  
 }

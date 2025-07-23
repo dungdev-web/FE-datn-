@@ -58,7 +58,7 @@ const defaultProducts: IProduct[] = [
       },
     ],
 
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 1001,
         rating: "5",
@@ -79,7 +79,7 @@ const defaultProducts: IProduct[] = [
       },
     ],
 
-    variants: [
+    product_variants: [
       {
         product_variants_id: 201,
         sku: "CV-RSM-BLK-40",
@@ -88,7 +88,7 @@ const defaultProducts: IProduct[] = [
           id: 301,
           code_color: "#000000",
           name_color: "Đen",
-          image: "/images/products/chaybo/ConverseRunStarMotion.webp",
+          images: "/images/products/chaybo/ConverseRunStarMotion.webp",
         },
         size: {
           id: 401,
@@ -103,7 +103,7 @@ const defaultProducts: IProduct[] = [
           id: 301,
           code_color: "#000000",
           name_color: "Đen",
-          image: "/images/products/chaybo/ConverseRunStarMotion.webp",
+          images: "/images/products/chaybo/ConverseRunStarMotion.webp",
         },
         size: {
           id: 402,
@@ -118,7 +118,7 @@ const defaultProducts: IProduct[] = [
           id: 302,
           code_color: "#FFFFFF",
           name_color: "Trắng",
-          image: "/images/products/chaybo/ConverseRunStarMotion_white.webp",
+          images: "/images/products/chaybo/ConverseRunStarMotion_white.webp",
         },
         size: {
           id: 403,
@@ -156,7 +156,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 2001,
         rating: "5",
@@ -185,7 +185,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 203,
         sku: "NK-PEG-GRN-42",
@@ -194,7 +194,8 @@ const defaultProducts: IProduct[] = [
           id: 303,
           code_color: "#00FF00",
           name_color: "Xanh lá",
-          image: "/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp",
+
+          images: "/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp",
         },
         size: { id: 403, number_size: "42" },
       },
@@ -206,7 +207,7 @@ const defaultProducts: IProduct[] = [
           id: 304,
           code_color: "#0000FF",
           name_color: "Xanh dương",
-          image: "/images/products/chaybo/AirJordanDMP1Retro(xanhduong).webp",
+          images: "/images/products/chaybo/AirJordanDMP1Retro(xanhduong).webp",
         },
         size: { id: 402, number_size: "41" },
       },
@@ -238,7 +239,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 3001,
         rating: "5",
@@ -258,7 +259,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 204,
         sku: "AD-UB22-BLU-43",
@@ -267,7 +268,8 @@ const defaultProducts: IProduct[] = [
           id: 304,
           code_color: "#FFFF00",
           name_color: "màu vàng",
-          image: "/images/products/chaybo/GiàyNamAirJordan14Retro(vang).webp",
+          images: "/images/products/chaybo/GiàyNamAirJordan14Retro(vang).webp",
+
         },
         size: { id: 404, number_size: "43" },
       },
@@ -279,7 +281,7 @@ const defaultProducts: IProduct[] = [
           id: 305,
           code_color: "#008000",
           name_color: "Xanh lá",
-          image: "/images/products/chaybo/GiàyNamAirJordan14Retro(xanhlam).webp",
+          images: "/images/products/chaybo/GiàyNamAirJordan14Retro(xanhlam).webp",
         },
         size: { id: 406, number_size: "41" },
        
@@ -292,7 +294,7 @@ const defaultProducts: IProduct[] = [
           id: 306,
           code_color: "#FF0000",
           name_color: "Màu đỏ",
-          image: "/images/products/chaybo/GiàyNamAirJordan14Retro(do).webp",
+          images: "/images/products/chaybo/GiàyNamAirJordan14Retro(do).webp",
         },
         size: { id: 405, number_size: "43" },
       },
@@ -324,7 +326,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -344,16 +346,17 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
         stock_quantity: 12,
         color: {
           id: 305,
+
           code_color: "#FFFF00",
           name_color: "Màu vàng",
-          image: "/images/products/chaybo/NeumelGRAYBROWNSnow(vang).webp",
+          images: "/images/products/chaybo/NeumelGRAYBROWNSnow(vang).webp",
         },
         size: { id: 405, number_size: "40" },
       },
@@ -365,7 +368,7 @@ const defaultProducts: IProduct[] = [
           id: 306,
           code_color: "#0000FF",
           name_color: "Xanh dương",
-          image: "/images/products/chaybo/NeumelGRAYBROWNSnow(xanhduong).webp",
+          images: "/images/products/chaybo/NeumelGRAYBROWNSnow(xanhduong).webp",
         },
         size: { id: 405, number_size: "40" },
       },
@@ -377,7 +380,7 @@ const defaultProducts: IProduct[] = [
           id: 307,
           code_color: "#FF0000",
           name_color: "Màu đỏ",
-          image: "/images/products/chaybo/NeumelGRAYBROWNSnow(do).webp",
+          images: "/images/products/chaybo/NeumelGRAYBROWNSnow(do).webp",
         },
         size: { id: 407, number_size: "40" },
       },
@@ -409,7 +412,7 @@ const defaultProducts: IProduct[] = [
         type: "thumbnail",
       },
     ],
-    reviews: [  
+    product_reviews: [  
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -429,16 +432,17 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
         stock_quantity: 12,
         color: {
           id: 305,
+
           code_color: "#FFFF00",
           name_color: "Màu hồng",
-          image: "/images/products/chaybo/GiàyNamNikeAirMax(hong).webp",
+          images: "/images/products/chaybo/GiàyNamNikeAirMax(hong).webp",
         },
         size: { id: 405, number_size: "40" },
       },
@@ -450,7 +454,7 @@ const defaultProducts: IProduct[] = [
           id: 306,
           code_color: "#0000FF",
           name_color: "Màu xanh dương",
-          image: "/images/products/chaybo/GiàyNamNikeAirMax(xanhduong).webp",
+          images: "/images/products/chaybo/GiàyNamNikeAirMax(xanhduong).webp",
         },
         size: { id: 405, number_size: "40" },
       },
@@ -462,7 +466,7 @@ const defaultProducts: IProduct[] = [
           id: 307,
           code_color: "#008000",
           name_color: "Màu xanh lá",
-          image: "/images/products/chaybo/GiàyNamNikeAirMax(xanhlam).webp",
+          images: "/images/products/chaybo/GiàyNamNikeAirMax(xanhlam).webp",
         },
         size: { id: 405, number_size: "40" },
       },
@@ -479,8 +483,8 @@ function normalizeProduct(p: any): IProduct {
     price: p.price,
     sale_price: p.sale_price,
     description: p.description,
-    variants: p.variants || [],
-    reviews: p.reviews || [],
+    product_variants: p.variants || [],
+    product_reviews: p.reviews || [],
   };
 }
 

@@ -20,6 +20,7 @@ export default function Account() {
         //   console.error("Token không tồn tại");
         //   return;
         // }
+        const token = document.cookie
         const tokenData = await checkToken();
 
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");

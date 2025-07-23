@@ -10,6 +10,8 @@ export interface IUser {
   role: string | "customer" | "admin";
   created_at: Date;
   updated_at: Date;
+  reset_otp?: string;
+  otp_created_at?: string | Date | null;
 }
 export interface StoredUser {
   token: string | null;
@@ -17,9 +19,5 @@ export interface StoredUser {
 
 export interface UserData {
   token: string;
-  user: {
-    userId: string;
-    username: string;
-    email: string;
-  };
+  user: IUser;
 }

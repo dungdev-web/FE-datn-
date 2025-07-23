@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import productSale from "../component/product_sale";
 import ProductSale from "../component/product_sale";
 
 export default function SalePage() {
@@ -52,14 +51,17 @@ export default function SalePage() {
           </h2>
           <p className="!mb-3">Mua sắm ngay tại Tera Shoes</p>
           <div className="grid grid-cols-4 gap-4 bg-white text-black rounded-lg !px-6 !py-2 !mb-3 max-w-md mx-auto">
-            {["days", "hours", "minutes", "seconds"].map((key, i) => (
-              <div key={i}>
-                <div className="text-3xl font-bold">{timeLeft[key]}</div>
-                <div className="text-sm">
-                  {["Ngày", "Giờ", "Phút", "Giây"][i]}
-                </div>
-              </div>
-            ))}
+            {(["days", "hours", "minutes", "seconds"] as (keyof typeof timeLeft)[]).map(
+  (key, i) => (
+    <div key={i}>
+      <div className="text-3xl font-bold">{timeLeft[key]}</div>
+      <div className="text-sm">
+        {["Ngày", "Giờ", "Phút", "Giây"][i]}
+      </div>
+    </div>
+  )
+)}
+
           </div>
           <button className="bg-[#021688] hover:bg-[#021688]/80 text-white !px-12 !py-1 font-semibold">
             MUA SẮM NGAY

@@ -7,6 +7,7 @@ import "./css/product.css";
 import Header from "./component/header";
 import Footer from "./component/footer";
 import ButtonToTop from "./component/ButtonToTop";
+import { CompareProvider } from "./component/product_compare/compare_context";
 import { LoaderProvider } from "./component/LinkWithLoader";
 export default function RootLayout({
   children,
@@ -18,10 +19,12 @@ export default function RootLayout({
       <body>
         <div className="container">
           <LoaderProvider>
-            <Header/>
-           {children}
-            <Footer></Footer>
-            <ButtonToTop />
+            <CompareProvider>
+              <Header />
+              {children}
+              <Footer></Footer>
+              <ButtonToTop />
+            </CompareProvider>
           </LoaderProvider>
         </div>
       </body>

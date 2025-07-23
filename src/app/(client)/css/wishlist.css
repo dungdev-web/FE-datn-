@@ -13,10 +13,7 @@
     margin-right: auto;
     margin-left: auto;
   }
-.row {
-  margin-right: -15px;
-  margin-left: -15px;
-}
+
 .row::after {
   clear: both;
 }
@@ -82,5 +79,19 @@
 
   .hover-icons {
     display: none !important;
+  }
+}
+
+
+/* Mobile hiển thị, desktop ẩn */
+@media (max-width: 768px) {
+  .product-grid-wishlist {
+    display: none;
+  }
+
+  .product-grid-wishlist-list {
+    display: grid;
+    grid-template-columns: 1fr; /* hoặc 2 cột tuỳ thiết kế */
+    gap: 10px;
   }
 }
