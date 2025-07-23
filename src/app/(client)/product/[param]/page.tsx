@@ -150,6 +150,7 @@ export default function Detail() {
     const fetchData = async () => {
       const data = await getBestSellingMockProducts(5);
       setBestSellProducts(data);
+      console.log("Product images:", data);
     };
 
     fetchData();
@@ -434,23 +435,22 @@ export default function Detail() {
 
                               const imageUrl =
                                 colorImage || fallbackImage || "logo/1.png";
+                              const fullImageUrl = `/images/products/chaybo/${imageUrl}`;
 
                               return (
                                 <div
                                   key={index}
                                   className={`space-item-tsn tns-item tns-slide-active ${
-                                    selectedImage === imageUrl ? "active" : ""
+                                    selectedImage === fullImageUrl
+                                      ? "active"
+                                      : ""
                                   }`}
-                                  onClick={() =>
-                                    setSelectedImage(
-                                      `/images/products/chaybo/${imageUrl}`
-                                    )
-                                  }
+                                  onClick={() => setSelectedImage(fullImageUrl)}
                                   style={{ cursor: "pointer" }}
                                 >
                                   <div className="item">
                                     <img
-                                      src={`/images/products/chaybo/${imageUrl}`}
+                                      src={fullImageUrl}
                                       className="img-responsive"
                                       alt={`${product.name} - ${
                                         variant.color?.name_color || ""
@@ -533,28 +533,48 @@ export default function Detail() {
                                 .filter((v) => v?.color?.code_color)
                                 .map((v) => [v.color.code_color, v.color])
                             ).values(),
-                          ].map((color) => (
-                            <div
-                              key={color.id}
-                              className="color-circle"
-                              onClick={() => {
-                                setSelectedColorId(color.id);
-                                setSelectedSizeId(null);
-                              }}
-                              style={{
-                                backgroundColor: color.code_color,
-                                width: 24,
-                                height: 24,
-                                borderRadius: "50%",
-                                border:
-                                  selectedColorId === color.id
-                                    ? "2px solid #facc15"
-                                    : "1px solid #ccc",
-                                cursor: "pointer",
-                              }}
-                              title={color.name_color}
-                            ></div>
-                          ))}
+                          ].map((color) => {
+                            return (
+                              <div
+                                key={color.id}
+                                className="color-circle"
+                                onClick={() => {
+                                  setSelectedColorId(color.id);
+                                  setSelectedSizeId(null);
+
+                                  // Tìm variant theo màu đã chọn
+                                  const matchedVariant =
+                                    product.product_variants.find(
+                                      (v) => v.color?.id === color.id
+                                    );
+
+                                  // Ưu tiên ảnh theo màu, nếu không có thì fallback ảnh phụ
+                                  const imageUrl =
+                                    matchedVariant?.color?.images ||
+                                    product.images?.find(
+                                      (img) => img.type === "side"
+                                    )?.url ||
+                                    "logo/1.png";
+
+                                  setSelectedImage(
+                                    `/images/products/chaybo/${imageUrl}`
+                                  );
+                                }}
+                                style={{
+                                  backgroundColor: color.code_color,
+                                  width: 24,
+                                  height: 24,
+                                  borderRadius: "50%",
+                                  border:
+                                    selectedColorId === color.id
+                                      ? "2px solid #facc15"
+                                      : "1px solid #ccc",
+                                  cursor: "pointer",
+                                }}
+                                title={color.name_color}
+                              ></div>
+                            );
+                          })}
                         </div>
                       </div>
 
@@ -1025,7 +1045,11 @@ export default function Detail() {
                             title={product.name}
                           >
                             <img
-                              src={product.images?.[0]?.url || "/default.jpg"}
+                              src={
+                                product.images?.[0]?.url
+                                  ? `/images/products/chaybo/${product.images[0].url}`
+                                  : "/default.jpg"
+                              }
                               alt={
                                 product.images?.[0]?.alt_text || product.name
                               }
@@ -1233,7 +1257,9 @@ export default function Detail() {
                               >
                                 <img
                                   src={
-                                    product.images?.[0]?.url || "/default.jpg"
+                                    product.images?.[0]?.url
+                                      ? `/images/products/chaybo/${product.images[0].url}`
+                                      : "/default.jpg"
                                   }
                                   alt={
                                     product.images?.[0]?.alt_text ||
