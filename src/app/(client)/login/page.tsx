@@ -4,11 +4,11 @@ import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
 import { Eye, EyeOff } from "lucide-react";
 import { validateField } from "@/hooks/validate_login_register";
 import Link from "next/link";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -78,8 +78,8 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
         setShowLoader(false);
         toast.success("Đăng nhập thành công!");
         window.location.href = "/account";
-      }, 7000);
-      router.refresh(); // <-- ép Next.js fetch lại dữ liệu của toàn bộ Server Components / Client layout
+      }, 2000);
+      router.refresh();
 
       return () => clearTimeout(timer);
     }
@@ -172,8 +172,6 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
 
               <button type="submit">Đăng nhập ngay</button>
             </form>
-
-            <Toaster position="bottom-right" />
 
             {showLoader && (
               <div className="loader-overlay">

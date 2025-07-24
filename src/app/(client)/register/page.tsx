@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { registerUser } from "@/services/authService";
-import toast, { Toaster } from "react-hot-toast";
 import "../css/login.css";
 import { validateField } from "@/hooks/validate_login_register";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -164,7 +164,6 @@ export default function Register() {
             <button type="submit">Đăng kí ngay</button>
           </form>
 
-          <Toaster position="bottom-right" />
 
           <h3>Hoặc</h3>
 
