@@ -10,6 +10,7 @@ import ButtonToTop from "./component/ButtonToTop";
 import { CompareProvider } from "./component/product_compare/compare_context";
 import { LoaderProvider } from "./component/LinkWithLoader";
 import ContactFloatingButton from "./component/ContactFloatingButton";
+import { ToastContainer } from "react-toastify";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +30,7 @@ export default function RootLayout({
             </CompareProvider>
           </LoaderProvider>
         </div>
+        <ToastContainer position="top-right" autoClose={2000} />
       </body>
     </html>
   );

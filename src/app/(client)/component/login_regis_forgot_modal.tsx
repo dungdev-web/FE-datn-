@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { loginUser } from "@/services/authService";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
+import { toast } from "react-toastify";
 
 export default function LoginMenu({
   isOpen,
@@ -120,7 +120,6 @@ export default function LoginMenu({
                     </button>
                   </div>
                 </form>
-                <Toaster position="bottom-right" />
                 {showLoader && (
                   <div className="loader-overlay">
                     <Loader />

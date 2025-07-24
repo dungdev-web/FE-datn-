@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { sendContactToAdmin, sendConfirmationToUser } from "@/services/contactService";
 import Swal from "sweetalert2";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -107,7 +107,6 @@ export default function Contact() {
           </div>
         </div>
       </main>
-      <Toaster position="top-right" reverseOrder={false} />
     </>
   );
 }
