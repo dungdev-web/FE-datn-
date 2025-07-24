@@ -90,7 +90,7 @@ export default function Contact() {
         <div className="contact-us">
           <div className="contact-left">
             <h3>Liên hệ</h3>
-            <p>Địa chỉ: 1371 Phan Văn Trị, Phường 10, Gò Vấp, Hồ Chí Minh</p>
+            <p>Địa chỉ: QTSC Building 1, Đ. Quang Trung, Tân Hưng Thuận, Hóc Môn, Hồ Chí Minh, Việt Nam</p>
             <p>
               Điện thoại: <span>0338538203</span>
             </p>
