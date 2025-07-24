@@ -1059,7 +1059,7 @@ export default function Detail() {
                         <div className="product-info-text">
                           <h3 className="product-name">
                             <a
-                              href={`/product${product.slug}`}
+                              href={`/product/${product.slug}`}
                               title={product.name}
                             >
                               {product.name}
