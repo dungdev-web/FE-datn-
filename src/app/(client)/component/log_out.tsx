@@ -19,6 +19,7 @@ export default function LogoutLink() {
 
       toast.success(result.message || "Đăng xuất thành công!");
       router.push("/login");
+      
     } catch (error: any) {
       toast.error(error.message || "Đăng xuất thất bại");
     }
