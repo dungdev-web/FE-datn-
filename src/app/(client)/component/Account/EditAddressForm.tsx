@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { addAddressService, updateAddress } from "@/services/addressService";
+import { toast } from "react-toastify";
 
 type AddressFormData = {
+  id?: number;
   full_name: string;
   phone: string;
   address_line_part: string;
@@ -12,6 +15,7 @@ type AddressFormData = {
   ward: string;
   is_default: boolean;
   address_line?: string;
+  user_id?: number;
 };
 
 type Province = { name: string; code: number };
@@ -22,17 +26,20 @@ type Props = {
   initialData: AddressFormData;
   onClose: () => void;
   onSubmit: (data: AddressFormData) => void;
+  mode: "add" | "edit";
 };
 
 export default function EditAddressForm({
   initialData,
   onClose,
   onSubmit,
+  mode,
 }: Props) {
   const [formData, setFormData] = useState<AddressFormData>(initialData);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
@@ -64,7 +71,7 @@ export default function EditAddressForm({
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const target = e.target;
     const { name, value, type } = target;
     const checked = type === "checkbox" ? target.checked : undefined;
 
@@ -76,13 +83,40 @@ export default function EditAddressForm({
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
-    onSubmit({
-      ...formData,
+
+    const dataToSubmit = {
+      user_id: 8,
+      full_name: formData.full_name,
+      phone: formData.phone,
       address_line: fullAddress,
-    });
+      is_default: formData.is_default ?? false,
+    };
+
+    try {
+      setLoading(true);
+
+      if (mode === "add") {
+        await addAddressService(dataToSubmit);
+        toast.success("Thêm địa chỉ thành công!");
+      } else if (formData.id) {
+        await updateAddress(formData.id, dataToSubmit);
+        toast.success("Cập nhật địa chỉ thành công!");
+      } else {
+        toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
+        return;
+      }
+
+      onSubmit(formData); // giữ nguyên, hoặc truyền lại bản đã chuẩn hóa nếu cần
+      onClose();
+    } catch (error: any) {
+      toast.error(error.message || "Có lỗi xảy ra");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -96,10 +130,11 @@ export default function EditAddressForm({
       </button>
 
       <h2 className="text-xl font-semibold !mb-6 text-center">
-        Chỉnh sửa địa chỉ
+        {mode === "add" ? "Thêm địa chỉ mới" : "Chỉnh sửa địa chỉ"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Các input giống cũ giữ nguyên */}
         <div>
           <label className="block text-sm font-medium mb-1">Họ tên</label>
           <input
@@ -108,10 +143,8 @@ export default function EditAddressForm({
             className="w-full border border-gray-300 rounded !px-3 !py-2"
             value={formData.full_name}
             onChange={handleChange}
-            required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">
             Số điện thoại
@@ -122,10 +155,8 @@ export default function EditAddressForm({
             className="w-full border border-gray-300 rounded !px-3 !py-2"
             value={formData.phone}
             onChange={handleChange}
-            required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">
             Địa chỉ cụ thể (số nhà, đường)
@@ -136,10 +167,8 @@ export default function EditAddressForm({
             className="w-full border border-gray-300 rounded !px-3 !py-2"
             value={formData.address_line_part}
             onChange={handleChange}
-            required
           />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">Quốc gia</label>
           <select
@@ -154,6 +183,7 @@ export default function EditAddressForm({
           </select>
         </div>
 
+        {/* Tỉnh - Huyện - Xã */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -173,7 +203,6 @@ export default function EditAddressForm({
               ))}
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">
               Quận / Huyện
@@ -193,7 +222,6 @@ export default function EditAddressForm({
               ))}
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">
               Phường / Xã
@@ -236,9 +264,14 @@ export default function EditAddressForm({
           </button>
           <button
             type="submit"
+            disabled={loading}
             className="!px-4 !py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Cập nhật địa chỉ
+            {loading
+              ? "Đang xử lý..."
+              : mode === "add"
+              ? "Thêm địa chỉ"
+              : "Cập nhật địa chỉ"}
           </button>
         </div>
       </form>
