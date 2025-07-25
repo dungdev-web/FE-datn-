@@ -36,6 +36,43 @@ export default function Product() {
   const [totalPages, setTotalPages] = useState(1);
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
+    undefined
+  );
+  const handleSortChange = (type: string) => {
+    switch (type) {
+      case "A → Z":
+        setSortBy("name");
+        setSortOrder("asc");
+        break;
+      case "Z → A":
+        setSortBy("name");
+        setSortOrder("desc");
+        break;
+      case "Giá tăng dần":
+        setSortBy("price");
+        setSortOrder("asc");
+        break;
+      case "Giá giảm dần":
+        setSortBy("price");
+        setSortOrder("desc");
+        break;
+      case "Hàng mới nhất":
+        setSortBy("created_at");
+        setSortOrder("desc");
+        break;
+      case "Hàng cũ nhất":
+        setSortBy("created_at");
+        setSortOrder("asc");
+        break;
+      default:
+        setSortBy(undefined);
+        setSortOrder(undefined);
+    }
+
+    setPage(1); // reset lại trang đầu tiên khi sort
+  };
 
   const [selectedPriceRange, setSelectedPriceRange] = useState<{
     min: number;
@@ -81,7 +118,6 @@ export default function Product() {
   };
   const handleGenderChange = (gender: string) => {
     setSelectedGender(gender);
-   
   };
 
   const toggleSidebar = () => {
@@ -96,6 +132,14 @@ export default function Product() {
   const toggleCategory = (id: number) => {
     setOpenCategoryId(openCategoryId === id ? null : id);
   };
+
+  function onProductsChange(
+    products: any[],
+    total: number,
+    totalPages: number
+  ): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <>
@@ -153,6 +197,8 @@ export default function Product() {
                   setTotal(total);
                   setTotalPages(totalPages);
                 }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
               />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
@@ -210,27 +256,27 @@ export default function Product() {
                             <li>
                               <span className="val">Mặc định</span>
                               <ul className="ul_2">
-                                <li>
-                                  <a href="#">Mặc định</a>
-                                </li>
-                                <li>
-                                  <a href="#">A → Z</a>
-                                </li>
-                                <li>
-                                  <a href="#">Z → A</a>
-                                </li>
-                                <li>
-                                  <a href="#">Giá tăng dần</a>
-                                </li>
-                                <li>
-                                  <a href="#">Giá giảm dần</a>
-                                </li>
-                                <li>
-                                  <a href="#">Hàng mới nhất</a>
-                                </li>
-                                <li>
-                                  <a href="#">Hàng cũ nhất</a>
-                                </li>
+                                {[
+                                  "Mặc định",
+                                  "A → Z",
+                                  "Z → A",
+                                  "Giá tăng dần",
+                                  "Giá giảm dần",
+                                  "Hàng mới nhất",
+                                  "Hàng cũ nhất",
+                                ].map((option) => (
+                                  <li key={option}>
+                                    <a
+                                      href="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSortChange(option);
+                                      }}
+                                    >
+                                      {option}
+                                    </a>
+                                  </li>
+                                ))}
                               </ul>
                             </li>
                           </ul>
@@ -548,6 +594,18 @@ export default function Product() {
         handleBrandCheckboxChange={handleBrandCheckboxChange}
         selectedGender={selectedGender}
         handleGenderChange={handleGenderChange}
+        selectedPriceRange={selectedPriceRange}
+        handlePriceChange={handlePriceChange}
+        searchKeyword={keyword}
+        currentPage={page}
+        limit={productsPerPage}
+        onProductsChange={(products, total, totalPages) => {
+          setProducts(products);
+          setTotal(total);
+          setTotalPages(totalPages);
+        }}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
       />
     </>
   );

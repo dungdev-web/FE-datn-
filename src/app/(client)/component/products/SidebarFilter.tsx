@@ -18,13 +18,15 @@ interface Props {
   selectedPriceRange: { min: number; max: number } | null;
   handlePriceChange: (range: { min: number; max: number } | null) => void;
   searchKeyword?: string;
-  currentPage: number; 
+  currentPage: number;
   limit?: number;
   onProductsChange: (
     products: any[],
     total: number,
     totalPages: number
   ) => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 export default function SidebarFilter({
@@ -42,6 +44,8 @@ export default function SidebarFilter({
   currentPage,
   limit = 12,
   onProductsChange,
+  sortBy, // <-- dùng props
+  sortOrder, // <-- dùng props
 }: Props) {
   // Hàm gọi API lọc
   const applyFilters = async () => {
@@ -57,18 +61,18 @@ export default function SidebarFilter({
       maxPrice: selectedPriceRange?.max,
       page: currentPage,
       limit,
-      sortBy: "price",
-      sortOrder: "asc" as "asc" | "desc",
+      sortBy,
+      sortOrder,
     };
 
     console.log("🔍 Dữ liệu lọc gửi đến API:", params);
 
     try {
       const res = await getFilteredProducts(params);
-      console.log("🧾 Danh sách sản phẩm trả về:", res.products); // ✅ Log sản phẩm
+      console.log("Danh sách sản phẩm trả về:", res.products); 
       onProductsChange(res.products, res.total, res.totalPages);
     } catch (error) {
-      console.error("❌ Lỗi khi lọc sản phẩm:", error);
+      console.error("Lỗi khi lọc sản phẩm:", error);
     }
   };
 
@@ -81,6 +85,8 @@ export default function SidebarFilter({
     selectedPriceRange,
     searchKeyword,
     currentPage,
+    sortBy,
+    sortOrder, // <-- thêm vào đây
   ]);
 
   return (
