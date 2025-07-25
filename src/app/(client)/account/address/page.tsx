@@ -10,9 +10,11 @@ import {
   addAddressService,
   updateAddress,
   getAddressByUserId,
+  deleteAddress,
 } from "@/services/addressService";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 const initialAddress = {
   full_name: "",
@@ -132,6 +134,30 @@ export default function Address() {
       toast.error("Lỗi khi lưu địa chỉ: " + error.message);
     }
   };
+  const handleDelete = async (addressId?: number) => {
+    if (!addressId) return;
+
+    const result = await Swal.fire({
+      title: "Bạn có chắc chắn?",
+      text: "Địa chỉ này sẽ bị xoá và không thể khôi phục!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Xoá",
+      cancelButtonText: "Huỷ",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await deleteAddress(addressId);
+      setAddressList((prev) => prev.filter((addr) => addr.id !== addressId));
+      Swal.fire("Đã xoá!", "Địa chỉ đã được xoá thành công.", "success");
+    } catch (error: any) {
+      Swal.fire("Lỗi!", "Xoá địa chỉ thất bại: " + error.message, "error");
+    }
+  };
 
   const handleAddClick = () => {
     setFormMode("add");
@@ -243,6 +269,13 @@ export default function Address() {
                               }}
                             >
                               Chỉnh sửa địa chỉ
+                            </button>
+                            <button
+                              className="btn-edit-addr btn btn-danger btn-delete ml-2"
+                              type="button"
+                              onClick={() => handleDelete(address.id)}
+                            >
+                              Xoá địa chỉ
                             </button>
                           </p>
                         </div>

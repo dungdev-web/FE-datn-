@@ -91,3 +91,27 @@ export async function addAddressService(data: {
 
   return result;
 }
+export async function deleteAddress(addressId: number): Promise<any> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      console.error("[FE Service] Lỗi deleteAddress:", errorData);
+      throw new Error(errorData?.message || "Xoá địa chỉ thất bại");
+    }
+
+    const data = await res.json();
+    console.log("[FE Service] Xoá địa chỉ thành công:", data);
+    return data;
+  } catch (error: any) {
+    console.error("[FE Service] Lỗi deleteAddress:", error);
+    throw new Error(error?.message || "Lỗi không xác định khi xoá địa chỉ");
+  }
+}
