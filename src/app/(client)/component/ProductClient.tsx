@@ -33,63 +33,30 @@ export default function Product() {
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
-  const totalPages = Math.ceil(total / productsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
+
   const [selectedPriceRange, setSelectedPriceRange] = useState<{
     min: number;
     max: number;
   } | null>(null);
+  // Lấy danh sách brand + category
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [fetchedBrands, fetchedCategories] = await Promise.all([
+        const [brands, categories] = await Promise.all([
           getBrands(),
           getCategories(),
         ]);
-        setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
-        setCategories(
-          Array.isArray(fetchedCategories) ? fetchedCategories : []
-        );
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu ban đầu:", error);
+        setBrandsList(brands || []);
+        setCategories(categories || []);
+      } catch (err) {
+        console.error("❌ Lỗi khi lấy dữ liệu brand/category:", err);
       }
     };
-
     fetchInitialData();
   }, []);
-  // Gộp toàn bộ điều kiện lọc sản phẩm vào 1 useEffect duy nhất
-  useEffect(() => {
-    const fetchFilteredProducts = async () => {
-      try {
-        let result: IProduct[] = [];
-
-        if (selectedGender) {
-          result = await getProductsByGender(selectedGender);
-        } else if (selectedBrandIds.length > 0) {
-          for (const id of selectedBrandIds) {
-            const brandProducts = await getProductsByBrandId(id);
-            result = [...result, ...brandProducts];
-          }
-        } else if (brandId) {
-          result = await getProductsByBrandId(brandId);
-        } else {
-          const res = await getAllProducts(page, productsPerPage);
-          result = res.data;
-          setTotal(res.total); // Chỉ getAllProducts có total
-        }
-
-        setProducts(result);
-        if (selectedGender || selectedBrandIds.length > 0 || brandId) {
-          setTotal(result.length);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lọc sản phẩm:", error);
-      }
-    };
-
-    fetchFilteredProducts();
-  }, [selectedGender, selectedBrandIds, brandId, page, viewMode]);
 
   // --- HANDLERS ---
   useEffect(() => {
@@ -106,20 +73,15 @@ export default function Product() {
     fetchSearch();
   }, [keyword]);
   const handleBrandCheckboxChange = (brandId: number) => {
-    setSelectedBrandIds((prev) =>
-      prev.includes(brandId)
-        ? prev.filter((id) => id !== brandId)
-        : [...prev, brandId]
-    );
+    setSelectedBrandIds((prev) => (prev[0] === brandId ? [] : [brandId]));
   };
   const handlePriceChange = (range: { min: number; max: number } | null) => {
     setSelectedPriceRange(range);
     setPage(1);
   };
-
   const handleGenderChange = (gender: string) => {
     setSelectedGender(gender);
-    setSelectedBrandIds([]); // Reset brand khi chọn lại giới tính (tuỳ logic)
+   
   };
 
   const toggleSidebar = () => {
@@ -183,6 +145,14 @@ export default function Product() {
                 handleGenderChange={handleGenderChange}
                 selectedPriceRange={selectedPriceRange}
                 handlePriceChange={handlePriceChange}
+                searchKeyword={keyword}
+                currentPage={page}
+                limit={productsPerPage}
+                onProductsChange={(products, total, totalPages) => {
+                  setProducts(products);
+                  setTotal(total);
+                  setTotalPages(totalPages);
+                }}
               />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
@@ -269,7 +239,7 @@ export default function Product() {
                     </div>
                   </div>
                 </div>
-                {viewMode === "grid" && (
+                {viewMode === "grid" && Array.isArray(products) && (
                   <div className="product-grid">
                     {products.map((sp) => (
                       <div
@@ -284,14 +254,21 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
-                                  "/images/placeholder.png"
+                                  sp.images?.[0]?.url
+                                    ? `/images/products/chaybo/${sp.images[0].url}`
+                                    : "/images/placeholder.png"
                                 }
                                 alt={sp.name}
                               />
                             </Link>
 
-                            <ProductIcons productId={sp.products_id ?? sp.products_id} variant_id={sp.product_variants[0]?.product_variants_id} price={sp.sale_price}/>
+                            <ProductIcons
+                              productId={sp.products_id}
+                              variant_id={
+                                sp.product_variants?.[0]?.product_variants_id
+                              }
+                              price={sp.sale_price}
+                            />
 
                             <span className="discount-tag">
                               -
@@ -304,21 +281,24 @@ export default function Product() {
                             </span>
 
                             <div className="product-colors">
-                              {[
-                                ...new Map(
-                                  sp.product_variants.map((v) => [
-                                    v.color.id,
-                                    v.color,
-                                  ])
-                                ).values(),
-                              ].map((color) => (
-                                <span
-                                  key={color.id}
-                                  className="color"
-                                  data-color={color.name_color}
-                                  style={{ backgroundColor: color.code_color }}
-                                ></span>
-                              ))}
+                              {Array.isArray(sp.product_variants) &&
+                                [
+                                  ...new Map(
+                                    sp.product_variants.map((v) => [
+                                      v.color.id,
+                                      v.color,
+                                    ])
+                                  ).values(),
+                                ].map((color) => (
+                                  <span
+                                    key={color.id}
+                                    className="color"
+                                    data-color={color.name_color}
+                                    style={{
+                                      backgroundColor: color.code_color,
+                                    }}
+                                  ></span>
+                                ))}
                             </div>
 
                             <h4 className="product-title">{sp.name}</h4>
@@ -338,16 +318,14 @@ export default function Product() {
                               <div className="progress-bar">
                                 <div
                                   className="progress-fill"
-                                  style={{
-                                    width: "87%",
-                                  }}
+                                  style={{ width: "87%" }}
                                 >
                                   <span className="sold-info">
                                     Đã bán{" "}
-                                    {sp.product_variants.reduce(
+                                    {sp.product_variants?.reduce(
                                       (sum, v) => sum + v.stock_quantity,
                                       0
-                                    )}{" "}
+                                    ) || 0}{" "}
                                     sản phẩm
                                   </span>
                                 </div>
@@ -378,7 +356,7 @@ export default function Product() {
                   </div>
                 )}
 
-                {viewMode === "list" && (
+                {viewMode === "list" && Array.isArray(products) && (
                   <div className="product-grid-column">
                     {products.map((sp) => (
                       <div
@@ -397,14 +375,21 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
-                                  "/images/placeholder.png"
+                                  sp.images?.[0]?.url
+                                    ? `/images/products/chaybo/${sp.images[0].url}`
+                                    : "/images/placeholder.png"
                                 }
                                 alt={sp.name}
                               />
                             </Link>
 
-                            <ProductIcons productId={sp.products_id ?? sp.products_id}  variant_id={sp.product_variants[0].product_variants_id} price={sp.sale_price} />
+                            <ProductIcons
+                              productId={sp.products_id}
+                              variant_id={
+                                sp.product_variants?.[0]?.product_variants_id
+                              }
+                              price={sp.sale_price}
+                            />
                           </div>
                           <div className="flex flex-col">
                             <span className="discount-tag">
@@ -456,21 +441,24 @@ export default function Product() {
                               )}
                             </div>
                             <div className="product-colors">
-                              {[
-                                ...new Map(
-                                  sp.product_variants.map((v) => [
-                                    v.color.id,
-                                    v.color,
-                                  ])
-                                ).values(),
-                              ].map((color) => (
-                                <span
-                                  key={color.id}
-                                  className="color"
-                                  data-color={color.name_color}
-                                  style={{ backgroundColor: color.code_color }}
-                                ></span>
-                              ))}
+                              {Array.isArray(sp.product_variants) &&
+                                [
+                                  ...new Map(
+                                    sp.product_variants.map((v) => [
+                                      v.color.id,
+                                      v.color,
+                                    ])
+                                  ).values(),
+                                ].map((color) => (
+                                  <span
+                                    key={color.id}
+                                    className="color"
+                                    data-color={color.name_color}
+                                    style={{
+                                      backgroundColor: color.code_color,
+                                    }}
+                                  ></span>
+                                ))}
                             </div>
                           </div>
                         </div>
@@ -478,7 +466,9 @@ export default function Product() {
                     ))}
                   </div>
                 )}
+
                 <div className="pagination">
+                  {/* Previous button */}
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
                     className={`page-btn ${
@@ -489,16 +479,39 @@ export default function Product() {
                     <i className="fa-solid fa-chevron-left"></i>
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i + 1}
-                      onClick={() => setPage(i + 1)}
-                      className={`page-btn ${page === i + 1 ? "active" : ""}`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                  {/* Page numbers with dots */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => {
+                      return (
+                        p === 1 || // Trang đầu
+                        p === totalPages || // Trang cuối
+                        Math.abs(p - page) <= 1 // Trang gần hiện tại
+                      );
+                    })
+                    .reduce((acc: (number | "...")[], curr, i, arr) => {
+                      if (i > 0 && curr - (arr[i - 1] as number) > 1) {
+                        acc.push("...");
+                      }
+                      acc.push(curr);
+                      return acc;
+                    }, [])
+                    .map((p, i) =>
+                      p === "..." ? (
+                        <span key={`dots-${i}`} className="page-btn dots">
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setPage(p)}
+                          className={`page-btn ${page === p ? "active" : ""}`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
 
+                  {/* Next button */}
                   <button
                     onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                     className={`page-btn ${
