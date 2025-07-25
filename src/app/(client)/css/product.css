@@ -290,11 +290,14 @@ a,
   display: flex;
 }
 
-
 .categories-box,
-.aside-filter .filter-container {
+.aside-filter {
   border: 1px solid #cdcdcd;
   border-top: none;
+  border-radius: 5px 5px 0 0;
+}
+.categories-box,
+.aside-filter .filter-container {
   padding: 10px !important;
 }
 .categories-box {
@@ -364,6 +367,7 @@ a,
   font-size: 14px !important;
   font-weight: normal;
 }
+
 label[for] {
   cursor: pointer;
 }
