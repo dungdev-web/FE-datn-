@@ -5,7 +5,7 @@ import "../css/product.css";
 import Link from "next/link";
 import { ICartItem } from "@/types/cart";
 import { useCart } from "@/hooks/useCart";
-
+import { API_BASE_URL } from "@/config/env";
 export default function Cart() {
   const {
     cart,
@@ -148,7 +148,7 @@ export default function Cart() {
                     alt={item.variant?.product.name}
                     src={
                       item.variant?.color.images
-                        ? `/images/products/chaybo/${item.variant.color.images}`
+                        ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
                         : "/images/placeholder.png"
                     }
                     width="80"

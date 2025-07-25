@@ -1,4 +1,5 @@
 "use client";
+import { API_BASE_URL } from "@/config/env";
 import "../css/product_admin.css";
 import Link from "next/link";
 import { useState } from "react";
@@ -103,7 +104,7 @@ export default function Products() {
               <td>VANS VAULT STYLE 36 BLACK</td>
               <td>
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                   alt="Vans"
                   className="product-img"
                 />

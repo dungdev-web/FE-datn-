@@ -16,6 +16,7 @@ import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
 import { searchProducts } from "@/services/productService";
 import ProductIcons from "../component/products/ProductIcons";
+import { API_BASE_URL } from "@/config/env";
 
 export default function Product() {
   const params = useParams();
@@ -288,7 +289,7 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
+                                  `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
@@ -402,7 +403,7 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
+                                  `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}

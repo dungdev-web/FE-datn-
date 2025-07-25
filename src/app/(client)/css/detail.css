@@ -136,7 +136,7 @@ main {
 .zoomWrapper {
   height: auto !important;
   margin: auto;
-  width: auto !important;
+  /* width: auto !important; */
 }
 
 .tns-outer {
@@ -1259,17 +1259,7 @@ a,
   margin-right: -15px;
   margin-left: -15px;
 }
-.categories-box,
-.aside-filter .filter-container {
-  border: 1px solid #cdcdcd;
-  border-top: none;
-  padding: 10px !important;
-}
-.categories-box {
-  background: #fff;
-  padding: 10px 0;
-  margin-bottom: 30px;
-}
+
 ul {
   list-style: none outside;
 }
@@ -1292,16 +1282,7 @@ ul {
   clear: left;
   font-size: 1.07143em;
 }
-.categories-box .lv1 li a {
-  padding-right: 20px;
-}
 
-.categories-box .lv1 li a {
-  font-size: 14px;
-  /* display: block; */
-  padding: 10px 0;
-  line-height: 2.5em;
-}
 a,
 .text-link {
   color: #333;

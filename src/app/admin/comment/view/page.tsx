@@ -10,6 +10,7 @@ import {
   FaCheckCircle,
   FaTimesCircle,
 } from "react-icons/fa";
+import { API_BASE_URL } from "@/config/env";
 
 const mockComment = {
   id: 101,
@@ -95,7 +96,7 @@ export default function CommentDetailPage() {
 
             <div className="flex items-center gap-4 mb-4">
               <img
-                src={`/images/products/chaybo/${comment.product.image}`}
+                src={`${API_BASE_URL}/uploads/${comment.product.image}`}
                 alt={comment.product.name}
                 className="w-24 h-24 rounded object-cover border"
               />
