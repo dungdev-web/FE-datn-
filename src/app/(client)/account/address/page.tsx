@@ -12,6 +12,7 @@ import {
   getAddressByUserId,
 } from "@/services/addressService";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { toast } from "react-toastify";
 
 const initialAddress = {
   full_name: "",
@@ -35,61 +36,65 @@ export default function Address() {
   const { user } = useAuthUser();
   const [showEditForm, setShowEditForm] = useState(false);
   const [formMode, setFormMode] = useState<FormMode>("add");
-  const [addressData, setAddressData] = useState<AddressFormData>(initialAddress);
+  const [addressData, setAddressData] =
+    useState<AddressFormData>(initialAddress);
   const [addressList, setAddressList] = useState<AddressFormData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-  if (!user?.id) return;
+    if (!user || !user.id) return;
 
-  const fetchAddresses = async () => {
-    try {
-      const res = await getAddressByUserId(user.id);
-      const addresses: AddressFormData[] = Array.isArray(res)
-        ? res
-            .filter((item: any) => item.id || item._id)
-            .map((item: any) => ({
-              id: item.id ?? item._id,
-              full_name: item.full_name,
-              phone: item.phone,
-              address_line_part: item.address_line_part ?? "",
-              country: item.country ?? "Vietnam",
-              province: item.province ?? "",
-              district: item.district ?? "",
-              ward: item.ward ?? "",
-              is_default: item.is_default ?? false,
-              address_line: item.address_line ?? "",
-            }))
-        : [];
+    const fetchAddresses = async () => {
+      try {
+        setIsLoading(true);
+        const res = await getAddressByUserId(user.id);
+        const addresses: AddressFormData[] = Array.isArray(res)
+          ? res
+              .filter((item: any) => item.ship_address_id)
+              .map((item: any) => ({
+                id: item.ship_address_id,
+                full_name: item.full_name,
+                phone: item.phone,
+                address_line_part: "",
+                country: "Vietnam",
+                province: "",
+                district: "",
+                ward: "",
+                is_default: item.is_default ?? false,
+                address_line: item.address_line ?? "",
+              }))
+          : [];
 
-      setAddressList(addresses);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách địa chỉ:", error);
-    }
-  };
+        setAddressList(addresses);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh sách địa chỉ:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  fetchAddresses();
-}, [user?.id]); // chạy lại khi user.id có giá trị
-
+    fetchAddresses();
+  }, [user?.id]);
 
   const handleAddOrUpdate = async (data: AddressFormData) => {
     try {
-       if (!user?.id) return alert("Không xác định được người dùng!");
-       const address_line = [
-      data.address_line_part,
-      data.ward,
-      data.district,
-      data.province,
-    ]
-      .filter(Boolean)
-      .join(", ");
+      if (!user?.id) return toast.error("Không xác định được người dùng!");
+      const address_line = [
+        data.address_line_part,
+        data.ward,
+        data.district,
+        data.province,
+      ]
+        .filter(Boolean)
+        .join(", ");
 
       const payload = {
-      user_id: user.id,
-      full_name: data.full_name,
-      phone: data.phone,
-      address_line,
-      is_default: data.is_default ?? false,
-    };
+        user_id: user.id,
+        full_name: data.full_name,
+        phone: data.phone,
+        address_line,
+        is_default: data.is_default ?? false,
+      };
 
       if (formMode === "add") {
         const result = await addAddressService(payload);
@@ -104,7 +109,7 @@ export default function Address() {
       } else {
         const addressId = data.id;
         if (!addressId) {
-          alert("Không tìm thấy ID địa chỉ để cập nhật!");
+          toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
           return;
         }
 
@@ -124,7 +129,7 @@ export default function Address() {
 
       setShowEditForm(false);
     } catch (error: any) {
-      alert("Lỗi khi lưu địa chỉ: " + error.message);
+      toast.error("Lỗi khi lưu địa chỉ: " + error.message);
     }
   };
 
@@ -183,82 +188,87 @@ export default function Address() {
               </p>
 
               <div className="row total_address">
-  {addressList.length === 0 ? (
-    <p className="text-gray-600 text-base ml-3">Bạn chưa có địa chỉ nào.</p>
-  ) : (
-    addressList.map((address, index) => (
-      <div
-        key={index}
-        className="customer_address col-xs-12 col-lg-12 col-md-12 col-xl-12"
-      >
-        <div
-          className="address_info"
-          style={{
-            borderTop: "1px #ebebeb solid",
-            paddingTop: "16px",
-            marginTop: "20px",
-          }}
-        >
-          <div className="address-group">
-            <div className="address form-signup">
-              <p>
-                <strong>Họ tên: </strong> {address.full_name}
-                {address.is_default && (
-                  <span className="address-default">
-                    <i className="far fa-check-circle"></i> Địa chỉ mặc định
-                  </span>
+                {isLoading ? (
+                  <p className="text-center text-base text-gray-400 mt-4">
+                    Đang tải danh sách địa chỉ...
+                  </p>
+                ) : addressList.length === 0 ? (
+                  <p className="text-center text-lg text-gray-500 mt-4">
+                    Bạn chưa có địa chỉ nào.
+                  </p>
+                ) : (
+                  addressList.map((address, index) => (
+                    <div
+                      key={index}
+                      className="customer_address col-xs-12 col-lg-12 col-md-12 col-xl-12"
+                    >
+                      <div
+                        className="address_info"
+                        style={{
+                          borderTop: "1px #ebebeb solid",
+                          paddingTop: "16px",
+                          marginTop: "20px",
+                        }}
+                      >
+                        <div className="address-group">
+                          <div className="address form-signup">
+                            <p>
+                              <strong>Họ tên: </strong> {address.full_name}
+                              {address.is_default && (
+                                <span className="address-default">
+                                  <i className="far fa-check-circle"></i> Địa
+                                  chỉ mặc định
+                                </span>
+                              )}
+                            </p>
+                            <p>
+                              <strong>Địa chỉ: </strong>
+                              {address.address_line || "Chưa có địa chỉ"}
+                            </p>
+
+                            <p>
+                              <strong>Số điện thoại:</strong> {address.phone}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="btn-address">
+                          <p className="btn-row">
+                            <button
+                              className="btn-edit-addr btn btn-primary btn-edit"
+                              type="button"
+                              onClick={() => {
+                                setFormMode("edit");
+                                setAddressData({ ...address });
+                                setShowEditForm(true);
+                              }}
+                            >
+                              Chỉnh sửa địa chỉ
+                            </button>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 )}
-              </p>
-              <p>
-                <strong>Địa chỉ: </strong>
-                {[address.address_line_part, address.ward, address.district, address.province]
-                  .filter(Boolean)
-                  .join(", ")}
-              </p>
-              <p>
-                <strong>Số điện thoại:</strong> {address.phone}
-              </p>
-            </div>
-          </div>
-          <div className="btn-address">
-            <p className="btn-row">
-              <button
-                className="btn-edit-addr btn btn-primary btn-edit"
-                type="button"
-                onClick={() => {
-                  setFormMode("edit");
-                  setAddressData({ ...address });
-                  setShowEditForm(true);
-                }}
-              >
-                Chỉnh sửa địa chỉ
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-    ))
-  )}
 
-  {/* Form thêm/sửa */}
-  {showEditForm && (
-    <div className="fixed inset-0 flex items-center justify-center z-[9999]">
-      <div
-        className="absolute inset-0 bg-black opacity-50 z-0"
-        onClick={() => setShowEditForm(false)}
-      ></div>
-      <div className="relative z-10 bg-white text-black rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
-        <EditAddressForm
-          mode={formMode}
-          initialData={addressData}
-          onClose={() => setShowEditForm(false)}
-          onSubmit={handleAddOrUpdate}
-        />
-      </div>
-    </div>
-  )}
-</div>
-
+                {/* Form thêm/sửa */}
+                {showEditForm && (
+                  <div className="fixed inset-0 flex items-center justify-center z-[9999]">
+                    <div
+                      className="absolute inset-0 bg-black opacity-50 z-0"
+                      onClick={() => setShowEditForm(false)}
+                    ></div>
+                    <div className="relative z-10 bg-white text-black rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg">
+                      <EditAddressForm
+                        mode={formMode}
+                        initialData={addressData}
+                        onClose={() => setShowEditForm(false)}
+                        onSubmit={handleAddOrUpdate}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

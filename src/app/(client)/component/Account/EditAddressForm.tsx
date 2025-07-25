@@ -110,7 +110,7 @@ export default function EditAddressForm({
         return;
       }
 
-      onSubmit(formData); // giữ nguyên, hoặc truyền lại bản đã chuẩn hóa nếu cần
+      onSubmit(formData);
       onClose();
     } catch (error: any) {
       toast.error(error.message || "Có lỗi xảy ra");
@@ -134,7 +134,6 @@ export default function EditAddressForm({
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Các input giống cũ giữ nguyên */}
         <div>
           <label className="block text-sm font-medium mb-1">Họ tên</label>
           <input
@@ -183,7 +182,6 @@ export default function EditAddressForm({
           </select>
         </div>
 
-        {/* Tỉnh - Huyện - Xã */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">

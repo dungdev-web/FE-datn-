@@ -9,25 +9,27 @@ export interface AddressPayload {
   [key: string]: any;
 }
 
-
-export async function getAddressByUserId(userId: number): Promise<AddressResponse> {
+export async function getAddressByUserId(
+  userId: number
+): Promise<AddressResponse> {
   try {
     const res = await fetch(`${API_BASE_URL}/addresses/${userId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
 
     if (!res.ok) {
       const errorData = await res.json();
-      console.error('[FE Service] Lỗi getAddressByUserId:', errorData);
-      throw new Error(errorData?.message || 'Lấy địa chỉ thất bại'); 
+      console.error("[FE Service] Lỗi getAddressByUserId:", errorData);
+      throw new Error(errorData?.message || "Lấy địa chỉ thất bại");
     }
+    const data = await res.json();
 
-    return await res.json();
+    return data;
   } catch (error: any) {
-    console.error('[FE Service] Lỗi getAddressByUserId:', error);
-    throw new Error(error?.message || 'Lỗi không xác định');
+    console.error("[FE Service] Lỗi getAddressByUserId:", error);
+    throw new Error(error?.message || "Lỗi không xác định");
   }
 }
 
@@ -42,25 +44,25 @@ export async function updateAddress(
 ): Promise<any> {
   try {
     const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      credentials: 'include',
+      credentials: "include",
       body: JSON.stringify(payload),
     });
 
     const result = await res.json();
 
     if (!res.ok) {
-      console.error('[FE Service] ❌ Lỗi updateAddress:', result);
-      throw new Error(result?.error || result?.message || 'Cập nhật thất bại');
+      console.error("[FE Service] ❌ Lỗi updateAddress:", result);
+      throw new Error(result?.error || result?.message || "Cập nhật thất bại");
     }
 
     return result;
   } catch (error: any) {
-    console.error('[FE Service] ❌ Exception updateAddress:', error);
-    throw new Error(error?.message || 'Lỗi không xác định');
+    console.error("[FE Service] ❌ Exception updateAddress:", error);
+    throw new Error(error?.message || "Lỗi không xác định");
   }
 }
 
@@ -89,4 +91,3 @@ export async function addAddressService(data: {
 
   return result;
 }
-
