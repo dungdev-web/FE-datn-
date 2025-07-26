@@ -106,7 +106,6 @@ export default function Product() {
         setProducts(res.products || []);
         setTotal(res.total || 0);
         console.log("Kết quả:", res.products);
-
       } catch (err) {
         console.error("Lỗi tìm kiếm:", err);
       }
@@ -248,9 +247,9 @@ export default function Product() {
 
                           <div className="tt hidden">
                             <div id="ttfix" className="hidden-sm hidden-xs">
-                              Hiển thị <span>1</span> - <span>{products.length}</span> trong
-
-                              tổng số <span></span> sản phẩm
+                              Hiển thị <span>1</span> -{" "}
+                              <span>{products.length}</span> trong tổng số{" "}
+                              <span></span> sản phẩm
                             </div>
                           </div>
                         </div>
@@ -291,170 +290,168 @@ export default function Product() {
                     </div>
                   </div>
                 </div>
-                {viewMode === "grid" && (
-                  <div className="product-grid">
-                    {products.map((sp) => (
-                      <div
-                        className="product-itemlist-main !block"
-                        key={sp.products_id}
-                      >
+                {viewMode === "grid" &&
+                  (products.length > 0 ? (
+                    <div className="product-grid">
+                      {products.map((sp) => (
                         <div
-                          className="product-card"
-                          style={{ width: "230px" }}
+                          className="product-itemlist-main !block"
+                          key={sp.products_id}
                         >
-                          <div className="product-image">
-                            <Link href={`/product/${sp.slug}`}>
-                              <img
-                                src={
-                                  `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
-                                  "/images/placeholder.png"
-                                }
-                                alt={sp.name}
-                                style={{ height: "250px" }}
-                              />
-                            </Link>
-
-
-                                <ProductIcons
-                                  productId={sp.products_id}
-                                  variant_id={
-                                    sp.product_variants?.[0]
-                                      ?.product_variants_id
+                          <div
+                            className="product-card"
+                            style={{ width: "230px" }}
+                          >
+                            <div className="product-image">
+                              <Link href={`/product/${sp.slug}`}>
+                                <img
+                                  src={
+                                    sp.images?.[0]?.url &&
+                                    sp.images[0].url.trim() !== ""
+                                      ? `${API_BASE_URL}/uploads/${sp.images[0].url}`
+                                      : "/images/placeholder.png"
                                   }
-                                  price={sp.sale_price}
+                                  alt={sp.name}
+                                  style={{ height: "250px" }}
                                 />
+                              </Link>
 
-                                <span className="discount-tag">
-                                  -
-                                  {Math.round(
-                                    ((Number(sp.price) -
-                                      Number(sp.sale_price)) /
-                                      Number(sp.price)) *
-                                      100
-                                  )}
-                                  %
+                              <ProductIcons
+                                productId={sp.products_id}
+                                variant_id={
+                                  sp.product_variants?.[0]?.product_variants_id
+                                }
+                                price={sp.sale_price}
+                              />
+
+                              <span className="discount-tag">
+                                -
+                                {Math.round(
+                                  ((Number(sp.price) - Number(sp.sale_price)) /
+                                    Number(sp.price)) *
+                                    100
+                                )}
+                                %
+                              </span>
+
+                              <div className="product-colors">
+                                {Array.isArray(sp.product_variants) &&
+                                  [
+                                    ...new Map(
+                                      sp.product_variants.map((v) => [
+                                        v.color.id,
+                                        v.color,
+                                      ])
+                                    ).values(),
+                                  ].map((color) => (
+                                    <span
+                                      key={color.id}
+                                      className="color"
+                                      data-color={color.name_color}
+                                      style={{
+                                        backgroundColor: color.code_color,
+                                      }}
+                                    ></span>
+                                  ))}
+                              </div>
+
+                              <h4
+                                className="product-title"
+                                style={{
+                                  textOverflow: "ellipsis",
+                                  overflow: "hidden",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {sp.name}
+                              </h4>
+
+                              <div className="product-price">
+                                <span className="old-price">
+                                  <del>
+                                    {Number(sp.price).toLocaleString("vi")}đ
+                                  </del>
                                 </span>
+                                <span className="new-price">
+                                  {Number(sp.sale_price).toLocaleString("vi")}đ
+                                </span>
+                              </div>
 
-                                <div className="product-colors">
-                                  {Array.isArray(sp.product_variants) &&
-                                    [
-                                      ...new Map(
-                                        sp.product_variants.map((v) => [
-                                          v.color.id,
-                                          v.color,
-                                        ])
-                                      ).values(),
-                                    ].map((color) => (
-                                      <span
-                                        key={color.id}
-                                        className="color"
-                                        data-color={color.name_color}
-                                        style={{
-                                          backgroundColor: color.code_color,
-                                        }}
-                                      ></span>
-                                    ))}
-                                </div>
-
-                            <h4 className="product-title" style={{textOverflow:"ellipsis",overflow:"hidden",whiteSpace:"nowrap"}}>{sp.name}</h4>
-
-
-
-                                <div className="product-price">
-                                  <span className="old-price">
-                                    <del>
-                                      {Number(sp.price).toLocaleString("vi")}đ
-                                    </del>
-                                  </span>
-                                  <span className="new-price">
-                                    {Number(sp.sale_price).toLocaleString("vi")}
-                                    đ
-                                  </span>
-                                </div>
-
-                                <div className="hot-product-progress">
-                                  <div className="progress-bar">
-                                    <div
-                                      className="progress-fill"
-                                      style={{ width: "87%" }}
-                                    >
-                                      <span className="sold-info">
-                                        Đã bán{" "}
-                                        {sp.product_variants?.reduce(
-                                          (sum, v) => sum + v.stock_quantity,
-                                          0
-                                        ) || 0}{" "}
-                                        sản phẩm
-                                      </span>
-                                    </div>
+                              <div className="hot-product-progress">
+                                <div className="progress-bar">
+                                  <div
+                                    className="progress-fill"
+                                    style={{ width: "87%" }}
+                                  >
+                                    <span className="sold-info">
+                                      Đã bán{" "}
+                                      {sp.product_variants?.reduce(
+                                        (sum, v) => sum + v.stock_quantity,
+                                        0
+                                      ) || 0}{" "}
+                                      sản phẩm
+                                    </span>
                                   </div>
                                 </div>
+                              </div>
 
-                                <div className="product-rating">
-                                  {Array.from({ length: 5 }, (_, i) =>
-                                    i <
-                                    (sp.product_reviews?.length
-                                      ? Math.round(
-                                          sp.product_reviews.reduce(
-                                            (s, r) => s + Number(r.rating),
-                                            0
-                                          ) / sp.product_reviews.length
-                                        )
-                                      : 0) ? (
-                                      <i
-                                        key={i}
-                                        className="fa-solid fa-star"
-                                      ></i>
-                                    ) : (
-                                      <i
-                                        key={i}
-                                        className="fa-regular fa-star"
-                                      ></i>
-                                    )
-                                  )}
-                                </div>
+                              <div className="product-rating">
+                                {Array.from({ length: 5 }, (_, i) =>
+                                  i <
+                                  (sp.product_reviews?.length
+                                    ? Math.round(
+                                        sp.product_reviews.reduce(
+                                          (s, r) => s + Number(r.rating),
+                                          0
+                                        ) / sp.product_reviews.length
+                                      )
+                                    : 0) ? (
+                                    <i key={i} className="fa-solid fa-star"></i>
+                                  ) : (
+                                    <i
+                                      key={i}
+                                      className="fa-regular fa-star"
+                                    ></i>
+                                  )
+                                )}
                               </div>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: "#fefae6",
+                        color: "#5c4d35",
+                        padding: "15px 20px",
+                        borderRadius: "8px",
+                        marginTop: "20px",
+                        fontSize: "16px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        border: "1px solid #f5e2b8",
+                        maxWidth: "500px",
+                        margin: "20px auto",
+                      }}
+                    >
+                      <span>Chưa có sản phẩm phù hợp với bộ lọc bạn chọn.</span>
+                      <button
+                        onClick={() => window.location.reload()}
                         style={{
-                          backgroundColor: "#fefae6",
-                          color: "#5c4d35",
-                          padding: "15px 20px",
-                          borderRadius: "8px",
-                          marginTop: "20px",
-                          fontSize: "16px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          border: "1px solid #f5e2b8",
-                          maxWidth: "500px",
-                          margin: "20px auto",
+                          background: "none",
+                          border: "none",
+                          fontSize: "18px",
+                          cursor: "pointer",
+                          color: "#999",
                         }}
                       >
-                        <span>
-                          Chưa có sản phẩm phù hợp với bộ lọc bạn chọn.
-                        </span>
-                        <button
-                          onClick={() => window.location.reload()}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            fontSize: "18px",
-                            cursor: "pointer",
-                            color: "#999",
-                          }}
-                        >
-
-                          <XCircle size={24} />
-                        </button>
-                      </div>
-                    )}
-                  </>
-                )}
+                        <XCircle size={24} />
+                      </button>
+                    </div>
+                  ))}
 
                 {viewMode === "list" && Array.isArray(products) && (
                   <>
@@ -478,7 +475,7 @@ export default function Product() {
                                   <img
                                     src={
                                       sp.images?.[0]?.url
-                                        ? `/images/products/chaybo/${sp.images[0].url}`
+                                        ? `${API_BASE_URL}/uploads/${sp.images[0].url}`
                                         : "/images/placeholder.png"
                                     }
                                     alt={sp.name}
