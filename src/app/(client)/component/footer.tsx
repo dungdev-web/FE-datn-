@@ -8,9 +8,9 @@ export default function Footer() {
           <Link href={'/'}>
           <img src="/images/logo/NBDT__1_-removebg-preview.png" alt="" />
           </Link>
-          <h2 className="text-center text-xl font-bold text-white mt-2">
-            “Đẹp từng bước, chất từng centimet”
-          </h2>
+          <p className="text-center text-white mt-2">
+            Với thiết kế hiện đại, đa dạng và bền bỉ, giày TeraShoes phù hợp cho mọi phong cách và hoạt động hằng ngày.
+          </p>
         </div>
         <div className="footer-column">
           <h3>Hệ thống cửa hàng toàn quốc</h3>
@@ -25,7 +25,7 @@ export default function Footer() {
             <p>
               <i className="fas fa-map-marker-alt"></i> Tera Shose Lữ Gia
             </p>
-            <p>Địa chỉ: 145 Lê Đức Thọ, Phường 1, Gò Vấp, TP.Hồ Chí Minh</p>
+            <p>Địa chỉ: QTSC Building 1, Đ. Quang Trung, Tân Hưng Thuận, Hóc Môn, Hồ Chí Minh, Việt Nam</p>
             <p>Hotline: 0363545849</p>
           </div>
         </div>

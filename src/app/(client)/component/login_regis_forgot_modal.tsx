@@ -41,7 +41,7 @@ export default function LoginMenu({
         setShowLoader(false);
         toast.success("Đăng nhập thành công!");
         router.push("/account");
-      }, 7000);
+      }, 2000);
 
       return () => clearTimeout(timer);
     }
