@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct,IReview,IReviewPayload } from "@/types/product";
+import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
 type ProductIdentifier = { id: number } | { slug: string };
@@ -41,10 +41,10 @@ export const getProductDetail = async (
     const products = getMockProducts();
 
     if ("id" in identifier) {
-      return products.find(p => p.products_id === identifier.id);
+      return products.find((p) => p.products_id === identifier.id);
     }
     if ("slug" in identifier) {
-      return products.find(p => p.slug === identifier.slug);
+      return products.find((p) => p.slug === identifier.slug);
     }
 
     return undefined;
@@ -52,7 +52,7 @@ export const getProductDetail = async (
 
   try {
     let url = "";
-    
+
     if ("id" in identifier && identifier.id) {
       url = `${API_BASE_URL}/product/detail/${identifier.id}`;
     } else if ("slug" in identifier && identifier.slug) {
@@ -69,15 +69,17 @@ export const getProductDetail = async (
 
     const data: IProduct = await res.json();
     return data;
-
   } catch (error) {
     console.error("Lỗi khi lấy chi tiết sản phẩm:", error);
     return undefined;
   }
 };
 
-// lấy filter theo giá 
-export async function getFilterPrice(min?: number, max?: number): Promise<IProduct[]> {
+// lấy filter theo giá
+export async function getFilterPrice(
+  min?: number,
+  max?: number
+): Promise<IProduct[]> {
   if (IS_MOCK) {
     const products = getMockProducts();
 
@@ -122,27 +124,32 @@ export async function getBestSellingMockProducts(top = 9): Promise<IProduct[]> {
   if (IS_MOCK) {
     const products = getMockProducts();
 
-    // Giả lập sold_count từ số lượng review hoặc random
+    // Giả lập sold_count
     const productsWithSold = products.map((p) => ({
       ...p,
-      sold_count: (p.product_reviews?.length || 0) * 10 + Math.floor(Math.random() * 20),
+      sold_count:
+        (p.product_reviews?.length || 0) * 10 + Math.floor(Math.random() * 20),
     }));
 
-    // Sắp xếp và lấy top sản phẩm bán chạy nhất
     return productsWithSold
       .sort((a, b) => (b.sold_count || 0) - (a.sold_count || 0))
       .slice(0, top);
   }
 
-  // Nếu không mock → gọi API thực
-  const res = await fetch(`${API_BASE_URL}/product/best-selling?page=1&limit=${top}`);
+  // Nếu dùng API thật
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/best-selling`);
 
-  if (!res.ok) {
-    throw new Error("Không thể lấy sản phẩm bán chạy.");
+    if (!res.ok) {
+      throw new Error("Không thể lấy sản phẩm bán chạy.");
+    }
+
+    const data: IProduct[] = await res.json();
+    return data.slice(0, top); // Lấy top sản phẩm
+  } catch (error) {
+    console.error("Lỗi khi fetch sản phẩm:", error);
+    return [];
   }
-
-  const data: IProduct[] = await res.json();
-  return data;
 }
 
 // Lấy sản phẩm theo slug
@@ -169,9 +176,7 @@ export async function getNewestProducts(): Promise<IProduct[]> {
     return all.sort((a, b) => b.products_id - a.products_id);
   }
 
-  const res = await fetch(
-    `${API_BASE_URL}/product/newest?page=1&limit=20`
-  );
+  const res = await fetch(`${API_BASE_URL}/product/newest?page=1&limit=20`);
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm mới nhất.");
   }
@@ -204,11 +209,10 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
     throw new Error("Không thể lấy danh sách sản phẩm nổi bật.");
   }
 
-  const products: IProduct[] = await res.json(); 
+  const products: IProduct[] = await res.json();
 
   return products;
 }
-
 
 //Lấy sản phẩm theo giới tính nam
 export async function getMenShoes(): Promise<IProduct[]> {
@@ -312,9 +316,7 @@ export async function getDealProducts(): Promise<IProduct[]> {
     return all.filter((p) => p.sale_price && p.sale_price < p.price);
   }
 
-  const res = await fetch(
-    `${API_BASE_URL}/product/deals?page=1&limit=20`
-  );
+  const res = await fetch(`${API_BASE_URL}/product/deals?page=1&limit=20`);
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách sản phẩm khuyến mãi.");
   }
@@ -338,7 +340,9 @@ export async function getRelatedProducts(
     return all.filter((p) => p.category.categories_id === categoryId);
   }
 
-  const res = await fetch(`${API_BASE_URL}/product/related/${categoryId}?page=1&limit=8`);
+  const res = await fetch(
+    `${API_BASE_URL}/product/related/${categoryId}?page=1&limit=8`
+  );
   if (!res.ok) {
     throw new Error("Không thể lấy sản phẩm cùng loại.");
   }
@@ -453,11 +457,14 @@ export async function deleteProduct(id: number): Promise<void> {
   }
 }
 
-export const getProductsByGender = async (gender: string): Promise<IProduct[]> => {
+export const getProductsByGender = async (
+  gender: string
+): Promise<IProduct[]> => {
   try {
     const res = await fetch(`${API_BASE_URL}/product?gender=${gender}`);
-    if (!res.ok) throw new Error("Lỗi khi lấy danh sách sản phẩm theo giới tính");
-    
+    if (!res.ok)
+      throw new Error("Lỗi khi lấy danh sách sản phẩm theo giới tính");
+
     const data = await res.json();
     return data.products as IProduct[];
   } catch (error) {
@@ -465,7 +472,6 @@ export const getProductsByGender = async (gender: string): Promise<IProduct[]> =
     return [];
   }
 };
-
 export const getFilteredProducts = async (
   params: FilterParams
 ): Promise<ProductFilterResponse> => {
@@ -474,20 +480,51 @@ export const getFilteredProducts = async (
 
     if (params.keyword) query.append("keyword", params.keyword);
     if (params.gender) query.append("gender", params.gender);
-    if (params.brand) query.append("brand", params.brand);
-    if (params.minPrice !== undefined) query.append("minPrice", params.minPrice.toString());
-    if (params.maxPrice !== undefined) query.append("maxPrice", params.maxPrice.toString());
-    if (params.status !== undefined) query.append("status", params.status.toString());
-    if (params.limit !== undefined) query.append("limit", params.limit.toString());
-    if (params.offset !== undefined) query.append("offset", params.offset.toString());
+    if (Array.isArray(params.brand)) {
+      params.brand.forEach((b) => query.append("brand", b));
+    } else if (params.brand) {
+      query.append("brand", params.brand);
+    }
 
-    const response = await fetch(`${API_BASE_URL}/product/filter?${query.toString()}`);
+    if (params.minPrice !== undefined)
+      query.append("minPrice", params.minPrice.toString());
+    if (params.maxPrice !== undefined)
+      query.append("maxPrice", params.maxPrice.toString());
+    if (params.status !== undefined)
+      query.append("status", params.status.toString());
+    if (params.limit !== undefined)
+      query.append("limit", params.limit.toString());
+
+    if (params.page !== undefined) query.append("page", params.page.toString());
+
+    if (params.sortBy) query.append("sortBy", params.sortBy);
+    if (params.sortOrder) query.append("sortOrder", params.sortOrder);
+
+    const response = await fetch(
+      `${API_BASE_URL}/product/filter?${query.toString()}`
+    );
+
     if (!response.ok) {
       throw new Error("Lỗi khi gọi API lọc sản phẩm");
     }
 
-    const data: ProductFilterResponse = await response.json();
-    return data;
+    const json = await response.json();
+
+    const {
+      data: {
+        data: products = [],
+        total = 0,
+        totalPages = 1,
+        page: currentPage = 1,
+      } = {},
+    } = json;
+
+    return {
+      products,
+      total,
+      totalPages,
+      currentPage,
+    };
   } catch (error) {
     console.error("Lỗi getFilteredProducts:", error);
     throw error;
@@ -496,19 +533,25 @@ export const getFilteredProducts = async (
 
 //search
 export async function searchProducts(keyword: string, page = 1, limit = 12) {
-  const res = await fetch(`${API_BASE_URL}/product/search?q=${encodeURIComponent(keyword)}&page=${page}&limit=${limit}`);
+  const res = await fetch(
+    `${API_BASE_URL}/product/search?q=${encodeURIComponent(
+      keyword
+    )}&page=${page}&limit=${limit}`
+  );
   if (!res.ok) throw new Error("Lỗi khi tìm kiếm sản phẩm");
   return await res.json();
 }
 //review
-export async function reviewProduct(productId:number) {
-  const res = await fetch( `${API_BASE_URL}/product/reviews/${productId}`);
-  if(!res.ok) throw new Error("Lỗi lấy review ");
+export async function reviewProduct(productId: number) {
+  const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`);
+  if (!res.ok) throw new Error("Lỗi lấy review ");
   return await res.json();
-  
 }
 // add reviews
-export async function addReviewProduct(productId: number, payload: IReviewPayload) {
+export async function addReviewProduct(
+  productId: number,
+  payload: IReviewPayload
+) {
   const res = await fetch(`${API_BASE_URL}/product/reviews/${productId}`, {
     method: "POST",
     headers: {
@@ -525,7 +568,7 @@ export async function addReviewProduct(productId: number, payload: IReviewPayloa
     throw new Error("Lỗi khi gửi đánh giá.");
   }
 
-  return await res.json(); 
+  return await res.json();
 }
 // compare product
 export async function getCompareProduct(userId: number) {
@@ -549,7 +592,7 @@ export async function addCompareProduct(userId: number, productID: number) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ user_id: userId, product_id: productID  }),
+    body: JSON.stringify({ user_id: userId, product_id: productID }),
   });
   const data = await res.json();
 
@@ -567,12 +610,12 @@ export async function deleteCompareProduct(userId: number, productID: number) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ user_id: userId, product_id: productID  }),
+    body: JSON.stringify({ user_id: userId, product_id: productID }),
   });
 
   if (!res.ok) {
-     const text = await res.text();
-  console.error("API response text:", text);
+    const text = await res.text();
+    console.error("API response text:", text);
     throw new Error("Không thể xóa danh sách sản phẩm so sánh");
   }
 
