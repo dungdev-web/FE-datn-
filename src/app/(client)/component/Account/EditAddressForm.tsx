@@ -89,7 +89,7 @@ export default function EditAddressForm({
     const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
 
     const dataToSubmit = {
-      user_id: 8,
+      user_id: 7,
       full_name: formData.full_name,
       phone: formData.phone,
       address_line: fullAddress,
