@@ -490,7 +490,7 @@ export default function Home() {
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -600,7 +600,7 @@ export default function Home() {
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>

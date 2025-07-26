@@ -293,6 +293,7 @@ export default function Product() {
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
+                                style={{ height: "250px" }}
                               />
                             </Link>
 
