@@ -14,6 +14,7 @@ import BlogHome from "./component/blog_home";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
+import { API_BASE_URL } from "@/config/env";
 import {
   getNewestProducts,
   getFeaturedProducts,
@@ -294,7 +295,7 @@ export default function Home() {
                   <div className="product-popup">
                     <a href="/index.html">
                       <img
-                        src="/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp"
+                        src={`${API_BASE_URL}/uploads/AirJordanDMP1Retro(xanhlam).webp`}
                         alt="Jordan 14"
                       />
                     </a>
@@ -326,7 +327,7 @@ export default function Home() {
                   <div className="product-popup">
                     <a href="/index.html">
                       <img
-                        src="/images/products/chaybo/GiàyNamAirJordan14Retro(do).webp"
+                        src={`${API_BASE_URL}/uploads/GiàyNamAirJordan14Retro(do).webp`}
                         alt="Air Max 97"
                       />
                     </a>
@@ -366,7 +367,7 @@ export default function Home() {
                   <div className="product-popup">
                     <a href="/index.html">
                       <img
-                        src="/images/products/chaybo/NeumelGRAYBROWNSnow(vang).webp"
+                        src={`${API_BASE_URL}/uploads/NeumelGRAYBROWNSnow(vang).webp`}
                         alt="Ultra Boost"
                       />
                     </a>
@@ -398,7 +399,7 @@ export default function Home() {
                   <div className="product-popup">
                     <a href="/index.html">
                       <img
-                        src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
+                        src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
                         alt="Nike Pegasus Trail"
                       />
                     </a>
@@ -483,13 +484,13 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -593,13 +594,13 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `/images/products/chaybo/${product.images?.[0]?.url}` || "/images/placeholder.png"
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0].product_variants_id} price={product.sale_price} />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>

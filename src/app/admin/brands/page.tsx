@@ -1,4 +1,5 @@
 "use client"
+import { API_BASE_URL } from "@/config/env";
 import "../../admin/css/brands_admin.css";
 import Link from "next/link";
 import { useState } from "react"; 
@@ -79,7 +80,7 @@ export default function Brands() {
               <td>NIKE</td>
               <td>
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  src={`${API_BASE_URL}/ConverseRunStarMotion.webp`}
                   alt="NIKE"
                   className="brand-logo"
                 />
@@ -104,7 +105,7 @@ export default function Brands() {
               <td>NIKE</td>
               <td>
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                   alt="NIKE"
                   className="brand-logo"
                 />
@@ -129,7 +130,7 @@ export default function Brands() {
               <td>NIKE</td>
               <td>
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                   alt="NIKE"
                   className="brand-logo"
                 />

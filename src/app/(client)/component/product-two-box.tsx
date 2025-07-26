@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
 import ProductIcons from "./products/ProductIcons";
-
+import { API_BASE_URL } from "@/config/env";
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
   const images = [
     "https://file.hstatic.net/200000581855/file/1_5d0aee5d42d245f395b3bfbc9d46e9f3.png",
@@ -90,7 +90,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                         <Link href={`product/${sp.slug}`}>
                           <img
                             src={
-                              `/images/products/chaybo/${sp.images?.[0]?.url}` ||
+                              `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
                               "/images/placeholder.png"
                             }
                             alt={sp.name}

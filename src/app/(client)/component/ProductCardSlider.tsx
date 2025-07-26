@@ -3,6 +3,7 @@
 import { IProduct } from "@/types/product";
 import Link from "next/link";
 import ProductIcons from "./products/ProductIcons";
+import { API_BASE_URL } from "@/config/env";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const reviews = product.product_reviews || [];
@@ -38,7 +39,7 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
           <Link href={`/product/${product.slug}`}>
             <img
               src={
-                `/images/products/chaybo/${images[0]?.url}` ||
+                `${API_BASE_URL}/uploads/${images[0]?.url}` ||
                 "/images/placeholder.png"
               }
               alt={product.name}

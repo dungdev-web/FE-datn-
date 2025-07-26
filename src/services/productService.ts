@@ -118,7 +118,7 @@ export async function getFilterPrice(min?: number, max?: number): Promise<IProdu
   return data;
 }
 // Lấy sản phẩm bán chạy dựa trên số lượng review hoặc random sold_count
-export async function getBestSellingMockProducts(top = 5): Promise<IProduct[]> {
+export async function getBestSellingMockProducts(top = 9): Promise<IProduct[]> {
   if (IS_MOCK) {
     const products = getMockProducts();
 

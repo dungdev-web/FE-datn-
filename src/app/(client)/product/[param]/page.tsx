@@ -18,6 +18,7 @@ import { addToMockCart } from "@/services/cartService";
 import { useRouter } from "next/navigation";
 import { addToCart } from "@/services/cartService";
 import { getCouponList } from "@/services/couponService";
+import { API_BASE_URL } from "@/config/env";
 export default function Detail() {
   const router = useRouter();
   const [product, setProduct] = useState<IProduct | null>(null);
@@ -148,7 +149,7 @@ export default function Detail() {
   }, []);
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getBestSellingMockProducts(5);
+      const data = await getBestSellingMockProducts(9);
       setBestSellProducts(data);
       console.log("Product images:", data);
     };
@@ -178,7 +179,7 @@ export default function Detail() {
     ) {
       setSelectedImage(
         product.images?.[0]?.url
-          ? `/images/products/chaybo/${product.images[0].url}`
+          ? `${API_BASE_URL}/uploads/${product.images[0].url}`
           : "/images/placeholder.png"
       );
     } else {
@@ -246,7 +247,7 @@ export default function Detail() {
       product?.images?.find((img) => img.type === "side")?.url;
 
     if (defaultImage) {
-      setSelectedImage(`/images/products/chaybo/${defaultImage}`);
+      setSelectedImage(`${API_BASE_URL}/uploads/${defaultImage}`);
     }
   }, [product]);
 
@@ -427,7 +428,13 @@ export default function Detail() {
                       <div className="tns-outer">
                         <div className="tns-ovh">
                           <div id="id_tiny_0-iw" className="tns-inner">
-                            {product.product_variants.map((variant, index) => {
+                            {[
+                              ...new Map(
+                                product.product_variants
+                                  .filter((v) => v?.color?.code_color)
+                                  .map((v) => [v.color.code_color, v])
+                              ).values(),
+                            ].map((variant, index) => {
                               const colorImage = variant.color?.images;
                               const fallbackImage = product.images?.find(
                                 (img) => img.type === "side"
@@ -435,7 +442,7 @@ export default function Detail() {
 
                               const imageUrl =
                                 colorImage || fallbackImage || "logo/1.png";
-                              const fullImageUrl = `/images/products/chaybo/${imageUrl}`;
+                              const fullImageUrl = `${API_BASE_URL}/uploads/${imageUrl}`;
 
                               return (
                                 <div
@@ -557,7 +564,7 @@ export default function Detail() {
                                     "logo/1.png";
 
                                   setSelectedImage(
-                                    `/images/products/chaybo/${imageUrl}`
+                                    `${API_BASE_URL}/uploads/${imageUrl}`
                                   );
                                 }}
                                 style={{
@@ -1047,7 +1054,7 @@ export default function Detail() {
                             <img
                               src={
                                 product.images?.[0]?.url
-                                  ? `/images/products/chaybo/${product.images[0].url}`
+                                  ? `${API_BASE_URL}/uploads/${product.images[0].url}`
                                   : "/default.jpg"
                               }
                               alt={
@@ -1059,7 +1066,7 @@ export default function Detail() {
                         <div className="product-info-text">
                           <h3 className="product-name">
                             <a
-                              href={`/product${product.slug}`}
+                              href={`/product/${product.slug}`}
                               title={product.name}
                             >
                               {product.name}
@@ -1258,7 +1265,7 @@ export default function Detail() {
                                 <img
                                   src={
                                     product.images?.[0]?.url
-                                      ? `/images/products/chaybo/${product.images[0].url}`
+                                      ? `${API_BASE_URL}/uploads/${product.images[0].url}`
                                       : "/default.jpg"
                                   }
                                   alt={

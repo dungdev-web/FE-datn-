@@ -1,6 +1,7 @@
 "use client";
 import React, { forwardRef } from "react";
 import { useCart } from "@/hooks/useCart";
+import { API_BASE_URL } from "@/config/env";
 
 const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
   const { cart, subtotal, handlePlus, handleMinus, handleRemoveItem } =
@@ -21,8 +22,8 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                   <img
                     alt={item.variant?.product.name}
                     src={
-                      item.variant?.product.images?.[0]?.url
-                        ? `/images/products/chaybo/${item.variant.product.images[0].url}`
+                      item.variant?.color.images
+                        ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
                         : "/images/placeholder.png"
                     }
                     width="80"

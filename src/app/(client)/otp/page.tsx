@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { resetPassword } from "@/services/authService";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { validateField } from "@/hooks/validate_login_register";
 import "../css/login.css";
@@ -174,8 +174,6 @@ export default function OTP() {
             . Nếu không nhận được, vui lòng kiểm tra lại email hoặc thử lại sau.
           </p>
         </form>
-
-        <ToastContainer position="top-right" autoClose={3000} />
       </div>
     </div>
   );

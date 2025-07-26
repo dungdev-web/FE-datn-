@@ -9,6 +9,7 @@ import { useRemoveCompare } from "@/hooks/useAddToCompare";
 import Swal from "sweetalert2";
 import "../css/product.css";
 import "../css/compare.css";
+import { API_BASE_URL } from "@/config/env";
 import { useRouter } from "next/navigation";
 export default function Compare_product() {
   const [compare, setCompare] = useState<ICompareProduct[]>([]);
@@ -140,7 +141,7 @@ export default function Compare_product() {
                           <img
                             className="img-fluid"
                             src={
-                              `/images/products/chaybo/${item.product.images?.[0]?.url}` || "/default.jpg"
+                              `${API_BASE_URL}/uploads/${item.product.images?.[0]?.url}` || "/default.jpg"
                             }
                             alt={
                               item.product.images?.[0]?.alt_text ||

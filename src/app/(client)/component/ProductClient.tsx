@@ -15,8 +15,8 @@ import { useSearchParams } from "next/navigation";
 import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
 import { searchProducts } from "@/services/productService";
-import { log } from "console";
 import ProductIcons from "../component/products/ProductIcons";
+import { API_BASE_URL } from "@/config/env";
 
 export default function Product() {
   const params = useParams();
@@ -95,16 +95,20 @@ export default function Product() {
   useEffect(() => {
     const fetchSearch = async () => {
       if (!keyword) return;
+
       try {
-        const res = await searchProducts(keyword);
+        const res = await searchProducts(keyword, page, productsPerPage);
         setProducts(res.products || []);
-        console.log(res.products);
+        setTotal(res.total || 0);
+        console.log("Kết quả:", res.products);
+
       } catch (err) {
         console.error("Lỗi tìm kiếm:", err);
       }
     };
     fetchSearch();
-  }, [keyword]);
+  }, [keyword, page]);
+
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(brandId)
@@ -227,7 +231,8 @@ export default function Product() {
 
                           <div className="tt hidden">
                             <div id="ttfix" className="hidden-sm hidden-xs">
-                              Hiển thị <span>1</span> - <span>12</span> trong
+                              Hiển thị <span>1</span> - <span>{products.length}</span> trong
+
                               tổng số <span></span> sản phẩm
                             </div>
                           </div>
@@ -284,10 +289,11 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
+                                  `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
+                                style={{ height: "250px" }}
                               />
                             </Link>
 
@@ -321,7 +327,8 @@ export default function Product() {
                               ))}
                             </div>
 
-                            <h4 className="product-title">{sp.name}</h4>
+                            <h4 className="product-title" style={{textOverflow:"ellipsis",overflow:"hidden",whiteSpace:"nowrap"}}>{sp.name}</h4>
+
 
                             <div className="product-price">
                               <span className="old-price">
@@ -397,7 +404,7 @@ export default function Product() {
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  `/images/products/chaybo/${sp.images?.[0]?.url}` ||
+                                  `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
                                   "/images/placeholder.png"
                                 }
                                 alt={sp.name}
