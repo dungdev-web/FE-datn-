@@ -215,54 +215,60 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
 }
 
 //Lấy sản phẩm theo giới tính nam
-export async function getMenShoes(): Promise<IProduct[]> {
+export async function getGenderShoes(name: string, limit: number, page: number): Promise<IProduct[]> {
   if (IS_MOCK) {
     const all = getMockProducts();
+    const lowerName = name.toLowerCase();
 
     return all.filter((product) => {
-      const gender = product.gender.name?.toLowerCase();
+      const gender = product.gender?.name?.toLowerCase();
       const categoryName = product.category?.name?.toLowerCase();
 
       return (
-        gender === "male" ||
-        gender === "unisex" ||
-        categoryName?.includes("nam")
+        gender === lowerName ||
+        (lowerName === "nam" && categoryName?.includes("nam"))
       );
     });
   }
 
-  // Nếu dùng API thật
-  const res = await fetch(`${API_BASE_URL}/products?gender=male_or_unisex`);
+  const params = new URLSearchParams({
+    gender: name,
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  const res = await fetch(`${API_BASE_URL}/products?${params.toString()}`);
   if (!res.ok) {
-    throw new Error("Không thể lấy danh sách giày nam.");
+    throw new Error("Không thể lấy danh sách giày theo giới tính.");
   }
 
   const data: IProduct[] = await res.json();
   return data;
 }
-//lấy sản phẩm theo giới tính nữ
-export async function getFemaleProducts(): Promise<IProduct[]> {
-  if (IS_MOCK) {
-    const all = getMockProducts();
-    return all.filter(
-      (product) =>
-        product.category?.name?.toLowerCase().includes("nữ") ||
-        product.category?.slug?.toLowerCase().includes("nu")
-    );
-  }
 
-  // API thực tế (nếu dùng sau)
-  const res = await fetch(`${API_BASE_URL}/products`);
-  if (!res.ok) {
-    throw new Error("Không thể lấy danh sách sản phẩm.");
-  }
-  const data: IProduct[] = await res.json();
-  return data.filter(
-    (product) =>
-      product.category?.name?.toLowerCase().includes("nữ") ||
-      product.category?.slug?.toLowerCase().includes("nu")
-  );
-}
+//lấy sản phẩm theo giới tính nữ
+// export async function getFemaleProducts(): Promise<IProduct[]> {
+//   if (IS_MOCK) {
+//     const all = getMockProducts();
+//     return all.filter(
+//       (product) =>
+//         product.category?.name?.toLowerCase().includes("nữ") ||
+//         product.category?.slug?.toLowerCase().includes("nu")
+//     );
+//   }
+
+//   // API thực tế (nếu dùng sau)
+//   const res = await fetch(`${API_BASE_URL}/products`);
+//   if (!res.ok) {
+//     throw new Error("Không thể lấy danh sách sản phẩm.");
+//   }
+//   const data: IProduct[] = await res.json();
+//   return data.filter(
+//     (product) =>
+//       product.category?.name?.toLowerCase().includes("nữ") ||
+//       product.category?.slug?.toLowerCase().includes("nu")
+//   );
+// }
 
 //Lấy sản phẩm theo catename
 export async function getProductsByCategory(
