@@ -215,12 +215,16 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
 }
 
 //Lấy sản phẩm theo giới tính nam
-export async function getGenderShoes(name: string, limit: number, page: number): Promise<IProduct[]> {
+export async function getGenderShoes(
+  name: string,
+  limit: number,
+  page: number
+): Promise<{ products: IProduct[]; total: number }> {
   if (IS_MOCK) {
     const all = getMockProducts();
     const lowerName = name.toLowerCase();
 
-    return all.filter((product) => {
+    const filtered = all.filter((product) => {
       const gender = product.gender?.name?.toLowerCase();
       const categoryName = product.category?.name?.toLowerCase();
 
@@ -229,6 +233,11 @@ export async function getGenderShoes(name: string, limit: number, page: number):
         (lowerName === "nam" && categoryName?.includes("nam"))
       );
     });
+
+    return {
+      products: filtered,
+      total: filtered.length,
+    };
   }
 
   const params = new URLSearchParams({
@@ -237,13 +246,17 @@ export async function getGenderShoes(name: string, limit: number, page: number):
     limit: limit.toString(),
   });
 
-  const res = await fetch(`${API_BASE_URL}/products?${params.toString()}`);
+  const res = await fetch(`${API_BASE_URL}/product/gender?${params.toString()}`);
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách giày theo giới tính.");
   }
 
-  const data: IProduct[] = await res.json();
-  return data;
+  const data = await res.json();
+
+  return {
+    products: data.products,
+    total: data.total,
+  };
 }
 
 //lấy sản phẩm theo giới tính nữ

@@ -283,8 +283,8 @@ export default function Home() {
               ở bất cứ nơi đâu bạn đến.
             </p>
             <div className="buttons">
-              <button className="btn-lookbook">GIÀY NAM</button>
-              <button className="btn-lookbook">GIÀY NỮ</button>
+              <button ><Link  className="btn-lookbook"  href={`/product?gender=nam`}>GIÀY NAM</Link></button>  
+              <button ><Link  className="btn-lookbook"  href={`/product?gender=female`}>GIÀY NỮ</Link></button> 
             </div>
           </div>
 

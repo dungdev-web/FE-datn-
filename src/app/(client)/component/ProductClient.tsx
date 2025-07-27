@@ -11,7 +11,7 @@ import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { useParams } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-
+import { getGenderShoes } from "@/services/productService";
 import SidebarFilter from "../component/products/SidebarFilter";
 import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
 import { searchProducts } from "@/services/productService";
@@ -36,6 +36,7 @@ export default function Product() {
   const [totalPages, setTotalPages] = useState(1);
   const searchParams = useSearchParams();
   const keyword = searchParams.get("q") || "";
+  const gender = searchParams.get("gender") || "";
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
     undefined
@@ -112,6 +113,24 @@ export default function Product() {
     };
     fetchSearch();
   }, [keyword, page]);
+  useEffect(() => {
+    const fetchGender = async () => {
+      if (!gender) return;
+
+      try {
+        const res = await getGenderShoes(gender, productsPerPage, page);
+        setProducts(res.products);
+        setTotal(res.total);
+        console.log("Kết quả gender:", res.products);
+        console.log("Kết quả limit:", productsPerPage);
+        console.log("Kết quả total:", res.total);
+      } catch (err) {
+        console.error("Lỗi tìm gender:", err);
+      }
+    };
+
+    fetchGender();
+  }, [gender, page]);
 
   const handleBrandCheckboxChange = (brandId: number) => {
     setSelectedBrandIds((prev) => (prev[0] === brandId ? [] : [brandId]));
@@ -199,7 +218,7 @@ export default function Product() {
                 onProductsChange={(products, total, totalPages) => {
                   setProducts(products);
                   setTotal(total);
-                  setTotalPages(totalPages);
+                  setTotal(totalPages);
                 }}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
@@ -707,7 +726,7 @@ export default function Product() {
         onProductsChange={(products, total, totalPages) => {
           setProducts(products);
           setTotal(total);
-          setTotalPages(totalPages);
+          setTotal(totalPages);
         }}
         sortBy={sortBy}
         sortOrder={sortOrder}
