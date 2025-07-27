@@ -3,6 +3,7 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { addAddressService, updateAddress } from "@/services/addressService";
 import { toast } from "react-toastify";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 type AddressFormData = {
   id?: number;
@@ -38,6 +39,7 @@ export default function EditAddressForm({
   const [formData, setFormData] = useState<AddressFormData>(initialData);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
+  const {user} = useAuthUser();
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -85,11 +87,15 @@ export default function EditAddressForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if(!user){
+      toast.error("Bạn cần đăng nhập để thực hiện thao tác này.");
+      return;
+    }
 
     const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
 
     const dataToSubmit = {
-      user_id: 7,
+      user_id: user.id,
       full_name: formData.full_name,
       phone: formData.phone,
       address_line: fullAddress,
