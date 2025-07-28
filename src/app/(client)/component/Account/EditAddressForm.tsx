@@ -44,7 +44,7 @@ export default function EditAddressForm({
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    console.log("🛠 initialData vào EditForm:", initialData); // 👈 Xem lúc nào `id` bị undefined
+    console.log("🛠 initialData vào EditForm:", initialData);
     if (initialData?.id !== undefined) {
       setFormData(initialData);
     }

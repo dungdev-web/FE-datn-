@@ -130,7 +130,7 @@ export default function Address() {
       }
 
       setShowEditForm(false);
-      await fetchAddresses(); // ✅ Luôn fetch lại để đồng bộ
+      await fetchAddresses();
     } catch (error: any) {
       toast.error("Lỗi khi lưu địa chỉ: " + error.message);
     }
