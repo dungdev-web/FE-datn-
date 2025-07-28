@@ -5,6 +5,9 @@ import "../css/product.css";
 import { useState, useEffect } from "react";
 import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
+import { API_BASE_URL } from "@/config/env";
+import AsideBlog from "@/app/(client)/component/blog/AsideBlog";
+import DOMPurify from "dompurify";
 export default function Blog() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [post, setPost] = useState<IBlog[]>([]);
@@ -35,6 +38,7 @@ export default function Blog() {
   const handlePageChange = (pageNumber: number) => {
     setPage(pageNumber);
   };
+
   return (
     <>
       <section
@@ -124,68 +128,35 @@ export default function Blog() {
             <img src="/images/banner/aside_banner.webp" alt="" />
           </div>
         </aside>
-        <aside className="desktop">
-          <div className="category-blog">
-            <h2>DANH MỤC BÀI VIẾT</h2>
-            <ul>
-              <li>Trang chủ</li>
-              <li>Giới thiệu</li>
-              <li>Sản phẩm</li>
-              <li>Tin tức</li>
-              <li>Liên hệ</li>
-              <li>Hệ thống cửa hàng</li>
-            </ul>
-          </div>
-
-          <div className="relate-blog">
-            <h2>BÀI VIẾT LIÊN QUAN</h2>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-1.webp" alt="" />
-              <p>TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-2.webp" alt="" />
-              <p>ADIDAS CHO TRÌNH LÀNG MẪU GIÀY SUPERNOVA ĐẲNG CẤP MỚI</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-3.webp" alt="" />
-              <p>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-4.webp" alt="" />
-              <p>BÍ QUYẾT BẢO QUẢN GIÀY ULTRA BOOST ĐƯỢC BỀN & LÂU DÀI NHẤT</p>
-            </div>
-          </div>
-
-          <div className="banner-relate-blog">
-            <img src="/images/banner/aside_banner.webp" alt="" />
-          </div>
-        </aside>
+        <AsideBlog/>
         <article>
           <div className="list-blog">
-            {post.map((item) => (
-              <div className="box-blog" key={item.post_id}>
-                <img src={`/images/blog/${item.images}`} alt={item.title} />
-                <div>
-                  <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
-                  <p>
-                    <span>{item.author.name} -</span>{" "}
-                    {new Date(item.created_at).toLocaleDateString("vi-VN")}-{" "}
-                    <span>0</span> bình luận
-                  </p>
-                  <p>
-                    {" "}
-                    {item.content.length > 100
-                      ? item.content.slice(0, 500) + "..."
-                      : item.content}
-                  </p>
+            {post.map((item) => {
+              const shortContent =
+                item.content.length > 500
+                  ? item.content.slice(0, 500) + "..."
+                  : item.content;
+
+              const safeHTML = DOMPurify.sanitize(shortContent); 
+
+              return (
+                <div className="box-blog" key={item.post_id}>
+                  <img
+                    src={`${API_BASE_URL}/uploads/blog/${item.images}`}
+                    alt={item.title}
+                  />
+                  <div>
+                    <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
+                    <p>
+                      <span>{item.author.name} -</span>{" "}
+                      {new Date(item.created_at).toLocaleDateString("vi-VN")} -{" "}
+                      <span>0</span> bình luận
+                    </p>
+                    <p dangerouslySetInnerHTML={{ __html: safeHTML }}></p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div className="flex justify-center items-center gap-2.5">
               <button
                 onClick={handlePrev}

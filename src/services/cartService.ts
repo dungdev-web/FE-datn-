@@ -8,6 +8,7 @@ import {
   RemoveFromCartResponse,
 } from "@/types/cart";
 interface AddToCartResponse {
+  length: any;
   message: string;
   cart: ICartItem[]; // danh sách cart_items sau khi thêm
 }

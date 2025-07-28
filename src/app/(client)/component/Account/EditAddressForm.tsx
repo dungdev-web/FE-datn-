@@ -40,6 +40,7 @@ export default function EditAddressForm({
   const [formData, setFormData] = useState<AddressFormData>(initialData);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
+  const {user} = useAuthUser();
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -87,6 +88,10 @@ export default function EditAddressForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if(!user){
+      toast.error("Bạn cần đăng nhập để thực hiện thao tác này.");
+      return;
+    }
 
     const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
 

@@ -100,7 +100,7 @@ export default function Detail() {
         showConfirmButton: false,
         timer: 1500,
       });
-      router.push("/cart");
+      window.location.href = "/cart"; // reload cứng nếu không dùng router.refresh
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
       Swal.fire({

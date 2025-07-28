@@ -4,7 +4,7 @@ import Product from "../component/ProductClient";
 export default function Page() {
   return (
     <Suspense fallback={<div>Đang tải sản phẩm...</div>}>
-      <Product />
+     <Product />
     </Suspense>
   );
 }
