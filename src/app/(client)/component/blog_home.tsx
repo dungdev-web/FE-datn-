@@ -5,7 +5,7 @@ import { Navigation } from "swiper/modules";
 import { useEffect, useState } from "react";
 import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService"; // hoặc blogApi nếu bạn dùng tên khác
-
+import { API_BASE_URL } from "@/config/env";
 import "swiper/css";
 import "swiper/css/navigation";
 export default function BlogHome() {
@@ -39,7 +39,7 @@ export default function BlogHome() {
       {blog.map((item) => (
         <SwiperSlide key={item.post_id}>
           <div className="blog-item">
-            <img src={`/images/blog/${item.images}`} alt={item.title} />
+            <img src={`${API_BASE_URL}/uploads/blog/${item.images}`} alt={item.title} />
             <div className="blog-info">
               <p className="blog-date">
                 {new Date(item.created_at).toLocaleDateString("vi-VN")}

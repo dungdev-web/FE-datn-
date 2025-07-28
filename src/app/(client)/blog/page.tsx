@@ -5,6 +5,7 @@ import "../css/product.css";
 import { useState, useEffect } from "react";
 import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
+import { API_BASE_URL } from "@/config/env";
 export default function Blog() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [post, setPost] = useState<IBlog[]>([]);
@@ -169,7 +170,7 @@ export default function Blog() {
           <div className="list-blog">
             {post.map((item) => (
               <div className="box-blog" key={item.post_id}>
-                <img src={`/images/blog/${item.images}`} alt={item.title} />
+                <img src={`${API_BASE_URL }/uploads/blog/${item.images}`} alt={item.title} />
                 <div>
                   <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
                   <p>
