@@ -90,85 +90,84 @@ export default function Address() {
     };
   }
 
-  const handleAddOrUpdate = async (data: AddressFormData) => {
-    try {
-      if (!user?.id) return toast.error("Không xác định được người dùng!");
-
-      const address_line = [
-        data.address_line_part,
-        data.ward,
-        data.district,
-        data.province,
-      ]
-        .filter(Boolean)
-        .join(", ");
-
-      const payload = {
-        user_id: user.id,
-        full_name: data.full_name,
-        phone: data.phone,
-        address_line,
-        is_default: data.is_default ?? false,
-      };
-
-      // ⚠️ Nếu người dùng chọn làm mặc định → Unset mặc định cũ
-      if (data.is_default) {
-        const updates = addressList
-          .filter((addr) => addr.is_default && addr.id !== data.id)
-          .map((addr) =>
-            updateAddress(addr.id!, {
-              full_name: addr.full_name,
-              phone: addr.phone,
-              address_line: addr.address_line ?? "",
-              is_default: false,
-            })
-          );
-
-        await Promise.all(updates);
-        // Đồng bộ lại local list
-        setAddressList((prev) =>
-          prev.map((addr) =>
-            addr.id !== data.id ? { ...addr, is_default: false } : addr
-          )
-        );
-      }
-
-      if (formMode === "add") {
-        const result = await addAddressService(payload);
-        setAddressList((prev) => [
-          ...prev,
-          {
-            ...data,
-            address_line,
-            id: result.id,
-          },
-        ]);
-      } else {
-        const addressId = data.id;
-        if (!addressId) {
-          toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
-          return;
-        }
-
-        await updateAddress(addressId, payload);
-        setAddressList((prev) =>
-          prev.map((addr) =>
-            addr.id === addressId
-              ? {
-                  ...data,
-                  address_line,
-                  id: addressId,
-                }
-              : addr
-          )
-        );
-      }
-
-      setShowEditForm(false);
-    } catch (error: any) {
-      toast.error("Lỗi khi lưu địa chỉ: " + error.message);
+const handleAddOrUpdate = async (data: AddressFormData) => {
+  try {
+    if (!user?.id) {
+      toast.error("Không xác định được người dùng!");
+      return;
     }
-  };
+
+    const address_line = [data.address_line_part, data.ward, data.district, data.province]
+      .filter(Boolean)
+      .join(", ");
+
+    const payload = {
+      user_id: user.id,
+      full_name: data.full_name,
+      phone: data.phone,
+      address_line,
+      is_default: data.is_default ?? false,
+    };
+
+    // Bỏ địa chỉ mặc định cũ nếu đang chọn địa chỉ mới là mặc định
+    if (data.is_default) {
+      await unsetOtherDefaultAddresses(data.id);
+    }
+
+    if (formMode === "add") {
+      const result = await addAddressService(payload);
+      setAddressList((prev) => [
+        ...prev.map((addr) =>
+          data.is_default ? { ...addr, is_default: false } : addr
+        ),
+        {
+          ...data,
+          address_line,
+          id: result.id,
+        },
+      ]);
+      toast.success("Thêm địa chỉ thành công!");
+    } else {
+      if (!data.id) {
+        toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
+        return;
+      }
+
+      await updateAddress(data.id, payload);
+      setAddressList((prev) =>
+        prev.map((addr) =>
+          addr.id === data.id
+            ? { ...data, address_line, id: data.id }
+            : data.is_default
+            ? { ...addr, is_default: false }
+            : addr
+        )
+      );
+      toast.success("Cập nhật địa chỉ thành công!");
+    }
+
+    setShowEditForm(false);
+  } catch (error: any) {
+    toast.error("Lỗi khi lưu địa chỉ: " + error.message);
+  }
+};
+
+// 🧠 Tách riêng logic bỏ mặc định cũ
+const unsetOtherDefaultAddresses = async (currentId?: number) => {
+  const updates = addressList
+    .filter((addr) => addr.is_default && addr.id !== currentId)
+    .map((addr) =>
+      updateAddress(addr.id!, {
+        full_name: addr.full_name,
+        phone: addr.phone,
+        address_line: addr.address_line ?? "",
+        is_default: false,
+      })
+    );
+
+  await Promise.all(updates);
+};
+
 
   const handleDelete = async (addressId?: number) => {
     if (!addressId) return;
@@ -261,7 +260,7 @@ export default function Address() {
                 ) : (
                   addressList.map((address, index) => (
                     <div
-                      key={index}
+                      key={address.id}
                       className="customer_address col-xs-12 col-lg-12 col-md-12 col-xl-12"
                     >
                       <div
