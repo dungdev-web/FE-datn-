@@ -120,7 +120,7 @@ export async function getFilterPrice(
   return data;
 }
 // Lấy sản phẩm bán chạy dựa trên số lượng review hoặc random sold_count
-export async function getBestSellingMockProducts(top = 9): Promise<IProduct[]> {
+export async function getBestSellingMockProducts(top = 6): Promise<IProduct[]> {
   if (IS_MOCK) {
     const products = getMockProducts();
 
@@ -138,7 +138,7 @@ export async function getBestSellingMockProducts(top = 9): Promise<IProduct[]> {
 
   // Nếu dùng API thật
   try {
-    const res = await fetch(`${API_BASE_URL}/product/best-selling`);
+    const res = await fetch(`${API_BASE_URL}/product/best-selling?top=${top}`);
 
     if (!res.ok) {
       throw new Error("Không thể lấy sản phẩm bán chạy.");
@@ -214,7 +214,7 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
   return products;
 }
 
-//Lấy sản phẩm theo giới tính nam
+//Lấy sản phẩm theo giới tính 
 export async function getGenderShoes(
   name: string,
   limit: number,
@@ -259,29 +259,6 @@ export async function getGenderShoes(
   };
 }
 
-//lấy sản phẩm theo giới tính nữ
-// export async function getFemaleProducts(): Promise<IProduct[]> {
-//   if (IS_MOCK) {
-//     const all = getMockProducts();
-//     return all.filter(
-//       (product) =>
-//         product.category?.name?.toLowerCase().includes("nữ") ||
-//         product.category?.slug?.toLowerCase().includes("nu")
-//     );
-//   }
-
-//   // API thực tế (nếu dùng sau)
-//   const res = await fetch(`${API_BASE_URL}/products`);
-//   if (!res.ok) {
-//     throw new Error("Không thể lấy danh sách sản phẩm.");
-//   }
-//   const data: IProduct[] = await res.json();
-//   return data.filter(
-//     (product) =>
-//       product.category?.name?.toLowerCase().includes("nữ") ||
-//       product.category?.slug?.toLowerCase().includes("nu")
-//   );
-// }
 
 //Lấy sản phẩm theo catename
 export async function getProductsByCategory(
