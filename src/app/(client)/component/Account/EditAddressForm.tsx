@@ -43,13 +43,12 @@ export default function EditAddressForm({
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
-useEffect(() => {
-  console.log("🛠 initialData vào EditForm:", initialData); // 👈 Xem lúc nào `id` bị undefined
-  if (initialData?.id !== undefined) {
-    setFormData(initialData);
-  }
-}, [initialData]);
-
+  useEffect(() => {
+    console.log("🛠 initialData vào EditForm:", initialData); // 👈 Xem lúc nào `id` bị undefined
+    if (initialData?.id !== undefined) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
@@ -103,27 +102,26 @@ useEffect(() => {
   };
 
   const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!user) {
-    toast.error("Không tìm thấy thông tin người dùng!");
-    return;
-  }
+    if (!user) {
+      toast.error("Không tìm thấy thông tin người dùng!");
+      return;
+    }
 
-  if (mode === "edit" && !formData.id) {
-    toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
-    return;
-  }
-console.log("🧾 Submit formData:", formData);
+    if (mode === "edit" && !formData.id) {
+      toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
+      return;
+    }
+    console.log("🧾 Submit formData:", formData);
 
-  onSubmit({
-    ...formData,
-    user_id: user.id,
-  });
+    onSubmit({
+      ...formData,
+      user_id: user.id,
+    });
 
-  onClose();
-};
-
+    onClose();
+  };
 
   return (
     <div className="relative bg-white rounded-lg shadow-lg !p-6 w-full">
