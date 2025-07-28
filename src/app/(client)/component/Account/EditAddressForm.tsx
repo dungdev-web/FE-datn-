@@ -4,6 +4,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { addAddressService, updateAddress } from "@/services/addressService";
 import { toast } from "react-toastify";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAddressFormValidation } from "@/hooks/useAddressFormValidation";
 
 type AddressFormData = {
   id?: number;
@@ -43,6 +44,8 @@ export default function EditAddressForm({
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
+  const { errors, validateField, validateAll } =
+    useAddressFormValidation(initialData);
   useEffect(() => {
     console.log("🛠 initialData vào EditForm:", initialData);
     if (initialData?.id !== undefined) {
@@ -91,7 +94,7 @@ export default function EditAddressForm({
   ) => {
     const target = e.target;
     const { name, value, type } = target;
-
+    validateField(name, value);
     setFormData((prev) => ({
       ...prev,
       [name]:
@@ -108,7 +111,11 @@ export default function EditAddressForm({
       toast.error("Không tìm thấy thông tin người dùng!");
       return;
     }
-
+    const isValid = validateAll(formData);
+    if (!isValid) {
+      toast.error("Vui lòng kiểm tra lại các trường bắt buộc.");
+      return;
+    }
     if (mode === "edit" && !formData.id) {
       toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
       return;
@@ -147,6 +154,9 @@ export default function EditAddressForm({
             value={formData.full_name}
             onChange={handleChange}
           />
+          {errors.full_name && (
+            <p className="text-sm text-red-500 mt-1">{errors.full_name}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -159,6 +169,9 @@ export default function EditAddressForm({
             value={formData.phone}
             onChange={handleChange}
           />
+          {errors.phone && (
+            <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -171,18 +184,21 @@ export default function EditAddressForm({
             value={formData.address_line_part}
             onChange={handleChange}
           />
+          {errors.address_line_part && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.address_line_part}
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Quốc gia</label>
           <select
             name="country"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 "
             value={formData.country}
             onChange={handleChange}
           >
             <option value="Vietnam">Vietnam</option>
-            <option value="United States">United States</option>
-            <option value="Japan">Japan</option>
           </select>
         </div>
 
@@ -204,6 +220,9 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.province && (
+              <p className="text-sm text-red-500 mt-1">{errors.province}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -223,6 +242,9 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.district && (
+              <p className="text-sm text-red-500 mt-1">{errors.district}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
