@@ -283,7 +283,7 @@ export default function Home() {
             </p>
             <div className="buttons">
               <button ><Link  className="btn-lookbook"  href={`/product?gender=nam`}>GIÀY NAM</Link></button>  
-              <button ><Link  className="btn-lookbook"  href={`/product?gender=female`}>GIÀY NỮ</Link></button> 
+              <button ><Link  className="btn-lookbook"  href={`/product?gender=nữ`}>GIÀY NỮ</Link></button> 
             </div>
           </div>
 
