@@ -1,7 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-import { getAllProducts, getProductsByGender } from "@/services/productService";
+import {
+  getAllProducts,
+  getFilteredProducts,
+  getProductsByGender,
+} from "@/services/productService";
 import Link from "next/link";
 import { ICategory } from "@/types/ICategory";
 import { getCategories } from "@/services/categoryService";
@@ -41,6 +45,7 @@ export default function Product() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
     undefined
   );
+  const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
 
   const handleSortChange = (type: string) => {
     switch (type) {
@@ -96,44 +101,48 @@ export default function Product() {
     };
     fetchInitialData();
   }, []);
-
-  // --- HANDLERS ---
   useEffect(() => {
-    const fetchSearch = async () => {
-      if (!keyword) return;
-
+    const fetchFilteredProducts = async () => {
       try {
-        const res = await searchProducts(keyword, page, productsPerPage);
+        const res = await getFilteredProducts({
+          keyword,
+          gender: selectedGender || gender,
+          brand:
+            selectedBrandIds.length > 0
+              ? selectedBrandIds
+                  .map((id) => brandsList.find((b) => b.id === id)?.name)
+                  .filter(Boolean)
+              : undefined,
+          minPrice: selectedPriceRange?.min,
+          maxPrice: selectedPriceRange?.max,
+          page,
+          limit: productsPerPage,
+          sortBy,
+          sortOrder,
+        });
+
         setProducts(res.products || []);
         setTotal(res.total || 0);
-        console.log("Kết quả:", res.products);
+        setTotalPages(res.totalPages || 1);
       } catch (err) {
-        console.error("Lỗi tìm kiếm:", err);
-      }
-    };
-    fetchSearch();
-  }, [keyword, page]);
-  useEffect(() => {
-    const fetchGender = async () => {
-      if (!gender) return;
-
-      try {
-        const res = await getGenderShoes(gender, productsPerPage, page);
-        setProducts(res.products);
-        setTotal(res.total);
-        console.log("Kết quả gender:", res.products);
-        console.log("Kết quả limit:", productsPerPage);
-        console.log("Kết quả total:", res.total);
-      } catch (err) {
-        console.error("Lỗi tìm gender:", err);
+        console.error("Lỗi lọc sản phẩm:", err);
       }
     };
 
-    fetchGender();
-  }, [gender, page]);
-
-  const handleBrandCheckboxChange = (brandId: number) => {
-    setSelectedBrandIds((prev) => (prev[0] === brandId ? [] : [brandId]));
+    fetchFilteredProducts();
+  }, [
+    keyword,
+    selectedGender,
+    gender,
+    selectedBrandIds,
+    selectedPriceRange,
+    page,
+    sortBy,
+    sortOrder,
+    productsPerPage,
+  ]);
+  const handleBrandCheckboxChange = (id: number) => {
+    setSelectedBrandId(id === -1 ? null : id);
   };
   const handlePriceChange = (range: { min: number; max: number } | null) => {
     setSelectedPriceRange(range);

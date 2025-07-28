@@ -11,7 +11,7 @@ interface Props {
   openCategoryId: number | null;
   toggleCategory: (id: number) => void;
   brandsList: IBrand[];
-  selectedBrandIds: number[];
+  selectedBrandId: number | null; // 👈 thay vì array
   handleBrandCheckboxChange: (brandId: number) => void;
   selectedGender: string | null;
   handleGenderChange: (gender: string) => void;
