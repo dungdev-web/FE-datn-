@@ -154,6 +154,18 @@ export default function Address() {
   const handleDelete = async (addressId?: number) => {
     if (!addressId) return;
 
+    const targetAddress = addressList.find((addr) => addr.id === addressId);
+
+    if (targetAddress?.is_default) {
+      await Swal.fire({
+        icon: "error",
+        title: "Không thể xoá",
+        text: "Không thể xoá địa chỉ mặc định. Vui lòng đổi mặc định trước!",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     const result = await Swal.fire({
       title: "Bạn có chắc chắn?",
       text: "Địa chỉ này sẽ bị xoá và không thể khôi phục!",
@@ -169,7 +181,7 @@ export default function Address() {
 
     try {
       await deleteAddress(addressId);
-      setAddressList((prev) => prev.filter((addr) => addr.id !== addressId));
+      await fetchAddresses();
       Swal.fire("Đã xoá!", "Địa chỉ đã được xoá thành công.", "success");
     } catch (error: any) {
       Swal.fire("Lỗi!", "Xoá địa chỉ thất bại: " + error.message, "error");
