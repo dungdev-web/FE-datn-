@@ -38,10 +38,18 @@ export default function EditAddressForm({
 }: Props) {
   const { user } = useAuthUser();
   const [formData, setFormData] = useState<AddressFormData>(initialData);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
+useEffect(() => {
+  console.log("🛠 initialData vào EditForm:", initialData); // 👈 Xem lúc nào `id` bị undefined
+  if (initialData?.id !== undefined) {
+    setFormData(initialData);
+  }
+}, [initialData]);
+
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
@@ -50,80 +58,72 @@ export default function EditAddressForm({
   }, []);
 
   useEffect(() => {
-    const province = provinces.find((p) => p.name === formData.province);
-    if (province) {
-      fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`)
-        .then((res) => res.json())
-        .then((data) => {
-          setDistricts(data.districts || []);
-          setWards([]);
-        });
+    if (formData.province && provinces.length) {
+      const selectedProvince = provinces.find(
+        (p) => p.name === formData.province
+      );
+      if (selectedProvince) {
+        fetch(
+          `https://provinces.open-api.vn/api/p/${selectedProvince.code}?depth=2`
+        )
+          .then((res) => res.json())
+          .then((data) => setDistricts(data.districts || []));
+      }
     }
-  }, [formData.province]);
+  }, [formData.province, provinces]);
 
   useEffect(() => {
-    const district = districts.find((d) => d.name === formData.district);
-    if (district) {
-      fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`)
-        .then((res) => res.json())
-        .then((data) => setWards(data.wards || []));
+    if (formData.district && districts.length) {
+      const selectedDistrict = districts.find(
+        (d) => d.name === formData.district
+      );
+      if (selectedDistrict) {
+        fetch(
+          `https://provinces.open-api.vn/api/d/${selectedDistrict.code}?depth=2`
+        )
+          .then((res) => res.json())
+          .then((data) => setWards(data.wards || []));
+      }
     }
-  }, [formData.district]);
+  }, [formData.district, districts]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const target = e.target;
     const { name, value, type } = target;
-    const checked = type === "checkbox" ? target.checked : undefined;
 
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox" ? (target as HTMLInputElement).checked : value,
       ...(name === "province" ? { district: "", ward: "" } : {}),
       ...(name === "district" ? { ward: "" } : {}),
     }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
+  if (!user) {
+    toast.error("Không tìm thấy thông tin người dùng!");
+    return;
+  }
 
-    if (!user) {
-      toast.error("Không tìm thấy thông tin người dùng!");
-      return;
-    }
-    const dataToSubmit = {
-      user_id: user.id,
-      full_name: formData.full_name,
-      phone: formData.phone,
-      address_line: fullAddress,
-      is_default: formData.is_default ?? false,
-    };
+  if (mode === "edit" && !formData.id) {
+    toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
+    return;
+  }
+console.log("🧾 Submit formData:", formData);
 
-    try {
-      setLoading(true);
+  onSubmit({
+    ...formData,
+    user_id: user.id,
+  });
 
-      if (mode === "add") {
-        await addAddressService(dataToSubmit);
-        toast.success("Thêm địa chỉ thành công!");
-      } else if (formData.id) {
-        await updateAddress(formData.id, dataToSubmit);
-        toast.success("Cập nhật địa chỉ thành công!");
-      } else {
-        toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
-        return;
-      }
+  onClose();
+};
 
-      onSubmit(formData);
-      onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="relative bg-white rounded-lg shadow-lg !p-6 w-full">

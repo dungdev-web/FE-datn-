@@ -53,20 +53,21 @@ export default function Address() {
         const addresses: AddressFormData[] = Array.isArray(res)
           ? res
               .filter((item: any) => item.ship_address_id)
-              .map((item: any) => ({
-                id: item.ship_address_id,
-                full_name: item.full_name,
-                phone: item.phone,
-                address_line_part: "",
-                country: "Vietnam",
-                province: "",
-                district: "",
-                ward: "",
-                is_default: item.is_default ?? false,
-                address_line: item.address_line ?? "",
-              }))
-          : [];
+              .map((item: any) => {
+                const parsed = parseAddressLine(item.address_line || "");
 
+                return {
+                  id: item.ship_address_id,
+                  full_name: item.full_name,
+                  phone: item.phone,
+                  ...parsed,
+                  country: "Vietnam",
+                  is_default: item.is_default ?? false,
+                  address_line: item.address_line ?? "",
+                };
+              })
+          : [];
+        console.log("📦 Địa chỉ người dùng:", addresses);
         setAddressList(addresses);
       } catch (error) {
         console.error("Lỗi khi lấy danh sách địa chỉ:", error);
@@ -77,10 +78,22 @@ export default function Address() {
 
     fetchAddresses();
   }, [user?.id]);
+  function parseAddressLine(address_line: string) {
+    const [part, ward, district, province] = address_line
+      .split(",")
+      .map((s) => s.trim());
+    return {
+      address_line_part: part || "",
+      ward: ward || "",
+      district: district || "",
+      province: province || "",
+    };
+  }
 
   const handleAddOrUpdate = async (data: AddressFormData) => {
     try {
       if (!user?.id) return toast.error("Không xác định được người dùng!");
+
       const address_line = [
         data.address_line_part,
         data.ward,
@@ -97,6 +110,28 @@ export default function Address() {
         address_line,
         is_default: data.is_default ?? false,
       };
+
+      // ⚠️ Nếu người dùng chọn làm mặc định → Unset mặc định cũ
+      if (data.is_default) {
+        const updates = addressList
+          .filter((addr) => addr.is_default && addr.id !== data.id)
+          .map((addr) =>
+            updateAddress(addr.id!, {
+              full_name: addr.full_name,
+              phone: addr.phone,
+              address_line: addr.address_line ?? "",
+              is_default: false,
+            })
+          );
+
+        await Promise.all(updates);
+        // Đồng bộ lại local list
+        setAddressList((prev) =>
+          prev.map((addr) =>
+            addr.id !== data.id ? { ...addr, is_default: false } : addr
+          )
+        );
+      }
 
       if (formMode === "add") {
         const result = await addAddressService(payload);
@@ -134,6 +169,7 @@ export default function Address() {
       toast.error("Lỗi khi lưu địa chỉ: " + error.message);
     }
   };
+
   const handleDelete = async (addressId?: number) => {
     if (!addressId) return;
 
@@ -265,7 +301,10 @@ export default function Address() {
                               onClick={() => {
                                 setFormMode("edit");
                                 setAddressData({ ...address });
-                                setShowEditForm(true);
+
+                                setTimeout(() => {
+                                  setShowEditForm(true);
+                                }, 0);
                               }}
                             >
                               Chỉnh sửa địa chỉ
