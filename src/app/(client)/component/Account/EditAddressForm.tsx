@@ -150,7 +150,7 @@ export default function EditAddressForm({
           <input
             type="text"
             name="full_name"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.full_name}
             onChange={handleChange}
           />
@@ -165,7 +165,7 @@ export default function EditAddressForm({
           <input
             type="text"
             name="phone"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.phone}
             onChange={handleChange}
           />
@@ -180,7 +180,7 @@ export default function EditAddressForm({
           <input
             type="text"
             name="address_line_part"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.address_line_part}
             onChange={handleChange}
           />
@@ -194,7 +194,7 @@ export default function EditAddressForm({
           <label className="block text-sm font-medium mb-1">Quốc gia</label>
           <select
             name="country"
-            className="w-full border border-gray-300 rounded !px-3 !py-2 "
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.country}
             onChange={handleChange}
           >
@@ -209,7 +209,7 @@ export default function EditAddressForm({
             </label>
             <select
               name="province"
-              className="w-full border border-gray-300 rounded !px-3 !py-2"
+              className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
               value={formData.province}
               onChange={handleChange}
             >
@@ -264,6 +264,9 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.ward && (
+              <p className="text-sm text-red-500 mt-1">{errors.ward}</p>
+            )}
           </div>
         </div>
 
