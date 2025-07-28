@@ -7,7 +7,7 @@ import { getInfoUser, checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import LogoutLink from "../component/log_out";
 import CheckTokenGuard from "@/store/CheckTokenGuard";
-import AccountSidebar from "../component/accountsidebar";
+import AccountSidebar from "../component/Account/AccountSidebar";
 import { updateUserService, uploadAvatarService } from "@/services/userService";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "@/config/env";

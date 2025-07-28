@@ -168,25 +168,37 @@ export const getCartByUserId = async (
   userId: number
 ): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`);
-    if (!res.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
+    const res = await fetch(`${API_BASE_URL}/cart/${userId}`, {
+      method: "GET",
+      credentials: "include", // nếu backend dùng cookie-auth
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fetch failed: ${res.status} - ${errorText}`);
+    }
+
     const data: ICart = await res.json();
 
-    // ✅ Chuyển đổi cart_items => items, ép price về number
+    // ✅ Chuyển cart_items thành items, ép price về number
     const cartWithItems = {
       ...data,
       items: data.cart_items.map((item) => ({
         ...item,
-        price: Number(item.price), // ép từ string => number để tính toán
+        price: Number(item.price), // ép từ string -> number
       })),
     };
 
     return cartWithItems;
   } catch (error) {
-    console.error("Lỗi lấy giỏ hàng:", error);
+    console.error("Lỗi khi lấy giỏ hàng:", error);
     return null;
   }
 };
+
 
 export const updateCartItem = async ({
   user_id,

@@ -1,12 +1,13 @@
 "use client";
 import { API_BASE_URL } from "@/config/env";
+import { useGlobalStore } from "@/store/useGlobalStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 export default function GoogleCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+ const setUser = useGlobalStore((state) => state.setUser);
   useEffect(() => {
     const code = searchParams.get("code");
 
@@ -19,6 +20,9 @@ export default function GoogleCallback() {
       })
         .then((res) => res.json())
         .then((data) => {
+          if (data.user) {
+            setUser(data.user);
+          }
           router.push("/account");
         })
         .catch((err) => console.error("Login error", err));
