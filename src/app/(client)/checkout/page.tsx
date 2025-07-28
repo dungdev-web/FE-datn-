@@ -8,6 +8,14 @@ import { ICart, ICartItem } from "@/types/cart";
 import { getCartByUserId } from "@/services/cartService";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { API_BASE_URL } from "@/config/env";
+import {
+  getAddressByUserId,
+  getDefaultAddressService,
+  updateAddress,
+} from "@/services/addressService";
+import { Address } from "@/types/address";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -20,6 +28,84 @@ export default function Checkout() {
   const [cart, setCart] = useState<(ICart & { items: ICartItem[] }) | null>(
     null
   );
+  const [fullName, setFullName] = useState("");
+  const [defaultAddress, setDefaultAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
+    null
+  );
+  const [hasNoAddress, setHasNoAddress] = useState(false);
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const fetchData = async () => {
+      try {
+        const [cartData, addressData, allAddresses] = await Promise.all([
+          getCartByUserId(user.id),
+          getDefaultAddressService(user.id),
+          getAddressByUserId(user.id),
+        ]);
+
+        setCart(cartData);
+        setAddresses(allAddresses);
+
+        if (allAddresses.length === 0) {
+          setHasNoAddress(true);
+        } else {
+          setHasNoAddress(false);
+
+          if (addressData) {
+            setFullName(addressData.full_name);
+            setPhone(addressData.phone);
+            setDefaultAddress(addressData.address_line);
+            setEmail(addressData.email);
+            setSelectedAddressId(addressData.ship_address_id);
+          } else {
+            const first = allAddresses[0];
+            setFullName(first.full_name);
+            setPhone(first.phone);
+            setDefaultAddress(first.address_line);
+            setEmail(first.email);
+            setSelectedAddressId(first.ship_address_id);
+
+            try {
+              await updateAddress(first.ship_address_id, {
+                full_name: first.full_name,
+                phone: first.phone,
+                address_line: first.address_line,
+                is_default: true,
+              });
+
+              Swal.fire({
+                icon: "success",
+                title: "Đã chọn địa chỉ mặc định",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+
+              const updated = await getAddressByUserId(user.id);
+              setAddresses(updated);
+              window.location.href = "/checkout";
+            } catch (error) {
+              console.error("❌ Không thể cập nhật địa chỉ mặc định:", error);
+              Swal.fire({
+                icon: "error",
+                title: "Không thể chọn địa chỉ mặc định",
+                text:
+                  error instanceof Error ? error.message : "Vui lòng thử lại.",
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("❌ Không thể lấy dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, [user?.id]);
+
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/?depth=1")
       .then((res) => res.json())
@@ -68,71 +154,150 @@ export default function Checkout() {
           TERA Shoes
         </a>
         <h3 className="text-lg font-semibold mt-4 mb-3">Thông tin nhận hàng</h3>
-        <form id="checkout-form" className="space-y-3">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-          />
-          <input
-            type="text"
-            placeholder="Họ và tên"
-            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-          />
-          <PhoneInput
-            country={"vn"}
-            value={phone}
-            onChange={setPhone}
-            inputClass="!w-full !border !px-4 !py-3 !rounded !border-gray-300 focus:!border-blue-500 focus:!outline-none"
-            containerClass="!mb-3"
-            placeholder="Số điện thoại"
-          />
-          <input
-            type="text"
-            placeholder="Địa chỉ (tùy chọn)"
-            className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
-          />
+        {hasNoAddress ? (
+          <div className="bg-yellow-100 border text-center border-yellow-400 text-yellow-800 px-4 py-3 rounded relative mb-4">
+            <strong className="font-bold ">
+              Bạn chưa có địa chỉ giao hàng!
+            </strong>
+            <p className="mt-1">
+              Vui lòng thêm địa chỉ trước khi tiếp tục thanh toán.
+            </p>
+          </div>
+        ) : (
+          <form id="checkout-form" className="space-y-3">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+            />
 
-          <select
-            value={selectedProvince}
-            onChange={(e) => setSelectedProvince(e.target.value)}
-            className="w-full px-4 py-3 rounded border border-gray-300"
-          >
-            <option value="">Chọn tỉnh/thành phố</option>
-            {provinces.map((p) => (
-              <option key={p.code} value={p.code}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+            <input
+              type="text"
+              placeholder="Họ và tên"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+            />
 
-          <select
-            value={selectedDistrict}
-            onChange={(e) => setSelectedDistrict(e.target.value)}
-            className="w-full px-4 py-3 rounded border border-gray-300"
-          >
-            <option value="">Chọn quận/huyện</option>
-            {districts.map((d) => (
-              <option key={d.code} value={d.code}>
-                {d.name}
-              </option>
-            ))}
-          </select>
+            <PhoneInput
+              country={"vn"}
+              value={phone}
+              onChange={setPhone}
+              inputClass="!w-full !border !px-4 !py-3 !rounded !border-gray-300 focus:!border-blue-500 focus:!outline-none"
+              containerClass="!mb-3"
+              placeholder="Số điện thoại"
+            />
+            <input
+              type="text"
+              placeholder="Địa chỉ (tùy chọn)"
+              value={defaultAddress}
+              onChange={(e) => setDefaultAddress(e.target.value)}
+              className="w-full px-4 py-3 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+            />
+            {addresses.length > 0 && (
+              <div className="mb-3">
+                <label className="block font-medium mb-1">
+                  Chọn địa chỉ giao hàng:
+                </label>
+                <select
+                  className="w-full px-4 py-3 rounded border border-gray-300"
+                  value={selectedAddressId || ""}
+                  onChange={async (e) => {
+                    const newId = parseInt(e.target.value);
+                    const selected = addresses.find(
+                      (addr) => addr.ship_address_id === newId
+                    );
 
-          <select className="w-full px-4 py-3 rounded border border-gray-300">
-            <option value="">Chọn phường/xã</option>
-            {wards.map((w) => (
-              <option key={w.code} value={w.code}>
-                {w.name}
-              </option>
-            ))}
-          </select>
+                    if (selected) {
+                      setSelectedAddressId(newId);
+                      setFullName(selected.full_name);
+                      setPhone(selected.phone);
+                      setDefaultAddress(selected.address_line);
 
-          <textarea
-            placeholder="Ghi chú (tùy chọn)"
-            className="w-full px-4 py-3 rounded border border-gray-300"
-          ></textarea>
-        </form>
+                      if (!selected.is_default) {
+                        try {
+                          const currentDefault = addresses.find(
+                            (addr) => addr.is_default
+                          );
+                          if (
+                            currentDefault &&
+                            currentDefault.ship_address_id !== newId
+                          ) {
+                            await updateAddress(
+                              currentDefault.ship_address_id,
+                              {
+                                full_name: currentDefault.full_name,
+                                phone: currentDefault.phone,
+                                address_line: currentDefault.address_line,
+                                is_default: false,
+                              }
+                            );
+                          }
+
+                          await updateAddress(newId, {
+                            full_name: selected.full_name,
+                            phone: selected.phone,
+                            address_line: selected.address_line,
+                            is_default: true,
+                          });
+
+                          Swal.fire({
+                            icon: "success",
+                            title: "Cập nhật địa chỉ mặc định thành công",
+                            showConfirmButton: false,
+                            timer: 1500,
+                          });
+
+                          const updated = await getAddressByUserId(
+                            user?.id || 0
+                          );
+                          setAddresses(updated);
+                        } catch (error) {
+                          Swal.fire({
+                            icon: "error",
+                            title: "Cập nhật địa chỉ thất bại",
+                            text:
+                              error instanceof Error
+                                ? error.message
+                                : "Vui lòng thử lại.",
+                          });
+
+                          console.error(error);
+                        }
+                      }
+                    }
+                  }}
+                >
+                  {addresses.map((addr) => (
+                    <option
+                      key={addr.ship_address_id}
+                      value={addr.ship_address_id}
+                    >
+                      {addr.address_line} {addr.is_default ? "(Mặc định)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <textarea
+              placeholder="Ghi chú (tùy chọn)"
+              className="w-full px-4 py-3 rounded border border-gray-300"
+            ></textarea>
+          </form>
+        )}
+        {hasNoAddress && (
+          <div className="mt-2 text-center">
+            <a
+              href="/account/address"
+              className="inline-block px-4 py-2 !text-xl !underline  bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+            >
+              Thêm địa chỉ giao hàng
+            </a>
+          </div>
+        )}
       </div>
 
       {/* EXTRA: Thanh toán */}
