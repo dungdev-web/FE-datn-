@@ -43,41 +43,39 @@ export default function Address() {
   const [addressList, setAddressList] = useState<AddressFormData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchAddresses = async () => {
+    if (!user?.id) return;
+    try {
+      setIsLoading(true);
+      const res = await getAddressByUserId(user.id);
+      const addresses: AddressFormData[] = Array.isArray(res)
+        ? res
+            .filter((item: any) => item.ship_address_id)
+            .map((item: any) => {
+              const parsed = parseAddressLine(item.address_line || "");
+              return {
+                id: item.ship_address_id,
+                full_name: item.full_name,
+                phone: item.phone,
+                ...parsed,
+                country: "Vietnam",
+                is_default: item.is_default ?? false,
+                address_line: item.address_line ?? "",
+              };
+            })
+        : [];
+      setAddressList(addresses);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách địa chỉ:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!user || !user.id) return;
-
-    const fetchAddresses = async () => {
-      try {
-        setIsLoading(true);
-        const res = await getAddressByUserId(user.id);
-        const addresses: AddressFormData[] = Array.isArray(res)
-          ? res
-              .filter((item: any) => item.ship_address_id)
-              .map((item: any) => {
-                const parsed = parseAddressLine(item.address_line || "");
-
-                return {
-                  id: item.ship_address_id,
-                  full_name: item.full_name,
-                  phone: item.phone,
-                  ...parsed,
-                  country: "Vietnam",
-                  is_default: item.is_default ?? false,
-                  address_line: item.address_line ?? "",
-                };
-              })
-          : [];
-        console.log("📦 Địa chỉ người dùng:", addresses);
-        setAddressList(addresses);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách địa chỉ:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchAddresses();
   }, [user?.id]);
+
   function parseAddressLine(address_line: string) {
     const [part, ward, district, province] = address_line
       .split(",")
@@ -90,84 +88,68 @@ export default function Address() {
     };
   }
 
-const handleAddOrUpdate = async (data: AddressFormData) => {
-  try {
-    if (!user?.id) {
-      toast.error("Không xác định được người dùng!");
-      return;
-    }
-
-    const address_line = [data.address_line_part, data.ward, data.district, data.province]
-      .filter(Boolean)
-      .join(", ");
-
-    const payload = {
-      user_id: user.id,
-      full_name: data.full_name,
-      phone: data.phone,
-      address_line,
-      is_default: data.is_default ?? false,
-    };
-
-    // Bỏ địa chỉ mặc định cũ nếu đang chọn địa chỉ mới là mặc định
-    if (data.is_default) {
-      await unsetOtherDefaultAddresses(data.id);
-    }
-
-    if (formMode === "add") {
-      const result = await addAddressService(payload);
-      setAddressList((prev) => [
-        ...prev.map((addr) =>
-          data.is_default ? { ...addr, is_default: false } : addr
-        ),
-        {
-          ...data,
-          address_line,
-          id: result.id,
-        },
-      ]);
-      toast.success("Thêm địa chỉ thành công!");
-    } else {
-      if (!data.id) {
-        toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
+  const handleAddOrUpdate = async (data: AddressFormData) => {
+    try {
+      if (!user?.id) {
+        toast.error("Không xác định được người dùng!");
         return;
       }
 
-      await updateAddress(data.id, payload);
-      setAddressList((prev) =>
-        prev.map((addr) =>
-          addr.id === data.id
-            ? { ...data, address_line, id: data.id }
-            : data.is_default
-            ? { ...addr, is_default: false }
-            : addr
-        )
-      );
-      toast.success("Cập nhật địa chỉ thành công!");
+      const address_line = [
+        data.address_line_part,
+        data.ward,
+        data.district,
+        data.province,
+      ]
+        .filter(Boolean)
+        .join(", ");
+
+      const payload = {
+        user_id: user.id,
+        full_name: data.full_name,
+        phone: data.phone,
+        address_line,
+        is_default: data.is_default ?? false,
+      };
+
+      if (data.is_default) {
+        await unsetOtherDefaultAddresses(data.id);
+      }
+
+      if (formMode === "add") {
+        await addAddressService(payload);
+        toast.success("Thêm địa chỉ thành công!");
+      } else {
+        if (!data.id) {
+          toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
+          return;
+        }
+
+        await updateAddress(data.id, payload);
+        toast.success("Cập nhật địa chỉ thành công!");
+      }
+
+      setShowEditForm(false);
+      await fetchAddresses(); // ✅ Luôn fetch lại để đồng bộ
+    } catch (error: any) {
+      toast.error("Lỗi khi lưu địa chỉ: " + error.message);
     }
+  };
 
-    setShowEditForm(false);
-  } catch (error: any) {
-    toast.error("Lỗi khi lưu địa chỉ: " + error.message);
-  }
-};
+  const unsetOtherDefaultAddresses = async (currentId?: number) => {
+    const updates = addressList
+      .filter((addr) => addr.is_default && addr.id !== currentId)
+      .map((addr) =>
+        updateAddress(addr.id!, {
+          full_name: addr.full_name,
+          phone: addr.phone,
+          address_line: addr.address_line ?? "",
+          is_default: false,
+        })
+      );
 
-// 🧠 Tách riêng logic bỏ mặc định cũ
-const unsetOtherDefaultAddresses = async (currentId?: number) => {
-  const updates = addressList
-    .filter((addr) => addr.is_default && addr.id !== currentId)
-    .map((addr) =>
-      updateAddress(addr.id!, {
-        full_name: addr.full_name,
-        phone: addr.phone,
-        address_line: addr.address_line ?? "",
-        is_default: false,
-      })
-    );
-
-  await Promise.all(updates);
-};
-
+    await Promise.all(updates);
+  };
 
   const handleDelete = async (addressId?: number) => {
     if (!addressId) return;
