@@ -1,11 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-import {
-  getAllProducts,
-  getFilteredProducts,
-  getProductsByGender,
-} from "@/services/productService";
+import { getAllProducts, getFilteredProducts, getProductsByGender } from "@/services/productService";
 import Link from "next/link";
 import { ICategory } from "@/types/ICategory";
 import { getCategories } from "@/services/categoryService";
@@ -45,7 +41,6 @@ export default function Product() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
     undefined
   );
-  const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
 
   const handleSortChange = (type: string) => {
     switch (type) {
@@ -101,48 +96,43 @@ export default function Product() {
     };
     fetchInitialData();
   }, []);
-  useEffect(() => {
-    const fetchFilteredProducts = async () => {
-      try {
-        const res = await getFilteredProducts({
-          keyword,
-          gender: selectedGender || gender,
-          brand:
-            selectedBrandIds.length > 0
-              ? selectedBrandIds
-                  .map((id) => brandsList.find((b) => b.id === id)?.name)
-                  .filter(Boolean)
-              : undefined,
-          minPrice: selectedPriceRange?.min,
-          maxPrice: selectedPriceRange?.max,
-          page,
-          limit: productsPerPage,
-          sortBy,
-          sortOrder,
-        });
+useEffect(() => {
+  const fetchFilteredProducts = async () => {
+    try {
+      const res = await getFilteredProducts({
+        keyword,
+        gender: selectedGender || gender,
+        brand: selectedBrandIds.length > 0 ? selectedBrandIds.map((id) => brandsList.find(b => b.id === id)?.name).filter(Boolean) : undefined,
+        minPrice: selectedPriceRange?.min,
+        maxPrice: selectedPriceRange?.max,
+        page,
+        limit: productsPerPage,
+        sortBy,
+        sortOrder,
+      });
 
-        setProducts(res.products || []);
-        setTotal(res.total || 0);
-        setTotalPages(res.totalPages || 1);
-      } catch (err) {
-        console.error("Lỗi lọc sản phẩm:", err);
-      }
-    };
+      setProducts(res.products || []);
+      setTotal(res.total || 0);
+      setTotalPages(res.totalPages || 1);
+    } catch (err) {
+      console.error("Lỗi lọc sản phẩm:", err);
+    }
+  };
 
-    fetchFilteredProducts();
-  }, [
-    keyword,
-    selectedGender,
-    gender,
-    selectedBrandIds,
-    selectedPriceRange,
-    page,
-    sortBy,
-    sortOrder,
-    productsPerPage,
-  ]);
-  const handleBrandCheckboxChange = (id: number) => {
-    setSelectedBrandId(id === -1 ? null : id);
+  fetchFilteredProducts();
+}, [
+  keyword,
+  selectedGender,
+  gender,
+  selectedBrandIds,
+  selectedPriceRange,
+  page,
+  sortBy,
+  sortOrder,
+  productsPerPage,
+]);
+  const handleBrandCheckboxChange = (brandId: number) => {
+    setSelectedBrandIds((prev) => (prev[0] === brandId ? [] : [brandId]));
   };
   const handlePriceChange = (range: { min: number; max: number } | null) => {
     setSelectedPriceRange(range);
