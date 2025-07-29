@@ -28,6 +28,7 @@ interface Props {
   ) => void;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  resetAllFilters: () => void;
 }
 
 export default function SidebarFilter({
@@ -47,6 +48,7 @@ export default function SidebarFilter({
   onProductsChange,
   sortBy,
   sortOrder,
+  resetAllFilters,
 }: Props) {
   const [filterHistory, setFilterHistory] = useState<
     {
@@ -117,15 +119,16 @@ export default function SidebarFilter({
   }, [selectedBrandIds, selectedGender, selectedPriceRange]);
 
   const hasFilter =
-    selectedBrandIds.length > 0 || selectedGender || selectedPriceRange;
+    selectedBrandIds.length > 0 ||
+    (selectedGender && selectedGender !== "") ||
+    selectedPriceRange !== null;
 
   const clearAllFilters = () => {
     setLocalBrand(null);
     setLocalGender(null);
     setLocalPrice(null);
-    handleBrandCheckboxChange(-1);
-    handleGenderChange("");
-    handlePriceChange(null);
+    setFilterHistory([]); // ✅ xóa luôn lịch sử nếu muốn
+    resetAllFilters(); // ✅ gọi từ cha để cập nhật lại UI chính xác
   };
 
   const handleUndo = () => {
@@ -243,12 +246,13 @@ export default function SidebarFilter({
               )}
               {selectedBrandIds.map((id) => {
                 const brand = brandsList.find((b) => b.brand_id === id);
+                if (!brand) return null;
                 return (
                   <li
                     key={id}
                     className="flex items-center text-sm justify-between"
                   >
-                    <span>{brand?.name}</span>
+                    <span>{brand.name}</span>
                     <button
                       onClick={() => handleBrandCheckboxChange(-1)}
                       className="text-red-500 ml-2"
@@ -400,19 +404,14 @@ export default function SidebarFilter({
                   >
                     <label>
                       <input
-                        key={
-                          selectedBrandIds.includes(brand.brand_id)
-                            ? "checked"
-                            : "unchecked"
-                        }
                         type="radio"
                         name="brand"
+                        value={brand.brand_id}
                         checked={selectedBrandIds.includes(brand.brand_id)}
                         onChange={() =>
                           handleBrandCheckboxChange(brand.brand_id)
                         }
                       />
-
                       <i className="fa"></i>
                       {brand.name}
                     </label>

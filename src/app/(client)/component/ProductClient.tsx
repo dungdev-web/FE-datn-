@@ -27,13 +27,18 @@ export default function Product() {
   const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<{ min: number; max: number } | null>(null);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{
+    min: number;
+    max: number;
+  } | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
+    undefined
+  );
   const [isActive, setIsActive] = useState(false);
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
 
@@ -43,6 +48,13 @@ export default function Product() {
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
 
   const productsPerPage = viewMode === "grid" ? 12 : 6;
+  // Product.tsx
+  const resetAllFilters = () => {
+    setSelectedBrandIds([]);
+    setSelectedGender(null);
+    setSelectedPriceRange(null);
+    setPage(1);
+  };
 
   // Đồng bộ gender từ query param vào selectedGender
   useEffect(() => {
@@ -55,7 +67,10 @@ export default function Product() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [brands, categories] = await Promise.all([getBrands(), getCategories()]);
+        const [brands, categories] = await Promise.all([
+          getBrands(),
+          getCategories(),
+        ]);
         setBrandsList(brands || []);
         setCategories(categories || []);
       } catch (err) {
@@ -71,12 +86,12 @@ export default function Product() {
       try {
         const res = await getFilteredProducts({
           keyword,
-          gender: selectedGender,
+          gender: selectedGender ?? undefined,
           brand:
             selectedBrandIds.length > 0
-              ? selectedBrandIds
+              ? (selectedBrandIds
                   .map((id) => brandsList.find((b) => b.id === id)?.name)
-                  .filter(Boolean)
+                  .filter(Boolean) as string[])
               : undefined,
           minPrice: selectedPriceRange?.min,
           maxPrice: selectedPriceRange?.max,
@@ -139,9 +154,10 @@ export default function Product() {
     }
     setPage(1);
   };
-
   const handleBrandCheckboxChange = (brandId: number) => {
-    setSelectedBrandIds((prev) => (prev[0] === brandId ? [] : [brandId]));
+    setSelectedBrandIds((prev) =>
+      prev.length > 0 && prev[0] === brandId ? [] : [brandId]
+    );
   };
 
   const handlePriceChange = (range: { min: number; max: number } | null) => {
@@ -218,10 +234,11 @@ export default function Product() {
                 onProductsChange={(products, total, totalPages) => {
                   setProducts(products);
                   setTotal(total);
-                  setTotal(totalPages);
+                  setTotalPages(totalPages);
                 }}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
+                resetAllFilters={resetAllFilters}
               />
 
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">

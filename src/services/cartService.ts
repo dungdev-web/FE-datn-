@@ -39,6 +39,7 @@ export const addToCart = async ({
     const data = await res.json();
 
     return {
+      length: Array.isArray(data.cart) ? data.cart.length : 0,
       message: data.message,
       cart: data.cart, // kiểu này khớp với ICartItem[]
     };
@@ -168,7 +169,7 @@ export const getCartByUserId = async (
   userId: number
 ): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/cart/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
       credentials: "include", // nếu backend dùng cookie-auth
       headers: {
