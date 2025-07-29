@@ -556,33 +556,6 @@ export default function OrderDetail() {
                 </div>
               </div>
             </div>
-
-            {/* Debug info - chỉ hiển thị trong development */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
-                <h3 className="font-semibold text-yellow-800 mb-2">Debug Info:</h3>
-                <pre className="text-xs text-yellow-700 overflow-auto">
-                  {JSON.stringify({ 
-                    orderId, 
-                    orderStatus: order.status,
-                    orderItemsCount: order.order_items?.length || 0,
-                    addressId: order.shipping_address_id,
-                    hasAddress: !!address,
-                    userName: user?.name,
-                    userEmail: user?.email,
-                    firstProduct: order.order_items?.[0]?.variant_id?.product?.name,
-                    firstProductVariant: order.order_items?.[0]?.variant_id,
-                    colorData: order.order_items?.[0]?.variant_id?.color,
-                    sizeData: order.order_items?.[0]?.variant_id?.size,
-                    rawOrderItem: order.order_items?.[0],
-                    addressName: address?.full_name,
-                    addressPhone: address?.phone,
-                    addressFull: address,
-                    paymentMethod: order.payment_method_id
-                  }, null, 2)}
-                </pre>
-              </div>
-            )}
           </div>
         </div>
       </main>
