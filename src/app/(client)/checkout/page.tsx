@@ -36,6 +36,99 @@ export default function Checkout() {
     null
   );
   const [hasNoAddress, setHasNoAddress] = useState(false);
+  const [shippingFee, setShippingFee] = useState(0);
+  const provinceShippingFees: Record<string, number> = {
+    // Thành phố lớn
+    "Hồ Chí Minh": 30000,
+    "Hà Nội": 35000,
+    "Đà Nẵng": 40000,
+
+    // Miền Nam
+    "Bình Dương": 35000,
+    "Đồng Nai": 35000,
+    "Cần Thơ": 40000,
+    "An Giang": 40000,
+    "Tiền Giang": 40000,
+    "Bến Tre": 40000,
+    "Long An": 35000,
+    "Vĩnh Long": 40000,
+    "Trà Vinh": 40000,
+    "Hậu Giang": 40000,
+    "Sóc Trăng": 40000,
+    "Cà Mau": 45000,
+    "Bạc Liêu": 45000,
+    "Tây Ninh": 35000,
+    "Bình Phước": 40000,
+
+    // Miền Trung
+    "Thừa Thiên Huế": 40000,
+    "Quảng Nam": 40000,
+    "Quảng Ngãi": 40000,
+    "Bình Định": 40000,
+    "Phú Yên": 40000,
+    "Khánh Hòa": 40000,
+    "Ninh Thuận": 40000,
+    "Bình Thuận": 40000,
+    "Lâm Đồng": 40000,
+    "Đắk Lắk": 45000,
+    "Đắk Nông": 45000,
+    "Gia Lai": 45000,
+    "Kon Tum": 45000,
+
+    // Miền Bắc
+    "Hải Phòng": 35000,
+    "Bắc Ninh": 35000,
+    "Bắc Giang": 35000,
+    "Thái Nguyên": 35000,
+    "Hưng Yên": 35000,
+    "Hải Dương": 35000,
+    "Nam Định": 35000,
+    "Ninh Bình": 35000,
+    "Thanh Hóa": 40000,
+    "Nghệ An": 40000,
+    "Hà Tĩnh": 40000,
+    "Quảng Bình": 40000,
+    "Quảng Trị": 40000,
+    "Lào Cai": 45000,
+    "Yên Bái": 45000,
+    "Điện Biên": 45000,
+    "Sơn La": 45000,
+    "Lai Châu": 45000,
+    "Hòa Bình": 40000,
+    "Tuyên Quang": 40000,
+    "Cao Bằng": 45000,
+    "Bắc Kạn": 45000,
+    "Hà Giang": 45000,
+    "Lạng Sơn": 45000,
+  };
+
+  const DEFAULT_SHIPPING_FEE = 50000;
+  const normalizeProvinceName = (province: string): string => {
+    if (!province) return "";
+    return province.replace("Thành phố ", "").replace("Tỉnh ", "").trim();
+  };
+
+  const getProvinceFromAddress = (address: string): string => {
+    const parts = address.split(",");
+    const rawProvince = parts[parts.length - 1]?.trim() || "";
+    return normalizeProvinceName(rawProvince);
+  };
+  useEffect(() => {
+    if (defaultAddress) {
+      const province = getProvinceFromAddress(defaultAddress);
+      console.log("Tỉnh từ địa chỉ:", province); // thêm dòng này
+      const fee = provinceShippingFees[province] ?? DEFAULT_SHIPPING_FEE;
+      setShippingFee(fee);
+    }
+  }, [defaultAddress]);
+
+  const subtotal =
+    cart?.items.reduce((sum, item) => {
+      const price =
+        item.variant?.product?.sale_price ?? item.variant?.product?.price ?? 0;
+      return sum + price * item.quantity;
+    }, 0) || 0;
+
   useEffect(() => {
     if (!user?.id) return;
 
@@ -328,27 +421,34 @@ export default function Checkout() {
         </h3>
 
         <div className="items max-h-[300px] overflow-y-auto pr-2 space-y-3">
-          {cart?.items.map((item) => (
-            <div
-              className="order-item flex gap-3 items-center"
-              key={item.cart_items_id}
-            >
-              <img
-                src={`${API_BASE_URL}/uploads/${item.variant.product.images?.[0]?.url}`} // hoặc sửa đường dẫn đúng
-                alt={item.variant.product.name}
-                className="w-16 h-16 object-cover rounded"
-              />
-              <div>
-                <p className="text-sm font-medium">
-                  {item.variant.product.name} - Size{" "}
-                  {item.variant.size.number_size}
-                </p>
-                <span className="text-red-600 text-sm">
-                  {item.price.toLocaleString()}đ × {item.quantity}
-                </span>
+          {cart?.items.map((item) => {
+            const price =
+              item.variant?.product?.sale_price ??
+              item.variant?.product?.price ??
+              0;
+
+            return (
+              <div
+                className="order-item flex gap-3 items-center"
+                key={item.cart_items_id}
+              >
+                <img
+                  src={`${API_BASE_URL}/uploads/${item.variant.product.images?.[0]?.url}`}
+                  alt={item.variant.product.name}
+                  className="w-16 h-16 object-cover rounded"
+                />
+                <div>
+                  <p className="text-sm font-medium">
+                    {item.variant.product.name} - Size{" "}
+                    {item.variant.size.number_size}
+                  </p>
+                  <span className="text-red-600 text-sm">
+                    {price.toLocaleString("vi")}đ × {item.quantity}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="discound mt-4 flex gap-2">
@@ -365,16 +465,19 @@ export default function Checkout() {
         <div className="tinhtien mt-4 space-y-2">
           <div className="tamtinh flex justify-between">
             <p>Tạm tính:</p>
-            <span>1.359.000đ</span>
+            <span>{subtotal.toLocaleString("vi")}đ</span>
           </div>
           <div className="tamtinh flex justify-between border-b pb-2">
             <p>Phí vận chuyển:</p>
-            <span>-</span>
+            <span>{shippingFee.toLocaleString("vi")}đ</span>
           </div>
         </div>
 
         <h3 className="py-4 text-lg font-semibold">
-          Tổng cộng: <span className="text-red-600">1.359.000đ</span>
+          Tổng cộng:{" "}
+          <span className="text-red-600">
+            {(subtotal + shippingFee).toLocaleString("vi")}đ
+          </span>
         </h3>
 
         <button

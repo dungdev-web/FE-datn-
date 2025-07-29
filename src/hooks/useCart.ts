@@ -16,7 +16,7 @@ export const useCart = () => {
   const decrementCart = useGlobalStore((state) => state.decrementCart);
   const cartCount = useGlobalStore((state) => state.cartCount);
   const SHIPPING_COST = 30000;
-  const FREE_SHIPPING_THRESHOLD = 7000000;
+  const FREE_SHIPPING_THRESHOLD = 3000000;
 
   const subtotal =
     cart?.cart_items.reduce(

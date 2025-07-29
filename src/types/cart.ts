@@ -26,6 +26,8 @@ export interface ICart {
 }
 
 export interface ICartItem {
+  sale_price: any;
+  priceSale: any;
   cart_items_id: number;
   cart_id: number;
   variant_id: number;
