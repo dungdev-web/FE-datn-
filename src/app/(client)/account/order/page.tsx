@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order"; // Đảm bảo bạn có file định nghĩa
-import { getOrdersByUserService  } from "@/services/orderService";
+import { getOrdersByUserService } from "@/services/orderService";
 
 export default function Order_Account() {
   const [user, setUser] = useState<IUser | null>(null);
@@ -90,48 +90,71 @@ export default function Order_Account() {
             <div className="col-xs-12 col-sm-12 col-lg-9 col-right-ac">
               <h1 className="title-head margin-top-0">Đơn hàng của bạn</h1>
               <div className="col-xs-12 col-sm-12 col-lg-12 no-padding">
-                <div className="my-account">
-                  <div className="table-responsive-block tab-all" style={{ overflowX: "auto" }}>
+                <div className="">
+                  <div
+                    className="table-responsive-block tab-all"
+                    style={{ overflowX: "auto" }}
+                  >
                     {loading ? (
-                      <p>Đang tải đơn hàng...</p>
+                      <div className="text-center py-8 text-gray-500">
+                        Đang tải đơn hàng...
+                      </div>
                     ) : orders.length === 0 ? (
-                      <p>Bạn chưa có đơn hàng nào.</p>
+                      <div className="text-center py-8 text-gray-500">
+                        Bạn chưa có đơn hàng nào.
+                      </div>
                     ) : (
-                      <table className="table table-cart table-order" id="my-orders-table">
-                        <thead className="thead-default">
-                          <tr>
-                            <th>Đơn hàng</th>
-                            <th>Ngày</th>
-                            <th>Địa chỉ</th>
-                            <th>Giá trị đơn hàng</th>
-                            <th>Thanh toán</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {orders.map((order) => (
-                            <tr key={order.orders_id}>
-                              <td>
-                                <Link href={`/account/orders/${order.orders_id}`}>
-                                  #{order.orders_id}
-                                </Link>
-                              </td>
-                              <td>
-                                {new Date(order.created_at).toLocaleDateString("vi-VN")}
-                              </td>
-                              <td>
-                                {/* Do API chưa trả address cụ thể → để placeholder */}
-                                Địa chỉ giao hàng #{order.shipping_address_id}
-                              </td>
-                              <td>
-                                <span className="price">
-                                  {order.total_amount.toLocaleString("vi-VN")}₫
-                                </span>
-                              </td>
-                              <td>{getPaymentStatus(order.status)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                        {orders.map((order) => (
+                          <div
+                            key={order.orders_id}
+                            className="border border-gray-200 rounded-2xl !px-6 !py-2 shadow hover:shadow-lg transition"
+                          >
+                            <div className="flex justify-between items-center !mb-2">
+                              <h2 className="text-lg font-semibold text-blue-600">
+                                Đơn hàng #{order.orders_id}
+                              </h2>
+                              <span
+                                className={`text-sm !px-6 !py-2 rounded-full ${
+                                  order.status === 1
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                                }`}
+                              >
+                                {order.status === 1
+                                  ? "Đã thanh toán"
+                                  : "Chưa thanh toán"}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              Ngày đặt:{" "}
+                              {new Date(order.created_at).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Giao đến:{" "}
+                              <span className="font-medium">
+                                #{order.shipping_address_id}
+                              </span>
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Tổng cộng:{" "}
+                              <span className="font-bold text-red-600">
+                                {order.total_amount.toLocaleString("vi-VN")}₫
+                              </span>
+                            </p>
+                            <div className="mt-3 text-right">
+                              <Link
+                                href={`/account/order/${order.orders_id}`}
+                                className="text-blue-500 hover:underline text-sm font-medium"
+                              >
+                                Xem chi tiết →
+                              </Link>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
