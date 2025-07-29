@@ -103,6 +103,8 @@ export default function Checkout() {
   };
 
   const DEFAULT_SHIPPING_FEE = 50000;
+  const FREE_SHIPPING_THRESHOLD = 3000000;
+
   const normalizeProvinceName = (province: string): string => {
     if (!province) return "";
     return province.replace("Thành phố ", "").replace("Tỉnh ", "").trim();
@@ -117,8 +119,20 @@ export default function Checkout() {
     if (defaultAddress) {
       const province = getProvinceFromAddress(defaultAddress);
       console.log("Tỉnh từ địa chỉ:", province); // thêm dòng này
-      const fee = provinceShippingFees[province] ?? DEFAULT_SHIPPING_FEE;
-      setShippingFee(fee);
+      const subtotal =
+        cart?.items.reduce((sum, item) => {
+          const price =
+            item.variant?.product?.sale_price ??
+            item.variant?.product?.price ??
+            0;
+          return sum + price * item.quantity;
+        }, 0) || 0;
+
+      const baseFee = provinceShippingFees[province] ?? DEFAULT_SHIPPING_FEE;
+      const finalShippingFee =
+        subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseFee;
+
+      setShippingFee(finalShippingFee);
     }
   }, [defaultAddress]);
 
@@ -404,13 +418,13 @@ export default function Checkout() {
         <div className="boc1 flex items-center mb-2 gap-2">
           <input type="radio" name="payment" id="payment" />
           <label htmlFor="payment">Chuyển khoản</label>
-          <i className="fa-solid fa-money-bill text-blue-600"></i>
+          <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
 
         <div className="boc1 flex items-center gap-2">
           <input type="radio" name="payment" id="cod" checked readOnly />
           <label htmlFor="cod">Thu hộ (COD)</label>
-          <i className="fa-solid fa-money-bill text-blue-600"></i>
+          <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
       </div>
 
@@ -442,7 +456,7 @@ export default function Checkout() {
                     {item.variant.product.name} - Size{" "}
                     {item.variant.size.number_size}
                   </p>
-                  <span className="text-red-600 text-sm">
+                <span className="text-[#4bd963] text-sm">
                     {price.toLocaleString("vi")}đ × {item.quantity}
                   </span>
                 </div>
@@ -467,15 +481,24 @@ export default function Checkout() {
             <p>Tạm tính:</p>
             <span>{subtotal.toLocaleString("vi")}đ</span>
           </div>
-          <div className="tamtinh flex justify-between border-b pb-2">
+          <div className="tamtinh flex justify-between ">
             <p>Phí vận chuyển:</p>
             <span>{shippingFee.toLocaleString("vi")}đ</span>
           </div>
+          <div className="freeship border-b pb-2 ">
+           {subtotal < FREE_SHIPPING_THRESHOLD && (
+            <p className="text-sm text-center text-cente mt-2">
+              Mua thêm{" "}
+               <span className="text-[#4bd963]">{(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("vi")}đ </span>để
+              được miễn phí vận chuyển!
+            </p>
+          )}
+          </div>
         </div>
 
-        <h3 className="py-4 text-lg font-semibold">
+        <h3 className="py-4 text-lg font-semibold !mt-2">
           Tổng cộng:{" "}
-          <span className="text-red-600">
+        <span className="text-[#4bd963]">
             {(subtotal + shippingFee).toLocaleString("vi")}đ
           </span>
         </h3>
