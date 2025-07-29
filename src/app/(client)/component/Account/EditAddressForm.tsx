@@ -270,18 +270,21 @@ export default function EditAddressForm({
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center !space-x-2">
           <input
             type="checkbox"
             name="is_default"
             checked={formData.is_default}
             onChange={handleChange}
             className="w-4 h-4"
+            id="is_default"
           />
-          <label className="text-sm">Đặt làm địa chỉ mặc định</label>
+          <label htmlFor="is_default" className="text-sm ">
+            Đặt làm địa chỉ mặc định
+          </label>
         </div>
 
-        <div className="flex justify-end space-x-4 !pt-4">
+        <div className="flex justify-end space-x-4 !pt-4 gap-2">
           <button
             type="button"
             onClick={onClose}

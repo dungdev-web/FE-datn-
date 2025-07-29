@@ -15,6 +15,7 @@ import {
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 const initialAddress = {
   full_name: "",
@@ -42,7 +43,7 @@ export default function Address() {
     useState<AddressFormData>(initialAddress);
   const [addressList, setAddressList] = useState<AddressFormData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const setAddressCount = useGlobalStore((state) => state.setAddressCount);
   const fetchAddresses = async () => {
     if (!user?.id) return;
     try {
@@ -65,6 +66,7 @@ export default function Address() {
             })
         : [];
       setAddressList(addresses);
+      setAddressCount(addresses.length);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách địa chỉ:", error);
     } finally {

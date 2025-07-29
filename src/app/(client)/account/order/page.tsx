@@ -8,12 +8,13 @@ import { checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order"; // Đảm bảo bạn có file định nghĩa
 import { getOrdersByUserService } from "@/services/orderService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export default function Order_Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const setOrderCount = useGlobalStore((state) => state.setOrderCount);
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -24,6 +25,7 @@ export default function Order_Account() {
 
         const orderList = await getOrdersByUserService(tokenData.user.id);
         setOrders(orderList);
+        setOrderCount(orderList.length);
       } catch (error) {
         console.error("Lỗi lấy đơn hàng:", error);
       } finally {
