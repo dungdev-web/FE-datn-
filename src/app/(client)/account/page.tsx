@@ -38,7 +38,11 @@ export default function Account() {
         ]);
 
         setOrderCount(orders.length);
-        setAddressCount(addresses.length);
+        if (Array.isArray(addresses)) {
+          setAddressCount(addresses.length);
+        } else {
+          setAddressCount(0);
+        }
       } catch (err) {
         console.error("Lỗi lấy số lượng đơn hàng/địa chỉ:", err);
       }
