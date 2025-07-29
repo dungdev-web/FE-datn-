@@ -6,7 +6,7 @@ import AccountSidebar from "../../component/Account/AccountSidebar";
 import { useState, useEffect } from "react";
 import { checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
-import { IOrder } from "@/types/Order"; // Đảm bảo bạn có file định nghĩa
+import { IOrder } from "@/types/Order";
 import { getOrdersByUserService } from "@/services/orderService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
