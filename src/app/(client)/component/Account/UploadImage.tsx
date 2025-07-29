@@ -3,7 +3,7 @@
 
 import { IUser } from "@/types/user";
 import { useState } from "react";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 interface Props {
   user: IUser;
@@ -18,10 +18,12 @@ export default function UploadImageProfile({
   uploadAvatarService,
   API_BASE_URL,
 }: Props) {
+  const [avatarVersion, setAvatarVersion] = useState(Date.now());
   const handleUpload = () => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
+
     input.onchange = async (e) => {
       const target = e.target as HTMLInputElement;
       if (target.files && target.files[0]) {
@@ -31,13 +33,15 @@ export default function UploadImageProfile({
             target.files[0]
           );
           setUser(updatedUser);
-          toast.success("Upload thành công");
+          setAvatarVersion(Date.now());
+          await Swal.fire("Thành công", "Upload thành công", "success");
         } catch (error: any) {
           console.error("Upload avatar error:", error);
-          toast.error(error.message);
+          await Swal.fire("Lỗi", error.message || "Upload thất bại", "error");
         }
       }
     };
+
     input.click();
   };
 
@@ -52,7 +56,7 @@ export default function UploadImageProfile({
             user.picture
               ? user.picture
               : user.avatar
-              ? `${API_BASE_URL}/uploads/${user.avatar}?t=${Date.now()}`
+              ? `${API_BASE_URL}/uploads/${user.avatar}?v=${avatarVersion}`
               : "/images/default.png"
           }
           alt="Avatar"
