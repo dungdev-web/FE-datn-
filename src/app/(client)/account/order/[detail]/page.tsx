@@ -8,6 +8,8 @@ import { getAddressByIdService } from "@/services/addressService";
 import { checkToken } from "@/services/authService";
 import "../../../css/account.css";
 import { API_BASE_URL } from "@/config/env";
+import { AddressResponse } from "@/types/address";
+import { IUser } from "@/types/user";
 
 export interface IOrderItem {
   order_items_id: number;
@@ -50,19 +52,13 @@ export interface IOrder {
   order_items: IOrderItem[];
 }
 
-export interface IUser {
-  id: number;
-  full_name: string;
-  email: string;
-  phone?: string;
-}
 
 export default function OrderDetail() {
   const params = useParams();
   const orderId = Number(params.detail);
 
   const [order, setOrder] = useState<IOrder | null>(null);
-  const [address, setAddress] = useState<IAddress | null>(null);
+  const [address, setAddress] = useState<AddressResponse | null>(null);
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
@@ -110,89 +106,92 @@ export default function OrderDetail() {
   };
 
   useEffect(() => {
-    const fetchOrderData = async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const fetchOrderData = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        // Lấy thông tin user từ token
-        const tokenData = await checkToken();
-        if (tokenData?.user) {
-          setUser(tokenData.user);
-        }
+      // Lấy thông tin user từ token
+      const tokenData = await checkToken();
+      if (tokenData?.user) {
+        setUser(tokenData.user);
+      }
 
-        // Lấy chi tiết đơn hàng
-        const orderData = await getOrderDetailService(orderId);
-        console.log("Order data:", orderData); // Debug log
-        console.log("Order items:", orderData?.order_items); // Debug order items
-        
-        if (!orderData) {
-          throw new Error("Không tìm thấy đơn hàng");
-        }
-        
-        setOrder(orderData);
+      // Lấy chi tiết đơn hàng
+      const orderData = await getOrderDetailService(orderId);
+      console.log("Order data:", orderData); // Debug log
+      console.log("Order items:", orderData?.order_items); // Debug order items
+      
+      if (!orderData) {
+        throw new Error("Không tìm thấy đơn hàng");
+      }
 
-        // Lấy địa chỉ giao hàng
-        if (orderData?.shipping_address_id) {
-          try {
-            const addressData = await getAddressByIdService(orderData.shipping_address_id);
-            console.log("Address data:", addressData); // Debug log
-            console.log("Address type:", typeof addressData, Array.isArray(addressData)); // Debug type
-            
-            if (addressData && addressData !== null && addressData !== undefined) {
-              // Xử lý nếu addressData là array, lấy phần tử đầu tiên
-              const addressObj = Array.isArray(addressData) ? addressData[0] : addressData;
-              console.log("Final address object:", addressObj);
-              setAddress(addressObj);
-            } else {
-              console.log("No address data returned, API response:", addressData);
-              // Tạo địa chỉ mặc định từ user info (nếu có)
-              if (user) {
-                const fallbackAddress = {
-                  id: orderData.shipping_address_id,
-                  full_name: user.full_name || "Khách hàng",
-                  phone: user.phone || "Chưa cập nhật",
-                  address_line_part: "Địa chỉ không khả dụng",
-                  ward: "",
-                  district: "",
-                  province: ""
-                };
-                setAddress(fallbackAddress);
-              }
-            }
-          } catch (addressError) {
-            console.error("Lỗi khi lấy địa chỉ:", addressError);
-            // Tạo địa chỉ fallback nếu có lỗi
+      setOrder(orderData);
+
+      // Lấy địa chỉ giao hàng
+      if (orderData?.shipping_address_id) {
+        try {
+          const addressData = await getAddressByIdService(orderData.shipping_address_id);
+          console.log("Address data:", addressData);
+          console.log("Address type:", typeof addressData, Array.isArray(addressData));
+
+          if (addressData && addressData !== null && addressData !== undefined) {
+            const addressObj = Array.isArray(addressData) ? addressData[0] : addressData;
+            console.log("Final address object:", addressObj);
+            setAddress(addressObj);
+          } else {
+            console.log("No address data returned, API response:", addressData);
             if (user) {
               const fallbackAddress = {
                 id: orderData.shipping_address_id,
-                full_name: user.full_name || "Khách hàng", 
+                full_name: user.name || "Khách hàng",
                 phone: user.phone || "Chưa cập nhật",
-                address_line_part: "Lỗi tải địa chỉ",
+                address_line_part: "Địa chỉ không khả dụng",
+                address_line: "Địa chỉ không khả dụng",
+                address: "Địa chỉ không khả dụng", 
                 ward: "",
                 district: "",
-                province: ""
+                province: "",
+                city: "",
+                is_default: false,
               };
               setAddress(fallbackAddress);
             }
           }
+        } catch (addressError) {
+          const fallbackAddress = {
+            id: orderData.shipping_address_id,
+            full_name: user?.name || "Khách hàng", 
+            phone: user?.phone || "Chưa cập nhật",
+            address_line_part: "Lỗi tải địa chỉ",
+            address_line: "Lỗi tải địa chỉ",
+            address: "Lỗi tải địa chỉ", 
+            ward: "",
+            district: "",
+            province: "",
+            city: "",
+            is_default: false,
+          };
+          setAddress(fallbackAddress);
         }
-
-      } catch (error) {
-        console.error("Lỗi khi lấy chi tiết đơn hàng:", error);
-        setError(error instanceof Error ? error.message : "Có lỗi xảy ra");
-      } finally {
-        setLoading(false);
       }
-    };
 
-    if (orderId && !isNaN(orderId)) {
-      fetchOrderData();
-    } else {
-      setError("Mã đơn hàng không hợp lệ");
+    } catch (error) {
+      console.error("Lỗi khi lấy chi tiết đơn hàng:", error);
+      setError(error instanceof Error ? error.message : "Có lỗi xảy ra");
+    } finally {
       setLoading(false);
     }
-  }, [orderId]);
+  };
+
+  if (orderId && !isNaN(orderId)) {
+    fetchOrderData();
+  } else {
+    setError("Mã đơn hàng không hợp lệ");
+    setLoading(false);
+  }
+}, [orderId]);
+
 
   const getShippingStatusLabel = (status: string) => {
     switch (status) {
@@ -310,7 +309,7 @@ export default function OrderDetail() {
             <div className="block-account">
               <h5 className="title-account">Tài khoản</h5>
               <p>
-                Xin chào, <span>{user?.full_name || "Khách hàng"}</span>!
+                Xin chào, <span>{user?.name || "Khách hàng"}</span>!
               </p>
               <ul>
                 <li>
@@ -398,14 +397,14 @@ export default function OrderDetail() {
                 {address ? (
                   <div className="space-y-2">
                     <p className="font-semibold text-gray-800">
-                      {address.full_name || address.name || user?.full_name || "Khách hàng"}
+                      {address.full_name || user?.name || "Khách hàng"}
                     </p>
                     <p className="text-gray-700">
                       {/* Xử lý nhiều cấu trúc địa chỉ khác nhau */}
-                      {address.address_line_part || address.address_line || address.address || "Địa chỉ không khả dụng"}
+                      {address.address_line || address.address || "Địa chỉ không khả dụng"}
                       {(address.ward || address.district || address.province) && 
-                       (address.address_line_part || address.address_line || address.address) !== "Địa chỉ không khả dụng" && 
-                       (address.address_line_part || address.address_line || address.address) !== "Lỗi tải địa chỉ" && ", "}
+                       (address.address_line || address.address) !== "Địa chỉ không khả dụng" && 
+                       (address.address_line || address.address) !== "Lỗi tải địa chỉ" && ", "}
                       {address.ward && `${address.ward}, `}
                       {address.district && `${address.district}, `}
                       {address.province || address.city}
@@ -413,7 +412,7 @@ export default function OrderDetail() {
                     <p className="text-gray-700">
                       <span className="font-medium">Số điện thoại:</span> {address.phone || user?.phone || "Chưa cập nhật"}
                     </p>
-                    {(address.address_line_part === "Địa chỉ không khả dụng" || address.address_line_part === "Lỗi tải địa chỉ") && (
+                    {(address.address_line === "Địa chỉ không khả dụng" || address.address_line === "Lỗi tải địa chỉ") && (
                       <p className="text-sm text-amber-600 bg-amber-50 p-2 rounded">
                         ⚠️ Thông tin địa chỉ từ API không khả dụng (ID: {order.shipping_address_id})
                       </p>
@@ -431,7 +430,7 @@ export default function OrderDetail() {
                       <div className="mt-2 p-2 bg-blue-50 rounded">
                         <p className="text-sm text-blue-800">
                           <strong>Thông tin người dùng:</strong><br/>
-                          {user.full_name}<br/>
+                          {user.name}<br/>
                           {user.email}
                         </p>
                       </div>
@@ -569,7 +568,7 @@ export default function OrderDetail() {
                     orderItemsCount: order.order_items?.length || 0,
                     addressId: order.shipping_address_id,
                     hasAddress: !!address,
-                    userName: user?.full_name,
+                    userName: user?.name,
                     userEmail: user?.email,
                     firstProduct: order.order_items?.[0]?.variant_id?.product?.name,
                     firstProductVariant: order.order_items?.[0]?.variant_id,

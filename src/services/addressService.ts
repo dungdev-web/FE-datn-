@@ -36,7 +36,7 @@ export const getAddressByIdService = async (
   addressId: number
 ): Promise<AddressResponse | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
+    const res = await fetch(`${API_BASE_URL}/addressesbyid/${addressId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -52,14 +52,13 @@ export const getAddressByIdService = async (
     const data = await res.json();
     console.log("API response:", data);
     
-    // Xử lý trường hợp API trả về array
     if (Array.isArray(data)) {
       if (data.length > 0) {
         console.log("Địa chỉ lấy thành công:", data[0]);
-        return data[0]; // Trả về phần tử đầu tiên
+        return data[0];
       } else {
         console.log("Không tìm thấy địa chỉ với ID:", addressId);
-        return null; // Array rỗng = không tìm thấy
+        return null;
       }
     }
     
