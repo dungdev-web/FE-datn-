@@ -69,6 +69,29 @@ export const getAddressByIdService = async (
     return null;
   }
 };
+export async function getDefaultAddressService(userId: number): Promise<AddressResponse | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/user_default_address/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Lỗi: ${res.status} - ${errorText}`);
+    }
+
+    const data = await res.json();
+    console.log("Địa chỉ mặc định:", data);
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi lấy địa chỉ mặc định:", error);
+    return null;
+  }
+}
 export async function updateAddress(
   addressId: number,
   payload: {
