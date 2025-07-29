@@ -7,7 +7,7 @@ import "../css/product.css";
 import "../css/wishlist.css";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import ProductIcons from "../component/products/ProductIcons";
-import Link  from "next/link";
+import Link from "next/link";
 import { API_BASE_URL } from "@/config/env";
 
 export default function Wishlist() {
@@ -130,7 +130,7 @@ export default function Wishlist() {
                 <p className="text-center max-w-sm text-gray-500">
                   Bạn chưa có sản phẩm nào trong danh sách yêu thích. Hãy khám
                   phá và thêm sản phẩm bạn yêu thích!
-                </p> 
+                </p>
                 <Link
                   href="/"
                   className="mt-5 px-6 py-2 !text-[#4bd963] rounded hover:bg-gray-800 transition-all"
@@ -233,7 +233,14 @@ export default function Wishlist() {
                     >
                       <div className="product-card">
                         <div className="product-image">
-                          <img src={image} alt={product.name} />
+                          <img
+                            src={
+                              image
+                                ? `${API_BASE_URL}/uploads/${image}`
+                                : "/images/placeholder.png"
+                            }
+                            alt={product.name}
+                          />
                           <ProductIcons
                             productId={product.products_id}
                             variant_id={variant?.product_variants_id ?? null}

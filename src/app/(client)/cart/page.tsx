@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ICartItem } from "@/types/cart";
 import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
+import { useEffect } from "react";
 export default function Cart() {
   const {
     cart,
@@ -19,6 +20,9 @@ export default function Cart() {
     handleChangeQuantity,
     handleRemoveItem,
   } = useCart();
+useEffect(() => {
+  console.log("🛒 Cart items:", cart?.cart_items);
+}, [cart]);
 
   if (!cart) {
     return (
@@ -141,60 +145,67 @@ export default function Cart() {
               </div>
             </div>
 
-            {cart.cart_items.map((item: ICartItem) => (
-              <div className="cart-item" key={item.cart_items_id}>
-                <div className="product-info">
-                 <img
-                    alt={item.variant?.product.name}
-                    src={
-                      item.variant?.color.images
-                        ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
-                        : "/images/placeholder.png"
-                    }
-                    width="80"
-                  />
+            {cart.cart_items.map((item: ICartItem) => {
+              const price =
+                item.variant?.product?.sale_price ??
+                item.variant?.product?.price ??
+                0;
 
-                  <div className="product-name">
-                    {item.variant?.product.name}
-                  </div>
-                  <div className="product-details">
-                    <div className="product-desc">
-                      Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
-                      {item.variant?.size.number_size}
+              return (
+                <div className="cart-item" key={item.cart_items_id}>
+                  <div className="product-info">
+                    <img
+                      alt={item.variant?.product.name}
+                      src={
+                        item.variant?.color.images
+                          ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
+                          : "/images/placeholder.png"
+                      }
+                      width="80"
+                    />
+                    <div className="product-name">
+                      {item.variant?.product.name}
+                    </div>
+                    <div className="product-details">
+                      <div className="product-desc">
+                        Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
+                        {item.variant?.size.number_size}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="cart-item-price">
-                  {item.price?.toLocaleString("vi")}₫
-                </div>
 
-                <div className="quantity-control">
-                  <button onClick={() => handleMinus(item.cart_items_id)}>
-                    -
-                  </button>
-                  <input
-                    type="text"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleChangeQuantity(item.cart_items_id, e)
-                    }
-                  />
-                  <button onClick={() => handlePlus(item.cart_items_id)}>
-                    +
-                  </button>
-                </div>
+                  <div className="cart-item-price">
+                    {price.toLocaleString("vi")}₫
+                  </div>
 
-                <div className="cart-item-total">
-                  {(item.price! * item.quantity).toLocaleString("vi")}₫
-                  <span
-                    className="remove-btn"
-                    onClick={() => handleRemoveItem(item.cart_items_id)}
-                  >
-                    <i className="fa-solid fa-trash text-red-600"></i>
-                  </span>
+                  <div className="quantity-control">
+                    <button onClick={() => handleMinus(item.cart_items_id)}>
+                      -
+                    </button>
+                    <input
+                      type="text"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleChangeQuantity(item.cart_items_id, e)
+                      }
+                    />
+                    <button onClick={() => handlePlus(item.cart_items_id)}>
+                      +
+                    </button>
+                  </div>
+
+                  <div className="cart-item-total">
+                    {(price * item.quantity).toLocaleString("vi")}₫
+                    <span
+                      className="remove-btn"
+                      onClick={() => handleRemoveItem(item.cart_items_id)}
+                    >
+                      <i className="fa-solid fa-trash text-red-600"></i>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="cart-actions">
               <a href="#" className="continue-shopping">
@@ -263,9 +274,8 @@ export default function Cart() {
                   <>
                     <span>Giao hàng: </span>
                     <span className="total">
-                      {shipprice.toLocaleString("vi")}₫
+                      có phí vận chuyển
                     </span>
-                    <span> phí vận chuyển</span>
                   </>
                 )}
               </div>

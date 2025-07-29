@@ -106,7 +106,10 @@ export default function EditAddressForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+    if(!user){
+      toast.error("Bạn cần đăng nhập để thực hiện thao tác này.");
+      return;
+    }
     if (!user) {
       toast.error("Không tìm thấy thông tin người dùng!");
       return;

@@ -6,7 +6,7 @@ import {
 } from "@/services/categoryService";
 import Link from "next/link";
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
@@ -30,7 +30,47 @@ export default function CategoryPage() {
   const [total, setTotal] = useState(0);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
-  const totalPages = Math.ceil(total / productsPerPage);
+    const [totalPages, setTotalPages] = useState(1);
+    const searchParams = useSearchParams();
+    const keyword = searchParams.get("q") || "";
+    const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
+      undefined
+    );
+    const handleSortChange = (type: string) => {
+      switch (type) {
+        case "A → Z":
+          setSortBy("name");
+          setSortOrder("asc");
+          break;
+        case "Z → A":
+          setSortBy("name");
+          setSortOrder("desc");
+          break;
+        case "Giá tăng dần":
+          setSortBy("price");
+          setSortOrder("asc");
+          break;
+        case "Giá giảm dần":
+          setSortBy("price");
+          setSortOrder("desc");
+          break;
+        case "Hàng mới nhất":
+          setSortBy("created_at");
+          setSortOrder("desc");
+          break;
+        case "Hàng cũ nhất":
+          setSortBy("created_at");
+          setSortOrder("asc");
+          break;
+        default:
+          setSortBy(undefined);
+          setSortOrder(undefined);
+      }
+  
+      setPage(1); // reset lại trang đầu tiên khi sort
+    };
+  
   const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<{
@@ -140,7 +180,7 @@ export default function CategoryPage() {
             </li>
             <li>
               <strong>
-                <span>{brands?.name || "Thương hiệu không xác định"}</span>
+                <span>Tất cả sản phẩm</span>
               </strong>
             </li>
             <li></li>
@@ -162,7 +202,18 @@ export default function CategoryPage() {
                 handleGenderChange={handleGenderChange}
                 selectedPriceRange={selectedPriceRange}
                 handlePriceChange={handlePriceChange}
+                searchKeyword={keyword}
+                currentPage={page}
+                limit={productsPerPage}
+                onProductsChange={(products, total, totalPages) => {
+                  setProducts(products);
+                  setTotal(total);
+                  setTotalPages(totalPages);
+                }}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
               />
+
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
                   <div className="sortPagiBar">
@@ -218,27 +269,27 @@ export default function CategoryPage() {
                             <li>
                               <span className="val">Mặc định</span>
                               <ul className="ul_2">
-                                <li>
-                                  <a href="#">Mặc định</a>
-                                </li>
-                                <li>
-                                  <a href="#">A → Z</a>
-                                </li>
-                                <li>
-                                  <a href="#">Z → A</a>
-                                </li>
-                                <li>
-                                  <a href="#">Giá tăng dần</a>
-                                </li>
-                                <li>
-                                  <a href="#">Giá giảm dần</a>
-                                </li>
-                                <li>
-                                  <a href="#">Hàng mới nhất</a>
-                                </li>
-                                <li>
-                                  <a href="#">Hàng cũ nhất</a>
-                                </li>
+                                {[
+                                  "Mặc định",
+                                  "A → Z",
+                                  "Z → A",
+                                  "Giá tăng dần",
+                                  "Giá giảm dần",
+                                  "Hàng mới nhất",
+                                  "Hàng cũ nhất",
+                                ].map((option) => (
+                                  <li key={option}>
+                                    <a
+                                      href="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSortChange(option);
+                                      }}
+                                    >
+                                      {option}
+                                    </a>
+                                  </li>
+                                ))}
                               </ul>
                             </li>
                           </ul>
@@ -247,34 +298,38 @@ export default function CategoryPage() {
                     </div>
                   </div>
                 </div>
-                {viewMode === "grid" && (
-                  <div className="product-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                {viewMode === "grid" && Array.isArray(products) && (
+                  <div className="product-grid">
                     {products.map((sp) => (
                       <div
                         className="product-itemlist-main !block"
                         key={sp.products_id}
                       >
-                        <div className="product-card" style={{ width: "100%" }}>
-                          <div className="product-image relative h-48">
+                        <div
+                          className="product-card"
+                          style={{ width: "230px" }}
+                        >
+                          <div className="product-image">
                             <Link href={`/product/${sp.slug}`}>
                               <img
                                 src={
-                                  sp.images?.[0]?.url ||
-                                  "/images/placeholder.png"
+                                  sp.images?.[0]?.url
+                                    ? `/images/products/chaybo/${sp.images[0].url}`
+                                    : "/images/placeholder.png"
                                 }
                                 alt={sp.name}
-                                className="w-full h-full object-cover rounded"
                               />
                             </Link>
+
                             <ProductIcons
                               productId={sp.products_id}
                               variant_id={
-                                sp.product_variants[0]?.product_variants_id ?? 0
+                                sp.product_variants?.[0]?.product_variants_id
                               }
-                              price={sp.price}
+                              price={sp.sale_price}
                             />
 
-                            <span className="discount-tag absolute top-1 left-1 text-white text-xs px-2 py-0.5 rounded">
+                            <span className="discount-tag">
                               -
                               {Math.round(
                                 ((Number(sp.price) - Number(sp.sale_price)) /
@@ -283,155 +338,10 @@ export default function CategoryPage() {
                               )}
                               %
                             </span>
-                          </div>
 
-                          <div className="product-colors flex gap-1 mt-2">
-                            {[
-                              ...new Map(
-                                sp.product_variants.map((v) => [
-                                  v.color.id,
-                                  v.color,
-                                ])
-                              ).values(),
-                            ].map((color) => (
-                              <span
-                                key={color.id}
-                                className="w-4 h-4 rounded-full border"
-                                style={{ backgroundColor: color.code_color }}
-                              ></span>
-                            ))}
-                          </div>
-
-                          <h4 className="product-title text-sm font-semibold mt-2">
-                            {sp.name}
-                          </h4>
-
-                          <div className="product-price text-red-500 font-bold">
-                            <span className="old-price text-gray-400 text-sm line-through mr-2">
-                              {Number(sp.price).toLocaleString("vi")}đ
-                            </span>
-                            <span className="new-price">
-                              {Number(sp.sale_price).toLocaleString("vi")}đ
-                            </span>
-                          </div>
-
-                          <div className="product-rating mt-1">
-                            {Array.from({ length: 5 }, (_, i) =>
-                              i <
-                              (sp.product_reviews?.length
-                                ? Math.round(
-                                    sp.product_reviews.reduce(
-                                      (s, r) => s + Number(r.rating),
-                                      0
-                                    ) / sp.product_reviews.length
-                                  )
-                                : 0) ? (
-                                <i
-                                  key={i}
-                                  className="fa-solid fa-star text-yellow-400"
-                                ></i>
-                              ) : (
-                                <i
-                                  key={i}
-                                  className="fa-regular fa-star text-gray-300"
-                                ></i>
-                              )
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {viewMode === "list" && (
-                  <div className="product-grid-column flex flex-col gap-4">
-                    {products.map((sp) => (
-                      <div
-                        className="product-itemlist-main"
-                        key={sp.products_id}
-                      >
-                        <div
-                          className="product-card-list flex bg-white p-4 border border-gray-200 rounded"
-                          style={{ width: "100%" }}
-                        >
-                          <div className="product-image w-48 h-48 flex-shrink-0 relative">
-                            <Link href={`/product/${sp.slug}`}>
-                              <img
-                                src={
-                                  sp.images?.[0]?.url ||
-                                  "/images/placeholder.png"
-                                }
-                                alt={sp.name}
-                                className="w-full h-full object-cover rounded"
-                              />
-                            </Link>
-                            <ProductIcons
-                              productId={sp.products_id}
-                              variant_id={
-                                sp.product_variants[0]?.product_variants_id ?? 0
-                              }
-                              price={sp.price}
-                            />
-                          </div>
-
-                          <div className="ml-4 flex flex-col justify-between flex-grow">
-                            <div>
-                              <span className="discount-tag text-sm text-red-600 font-medium">
-                                -
-                                {Math.round(
-                                  ((Number(sp.price) - Number(sp.sale_price)) /
-                                    Number(sp.price)) *
-                                    100
-                                )}
-                                %
-                              </span>
-
-                              <h4 className="product-title-column text-lg font-semibold mt-1">
-                                {sp.name}
-                              </h4>
-
-                              <div className="product-price mt-1">
-                                <span className="old-price text-gray-400 text-sm line-through mr-2">
-                                  {sp.price.toLocaleString("vi")}đ
-                                </span>
-                                <span className="new-price text-red-500 font-bold">
-                                  {sp.sale_price.toLocaleString("vi")}đ
-                                </span>
-                              </div>
-
-                              <p className="text-sm mt-2 text-gray-600">
-                                {sp.short_desc}...
-                              </p>
-                            </div>
-
-                            <div className="flex flex-col gap-2 mt-2">
-                              <div className="product-rating">
-                                {Array.from({ length: 5 }, (_, i) =>
-                                  i <
-                                  (sp.product_reviews?.length
-                                    ? Math.round(
-                                        sp.product_reviews.reduce(
-                                          (s, r) => s + Number(r.rating),
-                                          0
-                                        ) / sp.product_reviews.length
-                                      )
-                                    : 0) ? (
-                                    <i
-                                      key={i}
-                                      className="fa-solid fa-star text-yellow-400"
-                                    ></i>
-                                  ) : (
-                                    <i
-                                      key={i}
-                                      className="fa-regular fa-star text-gray-300"
-                                    ></i>
-                                  )
-                                )}
-                              </div>
-
-                              <div className="product-colors flex gap-1">
-                                {[
+                            <div className="product-colors">
+                              {Array.isArray(sp.product_variants) &&
+                                [
                                   ...new Map(
                                     sp.product_variants.map((v) => [
                                       v.color.id,
@@ -441,13 +351,62 @@ export default function CategoryPage() {
                                 ].map((color) => (
                                   <span
                                     key={color.id}
-                                    className="w-4 h-4 rounded-full border"
+                                    className="color"
+                                    data-color={color.name_color}
                                     style={{
                                       backgroundColor: color.code_color,
                                     }}
                                   ></span>
                                 ))}
+                            </div>
+
+                            <h4 className="product-title">{sp.name}</h4>
+
+                            <div className="product-price">
+                              <span className="old-price">
+                                <del>
+                                  {Number(sp.price).toLocaleString("vi")}đ
+                                </del>
+                              </span>
+                              <span className="new-price">
+                                {Number(sp.sale_price).toLocaleString("vi")}đ
+                              </span>
+                            </div>
+
+                            <div className="hot-product-progress">
+                              <div className="progress-bar">
+                                <div
+                                  className="progress-fill"
+                                  style={{ width: "87%" }}
+                                >
+                                  <span className="sold-info">
+                                    Đã bán{" "}
+                                    {sp.product_variants?.reduce(
+                                      (sum, v) => sum + v.stock_quantity,
+                                      0
+                                    ) || 0}{" "}
+                                    sản phẩm
+                                  </span>
+                                </div>
                               </div>
+                            </div>
+
+                            <div className="product-rating">
+                              {Array.from({ length: 5 }, (_, i) =>
+                                i <
+                                (sp.product_reviews?.length
+                                  ? Math.round(
+                                      sp.product_reviews.reduce(
+                                        (s, r) => s + Number(r.rating),
+                                        0
+                                      ) / sp.product_reviews.length
+                                    )
+                                  : 0) ? (
+                                  <i key={i} className="fa-solid fa-star"></i>
+                                ) : (
+                                  <i key={i} className="fa-regular fa-star"></i>
+                                )
+                              )}
                             </div>
                           </div>
                         </div>
@@ -455,7 +414,120 @@ export default function CategoryPage() {
                     ))}
                   </div>
                 )}
+
+                {viewMode === "list" && Array.isArray(products) && (
+                  <div className="product-grid-column">
+                    {products.map((sp) => (
+                      <div
+                        className="product-itemlist-main"
+                        key={sp.products_id}
+                      >
+                        <div
+                          className="product-card-list"
+                          style={{
+                            width: "100% !important",
+                            display: "flex",
+                            background: "none",
+                          }}
+                        >
+                          <div className="product-image">
+                            <Link href={`/product/${sp.slug}`}>
+                              <img
+                                src={
+                                  sp.images?.[0]?.url
+                                    ? `/images/products/chaybo/${sp.images[0].url}`
+                                    : "/images/placeholder.png"
+                                }
+                                alt={sp.name}
+                              />
+                            </Link>
+
+                            <ProductIcons
+                              productId={sp.products_id}
+                              variant_id={
+                                sp.product_variants?.[0]?.product_variants_id
+                              }
+                              price={sp.sale_price}
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="discount-tag">
+                              -
+                              {Math.round(
+                                ((sp.price - sp.sale_price) / sp.price) * 100
+                              )}
+                              %
+                            </span>
+
+                            <h4
+                              className="product-title-column"
+                              style={{ fontSize: "larger" }}
+                            >
+                              {sp.name}
+                            </h4>
+                            <div className="product-price">
+                              <span className="old-price">
+                                <del>{sp.price.toLocaleString("vi")}đ</del>
+                              </span>
+                              <span className="new-price">
+                                {sp.sale_price.toLocaleString("vi")}đ
+                              </span>
+                            </div>
+                            <p
+                              style={{
+                                margin: "10px 0 6px 10px",
+                                fontSize: "14px",
+                              }}
+                            >
+                              {sp.short_desc}...
+                            </p>
+
+                            <div className="product-rating">
+                              {Array.from({ length: 5 }, (_, i) =>
+                                i <
+                                (sp.product_reviews?.length
+                                  ? Math.round(
+                                      sp.product_reviews.reduce(
+                                        (s, r) => s + Number(r.rating),
+                                        0
+                                      ) / sp.product_reviews.length
+                                    )
+                                  : 0) ? (
+                                  <i key={i} className="fa-solid fa-star"></i>
+                                ) : (
+                                  <i key={i} className="fa-regular fa-star"></i>
+                                )
+                              )}
+                            </div>
+                            <div className="product-colors">
+                              {Array.isArray(sp.product_variants) &&
+                                [
+                                  ...new Map(
+                                    sp.product_variants.map((v) => [
+                                      v.color.id,
+                                      v.color,
+                                    ])
+                                  ).values(),
+                                ].map((color) => (
+                                  <span
+                                    key={color.id}
+                                    className="color"
+                                    data-color={color.name_color}
+                                    style={{
+                                      backgroundColor: color.code_color,
+                                    }}
+                                  ></span>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 <div className="pagination">
+                  {/* Previous button */}
                   <button
                     onClick={() => setPage((p) => Math.max(p - 1, 1))}
                     className={`page-btn ${
@@ -466,16 +538,39 @@ export default function CategoryPage() {
                     <i className="fa-solid fa-chevron-left"></i>
                   </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i + 1}
-                      onClick={() => setPage(i + 1)}
-                      className={`page-btn ${page === i + 1 ? "active" : ""}`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                  {/* Page numbers with dots */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => {
+                      return (
+                        p === 1 || // Trang đầu
+                        p === totalPages || // Trang cuối
+                        Math.abs(p - page) <= 1 // Trang gần hiện tại
+                      );
+                    })
+                    .reduce((acc: (number | "...")[], curr, i, arr) => {
+                      if (i > 0 && curr - (arr[i - 1] as number) > 1) {
+                        acc.push("...");
+                      }
+                      acc.push(curr);
+                      return acc;
+                    }, [])
+                    .map((p, i) =>
+                      p === "..." ? (
+                        <span key={`dots-${i}`} className="page-btn dots">
+                          ...
+                        </span>
+                      ) : (
+                        <button
+                          key={p}
+                          onClick={() => setPage(p)}
+                          className={`page-btn ${page === p ? "active" : ""}`}
+                        >
+                          {p}
+                        </button>
+                      )
+                    )}
 
+                  {/* Next button */}
                   <button
                     onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                     className={`page-btn ${
@@ -501,6 +596,7 @@ export default function CategoryPage() {
           className={`fa ${isActive ? "fa-times" : "fa-filter"}`}
         ></i>
       </div>
+
       <MobileSidebarFilter
         isActive={isActive}
         categories={categories}
@@ -511,6 +607,18 @@ export default function CategoryPage() {
         handleBrandCheckboxChange={handleBrandCheckboxChange}
         selectedGender={selectedGender}
         handleGenderChange={handleGenderChange}
+        selectedPriceRange={selectedPriceRange}
+        handlePriceChange={handlePriceChange}
+        searchKeyword={keyword}
+        currentPage={page}
+        limit={productsPerPage}
+        onProductsChange={(products, total, totalPages) => {
+          setProducts(products);
+          setTotal(total);
+          setTotalPages(totalPages);
+        }}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
       />
     </>
   );

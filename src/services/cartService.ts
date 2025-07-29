@@ -8,6 +8,7 @@ import {
   RemoveFromCartResponse,
 } from "@/types/cart";
 interface AddToCartResponse {
+  length: any;
   message: string;
   cart: ICartItem[]; // danh sách cart_items sau khi thêm
 }
@@ -38,6 +39,7 @@ export const addToCart = async ({
     const data = await res.json();
 
     return {
+      length: Array.isArray(data.cart) ? data.cart.length : 0,
       message: data.message,
       cart: data.cart, // kiểu này khớp với ICartItem[]
     };
@@ -167,8 +169,19 @@ export const getCartByUserId = async (
   userId: number
 ): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`);
-    if (!res.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
+      method: "GET",
+      credentials: "include", // nếu backend dùng cookie-auth
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fetch failed: ${res.status} - ${errorText}`);
+    }
+
     const data: ICart = await res.json();
 
     const cartWithItems = {

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
+import { useEffect } from "react";
+import { getFilteredProducts } from "@/services/productService";
 
 interface Props {
   isActive: boolean;
@@ -12,11 +14,23 @@ interface Props {
   brandsList: IBrand[];
   selectedBrandIds: number[];
   handleBrandCheckboxChange: (brandId: number) => void;
-
-  // Thêm dòng này
   selectedGender: string | null;
   handleGenderChange: (gender: string) => void;
+
+  selectedPriceRange: { min: number; max: number } | null;
+  handlePriceChange: (range: { min: number; max: number } | null) => void;
+  searchKeyword?: string;
+  currentPage: number;
+  limit?: number;
+  onProductsChange: (
+    products: any[],
+    total: number,
+    totalPages: number
+  ) => void;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
+
 export default function MobileSidebarFilter({
   isActive,
   categories,
@@ -27,7 +41,54 @@ export default function MobileSidebarFilter({
   handleBrandCheckboxChange,
   selectedGender,
   handleGenderChange,
+  selectedPriceRange,
+  handlePriceChange,
+  searchKeyword = "",
+  currentPage,
+  limit = 12,
+  onProductsChange,
+  sortBy,
+  sortOrder,
 }: Props) {
+  const applyFilters = async () => {
+    const brandSlug = selectedBrandIds.length
+      ? brandsList.find((b) => b.brand_id === selectedBrandIds[0])?.slug
+      : undefined;
+
+    const params = {
+      keyword: searchKeyword || undefined,
+      gender: selectedGender || undefined,
+      brand: brandSlug,
+      minPrice: selectedPriceRange?.min,
+      maxPrice: selectedPriceRange?.max,
+      page: currentPage,
+      limit,
+      sortBy,
+      sortOrder,
+    };
+
+    try {
+      const res = await getFilteredProducts(params);
+      onProductsChange(res.products, res.total, res.totalPages);
+    } catch (error) {
+      console.error("❌ Lỗi khi lọc sản phẩm (mobile):", error);
+    }
+  };
+
+  useEffect(() => {
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    selectedBrandIds,
+    selectedGender,
+    selectedPriceRange,
+    searchKeyword,
+    currentPage,
+    limit,
+    sortBy,
+    sortOrder,
+  ]);
+
   return (
     <div id="filter-sidebar" className={isActive ? "active" : ""}>
       {/* Danh mục */}
@@ -42,15 +103,12 @@ export default function MobileSidebarFilter({
             {categories.map((cat) => (
               <li key={cat.categories_id} className="nav-item nav-items">
                 <div className="flex justify-between items-center nav-button bg-white px-2 py-2">
-                  {/* Link danh mục cha */}
                   <Link
                     href={`/category/${cat.slug}`}
                     className="flex-1 hover:text-red-500"
                   >
                     {cat.name}
                   </Link>
-
-                  {/* Nút mở rộng danh mục con */}
                   {cat.children && cat.children.length > 0 && (
                     <button
                       type="button"
@@ -65,8 +123,6 @@ export default function MobileSidebarFilter({
                     </button>
                   )}
                 </div>
-
-                {/* Danh mục con */}
                 {cat.children &&
                   cat.children.length > 0 &&
                   openCategoryId === cat.categories_id && (
@@ -107,24 +163,27 @@ export default function MobileSidebarFilter({
             <div className="aside-content filter-group">
               <ul>
                 {[
-                  { label: "Giá dưới 100.000đ", value: "(<100000)" },
+                  { label: "Dưới 100.000đ", value: { min: 0, max: 100000 } },
                   {
                     label: "100.000đ - 200.000đ",
-                    value: "(>=100000 AND <200000)",
+                    value: { min: 100000, max: 200000 },
                   },
                   {
                     label: "200.000đ - 300.000đ",
-                    value: "(>=200000 AND <300000)",
+                    value: { min: 200000, max: 300000 },
                   },
                   {
                     label: "300.000đ - 500.000đ",
-                    value: "(>=300000 AND <500000)",
+                    value: { min: 300000, max: 500000 },
                   },
                   {
                     label: "500.000đ - 1.000.000đ",
-                    value: "(>500000 AND <1000000)",
+                    value: { min: 500000, max: 1000000 },
                   },
-                  { label: "Giá trên 1.000.000đ", value: "(>1000000)" },
+                  {
+                    label: "Trên 1.000.000đ",
+                    value: { min: 1000000, max: 100000000 },
+                  },
                 ].map((price, index) => (
                   <li
                     key={index}
@@ -132,7 +191,15 @@ export default function MobileSidebarFilter({
                   >
                     <span>
                       <label>
-                        <input type="checkbox" value={price.value} />
+                        <input
+                          type="radio"
+                          name="price"
+                          checked={
+                            selectedPriceRange?.min === price.value.min &&
+                            selectedPriceRange?.max === price.value.max
+                          }
+                          onChange={() => handlePriceChange(price.value)}
+                        />
                         <i className="fa"></i>
                         {price.label}
                       </label>
@@ -142,7 +209,8 @@ export default function MobileSidebarFilter({
               </ul>
             </div>
           </aside>
-          {/* Loại */}
+
+          {/* Loại (Giới tính) */}
           <aside className="aside-item filter-type">
             <div className="module-title">
               <h2 className="title-head margin-top-0">
@@ -152,8 +220,8 @@ export default function MobileSidebarFilter({
             <div className="aside-content filter-group">
               <ul>
                 {[
-                  { label: "Giày Nam", value: "nam" },
-                  { label: "Giày Nữ", value: "nu" },
+                  { label: "Giày Nam", value: "male" },
+                  { label: "Giày Nữ", value: "female" },
                 ].map((type) => (
                   <li
                     key={type.value}
@@ -195,7 +263,8 @@ export default function MobileSidebarFilter({
                     <span>
                       <label className="label_relative">
                         <input
-                          type="checkbox"
+                          type="radio"
+                          name="brand" // ✅ để đảm bảo chỉ chọn 1 radio trong nhóm
                           id={`filter-${brand.brand_id}`}
                           checked={selectedBrandIds.includes(brand.brand_id)}
                           onChange={() =>
