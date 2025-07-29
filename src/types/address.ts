@@ -10,7 +10,6 @@ export interface IAddressFormData {
   is_default: boolean;
 }
 export interface AddressResponse {
-  [x: string]: number;
   address: string;
   id: number;
   full_name: string;
