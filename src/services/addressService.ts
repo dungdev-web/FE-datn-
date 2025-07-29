@@ -62,7 +62,6 @@ export const getAddressByIdService = async (
       }
     }
     
-    // Trường hợp trả về object
     console.log("Địa chỉ lấy thành công:", data);
     return data;
   } catch (error) {

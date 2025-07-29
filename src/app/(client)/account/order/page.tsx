@@ -9,11 +9,16 @@ import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
 import { getOrdersByUserService } from "@/services/orderService";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import { getAddressByIdService } from "@/services/addressService";
 
 export default function Order_Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shippingAddresses, setShippingAddresses] = useState<
+    Record<number, string>
+  >({});
+
   const setOrderCount = useGlobalStore((state) => state.setOrderCount);
   useEffect(() => {
     const fetchOrders = async () => {
@@ -26,6 +31,17 @@ export default function Order_Account() {
         const orderList = await getOrdersByUserService(tokenData.user.id);
         setOrders(orderList);
         setOrderCount(orderList.length);
+
+        const addressMap: Record<number, string> = {};
+        for (const order of orderList) {
+          const address = await getAddressByIdService(
+            order.shipping_address_id
+          );
+          if (address) {
+            addressMap[order.shipping_address_id] = `${address.address_line}`;
+          }
+        }
+        setShippingAddresses(addressMap);
       } catch (error) {
         console.error("Lỗi lấy đơn hàng:", error);
       } finally {
@@ -164,9 +180,11 @@ export default function Order_Account() {
                             <p className="text-sm text-gray-600 mt-1">
                               Giao đến:{" "}
                               <span className="font-medium">
-                                #{order.shipping_address_id}
+                                {shippingAddresses[order.shipping_address_id] ??
+                                  `#${order.shipping_address_id}`}
                               </span>
                             </p>
+
                             <p className="text-sm text-gray-600 mt-1">
                               Tổng cộng:{" "}
                               <span className="font-bold text-red-600">
