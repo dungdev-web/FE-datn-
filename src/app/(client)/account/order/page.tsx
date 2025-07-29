@@ -34,13 +34,50 @@ export default function Order_Account() {
     fetchOrders();
   }, []);
 
-  const getPaymentStatus = (status: number) => {
+  const renderOrderStatus = (status: string) => {
     switch (status) {
-      case 1:
-        return <span className="span_success">Đã thanh toán</span>;
-      case 0:
+      case "pending":
+        return (
+          <span className="bg-gray-200 text-gray-800 text-sm !px-6 !py-2 rounded-full">
+            Chờ xử lý
+          </span>
+        );
+      case "processing":
+        return (
+          <span className="bg-yellow-100 text-yellow-800 text-sm !px-6 !py-2 rounded-full">
+            Đang xử lý
+          </span>
+        );
+      case "shipping":
+        return (
+          <span className="bg-blue-100 text-blue-800 text-sm !px-6 !py-2 rounded-full">
+            Đang giao
+          </span>
+        );
+      case "delivered":
+        return (
+          <span className="bg-green-100 text-green-700 text-sm !px-6 !py-2 rounded-full">
+            Đã giao
+          </span>
+        );
+      case "cancelled":
+        return (
+          <span className="bg-red-100 text-red-700 text-sm !px-6 !py-2 rounded-full">
+            Đã hủy
+          </span>
+        );
+      case "returned":
+        return (
+          <span className="bg-purple-100 text-purple-700 text-sm !px-6 !py-2 rounded-full">
+            Hoàn hàng
+          </span>
+        );
       default:
-        return <span className="span_pending">Chưa thanh toán</span>;
+        return (
+          <span className="bg-gray-100 text-gray-700 text-sm !px-6 !py-2 rounded-full">
+            Không rõ
+          </span>
+        );
     }
   };
 
@@ -114,17 +151,7 @@ export default function Order_Account() {
                               <h2 className="text-lg font-semibold text-blue-600">
                                 Đơn hàng #{order.orders_id}
                               </h2>
-                              <span
-                                className={`text-sm !px-6 !py-2 rounded-full ${
-                                  order.status === 1
-                                    ? "bg-green-100 text-green-700"
-                                    : "bg-yellow-100 text-yellow-700"
-                                }`}
-                              >
-                                {order.status === 1
-                                  ? "Đã thanh toán"
-                                  : "Chưa thanh toán"}
-                              </span>
+                              {renderOrderStatus(order.status)}
                             </div>
                             <p className="text-sm text-gray-600">
                               Ngày đặt:{" "}
