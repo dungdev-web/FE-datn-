@@ -10,37 +10,7 @@ import "../../../css/account.css";
 import { API_BASE_URL } from "@/config/env";
 import { AddressResponse } from "@/types/address";
 import { IUser } from "@/types/user";
-
-export interface IOrderItem {
-  order_items_id: number;
-  variant_id: {
-    variant_id: number;
-    product_id: number;
-    color: string;
-    size: string;
-    product: {
-      name: string;
-      image_url: string;
-    };
-  };
-  order_id: number;
-  quantity: number;
-  unit_price: number;
-}
-
-export interface IOrder {
-  orders_id: number;
-  user_id: number;
-  status: string;
-  total_amount: number;
-  payment_method_id: number;
-  shipping_address_id: number;
-  coupons_id: number | null;
-  comment: string | null;
-  created_at: string;
-  updated_at: string;
-  order_items: IOrderItem[];
-}
+import { IOrder } from "@/types/Order";
 
 export default function OrderDetail() {
   const params = useParams();
@@ -116,16 +86,14 @@ export default function OrderDetail() {
         setLoading(true);
         setError("");
 
-        // Lấy thông tin user từ token
         const tokenData = await checkToken();
         if (tokenData?.user) {
           setUser(tokenData.user);
         }
 
-        // Lấy chi tiết đơn hàng
         const orderData = await getOrderDetailService(orderId);
-        console.log("Order data:", orderData); // Debug log
-        console.log("Order items:", orderData?.order_items); // Debug order items
+        console.log("Order data:", orderData); 
+        console.log("Order items:", orderData?.order_items); 
 
         if (!orderData) {
           throw new Error("Không tìm thấy đơn hàng");
@@ -133,7 +101,6 @@ export default function OrderDetail() {
 
         setOrder(orderData);
 
-        // Lấy địa chỉ giao hàng
         if (orderData?.shipping_address_id) {
           try {
             const addressData = await getAddressByIdService(
@@ -360,7 +327,7 @@ export default function OrderDetail() {
           </div>
 
           <div className="col-xs-12 col-sm-12 col-lg-9 col-right-ac">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center !mb-4">
               <h1>Chi tiết đơn hàng #{order.orders_id}</h1>
               <Link
                 href="/account/order"
@@ -370,7 +337,7 @@ export default function OrderDetail() {
               </Link>
             </div>
 
-            <p className="order_date mb-6">
+            <p className="order_date !mb-6">
               Ngày tạo:{" "}
               {new Date(order.created_at).toLocaleDateString("vi-VN", {
                 year: "numeric",
@@ -381,7 +348,6 @@ export default function OrderDetail() {
               })}
             </p>
 
-            {/* Thông tin trạng thái */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 !mb-6">
               <div className="box bg-white !p-4 rounded shadow">
                 <h2 className="text-lg font-semibold !mb-2">
@@ -415,7 +381,6 @@ export default function OrderDetail() {
               </div>
             </div>
 
-            {/* Thông tin địa chỉ và thanh toán */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 !mb-6">
               <div className="box-address bg-gray-50 !p-4 rounded shadow col-span-2">
                 <h2 className="text-lg font-semibold !mb-3">
@@ -427,7 +392,6 @@ export default function OrderDetail() {
                       {address.full_name || user?.name || "Khách hàng"}
                     </p>
                     <p className="text-gray-700">
-                      {/* Xử lý nhiều cấu trúc địa chỉ khác nhau */}
                       {address.address_line ||
                         address.address ||
                         "Địa chỉ không khả dụng"}
@@ -448,7 +412,7 @@ export default function OrderDetail() {
                     {(address.address_line === "Địa chỉ không khả dụng" ||
                       address.address_line === "Lỗi tải địa chỉ") && (
                       <p className="text-sm text-amber-600 bg-amber-50 !p-2 rounded">
-                        ⚠️ Thông tin địa chỉ từ API không khả dụng (ID:{" "}
+                        Thông tin địa chỉ từ API không khả dụng (ID:{" "}
                         {order.shipping_address_id})
                       </p>
                     )}
@@ -464,7 +428,6 @@ export default function OrderDetail() {
                     <p className="text-sm text-gray-400">
                       API không trả về dữ liệu hoặc có lỗi
                     </p>
-                    {/* Hiển thị thông tin user như fallback */}
                     {user && (
                       <div className="mt-2 p-2 bg-blue-50 rounded">
                         <p className="text-sm text-blue-800">
@@ -497,7 +460,6 @@ export default function OrderDetail() {
               </div>
             </div>
 
-            {/* Bảng sản phẩm */}
             <div className="box bg-white rounded shadow overflow-hidden">
               <table className="table-auto w-full border-t border-gray-200">
                 <thead className="bg-gray-100">
@@ -531,7 +493,7 @@ export default function OrderDetail() {
                                 {getProductName(item)}
                               </div>
                               <div className="text-sm text-gray-500 mt-1">
-                                <span className="inline-block mr-3">
+                                <span className="inline-block !mr-3">
                                   Màu:{" "}
                                   <span className="font-medium">
                                     {getColorName(item)}
@@ -602,7 +564,7 @@ export default function OrderDetail() {
                       <span>Phí vận chuyển:</span>
                       <span className="font-medium">40.000₫</span>
                     </div>
-                    <div className="border-t pt-2">
+                    <div className="border-t !pt-2">
                       <div className="flex justify-between text-lg font-bold text-red-600">
                         <span>Tổng tiền:</span>
                         <span>
