@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { updateUserService } from "@/services/userService";
 import { IUser } from "@/types/user";
+import Swal from "sweetalert2";
 
 export default function InfoUpdateUser({
   user,
@@ -25,7 +26,7 @@ export default function InfoUpdateUser({
     }));
   };
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
   try {
     const updated = await updateUserService({
       userId: user.id,
@@ -42,14 +43,12 @@ export default function InfoUpdateUser({
     };
 
     setUser(newUser);
-    toast.success("Cập nhật thành công");
+    await Swal.fire("Thành công", "Cập nhật thành công", "success");
     setEditing(false);
   } catch (err: any) {
-    toast.error(err.message || "Cập nhật thất bại");
+    await Swal.fire("Lỗi", err.message || "Cập nhật thất bại", "error");
   }
 };
-
-
   return (
     <div className="form-signup name-account m992 bg-white !p-5 rounded-lg border border-[#e9ecef] text-[14px]">
       <h4 className="!mb-[15px] text-[#333] text-[16px] font-semibold">

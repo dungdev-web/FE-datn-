@@ -5,7 +5,7 @@ import "../../css/account.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import EditAddressForm from "../../component/Account/EditAddressForm";
-import AccountSidebar from "../../component/accountsidebar";
+import AccountSidebar from "../../component/Account/AccountSidebar";
 import {
   addAddressService,
   updateAddress,
@@ -43,99 +43,128 @@ export default function Address() {
   const [addressList, setAddressList] = useState<AddressFormData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user || !user.id) return;
-
-    const fetchAddresses = async () => {
-      try {
-        setIsLoading(true);
-        const res = await getAddressByUserId(user.id);
-        const addresses: AddressFormData[] = Array.isArray(res)
-          ? res
-              .filter((item: any) => item.ship_address_id)
-              .map((item: any) => ({
+  const fetchAddresses = async () => {
+    if (!user?.id) return;
+    try {
+      setIsLoading(true);
+      const res = await getAddressByUserId(user.id);
+      const addresses: AddressFormData[] = Array.isArray(res)
+        ? res
+            .filter((item: any) => item.ship_address_id)
+            .map((item: any) => {
+              const parsed = parseAddressLine(item.address_line || "");
+              return {
                 id: item.ship_address_id,
                 full_name: item.full_name,
                 phone: item.phone,
-                address_line_part: "",
+                ...parsed,
                 country: "Vietnam",
-                province: "",
-                district: "",
-                ward: "",
                 is_default: item.is_default ?? false,
                 address_line: item.address_line ?? "",
-              }))
-          : [];
+              };
+            })
+        : [];
+      setAddressList(addresses);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách địa chỉ:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        setAddressList(addresses);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách địa chỉ:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
+  useEffect(() => {
     fetchAddresses();
   }, [user?.id]);
 
+  function parseAddressLine(address_line: string) {
+    const [part, ward, district, province] = address_line
+      .split(",")
+      .map((s) => s.trim());
+    return {
+      address_line_part: part || "",
+      ward: ward || "",
+      district: district || "",
+      province: province || "",
+    };
+  }
+
   const handleAddOrUpdate = async (data: AddressFormData) => {
-    try {
-      if (!user?.id) return toast.error("Không xác định được người dùng!");
-      const address_line = [
-        data.address_line_part,
-        data.ward,
-        data.district,
-        data.province,
-      ]
-        .filter(Boolean)
-        .join(", ");
+  try {
+    if (!user?.id) {
+      await Swal.fire("Lỗi", "Không xác định được người dùng!", "error");
+      return;
+    }
 
-      const payload = {
-        user_id: user.id,
-        full_name: data.full_name,
-        phone: data.phone,
-        address_line,
-        is_default: data.is_default ?? false,
-      };
+    const address_line = [
+      data.address_line_part,
+      data.ward,
+      data.district,
+      data.province,
+    ]
+      .filter(Boolean)
+      .join(", ");
 
-      if (formMode === "add") {
-        const result = await addAddressService(payload);
-        setAddressList((prev) => [
-          ...prev,
-          {
-            ...data,
-            address_line,
-            id: result.id,
-          },
-        ]);
-      } else {
-        const addressId = data.id;
-        if (!addressId) {
-          toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
-          return;
-        }
+    const payload = {
+      user_id: user.id,
+      full_name: data.full_name,
+      phone: data.phone,
+      address_line,
+      is_default: data.is_default ?? false,
+    };
 
-        await updateAddress(addressId, payload);
-        setAddressList((prev) =>
-          prev.map((addr) =>
-            addr.id === addressId
-              ? {
-                  ...data,
-                  address_line,
-                  id: addressId,
-                }
-              : addr
-          )
-        );
+    if (data.is_default) {
+      await unsetOtherDefaultAddresses(data.id);
+    }
+
+    if (formMode === "add") {
+      await addAddressService(payload);
+      await Swal.fire("Thành công", "Thêm địa chỉ thành công!", "success");
+    } else {
+      if (!data.id) {
+        await Swal.fire("Cảnh báo", "Không tìm thấy ID địa chỉ để cập nhật!", "warning");
+        return;
       }
 
-      setShowEditForm(false);
-    } catch (error: any) {
-      toast.error("Lỗi khi lưu địa chỉ: " + error.message);
+      await updateAddress(data.id, payload);
+      await Swal.fire("Thành công", "Cập nhật địa chỉ thành công!", "success");
     }
+
+    setShowEditForm(false);
+    await fetchAddresses();
+  } catch (error: any) {
+    await Swal.fire("Lỗi", "Lỗi khi lưu địa chỉ: " + error.message, "error");
+  }
+};
+
+  const unsetOtherDefaultAddresses = async (currentId?: number) => {
+    const updates = addressList
+      .filter((addr) => addr.is_default && addr.id !== currentId)
+      .map((addr) =>
+        updateAddress(addr.id!, {
+          full_name: addr.full_name,
+          phone: addr.phone,
+          address_line: addr.address_line ?? "",
+          is_default: false,
+        })
+      );
+
+    await Promise.all(updates);
   };
+
   const handleDelete = async (addressId?: number) => {
     if (!addressId) return;
+
+    const targetAddress = addressList.find((addr) => addr.id === addressId);
+
+    if (targetAddress?.is_default) {
+      await Swal.fire({
+        icon: "error",
+        title: "Không thể xoá",
+        text: "Không thể xoá địa chỉ mặc định. Vui lòng đổi mặc định trước!",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
     const result = await Swal.fire({
       title: "Bạn có chắc chắn?",
@@ -152,7 +181,7 @@ export default function Address() {
 
     try {
       await deleteAddress(addressId);
-      setAddressList((prev) => prev.filter((addr) => addr.id !== addressId));
+      await fetchAddresses();
       Swal.fire("Đã xoá!", "Địa chỉ đã được xoá thành công.", "success");
     } catch (error: any) {
       Swal.fire("Lỗi!", "Xoá địa chỉ thất bại: " + error.message, "error");
@@ -225,7 +254,7 @@ export default function Address() {
                 ) : (
                   addressList.map((address, index) => (
                     <div
-                      key={index}
+                      key={address.id}
                       className="customer_address col-xs-12 col-lg-12 col-md-12 col-xl-12"
                     >
                       <div
@@ -265,7 +294,10 @@ export default function Address() {
                               onClick={() => {
                                 setFormMode("edit");
                                 setAddressData({ ...address });
-                                setShowEditForm(true);
+
+                                setTimeout(() => {
+                                  setShowEditForm(true);
+                                }, 0);
                               }}
                             >
                               Chỉnh sửa địa chỉ

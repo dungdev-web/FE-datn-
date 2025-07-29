@@ -67,7 +67,7 @@ export async function uploadAvatarService(userId: number, avatar: File) {
     throw new Error(result.error || "Upload ảnh đại diện thất bại");
   }
 
-  return result;
+  return result.user;
 }
 export async function getUserProfileService(userId: number) {
   const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
@@ -83,3 +83,4 @@ export async function getUserProfileService(userId: number) {
 
   return result;
 }
+

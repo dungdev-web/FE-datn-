@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IUser } from "@/types/user";
-import LogoutLink from "./log_out";
+import LogoutLink from "../log_out";
 export default function AccountSidebar({ user }: { user: IUser | null }) {
   const pathname = usePathname();
 
