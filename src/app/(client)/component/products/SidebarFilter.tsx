@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getFilteredProducts } from "@/services/productService";
+import { Label } from "@mui/icons-material";
 
 interface Props {
   categories: ICategory[];
@@ -261,7 +262,11 @@ export default function SidebarFilter({
               {selectedGender && (
                 <li className="flex items-center text-sm justify-between">
                   <span>
-                    {selectedGender === "nam" ? "Giày Nam" : "Giày Nữ"}
+                    {selectedGender === "nam"
+                      ? "Giày Nam"
+                      : selectedGender === "nữ"
+                      ? "Giày Nữ"
+                      : "Khác"}
                   </span>
                   <button
                     onClick={() => handleGenderChange("")}
@@ -352,6 +357,7 @@ export default function SidebarFilter({
                 {[
                   { label: "Giày Nam", value: "nam" },
                   { label: "Giày Nữ", value: "nữ" },
+                  { label: "Khác", value: "khác" },
                 ].map((type) => (
                   <li
                     key={type.value}
@@ -369,7 +375,6 @@ export default function SidebarFilter({
                         checked={selectedGender === type.value}
                         onChange={() => handleGenderChange(type.value)}
                       />
-
                       <i className="fa"></i>
                       {type.label}
                     </label>
