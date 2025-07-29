@@ -7,12 +7,15 @@ import { getInfoUser, checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
 import LogoutLink from "../component/log_out";
 import CheckTokenGuard from "@/store/CheckTokenGuard";
-import AccountSidebar from "../component/accountsidebar";
+import AccountSidebar from "../component/Account/AccountSidebar";
 import { updateUserService, uploadAvatarService } from "@/services/userService";
 import { toast } from "react-toastify";
 import { API_BASE_URL } from "@/config/env";
 import UploadImageProfile from "../component/Account/UploadImage";
 import InfoUpdateUser from "../component/Account/InfoUpdateUser";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { getOrdersByUserService } from "@/services/orderService";
+import { getAddressByUserId } from "@/services/addressService";
 interface Props {
   user: IUser;
   setUser: (user: IUser) => void;
@@ -20,6 +23,34 @@ interface Props {
 export default function Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const setOrderCount = useGlobalStore((state) => state.setOrderCount);
+  const setAddressCount = useGlobalStore((state) => state.setAddressCount);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (!tokenData?.user?.id) return;
+
+        const [orders, addresses] = await Promise.all([
+          getOrdersByUserService(tokenData.user.id),
+          getAddressByUserId(tokenData.user.id),
+        ]);
+
+        setOrderCount(orders.length);
+        if (Array.isArray(addresses)) {
+          setAddressCount(addresses.length);
+        } else {
+          setAddressCount(0);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy số lượng đơn hàng/địa chỉ:", err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {

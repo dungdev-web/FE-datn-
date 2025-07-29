@@ -172,12 +172,11 @@ export const getCartByUserId = async (
     if (!res.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
     const data: ICart = await res.json();
 
-    // ✅ Chuyển đổi cart_items => items, ép price về number
     const cartWithItems = {
       ...data,
       items: data.cart_items.map((item) => ({
         ...item,
-        price: Number(item.price), // ép từ string => number để tính toán
+        price: Number(item.price),
       })),
     };
 

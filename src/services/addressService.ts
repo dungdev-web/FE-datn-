@@ -32,7 +32,66 @@ export async function getAddressByUserId(
     throw new Error(error?.message || "Lỗi không xác định");
   }
 }
+export const getAddressByIdService = async (
+  addressId: number
+): Promise<AddressResponse | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/addressesbyid/${addressId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
 
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Lỗi: ${res.status} - ${errorText}`);
+    }
+
+    const data = await res.json();
+    console.log("API response:", data);
+    
+    if (Array.isArray(data)) {
+      if (data.length > 0) {
+        console.log("Địa chỉ lấy thành công:", data[0]);
+        return data[0];
+      } else {
+        console.log("Không tìm thấy địa chỉ với ID:", addressId);
+        return null;
+      }
+    }
+    
+    console.log("Địa chỉ lấy thành công:", data);
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi lấy địa chỉ theo ID:", error);
+    return null;
+  }
+};
+export async function getDefaultAddressService(userId: number): Promise<AddressResponse | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/user_default_address/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Lỗi: ${res.status} - ${errorText}`);
+    }
+
+    const data = await res.json();
+    console.log("Địa chỉ mặc định:", data);
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi lấy địa chỉ mặc định:", error);
+    return null;
+  }
+}
 export async function updateAddress(
   addressId: number,
   payload: {

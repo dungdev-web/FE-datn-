@@ -4,6 +4,7 @@ import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { addAddressService, updateAddress } from "@/services/addressService";
 import { toast } from "react-toastify";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAddressFormValidation } from "@/hooks/useAddressFormValidation";
 
 type AddressFormData = {
   id?: number;
@@ -38,11 +39,20 @@ export default function EditAddressForm({
 }: Props) {
   const { user } = useAuthUser();
   const [formData, setFormData] = useState<AddressFormData>(initialData);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const {user} = useAuthUser();
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
+  const { errors, validateField, validateAll } =
+    useAddressFormValidation(initialData);
+  useEffect(() => {
+    console.log("🛠 initialData vào EditForm:", initialData);
+    if (initialData?.id !== undefined) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
@@ -51,36 +61,45 @@ export default function EditAddressForm({
   }, []);
 
   useEffect(() => {
-    const province = provinces.find((p) => p.name === formData.province);
-    if (province) {
-      fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`)
-        .then((res) => res.json())
-        .then((data) => {
-          setDistricts(data.districts || []);
-          setWards([]);
-        });
+    if (formData.province && provinces.length) {
+      const selectedProvince = provinces.find(
+        (p) => p.name === formData.province
+      );
+      if (selectedProvince) {
+        fetch(
+          `https://provinces.open-api.vn/api/p/${selectedProvince.code}?depth=2`
+        )
+          .then((res) => res.json())
+          .then((data) => setDistricts(data.districts || []));
+      }
     }
-  }, [formData.province]);
+  }, [formData.province, provinces]);
 
   useEffect(() => {
-    const district = districts.find((d) => d.name === formData.district);
-    if (district) {
-      fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`)
-        .then((res) => res.json())
-        .then((data) => setWards(data.wards || []));
+    if (formData.district && districts.length) {
+      const selectedDistrict = districts.find(
+        (d) => d.name === formData.district
+      );
+      if (selectedDistrict) {
+        fetch(
+          `https://provinces.open-api.vn/api/d/${selectedDistrict.code}?depth=2`
+        )
+          .then((res) => res.json())
+          .then((data) => setWards(data.wards || []));
+      }
     }
-  }, [formData.district]);
+  }, [formData.district, districts]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const target = e.target;
     const { name, value, type } = target;
-    const checked = type === "checkbox" ? target.checked : undefined;
-
+    validateField(name, value);
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox" ? (target as HTMLInputElement).checked : value,
       ...(name === "province" ? { district: "", ward: "" } : {}),
       ...(name === "district" ? { ward: "" } : {}),
     }));
@@ -93,41 +112,27 @@ export default function EditAddressForm({
       return;
     }
 
-    const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
-
     if (!user) {
       toast.error("Không tìm thấy thông tin người dùng!");
       return;
     }
-    const dataToSubmit = {
-      user_id: user.id,
-      full_name: formData.full_name,
-      phone: formData.phone,
-      address_line: fullAddress,
-      is_default: formData.is_default ?? false,
-    };
-
-    try {
-      setLoading(true);
-
-      if (mode === "add") {
-        await addAddressService(dataToSubmit);
-        toast.success("Thêm địa chỉ thành công!");
-      } else if (formData.id) {
-        await updateAddress(formData.id, dataToSubmit);
-        toast.success("Cập nhật địa chỉ thành công!");
-      } else {
-        toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
-        return;
-      }
-
-      onSubmit(formData);
-      onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Có lỗi xảy ra");
-    } finally {
-      setLoading(false);
+    const isValid = validateAll(formData);
+    if (!isValid) {
+      toast.error("Vui lòng kiểm tra lại các trường bắt buộc.");
+      return;
     }
+    if (mode === "edit" && !formData.id) {
+      toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
+      return;
+    }
+    console.log("🧾 Submit formData:", formData);
+
+    onSubmit({
+      ...formData,
+      user_id: user.id,
+    });
+
+    onClose();
   };
 
   return (
@@ -150,10 +155,13 @@ export default function EditAddressForm({
           <input
             type="text"
             name="full_name"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.full_name}
             onChange={handleChange}
           />
+          {errors.full_name && (
+            <p className="text-sm text-red-500 mt-1">{errors.full_name}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -162,10 +170,13 @@ export default function EditAddressForm({
           <input
             type="text"
             name="phone"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.phone}
             onChange={handleChange}
           />
+          {errors.phone && (
+            <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">
@@ -174,22 +185,25 @@ export default function EditAddressForm({
           <input
             type="text"
             name="address_line_part"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.address_line_part}
             onChange={handleChange}
           />
+          {errors.address_line_part && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.address_line_part}
+            </p>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Quốc gia</label>
           <select
             name="country"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.country}
             onChange={handleChange}
           >
             <option value="Vietnam">Vietnam</option>
-            <option value="United States">United States</option>
-            <option value="Japan">Japan</option>
           </select>
         </div>
 
@@ -200,7 +214,7 @@ export default function EditAddressForm({
             </label>
             <select
               name="province"
-              className="w-full border border-gray-300 rounded !px-3 !py-2"
+              className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
               value={formData.province}
               onChange={handleChange}
             >
@@ -211,6 +225,9 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.province && (
+              <p className="text-sm text-red-500 mt-1">{errors.province}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -230,6 +247,9 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.district && (
+              <p className="text-sm text-red-500 mt-1">{errors.district}</p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -249,21 +269,27 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.ward && (
+              <p className="text-sm text-red-500 mt-1">{errors.ward}</p>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center !space-x-2">
           <input
             type="checkbox"
             name="is_default"
             checked={formData.is_default}
             onChange={handleChange}
             className="w-4 h-4"
+            id="is_default"
           />
-          <label className="text-sm">Đặt làm địa chỉ mặc định</label>
+          <label htmlFor="is_default" className="text-sm ">
+            Đặt làm địa chỉ mặc định
+          </label>
         </div>
 
-        <div className="flex justify-end space-x-4 !pt-4">
+        <div className="flex justify-end space-x-4 !pt-4 gap-2">
           <button
             type="button"
             onClick={onClose}

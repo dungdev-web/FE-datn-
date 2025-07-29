@@ -2,12 +2,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IUser } from "@/types/user";
-import LogoutLink from "./log_out";
+import LogoutLink from "../log_out";
+import { useGlobalStore } from "@/store/useGlobalStore";
 export default function AccountSidebar({ user }: { user: IUser | null }) {
   const pathname = usePathname();
 
   const isActive = (path: string) => pathname === path;
-
+  const addressCount = useGlobalStore((state) => state.addressCount);
+  const orderCount = useGlobalStore((state) => state.orderCount);
   return (
     <div className="block-account">
       <h5 className="title-account">Trang tài khoản</h5>
@@ -35,7 +37,7 @@ export default function AccountSidebar({ user }: { user: IUser | null }) {
             }`}
             href="/account/order"
           >
-            Đơn hàng của bạn
+            Đơn hàng của bạn ({orderCount})
           </Link>
         </li>
         <li>
@@ -55,7 +57,7 @@ export default function AccountSidebar({ user }: { user: IUser | null }) {
             }`}
             href="/account/address"
           >
-            Sổ địa chỉ (1)
+            Sổ địa chỉ ({addressCount})
           </Link>
         </li>
       </ul>

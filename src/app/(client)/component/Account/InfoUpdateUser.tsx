@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { updateUserService } from "@/services/userService";
 import { IUser } from "@/types/user";
+import Swal from "sweetalert2";
+import { AddressResponse } from "@/types/address";
+import { getDefaultAddressService } from "@/services/addressService";
 
 export default function InfoUpdateUser({
   user,
@@ -16,6 +19,21 @@ export default function InfoUpdateUser({
     email: "",
     phone: "",
   });
+  const [defaultAddress, setDefaultAddress] = useState<AddressResponse | null>(
+    null
+  );
+  useEffect(() => {
+    const fetchDefaultAddress = async () => {
+      if (!user?.id) return;
+
+      const address = await getDefaultAddressService(user.id);
+      setDefaultAddress(address);
+    };
+
+    fetchDefaultAddress();
+  }, [user]);
+  console.log("🛠 user trong InfoUpdateUser:", user);
+  console.log("🛠 defaultAddress trong InfoUpdateUser:", defaultAddress);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,30 +44,28 @@ export default function InfoUpdateUser({
   };
 
   const handleSubmit = async () => {
-  try {
-    const updated = await updateUserService({
-      userId: user.id,
-      fullName: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-    });
+    try {
+      const updated = await updateUserService({
+        userId: user.id,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+      });
 
-    const newUser = {
-      ...user,
-      name: formData.fullName,
-      email: formData.email,
-      phone: formData.phone,
-    };
+      const newUser = {
+        ...user,
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+      };
 
-    setUser(newUser);
-    toast.success("Cập nhật thành công");
-    setEditing(false);
-  } catch (err: any) {
-    toast.error(err.message || "Cập nhật thất bại");
-  }
-};
-
-
+      setUser(newUser);
+      await Swal.fire("Thành công", "Cập nhật thành công", "success");
+      setEditing(false);
+    } catch (err: any) {
+      await Swal.fire("Lỗi", err.message || "Cập nhật thất bại", "error");
+    }
+  };
   return (
     <div className="form-signup name-account m992 bg-white !p-5 rounded-lg border border-[#e9ecef] text-[14px]">
       <h4 className="!mb-[15px] text-[#333] text-[16px] font-semibold">
@@ -112,7 +128,11 @@ export default function InfoUpdateUser({
 
       <div className="!mb-0">
         <strong className="text-[#555]">Địa chỉ:</strong>
-        <span className="!ml-[10px]">{user.address}</span>
+        <span className="!ml-[10px]">
+          {defaultAddress
+            ? `${defaultAddress.address_line}`
+            : "Chưa có địa chỉ mặc định"}
+        </span>
       </div>
 
       <div className="!mt-4">

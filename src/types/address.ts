@@ -10,12 +10,14 @@ export interface IAddressFormData {
   is_default: boolean;
 }
 export interface AddressResponse {
+  address: string;
   id: number;
   full_name: string;
   phone: string;
   address_line: string;
   ward: string;
   district: string;
+  province: string;
   city: string;
   country?: string;
   is_default: boolean;
