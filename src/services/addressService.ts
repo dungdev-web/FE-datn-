@@ -174,19 +174,3 @@ export async function deleteAddress(addressId: number): Promise<any> {
     throw new Error(error?.message || "Lỗi không xác định khi xoá địa chỉ");
   }
 }
-export async function getDefaultAddressService(userId: number) {
-  const response = await fetch(`http://localhost:3000/user_default_address/${userId}`, {
-    method: "GET",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    return null; // Không có địa chỉ mặc định
-  }
-
-  const result = await response.json();
-  return {
-    ...result,
-    email: result.user?.email || "",
-  };
-}
