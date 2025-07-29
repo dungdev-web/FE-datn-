@@ -89,52 +89,52 @@ export default function Address() {
   }
 
   const handleAddOrUpdate = async (data: AddressFormData) => {
-    try {
-      if (!user?.id) {
-        toast.error("Không xác định được người dùng!");
+  try {
+    if (!user?.id) {
+      await Swal.fire("Lỗi", "Không xác định được người dùng!", "error");
+      return;
+    }
+
+    const address_line = [
+      data.address_line_part,
+      data.ward,
+      data.district,
+      data.province,
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    const payload = {
+      user_id: user.id,
+      full_name: data.full_name,
+      phone: data.phone,
+      address_line,
+      is_default: data.is_default ?? false,
+    };
+
+    if (data.is_default) {
+      await unsetOtherDefaultAddresses(data.id);
+    }
+
+    if (formMode === "add") {
+      await addAddressService(payload);
+      await Swal.fire("Thành công", "Thêm địa chỉ thành công!", "success");
+    } else {
+      if (!data.id) {
+        await Swal.fire("Cảnh báo", "Không tìm thấy ID địa chỉ để cập nhật!", "warning");
         return;
       }
 
-      const address_line = [
-        data.address_line_part,
-        data.ward,
-        data.district,
-        data.province,
-      ]
-        .filter(Boolean)
-        .join(", ");
-
-      const payload = {
-        user_id: user.id,
-        full_name: data.full_name,
-        phone: data.phone,
-        address_line,
-        is_default: data.is_default ?? false,
-      };
-
-      if (data.is_default) {
-        await unsetOtherDefaultAddresses(data.id);
-      }
-
-      if (formMode === "add") {
-        await addAddressService(payload);
-        toast.success("Thêm địa chỉ thành công!");
-      } else {
-        if (!data.id) {
-          toast.warn("Không tìm thấy ID địa chỉ để cập nhật!");
-          return;
-        }
-
-        await updateAddress(data.id, payload);
-        toast.success("Cập nhật địa chỉ thành công!");
-      }
-
-      setShowEditForm(false);
-      await fetchAddresses();
-    } catch (error: any) {
-      toast.error("Lỗi khi lưu địa chỉ: " + error.message);
+      await updateAddress(data.id, payload);
+      await Swal.fire("Thành công", "Cập nhật địa chỉ thành công!", "success");
     }
-  };
+
+    setShowEditForm(false);
+    await fetchAddresses();
+  } catch (error: any) {
+    await Swal.fire("Lỗi", "Lỗi khi lưu địa chỉ: " + error.message, "error");
+  }
+};
 
   const unsetOtherDefaultAddresses = async (currentId?: number) => {
     const updates = addressList
