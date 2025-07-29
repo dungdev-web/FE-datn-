@@ -142,6 +142,13 @@ export default function SidebarFilter({
     handlePriceChange(previous.price);
     setFilterHistory((prev) => prev.slice(0, prev.length - 1));
   };
+
+  // Helper function để kiểm tra price range có bằng nhau không
+  const isPriceRangeEqual = (range1: {min: number, max: number} | null, range2: {min: number, max: number}) => {
+    if (!range1) return false;
+    return range1.min === range2.min && range1.max === range2.max;
+  };
+
   return (
     <div className="col-lg-3 col-test">
       {/* Danh mục */}
@@ -318,33 +325,54 @@ export default function SidebarFilter({
                     label: "Trên 1.000.000đ",
                     value: { min: 1000000, max: 100000000 },
                   },
-                ].map((price, index) => (
-                  <li
-                    key={index}
-                    className="filter-item filter-item--check-box"
-                  >
-                    <label>
-                      <input
-                        key={
-                          selectedPriceRange?.min === price.value.min &&
-                          selectedPriceRange?.max === price.value.max
-                            ? "checked"
-                            : "unchecked"
-                        }
-                        type="radio"
-                        name="price"
-                        checked={
-                          selectedPriceRange?.min === price.value.min &&
-                          selectedPriceRange?.max === price.value.max
-                        }
-                        onChange={() => handlePriceChange(price.value)}
-                      />
-
-                      <i className="fa"></i>
-                      {price.label}
-                    </label>
-                  </li>
-                ))}
+                ].map((price, index) => {
+                  const isChecked = isPriceRangeEqual(selectedPriceRange, price.value);
+                  console.log(`Price ${price.label}: isChecked = ${isChecked}`, selectedPriceRange, price.value);
+                  
+                  return (
+                    <li
+                      key={index}
+                      className="filter-item filter-item--check-box"
+                    >
+                      <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="radio"
+                          name="price"
+                          checked={isChecked}
+                          onChange={() => handlePriceChange(price.value)}
+                          style={{ display: 'none' }}
+                        />
+                        <span 
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            borderRadius: '50%',
+                            border: '2px solid #ccc',
+                            backgroundColor: isChecked ? '#007bff' : 'transparent',
+                            position: 'relative',
+                            display: 'inline-block'
+                          }}
+                        >
+                          {isChecked && (
+                            <span 
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '50%',
+                                backgroundColor: 'white'
+                              }}
+                            />
+                          )}
+                        </span>
+                        {price.label}
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </aside>
@@ -367,19 +395,40 @@ export default function SidebarFilter({
                     key={type.value}
                     className="filter-item filter-item--check-box"
                   >
-                    <label>
+                    <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <input
-                        key={
-                          selectedGender === type.value
-                            ? "checked"
-                            : "unchecked"
-                        }
                         type="radio"
                         name="gender"
                         checked={selectedGender === type.value}
                         onChange={() => handleGenderChange(type.value)}
+                        style={{ display: 'none' }}
                       />
-                      <i className="fa"></i>
+                      <span 
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          borderRadius: '50%',
+                          border: '2px solid #ccc',
+                          backgroundColor: selectedGender === type.value ? '#007bff' : 'transparent',
+                          position: 'relative',
+                          display: 'inline-block'
+                        }}
+                      >
+                        {selectedGender === type.value && (
+                          <span 
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '50%',
+                              transform: 'translate(-50%, -50%)',
+                              width: '6px',
+                              height: '6px',
+                              borderRadius: '50%',
+                              backgroundColor: 'white'
+                            }}
+                          />
+                        )}
+                      </span>
                       {type.label}
                     </label>
                   </li>
@@ -397,26 +446,54 @@ export default function SidebarFilter({
             </div>
             <div className="aside-content filter-group">
               <ul>
-                {brandsList.map((brand) => (
-                  <li
-                    key={brand.brand_id}
-                    className="filter-item filter-item--check-box"
-                  >
-                    <label>
-                      <input
-                        type="radio"
-                        name="brand"
-                        value={brand.brand_id}
-                        checked={selectedBrandIds.includes(brand.brand_id)}
-                        onChange={() =>
-                          handleBrandCheckboxChange(brand.brand_id)
-                        }
-                      />
-                      <i className="fa"></i>
-                      {brand.name}
-                    </label>
-                  </li>
-                ))}
+                {brandsList.map((brand) => {
+                  const isChecked = selectedBrandIds.includes(brand.brand_id);
+                  console.log(`Brand ${brand.name}: isChecked = ${isChecked}`, selectedBrandIds);
+                  
+                  return (
+                    <li
+                      key={brand.brand_id}
+                      className="filter-item filter-item--check-box"
+                    >
+                      <label style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="radio"
+                          name="brand"
+                          checked={isChecked}
+                          onChange={() => handleBrandCheckboxChange(brand.brand_id)}
+                          style={{ display: 'none' }}
+                        />
+                        <span 
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            borderRadius: '50%',
+                            border: '2px solid #ccc',
+                            backgroundColor: isChecked ? '#007bff' : 'transparent',
+                            position: 'relative',
+                            display: 'inline-block'
+                          }}
+                        >
+                          {isChecked && (
+                            <span 
+                              style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '6px',
+                                height: '6px',
+                                borderRadius: '50%',
+                                backgroundColor: 'white'
+                              }}
+                            />
+                          )}
+                        </span>
+                        {brand.name}
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </aside>
