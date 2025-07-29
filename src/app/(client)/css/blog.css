@@ -1,4 +1,8 @@
 /* --- Desktop giữ nguyên px, không đổi --- */
+html {
+  scroll-behavior: smooth;
+}
+
 .intro-banner {
   position: relative;
   background: url("/images/banner/mega-menu-images2.webp") no-repeat center
@@ -295,6 +299,7 @@ article {
   border: none;
   margin: 10px;
   cursor: pointer;
+  width: 22%;
 }
 
 .close-sidebar-btn {

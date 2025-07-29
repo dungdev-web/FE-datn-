@@ -168,7 +168,7 @@ export const getCartByUserId = async (
   userId: number
 ): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/cart/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
       credentials: "include", // nếu backend dùng cookie-auth
       headers: {

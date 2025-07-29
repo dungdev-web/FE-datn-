@@ -37,7 +37,7 @@ export async function getPost(
   }
 }
 // Lấy bài viết theo ID
-export async function getPostById(id: string): Promise<IBlog | null> {
+export async function getPostById(id: number): Promise<IBlog | null> {
   if (IS_MOCK) {
     const allPosts = getMockBlog();
     return allPosts.find((post) => post.post_id === Number(id)) || null;

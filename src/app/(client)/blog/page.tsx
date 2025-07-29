@@ -9,7 +9,6 @@ import { API_BASE_URL } from "@/config/env";
 import AsideBlog from "@/app/(client)/component/blog/AsideBlog";
 import DOMPurify from "dompurify";
 export default function Blog() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [post, setPost] = useState<IBlog[]>([]);
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(true);
@@ -73,61 +72,10 @@ export default function Blog() {
         </div>
       </section>
       {/* Nút mở sidebar (chỉ hiển thị trên mobile) */}
-      <button
-        className="toggle-sidebar-btn"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        ☰ Danh mục & Liên quan
-      </button>
+
 
       <main className="main_blog">
-        <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`}>
-          <button
-            className="close-sidebar-btn"
-            onClick={() => setSidebarOpen(false)}
-          >
-            ×
-          </button>
-          <div className="category-blog">
-            <h2>DANH MỤC BÀI VIẾT</h2>
-            <ul>
-              <li>Trang chủ</li>
-              <li>Giới thiệu</li>
-              <li>Sản phẩm</li>
-              <li>Tin tức</li>
-              <li>Liên hệ</li>
-              <li>Hệ thống cửa hàng</li>
-            </ul>
-          </div>
-
-          <div className="relate-blog">
-            <h2>BÀI VIẾT LIÊN QUAN</h2>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-1.webp" alt="" />
-              <p>TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-2.webp" alt="" />
-              <p>ADIDAS CHO TRÌNH LÀNG MẪU GIÀY SUPERNOVA ĐẲNG CẤP MỚI</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-3.webp" alt="" />
-              <p>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-4.webp" alt="" />
-              <p>BÍ QUYẾT BẢO QUẢN GIÀY ULTRA BOOST ĐƯỢC BỀN & LÂU DÀI NHẤT</p>
-            </div>
-          </div>
-
-          <div className="banner-relate-blog">
-            <img src="/images/banner/aside_banner.webp" alt="" />
-          </div>
-        </aside>
+        
         <AsideBlog/>
         <article>
           <div className="list-blog">

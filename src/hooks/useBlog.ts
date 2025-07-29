@@ -21,7 +21,7 @@ export function useCategories() {
 
   return { categories, loading, error };
 }
-export function usePostsByCategory(categoryId: number | string) {
+export function usePostsByCategory(categoryId: number) {
   const [posts, setPosts] = useState<IBlog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
