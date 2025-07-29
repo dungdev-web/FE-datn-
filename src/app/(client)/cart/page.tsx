@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ICartItem } from "@/types/cart";
 import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
+import { useEffect } from "react";
 export default function Cart() {
   const {
     cart,
@@ -19,6 +20,9 @@ export default function Cart() {
     handleChangeQuantity,
     handleRemoveItem,
   } = useCart();
+useEffect(() => {
+  console.log("🛒 Cart items:", cart?.cart_items);
+}, [cart]);
 
   if (!cart) {
     return (

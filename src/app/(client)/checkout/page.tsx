@@ -4,18 +4,16 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../css/checkout.css";
 import { District, Province, Ward } from "@/types/Country";
-import { ICart, ICartItem } from "@/types/cart";
-import { getCartByUserId } from "@/services/cartService";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { API_BASE_URL } from "@/config/env";
 import {
   getAddressByUserId,
   getDefaultAddressService,
   updateAddress,
 } from "@/services/addressService";
 import { Address } from "@/types/address";
-import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useCart } from "@/hooks/useCart"; // ✅ dùng useCart
+import { API_BASE_URL } from "@/config/env";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -25,25 +23,20 @@ export default function Checkout() {
   const { user } = useAuthUser();
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [cart, setCart] = useState<(ICart & { items: ICartItem[] }) | null>(
-    null
-  );
   const [fullName, setFullName] = useState("");
   const [defaultAddress, setDefaultAddress] = useState("");
   const [email, setEmail] = useState("");
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
-    null
-  );
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [hasNoAddress, setHasNoAddress] = useState(false);
   const [shippingFee, setShippingFee] = useState(0);
+
+  const { cart, subtotal } = useCart(); // ✅ dùng hook đồng bộ giỏ hàng
+
   const provinceShippingFees: Record<string, number> = {
-    // Thành phố lớn
     "Hồ Chí Minh": 30000,
     "Hà Nội": 35000,
     "Đà Nẵng": 40000,
-
-    // Miền Nam
     "Bình Dương": 35000,
     "Đồng Nai": 35000,
     "Cần Thơ": 40000,
@@ -59,8 +52,6 @@ export default function Checkout() {
     "Bạc Liêu": 45000,
     "Tây Ninh": 35000,
     "Bình Phước": 40000,
-
-    // Miền Trung
     "Thừa Thiên Huế": 40000,
     "Quảng Nam": 40000,
     "Quảng Ngãi": 40000,
@@ -74,8 +65,6 @@ export default function Checkout() {
     "Đắk Nông": 45000,
     "Gia Lai": 45000,
     "Kon Tum": 45000,
-
-    // Miền Bắc
     "Hải Phòng": 35000,
     "Bắc Ninh": 35000,
     "Bắc Giang": 35000,
@@ -106,7 +95,6 @@ export default function Checkout() {
   const FREE_SHIPPING_THRESHOLD = 3000000;
 
   const normalizeProvinceName = (province: string): string => {
-    if (!province) return "";
     return province.replace("Thành phố ", "").replace("Tỉnh ", "").trim();
   };
 
@@ -115,46 +103,26 @@ export default function Checkout() {
     const rawProvince = parts[parts.length - 1]?.trim() || "";
     return normalizeProvinceName(rawProvince);
   };
+
   useEffect(() => {
     if (defaultAddress) {
       const province = getProvinceFromAddress(defaultAddress);
-      console.log("Tỉnh từ địa chỉ:", province); // thêm dòng này
-      const subtotal =
-        cart?.items.reduce((sum, item) => {
-          const price =
-            item.variant?.product?.sale_price ??
-            item.variant?.product?.price ??
-            0;
-          return sum + price * item.quantity;
-        }, 0) || 0;
-
       const baseFee = provinceShippingFees[province] ?? DEFAULT_SHIPPING_FEE;
-      const finalShippingFee =
-        subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseFee;
-
+      const finalShippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseFee;
       setShippingFee(finalShippingFee);
     }
-  }, [defaultAddress]);
-
-  const subtotal =
-    cart?.items.reduce((sum, item) => {
-      const price =
-        item.variant?.product?.sale_price ?? item.variant?.product?.price ?? 0;
-      return sum + price * item.quantity;
-    }, 0) || 0;
+  }, [defaultAddress, subtotal]);
 
   useEffect(() => {
     if (!user?.id) return;
 
     const fetchData = async () => {
       try {
-        const [cartData, addressData, allAddresses] = await Promise.all([
-          getCartByUserId(user.id),
+        const [addressData, allAddresses] = await Promise.all([
           getDefaultAddressService(user.id),
           getAddressByUserId(user.id),
         ]);
 
-        setCart(cartData);
         setAddresses(allAddresses);
 
         if (allAddresses.length === 0) {
@@ -176,37 +144,27 @@ export default function Checkout() {
             setEmail(first.email);
             setSelectedAddressId(first.ship_address_id);
 
-            try {
-              await updateAddress(first.ship_address_id, {
-                full_name: first.full_name,
-                phone: first.phone,
-                address_line: first.address_line,
-                is_default: true,
-              });
+            await updateAddress(first.ship_address_id, {
+              full_name: first.full_name,
+              phone: first.phone,
+              address_line: first.address_line,
+              is_default: true,
+            });
 
-              Swal.fire({
-                icon: "success",
-                title: "Đã chọn địa chỉ mặc định",
-                showConfirmButton: false,
-                timer: 1500,
-              });
+            Swal.fire({
+              icon: "success",
+              title: "Đã chọn địa chỉ mặc định",
+              showConfirmButton: false,
+              timer: 1500,
+            });
 
-              const updated = await getAddressByUserId(user.id);
-              setAddresses(updated);
-              window.location.href = "/checkout";
-            } catch (error) {
-              console.error("❌ Không thể cập nhật địa chỉ mặc định:", error);
-              Swal.fire({
-                icon: "error",
-                title: "Không thể chọn địa chỉ mặc định",
-                text:
-                  error instanceof Error ? error.message : "Vui lòng thử lại.",
-              });
-            }
+            const updated = await getAddressByUserId(user.id);
+            setAddresses(updated);
+            window.location.href = "/checkout";
           }
         }
       } catch (error) {
-        console.error("❌ Không thể lấy dữ liệu:", error);
+        console.error("❌ Không thể lấy địa chỉ:", error);
       }
     };
 
@@ -239,19 +197,6 @@ export default function Checkout() {
       setWards([]);
     }
   }, [selectedDistrict]);
-  useEffect(() => {
-    if (!user?.id) return;
-    const fetchCart = async () => {
-      try {
-        const data = await getCartByUserId(user.id);
-        setCart(data);
-      } catch (error) {
-        console.error("❌ Không thể lấy giỏ hàng:", error);
-      }
-    };
-
-    fetchCart();
-  }, [user?.id]);
 
   return (
     <div className="checkout-container px-4 flex flex-col lg:flex-row gap-6">
@@ -456,7 +401,7 @@ export default function Checkout() {
                     {item.variant.product.name} - Size{" "}
                     {item.variant.size.number_size}
                   </p>
-                <span className="text-[#4bd963] text-sm">
+                  <span className="text-[#4bd963] text-sm">
                     {price.toLocaleString("vi")}đ × {item.quantity}
                   </span>
                 </div>
@@ -483,22 +428,31 @@ export default function Checkout() {
           </div>
           <div className="tamtinh flex justify-between ">
             <p>Phí vận chuyển:</p>
-            <span>{shippingFee.toLocaleString("vi")}đ</span>
+            <span>
+              {shippingFee === 0 ? (
+                <span className="text-[#4bd963]">Miễn phí vận chuyển</span>
+              ) : (
+                `${shippingFee.toLocaleString("vi")}đ`
+              )}
+            </span>
           </div>
+
           <div className="freeship border-b pb-2 ">
-           {subtotal < FREE_SHIPPING_THRESHOLD && (
-            <p className="text-sm text-center text-cente mt-2">
-              Mua thêm{" "}
-               <span className="text-[#4bd963]">{(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("vi")}đ </span>để
-              được miễn phí vận chuyển!
-            </p>
-          )}
+            {subtotal < FREE_SHIPPING_THRESHOLD && (
+              <p className="text-sm text-center text-cente mt-2">
+                Mua thêm{" "}
+                <span className="text-[#4bd963]">
+                  {(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("vi")}đ{" "}
+                </span>
+                để được miễn phí vận chuyển!
+              </p>
+            )}
           </div>
         </div>
 
         <h3 className="py-4 text-lg font-semibold !mt-2">
           Tổng cộng:{" "}
-        <span className="text-[#4bd963]">
+          <span className="text-[#4bd963]">
             {(subtotal + shippingFee).toLocaleString("vi")}đ
           </span>
         </h3>
