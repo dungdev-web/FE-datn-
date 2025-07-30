@@ -30,47 +30,52 @@ export default function CategoryPage() {
   const [total, setTotal] = useState(0);
   const productsPerPage = viewMode === "grid" ? 12 : 6;
   const [openCategoryId, setOpenCategoryId] = useState<number | null>(null);
-    const [totalPages, setTotalPages] = useState(1);
-    const searchParams = useSearchParams();
-    const keyword = searchParams.get("q") || "";
-    const [sortBy, setSortBy] = useState<string | undefined>(undefined);
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
-      undefined
-    );
-    const handleSortChange = (type: string) => {
-      switch (type) {
-        case "A → Z":
-          setSortBy("name");
-          setSortOrder("asc");
-          break;
-        case "Z → A":
-          setSortBy("name");
-          setSortOrder("desc");
-          break;
-        case "Giá tăng dần":
-          setSortBy("price");
-          setSortOrder("asc");
-          break;
-        case "Giá giảm dần":
-          setSortBy("price");
-          setSortOrder("desc");
-          break;
-        case "Hàng mới nhất":
-          setSortBy("created_at");
-          setSortOrder("desc");
-          break;
-        case "Hàng cũ nhất":
-          setSortBy("created_at");
-          setSortOrder("asc");
-          break;
-        default:
-          setSortBy(undefined);
-          setSortOrder(undefined);
-      }
-  
-      setPage(1); // reset lại trang đầu tiên khi sort
-    };
-  
+  const [totalPages, setTotalPages] = useState(1);
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("q") || "";
+  const [sortBy, setSortBy] = useState<string | undefined>(undefined);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | undefined>(
+    undefined
+  );
+  const handleSortChange = (type: string) => {
+    switch (type) {
+      case "A → Z":
+        setSortBy("name");
+        setSortOrder("asc");
+        break;
+      case "Z → A":
+        setSortBy("name");
+        setSortOrder("desc");
+        break;
+      case "Giá tăng dần":
+        setSortBy("price");
+        setSortOrder("asc");
+        break;
+      case "Giá giảm dần":
+        setSortBy("price");
+        setSortOrder("desc");
+        break;
+      case "Hàng mới nhất":
+        setSortBy("created_at");
+        setSortOrder("desc");
+        break;
+      case "Hàng cũ nhất":
+        setSortBy("created_at");
+        setSortOrder("asc");
+        break;
+      default:
+        setSortBy(undefined);
+        setSortOrder(undefined);
+    }
+
+    setPage(1); // reset lại trang đầu tiên khi sort
+  };
+   const resetAllFilters = () => {
+    setSelectedBrandIds([]);
+    setSelectedGender(null);
+    setSelectedPriceRange(null);
+    setPage(1);
+  };
   const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<{
@@ -212,8 +217,8 @@ export default function CategoryPage() {
                 }}
                 sortBy={sortBy}
                 sortOrder={sortOrder}
+                resetAllFilters={resetAllFilters}
               />
-
               <div className="main_container collection col-lg-9 col-md-9 col-md-push-3 col-lg-push-3">
                 <div className="category-products products">
                   <div className="sortPagiBar">
