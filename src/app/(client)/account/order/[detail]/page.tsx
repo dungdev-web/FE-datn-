@@ -620,7 +620,9 @@ export default function OrderDetail() {
                     </div>
                     <div className="flex justify-between text-gray-700">
                       <span>Phí vận chuyển:</span>
-                      <span className="font-medium">0₫</span>
+                      <span className="font-medium">{order.shipping_address_id
+                            ? order.shipping_address_id.toLocaleString("vi-VN")
+                            : ""}₫</span>
                     </div>
                     <div className="border-t !pt-2">
                       <div className="flex justify-between text-lg font-bold text-red-600">
