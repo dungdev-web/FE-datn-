@@ -12,9 +12,11 @@ import {
 } from "@/services/addressService";
 import { Address } from "@/types/address";
 import Swal from "sweetalert2";
-import { useCart } from "@/hooks/useCart"; // ✅ dùng useCart
+import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
 import { useCoupon } from "@/hooks/useCoupon";
+import { useRouter } from "next/navigation";
+import { checkoutOrder } from "@/services/cartService";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -33,8 +35,9 @@ export default function Checkout() {
   );
   const [hasNoAddress, setHasNoAddress] = useState(false);
   const [shippingFee, setShippingFee] = useState(0);
-
-  const { cart, subtotal } = useCart(); // ✅ dùng hook đồng bộ giỏ hàng
+  const [note, setNote] = useState("");
+  const { cart, subtotal } = useCart();
+  const router = useRouter();
 
   const provinceShippingFees: Record<string, number> = {
     "Hồ Chí Minh": 30000,
@@ -133,7 +136,9 @@ export default function Checkout() {
         ]);
 
         // Ensure allAddresses is an array of Address
-        const allAddresses: Address[] = Array.isArray(allAddressesRaw) ? allAddressesRaw : [];
+        const allAddresses: Address[] = Array.isArray(allAddressesRaw)
+          ? allAddressesRaw
+          : [];
 
         setAddresses(allAddresses);
 
@@ -209,6 +214,42 @@ export default function Checkout() {
       setWards([]);
     }
   }, [selectedDistrict]);
+
+  const handleCheckout = async () => {
+    if (!user || !selectedAddressId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng đăng nhập và chọn địa chỉ giao hàng",
+      });
+      return;
+    }
+
+    try {
+      const response = await checkoutOrder({
+        user_id: user.id,
+        shipping_address_id: selectedAddressId,
+        payment_method: { id: 1 }, // mặc định COD
+        coupon_code: appliedCoupons[0]?.code,
+        shipping_fee: shippingFee,
+        note: note || null,
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Đặt hàng thành công!",
+        text: response.message,
+      }).then(() => {
+        // Chuyển hướng về trang đơn hàng hoặc trang chủ
+        router.push("/account/order"); // hoặc "/thank-you"
+      });
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi khi thanh toán",
+        text: error.message || "Vui lòng thử lại.",
+      });
+    }
+  };
 
   return (
     <div className="checkout-container px-4 flex flex-col lg:flex-row gap-6">
@@ -349,6 +390,8 @@ export default function Checkout() {
             <textarea
               placeholder="Ghi chú (tùy chọn)"
               className="w-full px-4 py-3 rounded border border-gray-300"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
             ></textarea>
           </form>
         )}
@@ -366,7 +409,6 @@ export default function Checkout() {
 
       {/* EXTRA: Thanh toán */}
       <div className="checkout-extra w-full lg:w-1/4">
-       
         <h3 className="text-lg font-semibold mb-3">Thanh toán</h3>
 
         <div className="boc1 flex items-center mb-2 gap-2">
@@ -492,11 +534,12 @@ export default function Checkout() {
         </h3>
 
         <button
-          id="order-button"
+          onClick={handleCheckout}
           className="button w-full bg-green-600 text-white py-3 rounded hover:bg-green-700"
         >
           ĐẶT HÀNG
         </button>
+
         <p id="order-status" className="text-green-600 mt-2 hidden">
           Đặt hàng thành công!
         </p>

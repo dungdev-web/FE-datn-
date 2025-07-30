@@ -7,6 +7,7 @@ import {
   RemoveFromCartRequest,
   RemoveFromCartResponse,
 } from "@/types/cart";
+import { CheckoutRequest, CheckoutResponse } from "@/types/ICheckout";
 interface AddToCartResponse {
   length: any;
   message: string;
@@ -258,6 +259,30 @@ export const removeFromCart = async ({
     return data;
   } catch (error) {
     console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
+    throw error;
+  }
+};
+
+export const checkoutOrder = async (
+  payload: CheckoutRequest
+): Promise<CheckoutResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error("Thanh toán thất bại.");
+    }
+
+    const data: CheckoutResponse = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi thanh toán:", error);
     throw error;
   }
 };
