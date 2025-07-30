@@ -35,10 +35,10 @@ export default function Checkout() {
   );
   const [hasNoAddress, setHasNoAddress] = useState(false);
   const [shippingFee, setShippingFee] = useState(0);
-  const [note, setNote] = useState("");
+  const [comment, setComment] = useState("");
   const { cart, subtotal } = useCart();
   const router = useRouter();
-
+  const [paymentMethodId, setPaymentMethodId] = useState(1);
   const provinceShippingFees: Record<string, number> = {
     "Hồ Chí Minh": 30000,
     "Hà Nội": 35000,
@@ -228,14 +228,11 @@ export default function Checkout() {
       const payload = {
         user_id: user.id,
         shipping_address_id: selectedAddressId,
-        payment_method: { id: 1 }, // mặc định COD
+        payment_method: { id: paymentMethodId },
         coupon_code: appliedCoupons[0]?.code,
         shipping_fee: shippingFee,
-        note: note || undefined,
+        comment: comment || undefined,
       };
-
-      console.log("📦 Dữ liệu gửi lên DB:", payload); // ✅ Log tại đây
-
       const response = await checkoutOrder(payload);
 
       Swal.fire({
@@ -243,8 +240,11 @@ export default function Checkout() {
         title: "Đặt hàng thành công!",
         text: response.message,
       }).then(() => {
-        // Chuyển hướng về trang đơn hàng hoặc trang chủ
-        router.push("/payment_successful"); // hoặc "/thank-you"
+        localStorage.setItem(
+          "checkout_shipping_fee",
+          JSON.stringify(shippingFee)
+        );
+        router.push(`/payment_successful?orderId=${response.data.orders_id}`);
       });
     } catch (error: any) {
       Swal.fire({
@@ -394,8 +394,8 @@ export default function Checkout() {
             <textarea
               placeholder="Ghi chú (tùy chọn)"
               className="w-full px-4 py-3 rounded border border-gray-300"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
             ></textarea>
           </form>
         )}
@@ -416,14 +416,28 @@ export default function Checkout() {
         <h3 className="text-lg font-semibold mb-3">Thanh toán</h3>
 
         <div className="boc1 flex items-center mb-2 gap-2">
-          <input type="radio" name="payment" id="payment" />
-          <label htmlFor="payment">Chuyển khoản</label>
+          <input
+            type="radio"
+            name="payment"
+            id="bank_transfer"
+            value="2"
+            checked={paymentMethodId === 2}
+            onChange={() => setPaymentMethodId(2)}
+          />
+          <label htmlFor="bank_transfer">Chuyển khoản</label>
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
 
         <div className="boc1 flex items-center gap-2">
-          <input type="radio" name="payment" id="cod" checked readOnly />
-          <label htmlFor="cod">Thu hộ (COD)</label>
+          <input
+            type="radio"
+            name="payment"
+            id="cod"
+            value="1"
+            checked={paymentMethodId === 1}
+            onChange={() => setPaymentMethodId(1)}
+          />
+          <label htmlFor="cod">Thanh toán khi nhận hàng</label>
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
       </div>

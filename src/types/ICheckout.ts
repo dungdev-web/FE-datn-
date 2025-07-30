@@ -8,7 +8,7 @@ export interface CheckoutRequest {
   payment_method: PaymentMethod;
   coupon_code?: string;
   shipping_fee: number;
-  note?: string;
+  comment?: string;
 }
 
 export interface OrderItem {
@@ -21,6 +21,7 @@ export interface OrderItem {
 }
 
 export interface CheckoutResponse {
+  orders_id: any;
   message: string;
   data: {
     orders_id: number;
