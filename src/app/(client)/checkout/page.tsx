@@ -181,7 +181,7 @@ export default function Checkout() {
           }
         }
       } catch (error) {
-        console.error("❌ Không thể lấy địa chỉ:", error);
+        console.error("Không thể lấy địa chỉ:", error);
       }
     };
 
@@ -225,14 +225,18 @@ export default function Checkout() {
     }
 
     try {
-      const response = await checkoutOrder({
+      const payload = {
         user_id: user.id,
         shipping_address_id: selectedAddressId,
         payment_method: { id: 1 }, // mặc định COD
         coupon_code: appliedCoupons[0]?.code,
         shipping_fee: shippingFee,
-        note: note || null,
-      });
+        note: note || undefined,
+      };
+
+      console.log("📦 Dữ liệu gửi lên DB:", payload); // ✅ Log tại đây
+
+      const response = await checkoutOrder(payload);
 
       Swal.fire({
         icon: "success",
@@ -240,7 +244,7 @@ export default function Checkout() {
         text: response.message,
       }).then(() => {
         // Chuyển hướng về trang đơn hàng hoặc trang chủ
-        router.push("/account/order"); // hoặc "/thank-you"
+        router.push("/payment_successful"); // hoặc "/thank-you"
       });
     } catch (error: any) {
       Swal.fire({
