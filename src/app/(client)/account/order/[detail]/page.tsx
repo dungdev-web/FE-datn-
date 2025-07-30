@@ -230,7 +230,7 @@ export default function OrderDetail() {
     try {
       setActionLoading(true);
       // Gọi API hủy đơn hàng
-      // const response = await cancelOrderService(orderId, cancelReason);
+      const response = await updateOrderStatus(orderId, "cancelled");
 
       // Giả lập API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
