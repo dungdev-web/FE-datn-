@@ -86,6 +86,8 @@ export async function addToMockCart(
         variant: cart.cart_items[0]?.variant,
         quantity,
         price,
+         sale_price: cart.cart_items[0]?.variant?.product?.sale_price || price, 
+  priceSale: cart.cart_items[0]?.variant?.product?.sale_price || price,  
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };

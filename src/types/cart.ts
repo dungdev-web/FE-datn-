@@ -48,8 +48,8 @@ export interface ICartItem {
       slug: string;
       description: string;
       short_desc: string;
-      price: string;
-      sale_price: string;
+      price: number;
+      sale_price: number;
       categories_id: number;
       brand_id: number;
       gender_id: number;
