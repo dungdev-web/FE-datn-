@@ -6,8 +6,9 @@ import { useState, useEffect } from "react";
 import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
+import { getLocalViews, increaseLocalViews } from "@/shared/until/viewTracker";
 import AsideBlog from "@/app/(client)/component/blog/AsideBlog";
-import DOMPurify from "dompurify";
+import Link from "next/link";
 export default function Blog() {
   const [post, setPost] = useState<IBlog[]>([]);
   const [page, setPage] = useState(1);
@@ -37,7 +38,11 @@ export default function Blog() {
   const handlePageChange = (pageNumber: number) => {
     setPage(pageNumber);
   };
-
+  const stripHtmlTags = (html: string): string => {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.innerText;
+  };
   return (
     <>
       <section
@@ -73,10 +78,8 @@ export default function Blog() {
       </section>
       {/* Nút mở sidebar (chỉ hiển thị trên mobile) */}
 
-
       <main className="main_blog">
-        
-        <AsideBlog/>
+        <AsideBlog />
         <article>
           <div className="list-blog">
             {post.map((item) => {
@@ -85,22 +88,32 @@ export default function Blog() {
                   ? item.content.slice(0, 500) + "..."
                   : item.content;
 
-              const safeHTML = DOMPurify.sanitize(shortContent); 
-
+              const safeHTML = shortContent;
+              const localViews = getLocalViews(item.post_id);
+              const handleViewDetail = () => {
+                increaseLocalViews(item.post_id);
+                window.location.href = `/blog/${item.post_id}`;
+              };
               return (
                 <div className="box-blog" key={item.post_id}>
+                  <Link href="#" onClick={handleViewDetail}>
                   <img
                     src={`${API_BASE_URL}/uploads/blog/${item.images}`}
                     alt={item.title}
                   />
-                  <div>
+                  </Link >
+                  <div className="content-blog" style={{width: "70%"}}>
                     <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
                     <p>
                       <span>{item.author.name} -</span>{" "}
                       {new Date(item.created_at).toLocaleDateString("vi-VN")} -{" "}
-                      <span>0</span> bình luận
+                      <span>{localViews}</span> lượt xem
                     </p>
-                    <p dangerouslySetInnerHTML={{ __html: safeHTML }}></p>
+                    <p
+                      dangerouslySetInnerHTML={{
+                        __html: stripHtmlTags(safeHTML),
+                      }}
+                    ></p>
                   </div>
                 </div>
               );

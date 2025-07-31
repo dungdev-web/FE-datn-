@@ -254,7 +254,9 @@ article {
     height: auto;
   }
 }
-
+.content-blog {
+  width: 88%!important;
+}
 /* --- Responsive Mobile --- */
 @media (max-width: 768px) {
   .intro-content h1 {
@@ -284,6 +286,9 @@ article {
   .box-blog {
     gap: 15px;
   }
+  .content-blog {
+  width: 100%!important;
+}
 }
 /* sidebar */
 .mobile-sidebar {
@@ -727,4 +732,12 @@ ul, ol {
 }
 .related-blogs a {
     color: #333;
+}
+blockquote {
+    font-size: 1.125em;
+    line-height: 1.45;
+    font-style: italic;
+    margin: 0 0 30px;
+    padding: 15px 30px;
+    border-left: 1px solid #e1e1e1;
 }

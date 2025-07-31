@@ -19,17 +19,18 @@ export default function AsideBlog() {
   // Set danh mục mặc định là cái đầu tiên khi có data
   useEffect(() => {
     if (categories.length > 0 && selectedCategoryId === null) {
-      setSelectedCategory(categories[1].category_post_id);
+      setSelectedCategory(3);
     }
   }, [categories, selectedCategoryId]);
 
   return (
+    
     <>
       <button
         className="toggle-sidebar-btn"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        ☰ Danh mục & Liên quan
+        ☰  
       </button>
       <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`}>
         <button
@@ -38,6 +39,7 @@ export default function AsideBlog() {
         >
           ×
         </button>
+        
         <div className="category-blog">
           <h2>DANH MỤC BÀI VIẾT</h2>
           <ul>
@@ -97,7 +99,7 @@ export default function AsideBlog() {
         </div>
 
        <div className="relate-blog">
-          <h2>BÀI VIẾT LIÊN QUAN</h2>
+          <h2>BÀI VIẾT NỔI BẬT</h2>
 
           {postLoading ? (
             <p>Đang tải bài viết...</p>
@@ -199,7 +201,7 @@ export default function AsideBlog() {
 
         {/* BÀI VIẾT LIÊN QUAN */}
         <div className="relate-blog">
-          <h2>BÀI VIẾT LIÊN QUAN</h2>
+          <h2>BÀI VIẾT NỔI BẬT</h2>
 
           {postLoading ? (
             <p>Đang tải bài viết...</p>
