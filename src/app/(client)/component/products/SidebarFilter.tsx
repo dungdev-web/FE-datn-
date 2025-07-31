@@ -28,6 +28,7 @@ interface Props {
   ) => void;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  resetAllFilters: () => void;
 }
 
 export default function SidebarFilter({
@@ -47,6 +48,7 @@ export default function SidebarFilter({
   onProductsChange,
   sortBy,
   sortOrder,
+  resetAllFilters,
 }: Props) {
   const [filterHistory, setFilterHistory] = useState<
     {
@@ -117,15 +119,16 @@ export default function SidebarFilter({
   }, [selectedBrandIds, selectedGender, selectedPriceRange]);
 
   const hasFilter =
-    selectedBrandIds.length > 0 || selectedGender || selectedPriceRange;
+    selectedBrandIds.length > 0 ||
+    (selectedGender && selectedGender !== "") ||
+    selectedPriceRange !== null;
 
   const clearAllFilters = () => {
     setLocalBrand(null);
     setLocalGender(null);
     setLocalPrice(null);
-    handleBrandCheckboxChange(-1);
-    handleGenderChange("");
-    handlePriceChange(null);
+    setFilterHistory([]); // ✅ xóa luôn lịch sử nếu muốn
+    resetAllFilters(); // ✅ gọi từ cha để cập nhật lại UI chính xác
   };
 
   const handleUndo = () => {
@@ -139,6 +142,16 @@ export default function SidebarFilter({
     handlePriceChange(previous.price);
     setFilterHistory((prev) => prev.slice(0, prev.length - 1));
   };
+
+  // Helper function để kiểm tra price range có bằng nhau không
+  const isPriceRangeEqual = (
+    range1: { min: number; max: number } | null,
+    range2: { min: number; max: number }
+  ) => {
+    if (!range1) return false;
+    return range1.min === range2.min && range1.max === range2.max;
+  };
+
   return (
     <div className="col-lg-3 col-test">
       {/* Danh mục */}
@@ -243,12 +256,13 @@ export default function SidebarFilter({
               )}
               {selectedBrandIds.map((id) => {
                 const brand = brandsList.find((b) => b.brand_id === id);
+                if (!brand) return null;
                 return (
                   <li
                     key={id}
                     className="flex items-center text-sm justify-between"
                   >
-                    <span>{brand?.name}</span>
+                    <span>{brand.name}</span>
                     <button
                       onClick={() => handleBrandCheckboxChange(-1)}
                       className="text-red-500 ml-2"
@@ -314,33 +328,70 @@ export default function SidebarFilter({
                     label: "Trên 1.000.000đ",
                     value: { min: 1000000, max: 100000000 },
                   },
-                ].map((price, index) => (
-                  <li
-                    key={index}
-                    className="filter-item filter-item--check-box"
-                  >
-                    <label>
-                      <input
-                        key={
-                          selectedPriceRange?.min === price.value.min &&
-                          selectedPriceRange?.max === price.value.max
-                            ? "checked"
-                            : "unchecked"
-                        }
-                        type="radio"
-                        name="price"
-                        checked={
-                          selectedPriceRange?.min === price.value.min &&
-                          selectedPriceRange?.max === price.value.max
-                        }
-                        onChange={() => handlePriceChange(price.value)}
-                      />
+                ].map((price, index) => {
+                  const isChecked = isPriceRangeEqual(
+                    selectedPriceRange,
+                    price.value
+                  );
+                  console.log(
+                    `Price ${price.label}: isChecked = ${isChecked}`,
+                    selectedPriceRange,
+                    price.value
+                  );
 
-                      <i className="fa"></i>
-                      {price.label}
-                    </label>
-                  </li>
-                ))}
+                  return (
+                    <li
+                      key={index}
+                      className="filter-item filter-item--check-box"
+                    >
+                      <label
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="price"
+                          checked={isChecked}
+                          onChange={() => handlePriceChange(price.value)}
+                          style={{ display: "none" }}
+                        />
+                        <span
+                          style={{
+                            width: "16px",
+                            height: "16px",
+                            borderRadius: "50%",
+                            border: "2px solid #ccc",
+                            backgroundColor: isChecked
+                              ? "#007bff"
+                              : "transparent",
+                            position: "relative",
+                            display: "inline-block",
+                          }}
+                        >
+                          {isChecked && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                width: "6px",
+                                height: "6px",
+                                borderRadius: "50%",
+                                backgroundColor: "white",
+                              }}
+                            />
+                          )}
+                        </span>
+                        {price.label}
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </aside>
@@ -363,19 +414,50 @@ export default function SidebarFilter({
                     key={type.value}
                     className="filter-item filter-item--check-box"
                   >
-                    <label>
+                    <label
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
                       <input
-                        key={
-                          selectedGender === type.value
-                            ? "checked"
-                            : "unchecked"
-                        }
                         type="radio"
                         name="gender"
                         checked={selectedGender === type.value}
                         onChange={() => handleGenderChange(type.value)}
+                        style={{ display: "none" }}
                       />
-                      <i className="fa"></i>
+                      <span
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          border: "2px solid #ccc",
+                          backgroundColor:
+                            selectedGender === type.value
+                              ? "#007bff"
+                              : "transparent",
+                          position: "relative",
+                          display: "inline-block",
+                        }}
+                      >
+                        {selectedGender === type.value && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              width: "6px",
+                              height: "6px",
+                              borderRadius: "50%",
+                              backgroundColor: "white",
+                            }}
+                          />
+                        )}
+                      </span>
                       {type.label}
                     </label>
                   </li>
@@ -393,31 +475,68 @@ export default function SidebarFilter({
             </div>
             <div className="aside-content filter-group">
               <ul>
-                {brandsList.map((brand) => (
-                  <li
-                    key={brand.brand_id}
-                    className="filter-item filter-item--check-box"
-                  >
-                    <label>
-                      <input
-                        key={
-                          selectedBrandIds.includes(brand.brand_id)
-                            ? "checked"
-                            : "unchecked"
-                        }
-                        type="radio"
-                        name="brand"
-                        checked={selectedBrandIds.includes(brand.brand_id)}
-                        onChange={() =>
-                          handleBrandCheckboxChange(brand.brand_id)
-                        }
-                      />
+                {brandsList.map((brand) => {
+                  const isChecked = selectedBrandIds.includes(brand.brand_id);
+                  console.log(
+                    `Brand ${brand.name}: isChecked = ${isChecked}`,
+                    selectedBrandIds
+                  );
 
-                      <i className="fa"></i>
-                      {brand.name}
-                    </label>
-                  </li>
-                ))}
+                  return (
+                    <li
+                      key={brand.brand_id}
+                      className="filter-item filter-item--check-box"
+                    >
+                      <label
+                        style={{
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="brand"
+                          checked={isChecked}
+                          onChange={() =>
+                            handleBrandCheckboxChange(brand.brand_id)
+                          }
+                          style={{ display: "none" }}
+                        />
+                        <span
+                          style={{
+                            width: "16px",
+                            height: "16px",
+                            borderRadius: "50%",
+                            border: "2px solid #ccc",
+                            backgroundColor: isChecked
+                              ? "#007bff"
+                              : "transparent",
+                            position: "relative",
+                            display: "inline-block",
+                          }}
+                        >
+                          {isChecked && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                top: "50%",
+                                left: "50%",
+                                transform: "translate(-50%, -50%)",
+                                width: "6px",
+                                height: "6px",
+                                borderRadius: "50%",
+                                backgroundColor: "white",
+                              }}
+                            />
+                          )}
+                        </span>
+                        {brand.name}
+                      </label>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </aside>

@@ -11,6 +11,7 @@ import { CompareProvider } from "./component/product_compare/compare_context";
 import { LoaderProvider } from "./component/LinkWithLoader";
 import ContactFloatingButton from "./component/ContactFloatingButton";
 import { ToastContainer } from "react-toastify";
+// import TawkToWidget from "./component/TawkToWidget";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,6 +32,7 @@ export default function RootLayout({
           </LoaderProvider>
         </div>
         <ToastContainer position="top-right" autoClose={2000} />
+        {/* <TawkToWidget /> */}
       </body>
     </html>
   );

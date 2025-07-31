@@ -25,13 +25,24 @@ export default function LogoutLink() {
     try {
       const result = await apiLogoutUser();
 
-      // ✅ Cập nhật Zustand store để header tự động re-render
       useGlobalStore.getState().logoutUser();
 
-      toast.success(result.message || "Đăng xuất thành công!");
+      Swal.fire({
+        title: result.message || "Đăng xuất thành công!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
       router.push("/login");
     } catch (error: any) {
-      toast.error(error.message || "Đăng xuất thất bại");
+      Swal.fire({
+        title: "Đăng xuất thất bại",
+        text: error.message || "Có lỗi xảy ra",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
