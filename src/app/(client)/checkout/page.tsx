@@ -17,6 +17,7 @@ import { API_BASE_URL } from "@/config/env";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useRouter } from "next/navigation";
 import { checkoutOrder } from "@/services/cartService";
+import { useGlobalStore } from "@/store/useGlobalStore";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -114,6 +115,12 @@ export default function Checkout() {
 
   const [couponInput, setCouponInput] = useState("");
   const discountAmount = getDiscountAmount();
+  const {
+  setCartCount,
+  setWishlistCount,
+  setCompareCount,
+  setOrderCount,
+} = useGlobalStore();
 
   useEffect(() => {
     if (defaultAddress) {
@@ -240,6 +247,7 @@ export default function Checkout() {
         title: "Đặt hàng thành công!",
         text: response.message,
       }).then(() => {
+         setCartCount(0);
         localStorage.setItem(
           "checkout_shipping_fee",
           JSON.stringify(shippingFee)
