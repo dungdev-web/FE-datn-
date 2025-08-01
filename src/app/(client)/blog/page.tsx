@@ -6,8 +6,10 @@ import { useState, useEffect } from "react";
 import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
+import { getLocalViews, increaseLocalViews } from "@/shared/until/viewTracker";
+import AsideBlog from "@/app/(client)/component/blog/AsideBlog";
+import Link from "next/link";
 export default function Blog() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [post, setPost] = useState<IBlog[]>([]);
   const [page, setPage] = useState(1);
   const [hasNext, setHasNext] = useState(true);
@@ -35,6 +37,11 @@ export default function Blog() {
   };
   const handlePageChange = (pageNumber: number) => {
     setPage(pageNumber);
+  };
+  const stripHtmlTags = (html: string): string => {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.innerText;
   };
   return (
     <>
@@ -70,123 +77,47 @@ export default function Blog() {
         </div>
       </section>
       {/* Nút mở sidebar (chỉ hiển thị trên mobile) */}
-      <button
-        className="toggle-sidebar-btn"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        ☰ Danh mục & Liên quan
-      </button>
 
       <main className="main_blog">
-        <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`}>
-          <button
-            className="close-sidebar-btn"
-            onClick={() => setSidebarOpen(false)}
-          >
-            ×
-          </button>
-          <div className="category-blog">
-            <h2>DANH MỤC BÀI VIẾT</h2>
-            <ul>
-              <li>Trang chủ</li>
-              <li>Giới thiệu</li>
-              <li>Sản phẩm</li>
-              <li>Tin tức</li>
-              <li>Liên hệ</li>
-              <li>Hệ thống cửa hàng</li>
-            </ul>
-          </div>
-
-          <div className="relate-blog">
-            <h2>BÀI VIẾT LIÊN QUAN</h2>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-1.webp" alt="" />
-              <p>TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-2.webp" alt="" />
-              <p>ADIDAS CHO TRÌNH LÀNG MẪU GIÀY SUPERNOVA ĐẲNG CẤP MỚI</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-3.webp" alt="" />
-              <p>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-4.webp" alt="" />
-              <p>BÍ QUYẾT BẢO QUẢN GIÀY ULTRA BOOST ĐƯỢC BỀN & LÂU DÀI NHẤT</p>
-            </div>
-          </div>
-
-          <div className="banner-relate-blog">
-            <img src="/images/banner/aside_banner.webp" alt="" />
-          </div>
-        </aside>
-        <aside className="desktop">
-          <div className="category-blog">
-            <h2>DANH MỤC BÀI VIẾT</h2>
-            <ul>
-              <li>Trang chủ</li>
-              <li>Giới thiệu</li>
-              <li>Sản phẩm</li>
-              <li>Tin tức</li>
-              <li>Liên hệ</li>
-              <li>Hệ thống cửa hàng</li>
-            </ul>
-          </div>
-
-          <div className="relate-blog">
-            <h2>BÀI VIẾT LIÊN QUAN</h2>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-1.webp" alt="" />
-              <p>TOP CÁC MẪU NIKE DUNK ĐƯỢC TÌM KIẾM NHIỀU NHẤT 2023</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-2.webp" alt="" />
-              <p>ADIDAS CHO TRÌNH LÀNG MẪU GIÀY SUPERNOVA ĐẲNG CẤP MỚI</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-3.webp" alt="" />
-              <p>BẢO QUẢN GIÀY AIR JORDAN HIỆU QUẢ KHI SỬ DỤNG MỖI NGÀY</p>
-            </div>
-
-            <div className="box-relate-blog">
-              <img src="/images/blog/layer-4.webp" alt="" />
-              <p>BÍ QUYẾT BẢO QUẢN GIÀY ULTRA BOOST ĐƯỢC BỀN & LÂU DÀI NHẤT</p>
-            </div>
-          </div>
-
-          <div className="banner-relate-blog">
-            <img src="/images/banner/aside_banner.webp" alt="" />
-          </div>
-        </aside>
+        <AsideBlog />
         <article>
           <div className="list-blog">
-            {post.map((item) => (
-              <div className="box-blog" key={item.post_id}>
-                <img src={`${API_BASE_URL }/uploads/blog/${item.images}`} alt={item.title} />
-                <div>
-                  <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
-                  <p>
-                    <span>{item.author.name} -</span>{" "}
-                    {new Date(item.created_at).toLocaleDateString("vi-VN")}-{" "}
-                    <span>0</span> bình luận
-                  </p>
-                  <p>
-                    {" "}
-                    {item.content.length > 100
-                      ? item.content.slice(0, 500) + "..."
-                      : item.content}
-                  </p>
+            {post.map((item) => {
+              const shortContent =
+                item.content.length > 500
+                  ? item.content.slice(0, 500) + "..."
+                  : item.content;
+
+              const safeHTML = shortContent;
+              const localViews = getLocalViews(item.post_id);
+              const handleViewDetail = () => {
+                increaseLocalViews(item.post_id);
+                window.location.href = `/blog/${item.post_id}`;
+              };
+              return (
+                <div className="box-blog" key={item.post_id}>
+                  <Link href="#" onClick={handleViewDetail}>
+                  <img
+                    src={`${API_BASE_URL}/uploads/blog/${item.images}`}
+                    alt={item.title}
+                  />
+                  </Link >
+                  <div className="content-blog" style={{width: "70%"}}>
+                    <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
+                    <p>
+                      <span>{item.author.name} -</span>{" "}
+                      {new Date(item.created_at).toLocaleDateString("vi-VN")} -{" "}
+                      <span>{localViews}</span> lượt xem
+                    </p>
+                    <p
+                      dangerouslySetInnerHTML={{
+                        __html: stripHtmlTags(safeHTML),
+                      }}
+                    ></p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div className="flex justify-center items-center gap-2.5">
               <button
                 onClick={handlePrev}

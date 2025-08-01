@@ -31,8 +31,8 @@ export async function loginUser(
   const res = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentials), // Không typo: credentialss ❌
-    credentials: "include", // Chỉ cần nếu dùng cookie/session
+    body: JSON.stringify(credentials), 
+    credentials: "include",
   });
 
   const data = await res.json();

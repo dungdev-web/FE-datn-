@@ -12,8 +12,11 @@ import {
 } from "@/services/addressService";
 import { Address } from "@/types/address";
 import Swal from "sweetalert2";
-import { useCart } from "@/hooks/useCart"; // ✅ dùng useCart
+import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
+import { useCoupon } from "@/hooks/useCoupon";
+import { useRouter } from "next/navigation";
+import { checkoutOrder } from "@/services/cartService";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -27,12 +30,15 @@ export default function Checkout() {
   const [defaultAddress, setDefaultAddress] = useState("");
   const [email, setEmail] = useState("");
   const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(
+    null
+  );
   const [hasNoAddress, setHasNoAddress] = useState(false);
   const [shippingFee, setShippingFee] = useState(0);
-
-  const { cart, subtotal } = useCart(); // ✅ dùng hook đồng bộ giỏ hàng
-
+  const [comment, setComment] = useState("");
+  const { cart, subtotal } = useCart();
+  const router = useRouter();
+  const [paymentMethodId, setPaymentMethodId] = useState(1);
   const provinceShippingFees: Record<string, number> = {
     "Hồ Chí Minh": 30000,
     "Hà Nội": 35000,
@@ -103,12 +109,18 @@ export default function Checkout() {
     const rawProvince = parts[parts.length - 1]?.trim() || "";
     return normalizeProvinceName(rawProvince);
   };
+  const { appliedCoupons, applyCoupon, error, getDiscountAmount, resetCoupon } =
+    useCoupon(subtotal, cart?.carts_id || "default");
+
+  const [couponInput, setCouponInput] = useState("");
+  const discountAmount = getDiscountAmount();
 
   useEffect(() => {
     if (defaultAddress) {
       const province = getProvinceFromAddress(defaultAddress);
       const baseFee = provinceShippingFees[province] ?? DEFAULT_SHIPPING_FEE;
-      const finalShippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseFee;
+      const finalShippingFee =
+        subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : baseFee;
       setShippingFee(finalShippingFee);
     }
   }, [defaultAddress, subtotal]);
@@ -118,10 +130,15 @@ export default function Checkout() {
 
     const fetchData = async () => {
       try {
-        const [addressData, allAddresses] = await Promise.all([
+        const [addressData, allAddressesRaw] = await Promise.all([
           getDefaultAddressService(user.id),
           getAddressByUserId(user.id),
         ]);
+
+        // Ensure allAddresses is an array of Address
+        const allAddresses: Address[] = Array.isArray(allAddressesRaw)
+          ? allAddressesRaw
+          : [];
 
         setAddresses(allAddresses);
 
@@ -134,14 +151,14 @@ export default function Checkout() {
             setFullName(addressData.full_name);
             setPhone(addressData.phone);
             setDefaultAddress(addressData.address_line);
-            setEmail(addressData.email);
+            setEmail(addressData.user?.email || ""); // ✅ Sửa ở đây
             setSelectedAddressId(addressData.ship_address_id);
           } else {
             const first = allAddresses[0];
             setFullName(first.full_name);
             setPhone(first.phone);
             setDefaultAddress(first.address_line);
-            setEmail(first.email);
+            setEmail(first.user?.email || "");
             setSelectedAddressId(first.ship_address_id);
 
             await updateAddress(first.ship_address_id, {
@@ -159,12 +176,12 @@ export default function Checkout() {
             });
 
             const updated = await getAddressByUserId(user.id);
-            setAddresses(updated);
+            setAddresses(Array.isArray(updated) ? updated : []);
             window.location.href = "/checkout";
           }
         }
       } catch (error) {
-        console.error("❌ Không thể lấy địa chỉ:", error);
+        console.error("Không thể lấy địa chỉ:", error);
       }
     };
 
@@ -197,6 +214,46 @@ export default function Checkout() {
       setWards([]);
     }
   }, [selectedDistrict]);
+
+  const handleCheckout = async () => {
+    if (!user || !selectedAddressId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng đăng nhập và chọn địa chỉ giao hàng",
+      });
+      return;
+    }
+
+    try {
+      const payload = {
+        user_id: user.id,
+        shipping_address_id: selectedAddressId,
+        payment_method: { id: paymentMethodId },
+        coupon_code: appliedCoupons[0]?.code,
+        shipping_fee: shippingFee,
+        comment: comment || undefined,
+      };
+      const response = await checkoutOrder(payload);
+
+      Swal.fire({
+        icon: "success",
+        title: "Đặt hàng thành công!",
+        text: response.message,
+      }).then(() => {
+        localStorage.setItem(
+          "checkout_shipping_fee",
+          JSON.stringify(shippingFee)
+        );
+        router.push(`/payment_successful?orderId=${response.data.orders_id}`);
+      });
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi khi thanh toán",
+        text: error.message || "Vui lòng thử lại.",
+      });
+    }
+  };
 
   return (
     <div className="checkout-container px-4 flex flex-col lg:flex-row gap-6">
@@ -305,7 +362,7 @@ export default function Checkout() {
                           const updated = await getAddressByUserId(
                             user?.id || 0
                           );
-                          setAddresses(updated);
+                          setAddresses(Array.isArray(updated) ? updated : []);
                         } catch (error) {
                           Swal.fire({
                             icon: "error",
@@ -337,6 +394,8 @@ export default function Checkout() {
             <textarea
               placeholder="Ghi chú (tùy chọn)"
               className="w-full px-4 py-3 rounded border border-gray-300"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
             ></textarea>
           </form>
         )}
@@ -354,21 +413,31 @@ export default function Checkout() {
 
       {/* EXTRA: Thanh toán */}
       <div className="checkout-extra w-full lg:w-1/4">
-        <h3 className="text-lg font-semibold mb-3">Vận chuyển</h3>
-        <p className="vanchuyen text-sm mb-4">
-          Vui lòng nhập thông tin giao hàng
-        </p>
         <h3 className="text-lg font-semibold mb-3">Thanh toán</h3>
 
         <div className="boc1 flex items-center mb-2 gap-2">
-          <input type="radio" name="payment" id="payment" />
-          <label htmlFor="payment">Chuyển khoản</label>
+          <input
+            type="radio"
+            name="payment"
+            id="bank_transfer"
+            value="2"
+            checked={paymentMethodId === 2}
+            onChange={() => setPaymentMethodId(2)}
+          />
+          <label htmlFor="bank_transfer">Chuyển khoản</label>
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
 
         <div className="boc1 flex items-center gap-2">
-          <input type="radio" name="payment" id="cod" checked readOnly />
-          <label htmlFor="cod">Thu hộ (COD)</label>
+          <input
+            type="radio"
+            name="payment"
+            id="cod"
+            value="1"
+            checked={paymentMethodId === 1}
+            onChange={() => setPaymentMethodId(1)}
+          />
+          <label htmlFor="cod">Thanh toán khi nhận hàng</label>
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
       </div>
@@ -376,11 +445,11 @@ export default function Checkout() {
       {/* RIGHT: Đơn hàng */}
       <div className="checkout-right w-full lg:w-1/4">
         <h3 className="text-lg font-semibold mb-3">
-          Đơn hàng ({cart?.items.length || 0} sản phẩm)
+          Đơn hàng ({cart?.cart_items?.length || 0} sản phẩm)
         </h3>
 
         <div className="items max-h-[300px] overflow-y-auto pr-2 space-y-3">
-          {cart?.items.map((item) => {
+          {cart?.cart_items?.map((item) => {
             const price =
               item.variant?.product?.sale_price ??
               item.variant?.product?.price ??
@@ -402,7 +471,7 @@ export default function Checkout() {
                     {item.variant.size.number_size}
                   </p>
                   <span className="text-[#4bd963] text-sm">
-                    {price.toLocaleString("vi")}đ × {item.quantity}
+                    {price.toLocaleString()}đ × {item.quantity}
                   </span>
                 </div>
               </div>
@@ -414,19 +483,37 @@ export default function Checkout() {
           <input
             type="text"
             placeholder="Nhập mã giảm giá"
+            value={couponInput}
+            onChange={(e) => setCouponInput(e.target.value)}
             className="flex-1 px-3 py-2 rounded border border-gray-300"
           />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded">
+          <button
+            onClick={() => applyCoupon(couponInput)}
+            className="button bg-blue-600 text-white px-4 py-2 rounded"
+          >
             Áp dụng
           </button>
         </div>
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        {appliedCoupons.map((coupon) => (
+          <p key={coupon.code} className="text-green-600 mt-1">
+            Đã áp dụng mã <strong>{coupon.code}</strong>{" "}
+            <button
+              className=" ml-2 text-blue-600 underline"
+              onClick={() => resetCoupon(coupon.code)}
+            >
+              Hủy
+            </button>
+          </p>
+        ))}
 
         <div className="tinhtien mt-4 space-y-2">
           <div className="tamtinh flex justify-between">
             <p>Tạm tính:</p>
             <span>{subtotal.toLocaleString("vi")}đ</span>
           </div>
-          <div className="tamtinh flex justify-between ">
+
+          <div className="tamtinh flex justify-between">
             <p>Phí vận chuyển:</p>
             <span>
               {shippingFee === 0 ? (
@@ -437,13 +524,20 @@ export default function Checkout() {
             </span>
           </div>
 
-          <div className="freeship border-b pb-2 ">
+          {discountAmount > 0 && (
+            <div className="tamtinh flex justify-between ">
+              <p>Giảm giá:</p>
+              <span>- {discountAmount.toLocaleString("vi")}đ</span>
+            </div>
+          )}
+
+          <div className="freeship border-b pb-2">
             {subtotal < FREE_SHIPPING_THRESHOLD && (
-              <p className="text-sm text-center text-cente mt-2">
+              <p className="text-sm text-center mt-2">
                 Mua thêm{" "}
                 <span className="text-[#4bd963]">
-                  {(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("vi")}đ{" "}
-                </span>
+                  {(FREE_SHIPPING_THRESHOLD - subtotal).toLocaleString("vi")}đ
+                </span>{" "}
                 để được miễn phí vận chuyển!
               </p>
             )}
@@ -453,16 +547,17 @@ export default function Checkout() {
         <h3 className="py-4 text-lg font-semibold !mt-2">
           Tổng cộng:{" "}
           <span className="text-[#4bd963]">
-            {(subtotal + shippingFee).toLocaleString("vi")}đ
+            {(subtotal + shippingFee - discountAmount).toLocaleString("vi")}đ
           </span>
         </h3>
 
         <button
-          id="order-button"
-          className="w-full bg-green-600 text-white py-3 rounded hover:bg-green-700"
+          onClick={handleCheckout}
+          className="button w-full bg-green-600 text-white py-3 rounded hover:bg-green-700"
         >
           ĐẶT HÀNG
         </button>
+
         <p id="order-status" className="text-green-600 mt-2 hidden">
           Đặt hàng thành công!
         </p>

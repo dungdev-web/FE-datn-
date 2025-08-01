@@ -136,11 +136,13 @@ export default function OrderDetail() {
                 addressData
               );
               if (user) {
-                const fallbackAddress = {
+                const fallbackAddress: AddressResponse = {
+                  ship_address_id: orderData.shipping_address_id,
+                  user: user || null,
+                  length: 0,
                   id: orderData.shipping_address_id,
                   full_name: user.name || "Khách hàng",
                   phone: user.phone || "Chưa cập nhật",
-                  address_line_part: "Địa chỉ không khả dụng",
                   address_line: "Địa chỉ không khả dụng",
                   address: "Địa chỉ không khả dụng",
                   ward: "",
@@ -149,15 +151,18 @@ export default function OrderDetail() {
                   city: "",
                   is_default: false,
                 };
+
                 setAddress(fallbackAddress);
               }
             }
           } catch (addressError) {
-            const fallbackAddress = {
-              id: orderData.shipping_address_id,
+            const fallbackAddress: AddressResponse = {
+              ship_address_id: orderData.shipping_address_id,
+              user: user || null,
+              id: orderData.shipping_address_id || 0, // hoặc 0 nếu không có id
+              length: 0, // bạn có thể cập nhật lại nếu cần
               full_name: user?.name || "Khách hàng",
               phone: user?.phone || "Chưa cập nhật",
-              address_line_part: "Lỗi tải địa chỉ",
               address_line: "Lỗi tải địa chỉ",
               address: "Lỗi tải địa chỉ",
               ward: "",
@@ -166,6 +171,7 @@ export default function OrderDetail() {
               city: "",
               is_default: false,
             };
+
             setAddress(fallbackAddress);
           }
         }

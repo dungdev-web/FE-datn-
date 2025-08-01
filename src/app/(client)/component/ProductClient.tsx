@@ -90,7 +90,7 @@ export default function Product() {
           brand:
             selectedBrandIds.length > 0
               ? (selectedBrandIds
-                  .map((id) => brandsList.find((b) => b.id === id)?.name)
+                  .map((id) => brandsList.find((b) => b.brand_id === id)?.name)
                   .filter(Boolean) as string[])
               : undefined,
           minPrice: selectedPriceRange?.min,
