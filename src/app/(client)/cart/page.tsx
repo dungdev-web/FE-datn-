@@ -6,6 +6,8 @@ import Link from "next/link";
 import { ICartItem } from "@/types/cart";
 import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
+import { useEffect, useState } from "react";
+import { useCoupon } from "@/hooks/useCoupon";
 export default function Cart() {
   const {
     cart,
@@ -18,7 +20,21 @@ export default function Cart() {
     handlePlus,
     handleChangeQuantity,
     handleRemoveItem,
-  } = useCart();
+  } = useCart(); // 👉 Gọi trước để lấy subtotal
+
+  const { appliedCoupons, applyCoupon, error, getDiscountAmount, resetCoupon } =
+    useCoupon(subtotal, cart?.carts_id || "default");
+
+  const [couponInput, setCouponInput] = useState("");
+  const discountAmount = getDiscountAmount();
+  useEffect(() => {
+    console.log("🛒 Cart items:", cart?.cart_items);
+  }, [cart]);
+  useEffect(() => {
+    if (appliedCoupons && appliedCoupons.length > 0) {
+      setCouponInput(appliedCoupons[0].code); // Hiện lại trong input
+    }
+  }, [appliedCoupons]);
 
   if (!cart) {
     return (
@@ -141,60 +157,67 @@ export default function Cart() {
               </div>
             </div>
 
-            {cart.cart_items.map((item: ICartItem) => (
-              <div className="cart-item" key={item.cart_items_id}>
-                <div className="product-info">
-                 <img
-                    alt={item.variant?.product.name}
-                    src={
-                      item.variant?.color.images
-                        ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
-                        : "/images/placeholder.png"
-                    }
-                    width="80"
-                  />
+            {cart.cart_items.map((item: ICartItem) => {
+              const price =
+                item.variant?.product?.sale_price ??
+                item.variant?.product?.price ??
+                0;
 
-                  <div className="product-name">
-                    {item.variant?.product.name}
-                  </div>
-                  <div className="product-details">
-                    <div className="product-desc">
-                      Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
-                      {item.variant?.size.number_size}
+              return (
+                <div className="cart-item" key={item.cart_items_id}>
+                  <div className="product-info">
+                    <img
+                      alt={item.variant?.product.name}
+                      src={
+                        item.variant?.color.images
+                          ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
+                          : "/images/placeholder.png"
+                      }
+                      width="80"
+                    />
+                    <div className="product-name">
+                      {item.variant?.product.name}
+                    </div>
+                    <div className="product-details">
+                      <div className="product-desc">
+                        Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
+                        {item.variant?.size.number_size}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="cart-item-price">
-                  {item.price?.toLocaleString("vi")}₫
-                </div>
 
-                <div className="quantity-control">
-                  <button onClick={() => handleMinus(item.cart_items_id)}>
-                    -
-                  </button>
-                  <input
-                    type="text"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleChangeQuantity(item.cart_items_id, e)
-                    }
-                  />
-                  <button onClick={() => handlePlus(item.cart_items_id)}>
-                    +
-                  </button>
-                </div>
+                  <div className="cart-item-price">
+                    {Number(price).toLocaleString("vi")}₫
+                  </div>
 
-                <div className="cart-item-total">
-                  {(item.price! * item.quantity).toLocaleString("vi")}₫
-                  <span
-                    className="remove-btn"
-                    onClick={() => handleRemoveItem(item.cart_items_id)}
-                  >
-                    <i className="fa-solid fa-trash text-red-600"></i>
-                  </span>
+                  <div className="quantity-control">
+                    <button onClick={() => handleMinus(item.cart_items_id)}>
+                      -
+                    </button>
+                    <input
+                      type="text"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleChangeQuantity(item.cart_items_id, e)
+                      }
+                    />
+                    <button onClick={() => handlePlus(item.cart_items_id)}>
+                      +
+                    </button>
+                  </div>
+
+                  <div className="cart-item-total">
+                    {(price * item.quantity).toLocaleString("vi")}₫
+                    <span
+                      className="remove-btn"
+                      onClick={() => handleRemoveItem(item.cart_items_id)}
+                    >
+                      <i className="fa-solid fa-trash text-red-600"></i>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <div className="cart-actions">
               <a href="#" className="continue-shopping">
@@ -245,9 +268,28 @@ export default function Cart() {
             <div className="discount-section">
               <h3>Áp Dụng Khuyến Mãi</h3>
               <div className="discount">
-                <input type="text" placeholder="Nhập mã giảm giá..." />
-                <button>Áp Dụng</button>
+                <input
+                  type="text"
+                  placeholder="Nhập mã giảm giá..."
+                  value={couponInput}
+                  onChange={(e) => setCouponInput(e.target.value)}
+                />
+                <button onClick={() => applyCoupon(couponInput)}>
+                  Áp Dụng
+                </button>
               </div>
+              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+              {appliedCoupons.map((coupon) => (
+                <p key={coupon.code} className="text-green-600 mt-1">
+                  Đã áp dụng mã <strong>{coupon.code}</strong>{" "}
+                  <button
+                    className="ml-2 text-blue-600 underline"
+                    onClick={() => resetCoupon(coupon.code)}
+                  >
+                    Hủy
+                  </button>
+                </p>
+              ))}
             </div>
 
             <div className="cart-total-box">
@@ -256,38 +298,45 @@ export default function Cart() {
                 <span>Tạm tính:</span>
                 <span className="total">{subtotal.toLocaleString("vi")}₫</span>
               </div>
-              <div className="summary-row">
-                {isFreeShipping ? (
+              {isFreeShipping ? (
+                <div className="summary-row">
                   <span>Miễn phí vận chuyển</span>
-                ) : (
-                  <>
+                </div>
+              ) : (
+                <>
+                  <div className="summary-row">
                     <span>Giao hàng: </span>
-                    <span className="total">
-                      {shipprice.toLocaleString("vi")}₫
+                    <span className="total !text-sm">
+                      có phí vận chuyển tùy theo vùng
                     </span>
-                    <span> phí vận chuyển</span>
-                  </>
-                )}
+                  </div>
+                  <p className="total text-center !text-sm">
+                    Phí vận chuyển từ 30.000đ đến 50.000đ
+                  </p>
+                </>
+              )}
+
+              <div className="summary-row">
+                <span>Giảm giá:</span>
+                <span className="total text-red-500">
+                  - {discountAmount.toLocaleString("vi")}₫
+                </span>
               </div>
-
-              <p className="shipping-note">
-                Tùy chọn giao hàng sẽ được cập nhật trong quá trình thanh toán.
-              </p>
-              <a href="#" className="shipping-fee">
-                Tính phí giao hàng <i className="fa-solid fa-truck-fast"></i>
-              </a>
-
               <hr />
-
               <div className="summary-row">
                 <span>Tổng:</span>
                 <span className="total">
-                  {(subtotal + shipprice).toLocaleString("vi")}₫
+                  {(subtotal + shipprice - discountAmount).toLocaleString("vi")}
+                  ₫
                 </span>
               </div>
             </div>
 
-            <button className="checkout-btn">Tiến Hành Thanh Toán</button>
+            <button className="checkout-btn">
+              <a href="/checkout" className="!text-white">
+                Tiến Hành Thanh Toán
+              </a>
+            </button>
           </div>
         </div>
       </main>

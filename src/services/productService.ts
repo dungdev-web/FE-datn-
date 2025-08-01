@@ -246,7 +246,9 @@ export async function getGenderShoes(
     limit: limit.toString(),
   });
 
-  const res = await fetch(`${API_BASE_URL}/product/gender?${params.toString()}`);
+  const res = await fetch(
+    `${API_BASE_URL}/product/gender?${params.toString()}`
+  );
   if (!res.ok) {
     throw new Error("Không thể lấy danh sách giày theo giới tính.");
   }
@@ -476,28 +478,52 @@ export const getFilteredProducts = async (
 
     if (params.keyword) query.append("keyword", params.keyword);
     if (params.gender) query.append("gender", params.gender);
-    if (Array.isArray(params.brand)) {
-      params.brand.forEach((b) => query.append("brand", b));
-    } else if (params.brand) {
-      query.append("brand", params.brand);
+
+    // Brand có thể là chuỗi hoặc mảng chuỗi
+    if (params.brand) {
+      if (Array.isArray(params.brand)) {
+        params.brand.forEach((b) => query.append("brand", b));
+      } else {
+        query.append("brand", params.brand);
+      }
     }
 
-    if (params.minPrice !== undefined)
-      query.append("minPrice", params.minPrice.toString());
-    if (params.maxPrice !== undefined)
-      query.append("maxPrice", params.maxPrice.toString());
-    if (params.status !== undefined)
-      query.append("status", params.status.toString());
-    if (params.limit !== undefined)
-      query.append("limit", params.limit.toString());
+    if (params.minPrice !== undefined) {
+      query.append("minPrice", String(params.minPrice));
+    }
 
-    if (params.page !== undefined) query.append("page", params.page.toString());
+    if (params.maxPrice !== undefined) {
+      query.append("maxPrice", String(params.maxPrice));
+    }
 
-    if (params.sortBy) query.append("sortBy", params.sortBy);
-    if (params.sortOrder) query.append("sortOrder", params.sortOrder);
+    if (params.status !== undefined) {
+      query.append("status", String(params.status));
+    }
+
+    if (params.limit !== undefined) {
+      query.append("limit", String(params.limit));
+    }
+
+    if (params.page !== undefined) {
+      query.append("page", String(params.page));
+    }
+
+    if (params.sortBy) {
+      query.append("sortBy", params.sortBy);
+    }
+
+    if (params.sortOrder) {
+      query.append("sortOrder", params.sortOrder);
+    }
 
     const response = await fetch(
-      `${API_BASE_URL}/product/filter?${query.toString()}`
+      `${API_BASE_URL}/product/filter?${query.toString()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
 
     if (!response.ok) {

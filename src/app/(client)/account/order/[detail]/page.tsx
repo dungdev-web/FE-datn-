@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getOrderDetailService } from "@/services/orderService";
+import {
+  getOrderDetailService,
+  updateOrderStatus,
+} from "@/services/orderService";
 import { getAddressByIdService } from "@/services/addressService";
 import { checkToken } from "@/services/authService";
 import "../../../css/account.css";
@@ -11,9 +14,11 @@ import { API_BASE_URL } from "@/config/env";
 import { AddressResponse } from "@/types/address";
 import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
+import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
 
 export default function OrderDetail() {
   const params = useParams();
+  const router = useRouter();
   const orderId = Number(params.detail);
 
   const [order, setOrder] = useState<IOrder | null>(null);
@@ -21,8 +26,10 @@ export default function OrderDetail() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [actionLoading, setActionLoading] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
-  // Helper functions để xử lý dữ liệu
   const getColorName = (item: any): string => {
     const colorData =
       item.variant?.color || item.variant_id?.color || item.color;
@@ -63,7 +70,6 @@ export default function OrderDetail() {
       item.product_name ||
       "Tên sản phẩm không có";
 
-    // Xử lý \n trong tên sản phẩm, thay thế bằng dấu cách
     return name.replace(/\n/g, " ").trim();
   };
 
@@ -92,8 +98,8 @@ export default function OrderDetail() {
         }
 
         const orderData = await getOrderDetailService(orderId);
-        console.log("Order data:", orderData); 
-        console.log("Order items:", orderData?.order_items); 
+        console.log("Order data:", orderData);
+        console.log("Order items:", orderData?.order_items);
 
         if (!orderData) {
           throw new Error("Không tìm thấy đơn hàng");
@@ -129,11 +135,13 @@ export default function OrderDetail() {
                 addressData
               );
               if (user) {
-                const fallbackAddress = {
+                const fallbackAddress: AddressResponse = {
+                  ship_address_id: orderData.shipping_address_id,
+                  user: user || null,
+                  length: 0,
                   id: orderData.shipping_address_id,
                   full_name: user.name || "Khách hàng",
                   phone: user.phone || "Chưa cập nhật",
-                  address_line_part: "Địa chỉ không khả dụng",
                   address_line: "Địa chỉ không khả dụng",
                   address: "Địa chỉ không khả dụng",
                   ward: "",
@@ -142,15 +150,18 @@ export default function OrderDetail() {
                   city: "",
                   is_default: false,
                 };
+
                 setAddress(fallbackAddress);
               }
             }
           } catch (addressError) {
-            const fallbackAddress = {
-              id: orderData.shipping_address_id,
+            const fallbackAddress: AddressResponse = {
+              ship_address_id: orderData.shipping_address_id,
+              user: user || null,
+              id: orderData.shipping_address_id || 0, // hoặc 0 nếu không có id
+              length: 0, // bạn có thể cập nhật lại nếu cần
               full_name: user?.name || "Khách hàng",
               phone: user?.phone || "Chưa cập nhật",
-              address_line_part: "Lỗi tải địa chỉ",
               address_line: "Lỗi tải địa chỉ",
               address: "Lỗi tải địa chỉ",
               ward: "",
@@ -159,6 +170,7 @@ export default function OrderDetail() {
               city: "",
               is_default: false,
             };
+
             setAddress(fallbackAddress);
           }
         }
@@ -213,6 +225,79 @@ export default function OrderDetail() {
         return "Thu hộ (COD)";
     }
   };
+
+  // Hàm xử lý hủy đơn hàng
+  const handleCancelOrder = async () => {
+    if (!cancelReason.trim()) {
+      alert("Vui lòng nhập lý do hủy đơn hàng");
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      // Gọi API hủy đơn hàng
+      // const response = await cancelOrderService(orderId, cancelReason);
+
+      // Giả lập API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Cập nhật trạng thái đơn hàng
+      if (order) {
+        setOrder({ ...order, status: "cancelled" });
+      }
+
+      setShowCancelModal(false);
+      setCancelReason("");
+      alert("Hủy đơn hàng thành công!");
+    } catch (error) {
+      console.error("Lỗi khi hủy đơn hàng:", error);
+      alert("Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại!");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleConfirmReceived = async () => {
+    try {
+      setActionLoading(true);
+
+      await updateOrderStatus(orderId, "delivered");
+
+      if (order) {
+        setOrder({ ...order, status: "delivered" });
+      }
+
+      alert("Xác nhận đã nhận hàng thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xác nhận nhận hàng:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Có lỗi xảy ra khi xác nhận nhận hàng. Vui lòng thử lại!"
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleTrackOrder = () => {
+    router.push(`/account/order/track/${orderId}`);
+  };
+
+  const handleReviewProducts = () => {
+    router.push(`/account/order/review/${orderId}`);
+  };
+
+  const canCancelOrder =
+    order?.status === "pending" || order?.status === "processing";
+  const canConfirmReceived = order?.status === "shipping";
+  const canReviewProducts = order?.status === "completed";
+  const canTrackOrder = [
+    "shipping",
+    "delivered",
+    "cancelled",
+    "returned",
+  ].includes(order?.status || "");
 
   const isPaid = order?.status === "completed" || order?.status === "delivered";
 
@@ -291,39 +376,7 @@ export default function OrderDetail() {
       <main className="container1">
         <div className="row">
           <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">
-            <div className="block-account">
-              <h5 className="title-account">Tài khoản</h5>
-              <p>
-                Xin chào, <span>{user?.name || "Khách hàng"}</span>!
-              </p>
-              <ul>
-                <li>
-                  <Link href="/account" className="title-info">
-                    Thông tin tài khoản
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/account/order" className="title-info active">
-                    Đơn hàng
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/account/change_pass" className="title-info">
-                    Đổi mật khẩu
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/account/address" className="title-info">
-                    Sổ địa chỉ
-                  </Link>
-                </li>
-                <li>
-                  <a href="/account/logout" className="title-info">
-                    Đăng xuất
-                  </a>
-                </li>
-              </ul>
-            </div>
+            <AccountSidebar user={user} />
           </div>
 
           <div className="col-xs-12 col-sm-12 col-lg-9 col-right-ac">
@@ -347,6 +400,46 @@ export default function OrderDetail() {
                 minute: "2-digit",
               })}
             </p>
+
+            <div className="flex flex-wrap gap-3 !mb-6">
+              {canCancelOrder && (
+                <button
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={actionLoading}
+                  className="bg-red-600 hover:bg-red-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {actionLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
+                </button>
+              )}
+
+              {canConfirmReceived && (
+                <button
+                  onClick={handleConfirmReceived}
+                  disabled={actionLoading}
+                  className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {actionLoading ? "Đang xử lý..." : "Đã nhận được hàng"}
+                </button>
+              )}
+
+              {canReviewProducts && (
+                <button
+                  onClick={handleReviewProducts}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                >
+                  Đánh giá sản phẩm
+                </button>
+              )}
+
+              {canTrackOrder && (
+                <button
+                  onClick={handleTrackOrder}
+                  className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors"
+                >
+                  Theo dõi đơn hàng
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 !mb-6">
               <div className="box bg-white !p-4 rounded shadow">
@@ -541,7 +634,6 @@ export default function OrderDetail() {
                 </tbody>
               </table>
 
-              {/* Tổng kết */}
               <div className="bg-gray-50 !px-6 !py-4">
                 <div className="flex justify-end">
                   <div className="w-full max-w-sm space-y-2">
@@ -562,17 +654,20 @@ export default function OrderDetail() {
                     </div>
                     <div className="flex justify-between text-gray-700">
                       <span>Phí vận chuyển:</span>
-                      <span className="font-medium">40.000₫</span>
+                      <span className="font-medium">
+                        {order.shipping_address_id
+                          ? order.shipping_address_id.toLocaleString("vi-VN")
+                          : ""}
+                        ₫
+                      </span>
                     </div>
                     <div className="border-t !pt-2">
                       <div className="flex justify-between text-lg font-bold text-red-600">
                         <span>Tổng tiền:</span>
                         <span>
                           {order.total_amount
-                            ? (order.total_amount + 40000).toLocaleString(
-                                "vi-VN"
-                              )
-                            : "40.000"}
+                            ? order.total_amount.toLocaleString("vi-VN")
+                            : ""}
                           ₫
                         </span>
                       </div>
@@ -584,6 +679,43 @@ export default function OrderDetail() {
           </div>
         </div>
       </main>
+
+      {showCancelModal && (
+        <div className="fixed inset-0 !bg-black/20 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg !p-6 w-full max-w-md !mx-4">
+            <h3 className="text-lg font-semibold !mb-4">Hủy đơn hàng</h3>
+            <p className="text-gray-600 !mb-4">
+              Vui lòng cho biết lý do bạn muốn hủy đơn hàng này:
+            </p>
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg !p-3 !mb-4 resize-none"
+              rows={4}
+              placeholder="Nhập lý do hủy đơn hàng..."
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowCancelModal(false);
+                  setCancelReason("");
+                }}
+                className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 !py-2 !px-6 rounded-lg font-medium transition-colors"
+                disabled={actionLoading}
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                disabled={actionLoading || !cancelReason.trim()}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white !py-2 !px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {actionLoading ? "Đang xử lý..." : "Xác nhận hủy"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

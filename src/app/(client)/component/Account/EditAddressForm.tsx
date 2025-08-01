@@ -42,7 +42,6 @@ export default function EditAddressForm({
   const [hasInitialized, setHasInitialized] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
-  const {user} = useAuthUser();
   const [wards, setWards] = useState<Ward[]>([]);
   const [loading, setLoading] = useState(false);
   const { errors, validateField, validateAll } =
@@ -111,7 +110,6 @@ export default function EditAddressForm({
       toast.error("Bạn cần đăng nhập để thực hiện thao tác này.");
       return;
     }
-
     if (!user) {
       toast.error("Không tìm thấy thông tin người dùng!");
       return;

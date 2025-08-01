@@ -119,7 +119,7 @@ export default function Blog_View() {
             </select>
           </div>
 
-          <div className="!mb-[12px]">
+          {/* <div className="!mb-[12px]">
             <label className=" text-lg/6 font-medium text-gray-900  !mb-[8px] !inline-block">
               Tags
             </label>
@@ -129,8 +129,13 @@ export default function Blog_View() {
               className="form-control w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Nhập các tag, phân cách bằng dấu phẩy"
             />
-          </div>
+          </div> */}
 
+          
+        </div>
+
+        <div className="w-1/2">
+        
           <div className="!mb-[12px]">
             <label className=" text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">
               Trạng thái
@@ -140,21 +145,6 @@ export default function Blog_View() {
               <option value="draft">Nháp</option>
               <option value="pending">Chờ duyệt</option>
             </select>
-          </div>
-        </div>
-
-        <div className="w-1/2">
-          <div className="!mb-[12px]">
-            <label className=" text-lg/6 font-medium text-gray-900 !mb-[8px] !inline-block">
-              Tóm tắt
-            </label>
-            <textarea
-              name="about"
-              id="about"
-              rows={5}
-              placeholder="Tóm tắt ngắn gọn nội dung bài viết"
-              className="w-full !px-4 !py-3 border border-gray-300 rounded-md shadow-sm bg-white text-base focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical"
-            ></textarea>
           </div>
 
           <div className="!mb-[12px]">

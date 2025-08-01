@@ -55,6 +55,8 @@ export default function UploadImageProfile({
           src={
             user.picture
               ? user.picture
+              : user.avatar?.startsWith("http")
+              ? user.avatar
               : user.avatar
               ? `${API_BASE_URL}/uploads/${user.avatar}?v=${avatarVersion}`
               : "/images/default.png"

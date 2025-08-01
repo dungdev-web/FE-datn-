@@ -16,13 +16,15 @@ export const useCart = () => {
   const decrementCart = useGlobalStore((state) => state.decrementCart);
   const cartCount = useGlobalStore((state) => state.cartCount);
   const SHIPPING_COST = 30000;
-  const FREE_SHIPPING_THRESHOLD = 7000000;
+  const FREE_SHIPPING_THRESHOLD = 3000000;
 
   const subtotal =
-    cart?.cart_items.reduce(
-      (sum, item) => sum + Number(item.price || 0) * item.quantity,
-      0
-    ) || 0;
+    cart?.cart_items.reduce((sum, item) => {
+      const price =
+        item.variant?.product?.sale_price ?? item.variant?.product?.price ?? 0;
+
+      return sum + price * item.quantity;
+    }, 0) || 0;
 
   const isFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
   const shipprice = isFreeShipping ? 0 : SHIPPING_COST;
