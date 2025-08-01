@@ -263,11 +263,12 @@ export const removeFromCart = async ({
   }
 };
 
+// Hàm gọi API
 export const checkoutOrder = async (
   payload: CheckoutRequest
 ): Promise<CheckoutResponse> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/product/checkout`, {
+    const res = await fetch(`${API_BASE_URL}/payment/checkout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -276,13 +277,48 @@ export const checkoutOrder = async (
     });
 
     if (!res.ok) {
-      throw new Error("Thanh toán thất bại.");
+      const errData = await res.json();
+      throw new Error(errData.error || "Thanh toán thất bại.");
     }
 
     const data: CheckoutResponse = await res.json();
     return data;
   } catch (error) {
     console.error("Lỗi khi thanh toán:", error);
+    throw error;
+  }
+};
+export const getZaloPayOrderStatus = async (
+  appTransId: string
+): Promise<{
+  return_code: number;
+  return_message: string;
+  sub_return_code: number;
+  sub_return_message: string;
+  is_processing: boolean;
+  amount: number;
+  zp_trans_id: number;
+  discount_amount: number;
+}> => {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/payment/order-status/${appTransId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Không thể kiểm tra trạng thái thanh toán.");
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi kiểm tra trạng thái thanh toán:", error);
     throw error;
   }
 };
