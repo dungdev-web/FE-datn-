@@ -33,11 +33,19 @@ export default function Account() {
         if (!tokenData?.user?.id) return;
 
         const [orders, addresses] = await Promise.all([
-          getOrdersByUserService(tokenData.user.id),
+          getOrdersByUserService({ 
+            userId: tokenData.user.id, 
+            page: 1, 
+            limit: 1
+          }),
           getAddressByUserId(tokenData.user.id),
         ]);
 
-        setOrderCount(orders.length);
+        if (orders?.pagination?.total !== undefined) {
+          setOrderCount(orders.pagination.total);
+        } else {
+          setOrderCount(orders?.orders?.length || 0);
+        }
         if (Array.isArray(addresses)) {
           setAddressCount(addresses.length);
         } else {

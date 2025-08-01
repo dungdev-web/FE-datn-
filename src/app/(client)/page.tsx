@@ -39,9 +39,8 @@ export default function Home() {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
-  const { handleAddToCart } = useAddToCart();
+ 
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
-  const [products, setProducts] = useState<IProduct[]>([]);
 
   const handlePlay = () => {
     setIsPlaying(true);
@@ -284,7 +283,7 @@ export default function Home() {
             </p>
             <div className="buttons">
               <button ><Link  className="btn-lookbook"  href={`/product?gender=nam`}>GIÀY NAM</Link></button>  
-              <button ><Link  className="btn-lookbook"  href={`/product?gender=female`}>GIÀY NỮ</Link></button> 
+              <button ><Link  className="btn-lookbook"  href={`/product?gender=nữ`}>GIÀY NỮ</Link></button> 
             </div>
           </div>
 

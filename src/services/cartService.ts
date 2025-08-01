@@ -7,6 +7,7 @@ import {
   RemoveFromCartRequest,
   RemoveFromCartResponse,
 } from "@/types/cart";
+import { CheckoutRequest, CheckoutResponse } from "@/types/ICheckout";
 interface AddToCartResponse {
   length: any;
   message: string;
@@ -39,6 +40,7 @@ export const addToCart = async ({
     const data = await res.json();
 
     return {
+      length: Array.isArray(data.cart) ? data.cart.length : 0,
       message: data.message,
       cart: data.cart, // kiểu này khớp với ICartItem[]
     };
@@ -84,6 +86,8 @@ export async function addToMockCart(
         variant: cart.cart_items[0]?.variant,
         quantity,
         price,
+         sale_price: cart.cart_items[0]?.variant?.product?.sale_price || price, 
+  priceSale: cart.cart_items[0]?.variant?.product?.sale_price || price,  
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -168,8 +172,19 @@ export const getCartByUserId = async (
   userId: number
 ): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`);
-    if (!res.ok) throw new Error("Không thể lấy dữ liệu giỏ hàng");
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
+      method: "GET",
+      credentials: "include", // nếu backend dùng cookie-auth
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fetch failed: ${res.status} - ${errorText}`);
+    }
+
     const data: ICart = await res.json();
 
     const cartWithItems = {
@@ -246,6 +261,30 @@ export const removeFromCart = async ({
     return data;
   } catch (error) {
     console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
+    throw error;
+  }
+};
+
+export const checkoutOrder = async (
+  payload: CheckoutRequest
+): Promise<CheckoutResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error("Thanh toán thất bại.");
+    }
+
+    const data: CheckoutResponse = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi thanh toán:", error);
     throw error;
   }
 };

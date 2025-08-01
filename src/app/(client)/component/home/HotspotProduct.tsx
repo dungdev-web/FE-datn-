@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { IProduct } from "@/types/product";
 import { getBestSellingMockProducts } from "@/services/productService";
+import { API_BASE_URL } from "@/config/env";
 
 interface Props {
   openIndex: string | null;
@@ -44,11 +45,11 @@ export default function HotspotLookbook({
     const fallbackImage = product.images?.[0]?.url;
 
     const imageUrl = variantImage
-      ? `/images/products/chaybo/${variantImage}`
+      ? `${API_BASE_URL}/uploads/${variantImage}`
       : mainImage
-      ? `/images/products/chaybo/${mainImage}`
+      ? `${API_BASE_URL}/uploads/${mainImage}`
       : fallbackImage
-      ? `/images/products/chaybo/${fallbackImage}`
+      ? `${API_BASE_URL}/uploads/${fallbackImage}`
       : "/images/noimage.webp";
 
     return (

@@ -61,7 +61,7 @@ textarea {
     height: 100px;
 }
 
-.checkout-right button {
+.checkout-right .button {
     background-color: #021688;
     color: white;
     border: none;
@@ -74,10 +74,26 @@ textarea {
 
 }
 
-.checkout-right button:hover {
+.checkout-right .button:hover {
     background-color: #021371;
 }
+.checkout-right .button {
+    background-color: #021688;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
 
+}
+
+
+.checkout-right .button:hover {
+    background-color: #021371;
+}
 .order-item {
     display: flex;
     align-items: center;
@@ -116,8 +132,8 @@ textarea {
     padding:10px 0;
     border-bottom: 1px solid #cecdcd;
 }
-.discound button{
-    width:30%;
+.discound .button{
+    width: 30% !important;
 }
 .tinhtien .tamtinh {
     display: flex;
