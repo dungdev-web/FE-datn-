@@ -7,11 +7,12 @@ import { useState } from "react";
 export default function Brands() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+
+  
   return (
     <>
       <div className="brand-list">
         <h2>Danh sách nhãn hiệu</h2>
-
         <div className="actions">
           <Link href="/admin/brands/add" className="btn btn-add">
             <i className="fa-solid fa-plus"></i> Thêm mới nhãn hiệu
