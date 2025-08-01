@@ -7,11 +7,11 @@ export default function Categories() {
   const [searchText, setSearchText] = useState("");
   return (
       <div className="category-list">
-        <h2>Danh sách danh mục</h2>
+        <h2>Danh sách danh mục bài viết</h2>
 
         <div className="actions">
           <Link href={"/admin/categories/add"} className="btn btn-add">
-            <i className="fa-solid fa-plus"></i> Thêm mới danh mục
+            <i className="fa-solid fa-plus"></i> Thêm mới danh mục bài viết
           </Link>
           <button className="btn btn-refresh">
             <i className="fa-solid fa-rotate-right"></i> Refresh
@@ -44,8 +44,8 @@ export default function Categories() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Tên danh mục</th>
-              <th>Trạng thái danh mục</th>
+              <th>Tên danh mục bài viết</th>
+              <th>Trạng thái danh mục bài viết</th>
               <th>Thứ tự danh mục</th>
               <th>Ngày tạo danh mục</th>
               <th>Ngày sửa danh mục</th>

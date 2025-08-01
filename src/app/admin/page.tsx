@@ -110,7 +110,7 @@ export default function Home_admin() {
           <div className="info">
             <p className="title">Số lượng sản phẩm</p>
             <p className="number">
-              {data?.products.totalProducts ?? "Đang tải..."}
+              {data.products?.totalProducts}
             </p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -123,7 +123,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số nhãn hiệu</p>
-            <p className="number">{data.brands.totalBrands}</p>
+            <p className="number">{data.brands?.totalBrands}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -135,7 +135,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số danh mục</p>
-            <p className="number">{data.categories.totalCategories}</p>
+            <p className="number">{data.categories?.totalCategories}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -147,7 +147,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số đơn hàng</p>
-            <p className="number">{data.orders.totalOrders}</p>
+            <p className="number">{data.orders?.totalOrders}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -160,7 +160,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số user</p>
-            <p className="number">{data.users.totalUsers}</p>
+            <p className="number">{data.users?.totalUsers}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -172,7 +172,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số đánh giá</p>
-            <p className="number">{data.reviews.totalReviews}</p>
+            <p className="number">{data.reviews?.totalReviews}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -184,7 +184,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số danh mục bài viết</p>
-            <p className="number">{data.postCategories.totalPostCategories}</p>
+            <p className="number">{data.postCategories?.totalPostCategories}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -196,7 +196,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số bài viết</p>
-            <p className="number">{data.posts.totalPosts}</p>
+            <p className="number">{data.posts?.totalPosts}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>

@@ -497,6 +497,7 @@ export default function Product() {
                           <div
                             className="product-itemlist-main"
                             key={sp.products_id}
+                            style={{ display: "block" }}
                           >
                             <div
                               className="product-card-list"
@@ -515,6 +516,7 @@ export default function Product() {
                                         : "/images/placeholder.png"
                                     }
                                     alt={sp.name}
+                                    style={{height:"221px"}}
                                   />
                                 </Link>
                                 <ProductIcons

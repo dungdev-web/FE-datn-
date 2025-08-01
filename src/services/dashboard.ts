@@ -12,7 +12,7 @@ async function fetchDashboardData(endpoint: string) {
   }
 }
 
-export const getRevernueWeekly = () => fetchDashboardData("revenue/weekly");
+// export const getRevernueWeekly = () => fetchDashboardData("revenue/weekly");
 // export const getRevernueMonthly = () => fetchDashboardData("revenue/monthly");
 // export const getRevernueYearly = () => fetchDashboardData("revenue/yearly");
 
