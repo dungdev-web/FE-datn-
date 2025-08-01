@@ -1,13 +1,66 @@
 "use client";
 import "./css/dashboard.css";
 import "./css/css.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SideBar from "./component_admin/Sidebar";
 import RevenueAndVisitsChart from "./component_admin/Chart";
 import { API_BASE_URL } from "@/config/env";
+import {
+  getCountProduct,
+  getCountBrand,
+  getCountCategories,
+  getCountUsers,
+  getCountReviews,
+  getCountPosts,
+  getCountPostCategories,
+  getCountOrders,
+} from "@/services/dashboard";
 export default function Home_admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [data, setData] = useState<any>({});
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [
+          products,
+          brands,
+          categories,
+          users,
+          reviews,
+          posts,
+          postCategories,
+          orders,
+        ] = await Promise.all([
+          getCountProduct(),
+          getCountBrand(),
+          getCountCategories(),
+          getCountUsers(),
+          getCountReviews(),
+          getCountPosts(),
+          getCountPostCategories(),
+          getCountOrders(),
+        ]);
+      console.log("📦 Sản phẩm:", products);
+
+        setData({
+         
+          products,
+          brands,
+          categories,
+          users,
+          reviews,
+          posts,
+          postCategories,
+          orders,
+        });
+      } catch (error) {
+        console.error("Failed to fetch dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <div>
       {/* <SideBar isCollapsed1={isCollapsed} setIsCollapsed1={setIsCollapsed} /> */}
@@ -27,7 +80,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu tuần</p>
-            <p className="number">56.000.000₫</p>
+            <p className="number">0₫</p>
           </div>
         </div>
         <div className="revenue-card">
@@ -56,7 +109,9 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Số lượng sản phẩm</p>
-            <p className="number">5</p>
+            <p className="number">
+              {data?.products.totalProducts ?? "Đang tải..."}
+            </p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -68,7 +123,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số nhãn hiệu</p>
-            <p className="number">4</p>
+            <p className="number">{data.brands.totalBrands}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -80,7 +135,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số danh mục</p>
-            <p className="number">4</p>
+            <p className="number">{data.categories.totalCategories}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -88,10 +143,11 @@ export default function Home_admin() {
         </div>
         <div className="card">
           <div className="icon">
-            <i className="fa fa-shopping-bag position-relative"></i>          </div>
+            <i className="fa fa-shopping-bag position-relative"></i>{" "}
+          </div>
           <div className="info">
             <p className="title">Tổng số đơn hàng</p>
-            <p className="number">7</p>
+            <p className="number">{data.orders.totalOrders}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -104,7 +160,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số user</p>
-            <p className="number">6</p>
+            <p className="number">{data.users.totalUsers}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -116,7 +172,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số đánh giá</p>
-            <p className="number">6</p>
+            <p className="number">{data.reviews.totalReviews}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -128,7 +184,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số danh mục bài viết</p>
-            <p className="number">6</p>
+            <p className="number">{data.postCategories.totalPostCategories}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -140,7 +196,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Tổng số bài viết</p>
-            <p className="number">2</p>
+            <p className="number">{data.posts.totalPosts}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
