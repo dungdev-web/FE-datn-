@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { getOrderDetailService } from "@/services/orderService";
+import {
+  getOrderDetailService,
+  updateOrderStatus,
+} from "@/services/orderService";
 import { getAddressByIdService } from "@/services/addressService";
 import { checkToken } from "@/services/authService";
 import "../../../css/account.css";
@@ -27,7 +30,6 @@ export default function OrderDetail() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
-  // Helper functions để xử lý dữ liệu
   const getColorName = (item: any): string => {
     const colorData =
       item.variant?.color || item.variant_id?.color || item.color;
@@ -68,7 +70,6 @@ export default function OrderDetail() {
       item.product_name ||
       "Tên sản phẩm không có";
 
-    // Xử lý \n trong tên sản phẩm, thay thế bằng dấu cách
     return name.replace(/\n/g, " ").trim();
   };
 
@@ -134,11 +135,13 @@ export default function OrderDetail() {
                 addressData
               );
               if (user) {
-                const fallbackAddress = {
+                const fallbackAddress: AddressResponse = {
+                  ship_address_id: orderData.shipping_address_id,
+                  user: user || null,
+                  length: 0,
                   id: orderData.shipping_address_id,
                   full_name: user.name || "Khách hàng",
                   phone: user.phone || "Chưa cập nhật",
-                  address_line_part: "Địa chỉ không khả dụng",
                   address_line: "Địa chỉ không khả dụng",
                   address: "Địa chỉ không khả dụng",
                   ward: "",
@@ -147,15 +150,18 @@ export default function OrderDetail() {
                   city: "",
                   is_default: false,
                 };
+
                 setAddress(fallbackAddress);
               }
             }
           } catch (addressError) {
-            const fallbackAddress = {
-              id: orderData.shipping_address_id,
+            const fallbackAddress: AddressResponse = {
+              ship_address_id: orderData.shipping_address_id,
+              user: user || null,
+              id: orderData.shipping_address_id || 0, // hoặc 0 nếu không có id
+              length: 0, // bạn có thể cập nhật lại nếu cần
               full_name: user?.name || "Khách hàng",
               phone: user?.phone || "Chưa cập nhật",
-              address_line_part: "Lỗi tải địa chỉ",
               address_line: "Lỗi tải địa chỉ",
               address: "Lỗi tải địa chỉ",
               ward: "",
@@ -164,6 +170,7 @@ export default function OrderDetail() {
               city: "",
               is_default: false,
             };
+
             setAddress(fallbackAddress);
           }
         }
@@ -250,21 +257,40 @@ export default function OrderDetail() {
     }
   };
 
-  // Hàm xử lý theo dõi đơn hàng
+  const handleConfirmReceived = async () => {
+    try {
+      setActionLoading(true);
+
+      await updateOrderStatus(orderId, "delivered");
+
+      if (order) {
+        setOrder({ ...order, status: "delivered" });
+      }
+
+      alert("Xác nhận đã nhận hàng thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xác nhận nhận hàng:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Có lỗi xảy ra khi xác nhận nhận hàng. Vui lòng thử lại!"
+      );
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleTrackOrder = () => {
-    // Chuyển đến trang theo dõi đơn hàng
     router.push(`/account/order/track/${orderId}`);
   };
 
-  // Hàm xử lý đánh giá sản phẩm
   const handleReviewProducts = () => {
-    // Chuyển đến trang đánh giá sản phẩm
     router.push(`/account/order/review/${orderId}`);
   };
 
-  // Kiểm tra xem có thể thực hiện hành động nào
   const canCancelOrder =
     order?.status === "pending" || order?.status === "processing";
+  const canConfirmReceived = order?.status === "shipping";
   const canReviewProducts = order?.status === "completed";
   const canTrackOrder = [
     "shipping",
@@ -375,7 +401,6 @@ export default function OrderDetail() {
               })}
             </p>
 
-            {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 !mb-6">
               {canCancelOrder && (
                 <button
@@ -384,6 +409,16 @@ export default function OrderDetail() {
                   className="bg-red-600 hover:bg-red-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {actionLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
+                </button>
+              )}
+
+              {canConfirmReceived && (
+                <button
+                  onClick={handleConfirmReceived}
+                  disabled={actionLoading}
+                  className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {actionLoading ? "Đang xử lý..." : "Đã nhận được hàng"}
                 </button>
               )}
 
@@ -599,7 +634,6 @@ export default function OrderDetail() {
                 </tbody>
               </table>
 
-              {/* Tổng kết */}
               <div className="bg-gray-50 !px-6 !py-4">
                 <div className="flex justify-end">
                   <div className="w-full max-w-sm space-y-2">
@@ -620,9 +654,12 @@ export default function OrderDetail() {
                     </div>
                     <div className="flex justify-between text-gray-700">
                       <span>Phí vận chuyển:</span>
-                      <span className="font-medium">{order.shipping_address_id
-                            ? order.shipping_address_id.toLocaleString("vi-VN")
-                            : ""}₫</span>
+                      <span className="font-medium">
+                        {order.shipping_address_id
+                          ? order.shipping_address_id.toLocaleString("vi-VN")
+                          : ""}
+                        ₫
+                      </span>
                     </div>
                     <div className="border-t !pt-2">
                       <div className="flex justify-between text-lg font-bold text-red-600">
@@ -643,7 +680,6 @@ export default function OrderDetail() {
         </div>
       </main>
 
-      {/* Modal hủy đơn hàng */}
       {showCancelModal && (
         <div className="fixed inset-0 !bg-black/20 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg !p-6 w-full max-w-md !mx-4">

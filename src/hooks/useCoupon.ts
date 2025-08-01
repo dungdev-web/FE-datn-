@@ -43,7 +43,9 @@ export function useCoupon(subtotal: number, cartId: number | string) {
     }
 
     if (subtotal < 500_000) {
-      return setError("Đơn hàng phải từ 500.000₫ mới được áp dụng mã giảm giá.");
+      return setError(
+        "Đơn hàng phải từ 500.000₫ mới được áp dụng mã giảm giá."
+      );
     }
 
     if (appliedCoupons.find((c) => c.code === coupon.code)) {
@@ -77,11 +79,12 @@ export function useCoupon(subtotal: number, cartId: number | string) {
   };
 
   const getDiscountAmount = (): number => {
-    return appliedCoupons.reduce((total, coupon) => {
+    return appliedCoupons.reduce((total: number, coupon: ICoupon) => {
+      const discountValue = Number(coupon.discount_value); 
       if (coupon.discount_type === "percentage") {
-        return total + Math.floor((subtotal * coupon.discount_value) / 100);
+        return total + Math.floor((subtotal * discountValue) / 100);
       } else {
-        return total + coupon.discount_value;
+        return total + discountValue;
       }
     }, 0);
   };

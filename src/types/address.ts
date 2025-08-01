@@ -10,7 +10,7 @@ export interface IAddressFormData {
   is_default: boolean;
 }
 export interface AddressResponse {
-  ship_address_id(ship_address_id: any): unknown;
+  ship_address_id: any;
   user: any;
   length: number;
   address: string;
@@ -25,9 +25,11 @@ export interface AddressResponse {
   country?: string;
   is_default: boolean;
 }
+
 export interface Address {
   email(email: any): unknown;
   ship_address_id: number;
+  user:any;
   user_id: number;
   full_name: string;
   phone: string;

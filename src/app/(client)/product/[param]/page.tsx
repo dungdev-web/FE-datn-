@@ -826,8 +826,15 @@ export default function Detail() {
                                     <img
                                       className="!w-[35px] rounded-[50%]"
                                       src={
-                                        review.user?.avatar ||
-                                        "/images/default.png"
+                                        review.user?.picture
+                                          ? review.user?.picture
+                                          : review.user.avatar?.startsWith(
+                                              "http"
+                                            )
+                                          ? review.user.avatar
+                                          : review.user.avatar
+                                          ? `${API_BASE_URL}/uploads/${review.user.avatar}`
+                                          : "/images/default.png"
                                       }
                                       alt=""
                                     />

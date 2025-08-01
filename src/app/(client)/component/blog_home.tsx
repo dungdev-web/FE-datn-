@@ -4,10 +4,11 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { useEffect, useState } from "react";
 import { IBlog } from "@/types/blog";
-import { getPost } from "@/services/blogService"; // hoặc blogApi nếu bạn dùng tên khác
+import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
 import "swiper/css";
 import "swiper/css/navigation";
+
 export default function BlogHome() {
   const [blog, setBlog] = useState<IBlog[]>([]);
 
@@ -22,6 +23,13 @@ export default function BlogHome() {
     };
     fetchDataBlog();
   }, []);
+
+  const stripHtmlTags = (html: string): string => {
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    return temp.innerText;
+  };
+
   return (
     <Swiper
       modules={[Navigation]}
@@ -39,7 +47,10 @@ export default function BlogHome() {
       {blog.map((item) => (
         <SwiperSlide key={item.post_id}>
           <div className="blog-item">
-            <img src={`${API_BASE_URL}/uploads/blog/${item.images}`} alt={item.title} />
+            <img
+              src={`${API_BASE_URL}/uploads/blog/${item.images}`}
+              alt={item.title}
+            />
             <div className="blog-info">
               <p className="blog-date">
                 {new Date(item.created_at).toLocaleDateString("vi-VN")}
@@ -47,7 +58,9 @@ export default function BlogHome() {
               <p className="blog-author">{item.author?.name || "Admin"}</p>
             </div>
             <h3 className="blog-title">{item.title}</h3>
-            <p className="blog-desc">{item.content?.slice(0, 120)}...</p>
+            <p className="blog-desc">
+              {stripHtmlTags(item.content).slice(0, 120)}...
+            </p>
           </div>
         </SwiperSlide>
       ))}
