@@ -515,10 +515,17 @@ export default function Checkout() {
             id="bank_transfer"
             value="2"
             checked={paymentMethodId === 2}
-            onChange={() => setPaymentMethodId(2)}
+            onChange={() => {
+              setPaymentMethodId(2);
+              setPaymentCode("zalopay"); // ✅ Gán luôn ZaloPay
+            }}
           />
-          <label htmlFor="bank_transfer">Chuyển khoản</label>
-          <i className="fa-solid fa-money-bill text-[#021688]"></i>
+          <label htmlFor="bank_transfer">Chuyển khoản (ZaloPay)</label>
+                <img
+        src={`${API_BASE_URL}/uploads/logo_zalopay.png`}
+        alt="ZaloPay"
+        className="w-7 h-auto border-1 border-blue-500 ring-2 ring-blue-200 rounded"
+      />
         </div>
 
         <div className="boc1 flex items-center gap-2">
@@ -528,48 +535,15 @@ export default function Checkout() {
             id="cod"
             value="1"
             checked={paymentMethodId === 1}
-            onChange={() => setPaymentMethodId(1)}
+            onChange={() => {
+              setPaymentMethodId(1);
+              setPaymentCode(""); // Xóa paymentCode khi chọn COD
+            }}
           />
           <label htmlFor="cod">Thanh toán khi nhận hàng</label>
+            
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
-        {paymentMethodId === 2 && (
-          <div className="mt-4 flex flex-col gap-3">
-            <div className="flex gap-4">
-              {/* ZaloPay */}
-              <div
-                className="w-1/2 p-3 flex flex-col items-center text-center cursor-pointer"
-                onClick={() => setPaymentCode("zalopay")}
-              >
-                <img
-                  src={`${API_BASE_URL}/uploads/logo_zalopay.png`}
-                  alt="ZaloPay"
-                  className={`w-50 h-auto mb-2 zalo ${
-                    paymentCode === "zalopay"
-                      ? "border-2 border-blue-500 ring-2 ring-blue-200"
-                      : "border border-gray-300"
-                  }`}
-                />
-              </div>
-
-              {/* MoMo */}
-              <div
-                className="w-1/2 p-3 flex flex-col items-center text-center cursor-pointer"
-                onClick={() => setPaymentCode("momo")}
-              >
-                <img
-                  src={`${API_BASE_URL}/uploads/logo_momo.png`}
-                  alt="MoMo"
-                  className={`w-50 h-auto mb-2 momo ${
-                    paymentCode === "momo"
-                      ? "border-2 border-pink-500 ring-2 ring-pink-200"
-                      : "border border-gray-300"
-                  }`}
-                />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* RIGHT: Đơn hàng */}
