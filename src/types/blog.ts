@@ -22,3 +22,9 @@ export interface IBlog {
     avatar: string;
   };
 }
+export interface Category {
+  category_post_id: number;
+  name: string;
+  slug: string;
+  parent_id: number | null;
+}

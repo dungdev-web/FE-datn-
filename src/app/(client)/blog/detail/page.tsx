@@ -44,7 +44,7 @@ export default function Detail_blog() {
           </ul>
         </div>
       </section>
-      <main>
+      <main style={{display: "flex"}}>
 		 <button
         className="toggle-sidebar-btn"
         onClick={() => setSidebarOpen(!sidebarOpen)}

@@ -1,4 +1,5 @@
 // mocks/mockCart.ts
+import { API_BASE_URL } from "@/config/env";
 import { ICartItem, ICart } from "@/types/cart";
 const defaultCart: ICart[] = [
   {
@@ -39,7 +40,7 @@ const defaultCart: ICart[] = [
             images: [
               {
                 images_id: 1,
-                url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+                url: `${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`,
                 alt_text: "Ảnh sản phẩm",
                 type: "main",
                 product_id: 1,

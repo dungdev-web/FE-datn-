@@ -2,7 +2,8 @@
 
 import { IProduct } from "@/types/product";
 import ProductIcons from "./products/ProductIcons";
-
+import { API_BASE_URL } from "@/config/env";
+import Link from "next/link";
 export default function Product4box(props: any) {
   const sp = props.sp as IProduct;
   if (!sp) return null;
@@ -26,19 +27,20 @@ export default function Product4box(props: any) {
     <>
       <div className="hot-product-card" style={{ width: "230px" }}>
         <div className="hot-product-image">
-          <img
-            src={
-              Array.isArray(sp.images) && sp.images.length > 0
-                ? `/images/products/chaybo/${sp.images[0].url}`
-                : "/images/placeholder.png"
-            }
-            alt={
-              Array.isArray(sp.images) && sp.images.length > 0
-                ? sp.images[0].alt_text
-                : sp.name
-            }
-          />
-
+          <Link href={`/product/${sp.slug}`}>
+            <img
+              src={
+                Array.isArray(sp.images) && sp.images.length > 0
+                  ? `${API_BASE_URL}/uploads/${sp.images[0].url}`
+                  : "/images/placeholder.png"
+              }
+              alt={
+                Array.isArray(sp.images) && sp.images.length > 0
+                  ? sp.images[0].alt_text
+                  : sp.name
+              }
+            />
+          </Link>
           <div className="hot-product-icons">
             <ProductIcons
               productId={productId}

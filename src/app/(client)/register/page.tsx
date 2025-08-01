@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import { registerUser } from "@/services/authService";
-import toast, { Toaster } from "react-hot-toast";
 import "../css/login.css";
 import { validateField } from "@/hooks/validate_login_register";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -51,10 +52,21 @@ export default function Register() {
         phone: "",
       };
       const res = await registerUser(formData);
-      toast.success(res.message);
+      Swal.fire({
+        title: res.message || "Đăng ký thành công!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
       window.location.href = "/login";
     } catch (err: any) {
-      toast.error(err.message);
+      Swal.fire({
+        title: "Đăng ký thất bại",
+        text: err.message || "Có lỗi xảy ra",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -70,9 +82,7 @@ export default function Register() {
           <h2>Đăng Ký email</h2>
 
           <div className="register-link">
-            <p>
-              Hãy đăng ký để được hưởng nhiều đặc quyền riêng dành cho bạn
-            </p>
+            <p>Hãy đăng ký để được hưởng nhiều đặc quyền riêng dành cho bạn</p>
           </div>
 
           <form id="formRegister" onSubmit={handleSubmit}>
@@ -155,7 +165,6 @@ export default function Register() {
             </div>
 
             <div className="register-link">
-             
               <p>
                 Bạn chưa có tài khoản? <a href="/login">Đăng nhập ngay</a>
               </p>
@@ -163,8 +172,6 @@ export default function Register() {
 
             <button type="submit">Đăng kí ngay</button>
           </form>
-
-          <Toaster position="bottom-right" />
 
           <h3>Hoặc</h3>
 

@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { loginUser } from "@/services/authService";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export default function LoginMenu({
   isOpen,
@@ -39,9 +40,15 @@ export default function LoginMenu({
     if (showLoader && loginSuccess) {
       const timer = setTimeout(() => {
         setShowLoader(false);
-        toast.success("Đăng nhập thành công!");
+        Swal.fire({
+          title: "Đăng nhập thành công!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000, 
+          timerProgressBar: true,
+        });
         router.push("/account");
-      }, 7000);
+      }, 2000);
 
       return () => clearTimeout(timer);
     }
@@ -120,7 +127,6 @@ export default function LoginMenu({
                     </button>
                   </div>
                 </form>
-                <Toaster position="bottom-right" />
                 {showLoader && (
                   <div className="loader-overlay">
                     <Loader />

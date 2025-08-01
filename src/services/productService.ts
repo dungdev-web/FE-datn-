@@ -120,7 +120,7 @@ export async function getFilterPrice(
   return data;
 }
 // Lấy sản phẩm bán chạy dựa trên số lượng review hoặc random sold_count
-export async function getBestSellingMockProducts(top = 5): Promise<IProduct[]> {
+export async function getBestSellingMockProducts(top = 6): Promise<IProduct[]> {
   if (IS_MOCK) {
     const products = getMockProducts();
 
@@ -138,7 +138,7 @@ export async function getBestSellingMockProducts(top = 5): Promise<IProduct[]> {
 
   // Nếu dùng API thật
   try {
-    const res = await fetch(`${API_BASE_URL}/product/best-selling`);
+    const res = await fetch(`${API_BASE_URL}/product/best-selling?top=${top}`);
 
     if (!res.ok) {
       throw new Error("Không thể lấy sản phẩm bán chạy.");
@@ -214,55 +214,51 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
   return products;
 }
 
-//Lấy sản phẩm theo giới tính nam
-export async function getMenShoes(): Promise<IProduct[]> {
+//Lấy sản phẩm theo giới tính 
+export async function getGenderShoes(
+  name: string,
+  limit: number,
+  page: number
+): Promise<{ products: IProduct[]; total: number }> {
   if (IS_MOCK) {
     const all = getMockProducts();
+    const lowerName = name.toLowerCase();
 
-    return all.filter((product) => {
-      const gender = product.gender.name?.toLowerCase();
+    const filtered = all.filter((product) => {
+      const gender = product.gender?.name?.toLowerCase();
       const categoryName = product.category?.name?.toLowerCase();
 
       return (
-        gender === "male" ||
-        gender === "unisex" ||
-        categoryName?.includes("nam")
+        gender === lowerName ||
+        (lowerName === "nam" && categoryName?.includes("nam"))
       );
     });
+
+    return {
+      products: filtered,
+      total: filtered.length,
+    };
   }
 
-  // Nếu dùng API thật
-  const res = await fetch(`${API_BASE_URL}/products?gender=male_or_unisex`);
+  const params = new URLSearchParams({
+    gender: name,
+    page: page.toString(),
+    limit: limit.toString(),
+  });
+
+  const res = await fetch(`${API_BASE_URL}/product/gender?${params.toString()}`);
   if (!res.ok) {
-    throw new Error("Không thể lấy danh sách giày nam.");
+    throw new Error("Không thể lấy danh sách giày theo giới tính.");
   }
 
-  const data: IProduct[] = await res.json();
-  return data;
-}
-//lấy sản phẩm theo giới tính nữ
-export async function getFemaleProducts(): Promise<IProduct[]> {
-  if (IS_MOCK) {
-    const all = getMockProducts();
-    return all.filter(
-      (product) =>
-        product.category?.name?.toLowerCase().includes("nữ") ||
-        product.category?.slug?.toLowerCase().includes("nu")
-    );
-  }
+  const data = await res.json();
 
-  // API thực tế (nếu dùng sau)
-  const res = await fetch(`${API_BASE_URL}/products`);
-  if (!res.ok) {
-    throw new Error("Không thể lấy danh sách sản phẩm.");
-  }
-  const data: IProduct[] = await res.json();
-  return data.filter(
-    (product) =>
-      product.category?.name?.toLowerCase().includes("nữ") ||
-      product.category?.slug?.toLowerCase().includes("nu")
-  );
+  return {
+    products: data.products,
+    total: data.total,
+  };
 }
+
 
 //Lấy sản phẩm theo catename
 export async function getProductsByCategory(
@@ -472,7 +468,6 @@ export const getProductsByGender = async (
     return [];
   }
 };
-
 export const getFilteredProducts = async (
   params: FilterParams
 ): Promise<ProductFilterResponse> => {
@@ -481,7 +476,12 @@ export const getFilteredProducts = async (
 
     if (params.keyword) query.append("keyword", params.keyword);
     if (params.gender) query.append("gender", params.gender);
-    if (params.brand) query.append("brand", params.brand);
+    if (Array.isArray(params.brand)) {
+      params.brand.forEach((b) => query.append("brand", b));
+    } else if (params.brand) {
+      query.append("brand", params.brand);
+    }
+
     if (params.minPrice !== undefined)
       query.append("minPrice", params.minPrice.toString());
     if (params.maxPrice !== undefined)
@@ -490,18 +490,37 @@ export const getFilteredProducts = async (
       query.append("status", params.status.toString());
     if (params.limit !== undefined)
       query.append("limit", params.limit.toString());
-    if (params.offset !== undefined)
-      query.append("offset", params.offset.toString());
+
+    if (params.page !== undefined) query.append("page", params.page.toString());
+
+    if (params.sortBy) query.append("sortBy", params.sortBy);
+    if (params.sortOrder) query.append("sortOrder", params.sortOrder);
 
     const response = await fetch(
       `${API_BASE_URL}/product/filter?${query.toString()}`
     );
+
     if (!response.ok) {
       throw new Error("Lỗi khi gọi API lọc sản phẩm");
     }
 
-    const data: ProductFilterResponse = await response.json();
-    return data;
+    const json = await response.json();
+
+    const {
+      data: {
+        data: products = [],
+        total = 0,
+        totalPages = 1,
+        page: currentPage = 1,
+      } = {},
+    } = json;
+
+    return {
+      products,
+      total,
+      totalPages,
+      currentPage,
+    };
   } catch (error) {
     console.error("Lỗi getFilteredProducts:", error);
     throw error;

@@ -3,6 +3,7 @@ import React from "react";
 import "../../css/product_add.css";
 import { useEffect, useState, useRef  } from "react";
 import dynamic from "next/dynamic";
+import { API_BASE_URL } from "@/config/env";
 const CKEditor = dynamic(
   () =>
     import("@ckeditor/ckeditor5-react").then(async ({ CKEditor }) => {
@@ -389,25 +390,25 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
             <div className="product-images">
               <div className="image-thumb">
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion(1).webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion(1).webp`}
                   alt="Ảnh 1"
                 />
               </div>
               <div className="image-thumb">
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion(2).webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion(2).webp`}
                   alt="Ảnh 2"
                 />
               </div>
               <div className="image-thumb">
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion(3).webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion(3).webp`}
                   alt="Ảnh 3"
                 />
               </div>
               <div className="image-thumb">
                 <img
-                  src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                   alt="Ảnh 4"
                 />
               </div>

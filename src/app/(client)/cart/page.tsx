@@ -5,7 +5,7 @@ import "../css/product.css";
 import Link from "next/link";
 import { ICartItem } from "@/types/cart";
 import { useCart } from "@/hooks/useCart";
-
+import { API_BASE_URL } from "@/config/env";
 export default function Cart() {
   const {
     cart,
@@ -144,22 +144,19 @@ export default function Cart() {
             {cart.cart_items.map((item: ICartItem) => (
               <div className="cart-item" key={item.cart_items_id}>
                 <div className="product-info">
-                  <Link href={`/product/${item.variant?.product.slug}`}>
-                     <img
+                 <img
                     alt={item.variant?.product.name}
                     src={
                       item.variant?.color.images
-                        ? `/images/products/chaybo/${item.variant.color.images}`
+                        ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
                         : "/images/placeholder.png"
                     }
                     width="80"
                   />
-                  </Link>
-                 <Link href={`/product/${item.variant?.product.slug}`}>
+
                   <div className="product-name">
                     {item.variant?.product.name}
                   </div>
-                  </Link>
                   <div className="product-details">
                     <div className="product-desc">
                       Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}

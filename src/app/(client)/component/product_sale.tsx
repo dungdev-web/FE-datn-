@@ -10,7 +10,7 @@ import { getDealProducts } from "@/services/productService";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import ProductIcons from "./products/ProductIcons";
-
+import { API_BASE_URL } from "@/config/env";
 export default function ProductSale() {
   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);
 
@@ -87,7 +87,7 @@ export default function ProductSale() {
                     <Link href={`/product/${product.slug}`}>
                       <img
                         src={
-                          `/images/products/chaybo/${images?.[0]?.url}` ||
+                          `${API_BASE_URL}/uploads/${images?.[0]?.url}` ||
                           "/images/placeholder.png"
                         }
                         alt={product.name}

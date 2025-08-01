@@ -8,6 +8,7 @@ import "../css/wishlist.css";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import ProductIcons from "../component/products/ProductIcons";
 import Link  from "next/link";
+import { API_BASE_URL } from "@/config/env";
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState<IWishlistItemWithProduct[]>([]);
@@ -161,7 +162,7 @@ export default function Wishlist() {
                             <img
                               src={
                                 image
-                                  ? `/images/products/chaybo/${image}`
+                                  ? `${API_BASE_URL}/uploads/${image}`
                                   : "/images/placeholder.png"
                               }
                               alt={product.name}

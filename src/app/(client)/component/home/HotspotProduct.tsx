@@ -7,8 +7,9 @@ interface Props {
   openIndex: string | null;
   setOpenIndex: (index: string | null) => void;
   togglePopup: (index: string, e: React.MouseEvent) => void;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
+
 
 export default function HotspotLookbook({
   openIndex,

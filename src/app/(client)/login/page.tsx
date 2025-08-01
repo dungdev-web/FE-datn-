@@ -4,11 +4,12 @@ import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
 import Loader from "../component/loader";
 import { Eye, EyeOff } from "lucide-react";
 import { validateField } from "@/hooks/validate_login_register";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -18,7 +19,7 @@ export default function Login() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
+  const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -41,7 +42,6 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
     return Object.keys(newErrors).length === 0;
   };
 
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -55,7 +55,12 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
       setShowLoader(true);
       setLoginSuccess(true);
     } catch (err: any) {
-      toast.error(err.message || "Đăng nhập thất bại");
+      Swal.fire({
+        title: "Đăng nhập thất bại",
+        text: err.message || "Có lỗi xảy ra",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -76,10 +81,16 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
     if (showLoader && loginSuccess) {
       const timer = setTimeout(() => {
         setShowLoader(false);
-        toast.success("Đăng nhập thành công!");
+        Swal.fire({
+  title: "Đăng nhập thành công!",
+  icon: "success",
+  showConfirmButton: false,
+  timer: 2000, 
+  timerProgressBar: true,
+});
         window.location.href = "/account";
-      }, 7000);
-      router.refresh(); // <-- ép Next.js fetch lại dữ liệu của toàn bộ Server Components / Client layout
+      }, 2000);
+      router.refresh();
 
       return () => clearTimeout(timer);
     }
@@ -120,7 +131,6 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
                   }
                   type="text"
                   placeholder="Tài Khoản"
-                 
                 />
                 {errors.email && (
                   <p className="text-sm text-red-500 mt-1">{errors.email}</p>
@@ -146,7 +156,6 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
                       }),
                     }))
                   }
-                 
                 />
                 {errors.password && (
                   <p className="text-sm text-red-500 mt-1">{errors.password}</p>
@@ -173,8 +182,6 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
               <button type="submit">Đăng nhập ngay</button>
             </form>
 
-            <Toaster position="bottom-right" />
-
             {showLoader && (
               <div className="loader-overlay">
                 <Loader />
@@ -182,9 +189,9 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
             )}
 
             <br />
-            <h5><Link href="/forgot-password">
-            Quên mật khẩu?
-            </Link></h5>
+            <h5>
+              <Link href="/forgot-password">Quên mật khẩu?</Link>
+            </h5>
 
             <button className="google-login" onClick={googleLogin}>
               <i className="fab fa-google"></i> Đăng nhập bằng Google
@@ -192,7 +199,7 @@ const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
 
             <div className="register-link">
               <p>
-                Bạn chưa có tài khoản Tera Shoes? {" "}
+                Bạn chưa có tài khoản Tera Shoes?{" "}
                 <Link href="/register">Đăng ký ngay</Link>
               </p>
             </div>

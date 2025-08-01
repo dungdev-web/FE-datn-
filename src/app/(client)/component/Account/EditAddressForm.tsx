@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { addAddressService, updateAddress } from "@/services/addressService";
+import { toast } from "react-toastify";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { useAddressFormValidation } from "@/hooks/useAddressFormValidation";
 
 type AddressFormData = {
+  id?: number;
   full_name: string;
   phone: string;
   address_line_part: string;
@@ -12,6 +17,7 @@ type AddressFormData = {
   ward: string;
   is_default: boolean;
   address_line?: string;
+  user_id?: number;
 };
 
 type Province = { name: string; code: number };
@@ -22,17 +28,31 @@ type Props = {
   initialData: AddressFormData;
   onClose: () => void;
   onSubmit: (data: AddressFormData) => void;
+  mode: "add" | "edit";
 };
 
 export default function EditAddressForm({
   initialData,
   onClose,
   onSubmit,
+  mode,
 }: Props) {
+  const { user } = useAuthUser();
   const [formData, setFormData] = useState<AddressFormData>(initialData);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
+  const {user} = useAuthUser();
   const [wards, setWards] = useState<Ward[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { errors, validateField, validateAll } =
+    useAddressFormValidation(initialData);
+  useEffect(() => {
+    console.log("🛠 initialData vào EditForm:", initialData);
+    if (initialData?.id !== undefined) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/p/")
@@ -41,48 +61,78 @@ export default function EditAddressForm({
   }, []);
 
   useEffect(() => {
-    const province = provinces.find((p) => p.name === formData.province);
-    if (province) {
-      fetch(`https://provinces.open-api.vn/api/p/${province.code}?depth=2`)
-        .then((res) => res.json())
-        .then((data) => {
-          setDistricts(data.districts || []);
-          setWards([]);
-        });
+    if (formData.province && provinces.length) {
+      const selectedProvince = provinces.find(
+        (p) => p.name === formData.province
+      );
+      if (selectedProvince) {
+        fetch(
+          `https://provinces.open-api.vn/api/p/${selectedProvince.code}?depth=2`
+        )
+          .then((res) => res.json())
+          .then((data) => setDistricts(data.districts || []));
+      }
     }
-  }, [formData.province]);
+  }, [formData.province, provinces]);
 
   useEffect(() => {
-    const district = districts.find((d) => d.name === formData.district);
-    if (district) {
-      fetch(`https://provinces.open-api.vn/api/d/${district.code}?depth=2`)
-        .then((res) => res.json())
-        .then((data) => setWards(data.wards || []));
+    if (formData.district && districts.length) {
+      const selectedDistrict = districts.find(
+        (d) => d.name === formData.district
+      );
+      if (selectedDistrict) {
+        fetch(
+          `https://provinces.open-api.vn/api/d/${selectedDistrict.code}?depth=2`
+        )
+          .then((res) => res.json())
+          .then((data) => setWards(data.wards || []));
+      }
     }
-  }, [formData.district]);
+  }, [formData.district, districts]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const target = e.target;
     const { name, value, type } = target;
-    const checked = type === "checkbox" ? target.checked : undefined;
-
+    validateField(name, value);
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox" ? (target as HTMLInputElement).checked : value,
       ...(name === "province" ? { district: "", ward: "" } : {}),
       ...(name === "district" ? { ward: "" } : {}),
     }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const fullAddress = `${formData.address_line_part}, ${formData.ward}, ${formData.district}, ${formData.province}, ${formData.country}`;
+    if(!user){
+      toast.error("Bạn cần đăng nhập để thực hiện thao tác này.");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Không tìm thấy thông tin người dùng!");
+      return;
+    }
+    const isValid = validateAll(formData);
+    if (!isValid) {
+      toast.error("Vui lòng kiểm tra lại các trường bắt buộc.");
+      return;
+    }
+    if (mode === "edit" && !formData.id) {
+      toast.error("Không tìm thấy ID địa chỉ để cập nhật!");
+      return;
+    }
+    console.log("🧾 Submit formData:", formData);
+
     onSubmit({
       ...formData,
-      address_line: fullAddress,
+      user_id: user.id,
     });
+
+    onClose();
   };
 
   return (
@@ -96,7 +146,7 @@ export default function EditAddressForm({
       </button>
 
       <h2 className="text-xl font-semibold !mb-6 text-center">
-        Chỉnh sửa địa chỉ
+        {mode === "add" ? "Thêm địa chỉ mới" : "Chỉnh sửa địa chỉ"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -105,13 +155,14 @@ export default function EditAddressForm({
           <input
             type="text"
             name="full_name"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.full_name}
             onChange={handleChange}
-            required
           />
+          {errors.full_name && (
+            <p className="text-sm text-red-500 mt-1">{errors.full_name}</p>
+          )}
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">
             Số điện thoại
@@ -119,13 +170,14 @@ export default function EditAddressForm({
           <input
             type="text"
             name="phone"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.phone}
             onChange={handleChange}
-            required
           />
+          {errors.phone && (
+            <p className="text-sm text-red-500 mt-1">{errors.phone}</p>
+          )}
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">
             Địa chỉ cụ thể (số nhà, đường)
@@ -133,24 +185,25 @@ export default function EditAddressForm({
           <input
             type="text"
             name="address_line_part"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.address_line_part}
             onChange={handleChange}
-            required
           />
+          {errors.address_line_part && (
+            <p className="text-sm text-red-500 mt-1">
+              {errors.address_line_part}
+            </p>
+          )}
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1">Quốc gia</label>
           <select
             name="country"
-            className="w-full border border-gray-300 rounded !px-3 !py-2"
+            className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
             value={formData.country}
             onChange={handleChange}
           >
             <option value="Vietnam">Vietnam</option>
-            <option value="United States">United States</option>
-            <option value="Japan">Japan</option>
           </select>
         </div>
 
@@ -161,7 +214,7 @@ export default function EditAddressForm({
             </label>
             <select
               name="province"
-              className="w-full border border-gray-300 rounded !px-3 !py-2"
+              className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
               value={formData.province}
               onChange={handleChange}
             >
@@ -172,8 +225,10 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.province && (
+              <p className="text-sm text-red-500 mt-1">{errors.province}</p>
+            )}
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">
               Quận / Huyện
@@ -192,8 +247,10 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.district && (
+              <p className="text-sm text-red-500 mt-1">{errors.district}</p>
+            )}
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">
               Phường / Xã
@@ -212,21 +269,27 @@ export default function EditAddressForm({
                 </option>
               ))}
             </select>
+            {errors.ward && (
+              <p className="text-sm text-red-500 mt-1">{errors.ward}</p>
+            )}
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center !space-x-2">
           <input
             type="checkbox"
             name="is_default"
             checked={formData.is_default}
             onChange={handleChange}
             className="w-4 h-4"
+            id="is_default"
           />
-          <label className="text-sm">Đặt làm địa chỉ mặc định</label>
+          <label htmlFor="is_default" className="text-sm ">
+            Đặt làm địa chỉ mặc định
+          </label>
         </div>
 
-        <div className="flex justify-end space-x-4 !pt-4">
+        <div className="flex justify-end space-x-4 !pt-4 gap-2">
           <button
             type="button"
             onClick={onClose}
@@ -236,9 +299,14 @@ export default function EditAddressForm({
           </button>
           <button
             type="submit"
+            disabled={loading}
             className="!px-4 !py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            Cập nhật địa chỉ
+            {loading
+              ? "Đang xử lý..."
+              : mode === "add"
+              ? "Thêm địa chỉ"
+              : "Cập nhật địa chỉ"}
           </button>
         </div>
       </form>

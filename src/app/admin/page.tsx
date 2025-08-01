@@ -4,6 +4,7 @@ import "./css/css.css";
 import { useState } from "react";
 import SideBar from "./component_admin/Sidebar";
 import RevenueAndVisitsChart from "./component_admin/Chart";
+import { API_BASE_URL } from "@/config/env";
 export default function Home_admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -258,7 +259,7 @@ export default function Home_admin() {
           <div className="product-list">
             <div className="product-card">
               <img
-                src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                 alt="Sản phẩm"
               />
               <div className="product-info">
@@ -275,7 +276,7 @@ export default function Home_admin() {
           <div className="product-list">
             <div className="product-card">
               <img
-                src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                 alt="Sản phẩm"
               />
               <div className="product-info">
@@ -292,7 +293,7 @@ export default function Home_admin() {
           <div className="product-list">
             <div className="product-card">
               <img
-                src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
                 alt="Sản phẩm"
               />
               <div className="product-info">
@@ -316,7 +317,7 @@ export default function Home_admin() {
           <div className="stock-list">
             <div className="stock-item">
               <img
-                src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
+                src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
                 alt="Sản phẩm"
               />
               <div className="stock-info">
@@ -330,7 +331,7 @@ export default function Home_admin() {
           <div className="stock-list">
             <div className="stock-item">
               <img
-                src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
+                src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
                 alt="Sản phẩm"
               />
               <div className="stock-info">
@@ -344,7 +345,7 @@ export default function Home_admin() {
           <div className="stock-list">
             <div className="stock-item">
               <img
-                src="/images/products/chaybo/GiàyNamJordanMaxAura.webp"
+                src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
                 alt="Sản phẩm"
               />
               <div className="stock-info">

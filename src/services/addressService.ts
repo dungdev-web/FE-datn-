@@ -9,51 +9,168 @@ export interface AddressPayload {
   [key: string]: any;
 }
 
-
-export async function getAddressByUserId(userId: number): Promise<AddressResponse> {
+export async function getAddressByUserId(
+  userId: number
+): Promise<AddressResponse> {
   try {
-    const res = await fetch(`${API_BASE_URL}/addresses/user/${userId}`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+    const res = await fetch(`${API_BASE_URL}/addresses/${userId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
     });
 
     if (!res.ok) {
       const errorData = await res.json();
-      console.error('[FE Service] Lỗi getAddressByUserId:', errorData);
-      throw new Error(errorData?.message || 'Lấy địa chỉ thất bại'); 
+      console.error("[FE Service] Lỗi getAddressByUserId:", errorData);
+      throw new Error(errorData?.message || "Lấy địa chỉ thất bại");
+    }
+    const data = await res.json();
+
+    return data;
+  } catch (error: any) {
+    console.error("[FE Service] Lỗi getAddressByUserId:", error);
+    throw new Error(error?.message || "Lỗi không xác định");
+  }
+}
+export const getAddressByIdService = async (
+  addressId: number
+): Promise<AddressResponse | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/addressesbyid/${addressId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Lỗi: ${res.status} - ${errorText}`);
     }
 
-    return await res.json();
+    const data = await res.json();
+    console.log("API response:", data);
+    
+    if (Array.isArray(data)) {
+      if (data.length > 0) {
+        console.log("Địa chỉ lấy thành công:", data[0]);
+        return data[0];
+      } else {
+        console.log("Không tìm thấy địa chỉ với ID:", addressId);
+        return null;
+      }
+    }
+    
+    console.log("Địa chỉ lấy thành công:", data);
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi lấy địa chỉ theo ID:", error);
+    return null;
+  }
+};
+export async function getDefaultAddressService(userId: number): Promise<AddressResponse | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/user_default_address/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Lỗi: ${res.status} - ${errorText}`);
+    }
+
+    const data = await res.json();
+    console.log("Địa chỉ mặc định:", data);
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi lấy địa chỉ mặc định:", error);
+    return null;
+  }
+}
+export async function updateAddress(
+  addressId: number,
+  payload: {
+    full_name: string;
+    phone: string;
+    address_line: string;
+    is_default?: boolean;
+  }
+): Promise<any> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      console.error("[FE Service] ❌ Lỗi updateAddress:", result);
+      throw new Error(result?.error || result?.message || "Cập nhật thất bại");
+    }
+
+    return result;
   } catch (error: any) {
-    console.error('[FE Service] Lỗi getAddressByUserId:', error);
-    throw new Error(error?.message || 'Lỗi không xác định');
+    console.error("[FE Service] ❌ Exception updateAddress:", error);
+    throw new Error(error?.message || "Lỗi không xác định");
   }
 }
 
-export async function updateAddress(
-  addressId: number,
-  payload: AddressPayload
-): Promise<AddressResponse> {
+export async function addAddressService(data: {
+  user_id?: number;
+  full_name: string;
+  phone: string;
+  address_line: string;
+  is_default?: boolean;
+}) {
+  console.log("🔍 Sending address payload:", data);
+
+  const response = await fetch(`${API_BASE_URL}/add-address`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    console.error("❌ Response error:", result);
+    throw new Error(result.error || "Lỗi khi thêm địa chỉ");
+  }
+
+  return result;
+}
+export async function deleteAddress(addressId: number): Promise<any> {
   try {
     const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
-      method: 'PUT',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
-      credentials: 'include',
+      credentials: "include",
     });
 
     if (!res.ok) {
       const errorData = await res.json();
-      console.error('[FE Service] Lỗi updateAddress:', errorData); // 👈 log chi tiết
-      throw new Error(errorData?.message || 'Cập nhật thất bại');   // 👈 luôn throw Error object
+      console.error("[FE Service] Lỗi deleteAddress:", errorData);
+      throw new Error(errorData?.message || "Xoá địa chỉ thất bại");
     }
 
-    return await res.json();
+    const data = await res.json();
+    console.log("[FE Service] Xoá địa chỉ thành công:", data);
+    return data;
   } catch (error: any) {
-    console.error('[FE Service] Lỗi updateAddress:', error);
-    throw new Error(error?.message || 'Lỗi không xác định');
+    console.error("[FE Service] Lỗi deleteAddress:", error);
+    throw new Error(error?.message || "Lỗi không xác định khi xoá địa chỉ");
   }
 }
