@@ -159,8 +159,8 @@ export default function OrderDetail() {
             const fallbackAddress: AddressResponse = {
               ship_address_id: orderData.shipping_address_id,
               user: user || null,
-              id: orderData.shipping_address_id || 0, // hoặc 0 nếu không có id
-              length: 0, // bạn có thể cập nhật lại nếu cần
+              id: orderData.shipping_address_id || 0,
+              length: 0,
               full_name: user?.name || "Khách hàng",
               phone: user?.phone || "Chưa cập nhật",
               address_line: "Lỗi tải địa chỉ",
@@ -311,6 +311,7 @@ export default function OrderDetail() {
       setActionLoading(false);
     }
   };
+
   const handleTrackOrder = () => {
     router.push(`/account/order/track/${orderId}`);
   };
@@ -319,10 +320,23 @@ export default function OrderDetail() {
     router.push(`/account/order/review/${orderId}`);
   };
 
+  const handleBuyAgain = () => {
+    // Logic để thêm lại tất cả sản phẩm vào giỏ hàng
+    router.push('/cart');
+  };
+
+  const handleViewProducts = () => {
+    // Logic để xem lại các sản phẩm trong đơn hàng đã hủy
+    // Có thể navigate đến trang danh sách sản phẩm hoặc hiển thị modal
+    console.log("Xem lại sản phẩm trong đơn hàng đã hủy");
+  };
+
+  // Cập nhật logic hiển thị các nút action
   const canCancelOrder =
     order?.status === "pending" || order?.status === "processing";
   const canConfirmReceived = order?.status === "shipping";
-  const canReviewProducts = order?.status === "completed";
+  const canReviewAndBuyAgain = order?.status === "delivered";
+  const canViewProducts = order?.status === "cancelled";
   const canTrackOrder = [
     "shipping",
     "delivered",
@@ -453,12 +467,29 @@ export default function OrderDetail() {
                 </button>
               )}
 
-              {canReviewProducts && (
+              {canReviewAndBuyAgain && (
+                <>
+                  <button
+                    onClick={handleReviewProducts}
+                    className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
+                  >
+                    Đánh giá sản phẩm
+                  </button>
+                  <button
+                    onClick={handleBuyAgain}
+                    className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
+                  >
+                    Mua lại
+                  </button>
+                </>
+              )}
+
+              {canViewProducts && (
                 <button
-                  onClick={handleReviewProducts}
-                  className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
+                  onClick={handleViewProducts}
+                  className="bg-gray-600 hover:bg-gray-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
                 >
-                  Đánh giá sản phẩm
+                  Xem lại sản phẩm
                 </button>
               )}
 
