@@ -102,7 +102,6 @@ export default function Banner3D() {
       <div className="absolute inset-0 bg-black/10"></div>
 
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 items-center !gap-4 md:!gap-6 lg:!gap-8 !px-4 sm:px-6 lg:!px-8 !py-8 md:!py-12 relative z-10">
-        {/* Content Section */}
         <div className="flex flex-col space-y-4 lg:space-y-6 order-2 lg:order-1">
           <div className="relative h-auto min-h-[350px] md:min-h-[400px] lg:min-h-[450px] overflow-hidden">
             {slides.map((slide, i) => (
@@ -166,8 +165,6 @@ export default function Banner3D() {
               </div>
             ))}
           </div>
-
-          {/* Pagination Dots */}
           <div className="flex justify-center !gap-2">
             {slides.map((_, i) => (
               <button
@@ -182,8 +179,6 @@ export default function Banner3D() {
             ))}
           </div>
         </div>
-
-        {/* 3D Model Section */}
         <div className="w-full h-[300px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[550px] bg-transparent order-1 lg:order-2">
           <Canvas
             camera={{
@@ -210,7 +205,6 @@ export default function Banner3D() {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
       <button
         onClick={prevSlide}
         className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-600 !p-2 sm:!p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-20 text-lg sm:text-xl"
