@@ -322,7 +322,7 @@ export default function OrderDetail() {
 
   const handleBuyAgain = () => {
     // Logic để thêm lại tất cả sản phẩm vào giỏ hàng
-    router.push('/cart');
+    router.push("/cart");
   };
 
   const handleViewProducts = () => {
