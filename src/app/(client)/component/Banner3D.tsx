@@ -154,10 +154,10 @@ export default function Banner3D() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row !gap-3 !pt-2">
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm sm:text-base lg:text-lg !px-6 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                       MUA NGAY
                     </button>
-                    <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold text-sm sm:text-base lg:text-lg !px-6 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full transition-all duration-300">
+                    <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full transition-all duration-300">
                       CHI TIẾT
                     </button>
                   </div>
