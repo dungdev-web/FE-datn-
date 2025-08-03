@@ -293,6 +293,7 @@ export const checkoutOrder = async (
 export const getZaloPayOrderStatus = async (
   appTransId: string
 ): Promise<{
+  order_id: any;
   return_code: number;
   return_message: string;
   sub_return_code: number;

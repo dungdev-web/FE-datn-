@@ -124,11 +124,9 @@ export default function Checkout() {
   const searchParams = useSearchParams();
   useEffect(() => {
     const payment = searchParams.get("payment");
-    const orderId = searchParams.get("orderId");
-
-    if (payment === "success" && orderId) {
-      const transId = localStorage.getItem("zalopay_app_trans_id");
-
+    const orderIdParam = searchParams.get("orderId");
+    const transId = localStorage.getItem("zalopay_app_trans_id");
+    if (payment === "success") {
       if (!transId) {
         Swal.fire({
           icon: "error",
@@ -142,15 +140,20 @@ export default function Checkout() {
 
       getZaloPayOrderStatus(transId)
         .then((status) => {
-          if (status.return_code === 1) {
+    
+
+          if (status.return_code === 1 && status.order_id) {
             Swal.fire({
               icon: "success",
               title: "Thanh toán thành công!",
-              text: `Mã đơn hàng: ${orderId}`,
+              text: `Mã đơn hàng: ${status.order_id}`,
             }).then(() => {
               localStorage.removeItem("zalopay_app_trans_id");
-              setCartCount(0); // thêm dòng này
-              router.push(`/payment_successful?orderId=${orderId}`);
+
+              // 👉 Chỉ redirect nếu param orderId khác order_id từ BE
+              if (orderIdParam !== String(status.order_id)) {
+                router.push(`/payment_successful?orderId=${status.order_id}`);
+              }
             });
           } else {
             Swal.fire({
@@ -162,7 +165,8 @@ export default function Checkout() {
             });
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error("💥 Lỗi khi gọi checkStatus:", err);
           Swal.fire({
             icon: "error",
             title: "Lỗi khi kiểm tra trạng thái thanh toán",
@@ -521,11 +525,11 @@ export default function Checkout() {
             }}
           />
           <label htmlFor="bank_transfer">Chuyển khoản (ZaloPay)</label>
-                <img
-        src={`${API_BASE_URL}/uploads/logo_zalopay.png`}
-        alt="ZaloPay"
-        className="w-7 h-auto border-1 border-blue-500 ring-2 ring-blue-200 rounded"
-      />
+          <img
+            src={`${API_BASE_URL}/uploads/logo_zalopay.png`}
+            alt="ZaloPay"
+            className="w-7 h-auto border-1 border-blue-500 ring-2 ring-blue-200 rounded"
+          />
         </div>
 
         <div className="boc1 flex items-center gap-2">
@@ -541,7 +545,7 @@ export default function Checkout() {
             }}
           />
           <label htmlFor="cod">Thanh toán khi nhận hàng</label>
-            
+
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
       </div>
