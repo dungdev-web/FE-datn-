@@ -98,7 +98,7 @@ export default function Blog() {
                 <div className="box-blog" key={item.post_id}>
                   <Link href="#" onClick={handleViewDetail}>
                   <img
-                    src={`${API_BASE_URL}/uploads/blog/${item.images}`}
+                    src={`${API_BASE_URL}/uploads/blog/${item.thumbnail}`}
                     alt={item.title}
                   />
                   </Link >

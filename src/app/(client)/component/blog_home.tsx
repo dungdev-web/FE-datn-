@@ -48,7 +48,7 @@ export default function BlogHome() {
         <SwiperSlide key={item.post_id}>
           <div className="blog-item">
             <img
-              src={`${API_BASE_URL}/uploads/blog/${item.images}`}
+              src={`${API_BASE_URL}/uploads/blog/${item.thumbnail}`}
               alt={item.title}
             />
             <div className="blog-info">

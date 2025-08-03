@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCategory } from "@/services/blogService";
-import { getPostsByCategory } from "@/services/blogService";
-import { IBlog,Category } from "@/types/blog";
+import { getPostsByCategory,addPost } from "@/services/blogService";
+import { IBlog,Category,IBlogCreate } from "@/types/blog";
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
