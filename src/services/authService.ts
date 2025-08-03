@@ -163,6 +163,28 @@ export async function registerUser(
 
   return data;
 }
+export async function confirmEmailService(email: string, token: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/confirm-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, token }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Xác nhận email thất bại.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[Service] Lỗi xác nhận email:", error);
+    throw error;
+  }
+}
 
 // --------- GET USER INFO ---------
 export async function getInfoUser(id: number | string): Promise<IUser> {

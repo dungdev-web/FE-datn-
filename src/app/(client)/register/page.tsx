@@ -59,7 +59,7 @@ export default function Register() {
         timer: 2000,
         timerProgressBar: true,
       });
-      window.location.href = "/login";
+      window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
     } catch (err: any) {
       Swal.fire({
         title: "Đăng ký thất bại",
