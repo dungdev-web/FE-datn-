@@ -15,6 +15,7 @@ import { AddressResponse } from "@/types/address";
 import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
 import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
+import Swal from "sweetalert2";
 
 export default function OrderDetail() {
   const params = useParams();
@@ -158,8 +159,8 @@ export default function OrderDetail() {
             const fallbackAddress: AddressResponse = {
               ship_address_id: orderData.shipping_address_id,
               user: user || null,
-              id: orderData.shipping_address_id || 0, // hoặc 0 nếu không có id
-              length: 0, // bạn có thể cập nhật lại nếu cần
+              id: orderData.shipping_address_id || 0,
+              length: 0,
               full_name: user?.name || "Khách hàng",
               phone: user?.phone || "Chưa cập nhật",
               address_line: "Lỗi tải địa chỉ",
@@ -229,29 +230,53 @@ export default function OrderDetail() {
   // Hàm xử lý hủy đơn hàng
   const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
-      alert("Vui lòng nhập lý do hủy đơn hàng");
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu lý do",
+        text: "Vui lòng nhập lý do hủy đơn hàng",
+      });
       return;
     }
 
+    const result = await Swal.fire({
+      icon: "question",
+      title: "Bạn có chắc muốn hủy đơn hàng?",
+      text: "Hành động này không thể hoàn tác.",
+      showCancelButton: true,
+      confirmButtonText: "Hủy đơn",
+      cancelButtonText: "Quay lại",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setActionLoading(true);
-      // Gọi API hủy đơn hàng
-      // const response = await cancelOrderService(orderId, cancelReason);
 
-      // Giả lập API call
+      await updateOrderStatus(orderId, "cancelled");
+
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Cập nhật trạng thái đơn hàng
       if (order) {
         setOrder({ ...order, status: "cancelled" });
       }
 
       setShowCancelModal(false);
       setCancelReason("");
-      alert("Hủy đơn hàng thành công!");
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã hủy đơn hàng",
+        text: "Hủy đơn hàng thành công!",
+      });
     } catch (error) {
       console.error("Lỗi khi hủy đơn hàng:", error);
-      alert("Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại!");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại!",
+      });
     } finally {
       setActionLoading(false);
     }
@@ -267,14 +292,21 @@ export default function OrderDetail() {
         setOrder({ ...order, status: "delivered" });
       }
 
-      alert("Xác nhận đã nhận hàng thành công!");
+      Swal.fire({
+        icon: "success",
+        title: "Đã nhận hàng",
+        text: "Xác nhận đã nhận hàng thành công!",
+      });
     } catch (error) {
       console.error("Lỗi khi xác nhận nhận hàng:", error);
-      alert(
-        error instanceof Error
-          ? error.message
-          : "Có lỗi xảy ra khi xác nhận nhận hàng. Vui lòng thử lại!"
-      );
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Có lỗi xảy ra khi xác nhận nhận hàng. Vui lòng thử lại!",
+      });
     } finally {
       setActionLoading(false);
     }
@@ -288,10 +320,23 @@ export default function OrderDetail() {
     router.push(`/account/order/review/${orderId}`);
   };
 
+  const handleBuyAgain = () => {
+    // Logic để thêm lại tất cả sản phẩm vào giỏ hàng
+    router.push("/cart");
+  };
+
+  const handleViewProducts = () => {
+    // Logic để xem lại các sản phẩm trong đơn hàng đã hủy
+    // Có thể navigate đến trang danh sách sản phẩm hoặc hiển thị modal
+    console.log("Xem lại sản phẩm trong đơn hàng đã hủy");
+  };
+
+  // Cập nhật logic hiển thị các nút action
   const canCancelOrder =
     order?.status === "pending" || order?.status === "processing";
   const canConfirmReceived = order?.status === "shipping";
-  const canReviewProducts = order?.status === "completed";
+  const canReviewAndBuyAgain = order?.status === "delivered";
+  const canViewProducts = order?.status === "cancelled";
   const canTrackOrder = [
     "shipping",
     "delivered",
@@ -406,7 +451,7 @@ export default function OrderDetail() {
                 <button
                   onClick={() => setShowCancelModal(true)}
                   disabled={actionLoading}
-                  className="bg-red-600 hover:bg-red-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-red-600 hover:bg-red-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {actionLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
                 </button>
@@ -416,25 +461,42 @@ export default function OrderDetail() {
                 <button
                   onClick={handleConfirmReceived}
                   disabled={actionLoading}
-                  className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {actionLoading ? "Đang xử lý..." : "Đã nhận được hàng"}
                 </button>
               )}
 
-              {canReviewProducts && (
+              {canReviewAndBuyAgain && (
+                <>
+                  <button
+                    onClick={handleReviewProducts}
+                    className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
+                  >
+                    Đánh giá sản phẩm
+                  </button>
+                  <button
+                    onClick={handleBuyAgain}
+                    className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
+                  >
+                    Mua lại
+                  </button>
+                </>
+              )}
+
+              {canViewProducts && (
                 <button
-                  onClick={handleReviewProducts}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  onClick={handleViewProducts}
+                  className="bg-gray-600 hover:bg-gray-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
                 >
-                  Đánh giá sản phẩm
+                  Xem lại sản phẩm
                 </button>
               )}
 
               {canTrackOrder && (
                 <button
                   onClick={handleTrackOrder}
-                  className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-lg font-medium transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
                 >
                   Theo dõi đơn hàng
                 </button>

@@ -16,7 +16,9 @@ import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useRouter } from "next/navigation";
-import { checkoutOrder } from "@/services/cartService";
+import { checkoutOrder, getZaloPayOrderStatus } from "@/services/cartService";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { useSearchParams } from "next/navigation";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -114,6 +116,66 @@ export default function Checkout() {
 
   const [couponInput, setCouponInput] = useState("");
   const discountAmount = getDiscountAmount();
+  const { setCartCount, setWishlistCount, setCompareCount, setOrderCount } =
+    useGlobalStore();
+  const [paymentCode, setPaymentCode] = useState<"zalopay" | "momo" | null>(
+    null
+  );
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const payment = searchParams.get("payment");
+    const orderIdParam = searchParams.get("orderId");
+    const transId = localStorage.getItem("zalopay_app_trans_id");
+    if (payment === "success") {
+      if (!transId) {
+        Swal.fire({
+          icon: "error",
+          title: "Thiếu thông tin giao dịch",
+          text: "Không tìm thấy mã giao dịch để kiểm tra trạng thái.",
+        }).then(() => {
+          router.push("/checkout");
+        });
+        return;
+      }
+
+      getZaloPayOrderStatus(transId)
+        .then((status) => {
+    
+
+          if (status.return_code === 1 && status.order_id) {
+            Swal.fire({
+              icon: "success",
+              title: "Thanh toán thành công!",
+              text: `Mã đơn hàng: ${status.order_id}`,
+            }).then(() => {
+              localStorage.removeItem("zalopay_app_trans_id");
+
+              // 👉 Chỉ redirect nếu param orderId khác order_id từ BE
+              if (orderIdParam !== String(status.order_id)) {
+                router.push(`/payment_successful?orderId=${status.order_id}`);
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: "warning",
+              title: "Giao dịch chưa hoàn tất",
+              text: "ZaloPay chưa xử lý xong hoặc bị huỷ.",
+            }).then(() => {
+              router.push("/checkout");
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("💥 Lỗi khi gọi checkStatus:", err);
+          Swal.fire({
+            icon: "error",
+            title: "Lỗi khi kiểm tra trạng thái thanh toán",
+          }).then(() => {
+            router.push("/checkout");
+          });
+        });
+    }
+  }, []);
 
   useEffect(() => {
     if (defaultAddress) {
@@ -224,27 +286,62 @@ export default function Checkout() {
       return;
     }
 
+    if (paymentMethodId === 2 && !paymentCode) {
+      Swal.fire({
+        icon: "warning",
+        title: "Vui lòng chọn hình thức chuyển khoản (ZaloPay hoặc MoMo)",
+      });
+      return;
+    }
+
     try {
+      const payment_method =
+        paymentMethodId === 2
+          ? { id: 2, code: paymentCode || "zalopay" }
+          : { id: 1, code: "cod" };
+
       const payload = {
         user_id: user.id,
         shipping_address_id: selectedAddressId,
-        payment_method: { id: paymentMethodId },
+        payment_method,
         coupon_code: appliedCoupons[0]?.code,
         shipping_fee: shippingFee,
         comment: comment || undefined,
       };
+
       const response = await checkoutOrder(payload);
 
+      // Nếu là chuyển khoản (ZaloPay, MoMo) → redirect sang cổng thanh toán
+      if (response.payment?.order_url) {
+        // ✅ Lưu app_trans_id để kiểm tra trạng thái sau này
+        if (response.payment.app_trans_id) {
+          localStorage.setItem(
+            "zalopay_app_trans_id",
+            response.payment.app_trans_id
+          );
+        }
+
+        localStorage.setItem(
+          "checkout_shipping_fee",
+          JSON.stringify(shippingFee)
+        );
+
+        window.location.href = response.payment.order_url;
+        return;
+      }
+
+      // Nếu là COD → hiển thị thông báo và chuyển hướng
       Swal.fire({
         icon: "success",
         title: "Đặt hàng thành công!",
         text: response.message,
       }).then(() => {
+        setCartCount(0);
         localStorage.setItem(
           "checkout_shipping_fee",
           JSON.stringify(shippingFee)
         );
-        router.push(`/payment_successful?orderId=${response.data.orders_id}`);
+        router.push(`/payment_successful?orderId=${response.order.orders_id}`);
       });
     } catch (error: any) {
       Swal.fire({
@@ -422,10 +519,17 @@ export default function Checkout() {
             id="bank_transfer"
             value="2"
             checked={paymentMethodId === 2}
-            onChange={() => setPaymentMethodId(2)}
+            onChange={() => {
+              setPaymentMethodId(2);
+              setPaymentCode("zalopay"); // ✅ Gán luôn ZaloPay
+            }}
           />
-          <label htmlFor="bank_transfer">Chuyển khoản</label>
-          <i className="fa-solid fa-money-bill text-[#021688]"></i>
+          <label htmlFor="bank_transfer">Chuyển khoản (ZaloPay)</label>
+          <img
+            src={`${API_BASE_URL}/uploads/logo_zalopay.png`}
+            alt="ZaloPay"
+            className="w-7 h-auto border-1 border-blue-500 ring-2 ring-blue-200 rounded"
+          />
         </div>
 
         <div className="boc1 flex items-center gap-2">
@@ -435,9 +539,13 @@ export default function Checkout() {
             id="cod"
             value="1"
             checked={paymentMethodId === 1}
-            onChange={() => setPaymentMethodId(1)}
+            onChange={() => {
+              setPaymentMethodId(1);
+              setPaymentCode(""); // Xóa paymentCode khi chọn COD
+            }}
           />
           <label htmlFor="cod">Thanh toán khi nhận hàng</label>
+
           <i className="fa-solid fa-money-bill text-[#021688]"></i>
         </div>
       </div>

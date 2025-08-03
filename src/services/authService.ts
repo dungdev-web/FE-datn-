@@ -242,7 +242,7 @@ export async function sendResetPassword(
     return { message: "Đã gửi mã OTP đến email", otp };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/send-reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/forget`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -280,7 +280,7 @@ export async function resetPassword(
     return { message: "Đổi mật khẩu thành công" };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, otp, newPassword }),
