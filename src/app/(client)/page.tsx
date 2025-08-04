@@ -39,7 +39,7 @@ export default function Home() {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
-
+ 
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
 
   const handlePlay = () => {
@@ -242,11 +242,12 @@ export default function Home() {
         <div className="marquee-wrapper">
           <div className="marquee" ref={marqueeRef}>
             <div className="marquee-content">
-              <span>⚡ ƯU ĐÃI CỰC HẤP DẪN CHO NHỮNG ĐƠN HÀNG LỚN</span>
-              <span>⚡ MIỄN PHÍ VẬN CHUYỂN CHO MỌI ĐƠN HÀNG TỪ 3TR</span>
-              <span>⚡ NHẬP MÃ *FREESHIP* ĐỂ MIỄN PHÍ SHIP TỪ 500K</span>
-              <span>⚡ NHẶT MÃ GIẢM GIÁ SIÊU HỜI CHO CÁC ĐƠN HÀNG</span>
-              <span>⚡ ƯU ĐÃI HẤP DẪN – FREESHIP TOÀN QUỐC ĐƠN TỪ 3TR ⚡</span>
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K 599K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH</span>
+              <span>⚡ GIẢM 20% CHO ĐH TỪ 1.500K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K</span>
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K ⚡</span>
             </div>
           </div>
         </div>
@@ -281,25 +282,17 @@ export default function Home() {
               ở bất cứ nơi đâu bạn đến.
             </p>
             <div className="buttons">
-              <button>
-                <Link className="btn-lookbook" href={`/product?gender=nam`}>
-                  GIÀY NAM
-                </Link>
-              </button>
-              <button>
-                <Link className="btn-lookbook" href={`/product?gender=nữ`}>
-                  GIÀY NỮ
-                </Link>
-              </button>
+              <button ><Link  className="btn-lookbook"  href={`/product?gender=nam`}>GIÀY NAM</Link></button>  
+              <button ><Link  className="btn-lookbook"  href={`/product?gender=nữ`}>GIÀY NỮ</Link></button> 
             </div>
           </div>
 
           <HotspotLookbook
-            openIndex={openIndex}
-            setOpenIndex={setOpenIndex}
-            togglePopup={togglePopup}
-            containerRef={containerRef}
-          />
+        openIndex={openIndex}
+        setOpenIndex={setOpenIndex}
+        togglePopup={togglePopup}
+        containerRef={containerRef}
+      />
         </div>
         <div className="shipping-main">
           <div className="shipping1">
@@ -322,7 +315,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM MỚI NHẤT</h1>
             <h4>
-              <Link href="/product"> Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
+              <a href="">–– Xem tất cả</a>
             </h4>
           </div>
 
@@ -366,20 +359,14 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
-                          "/images/placeholder.png"
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
+
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons
-                      productId={productId}
-                      variant_id={
-                        product.product_variants[0]?.product_variants_id
-                      }
-                      price={product.sale_price}
-                    />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
 
                     <span className="tag-discount">-{discount}%</span>
                   </div>
@@ -438,7 +425,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
             <h4>
-              <Link href="/product">–– Xem tất cả<i className="fa-solid fa-angles-right"></i></Link>
+              <a href="">–– Xem tất cả</a>
             </h4>
           </div>
 
@@ -484,20 +471,15 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
-                          "/images/placeholder.png"
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
+
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons
-                      productId={productId}
-                      variant_id={
-                        product.product_variants[0]?.product_variants_id
-                      }
-                      price={product.sale_price}
-                    />
+                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
+
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
