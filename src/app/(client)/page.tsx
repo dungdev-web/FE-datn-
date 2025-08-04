@@ -216,7 +216,7 @@ export default function Home() {
         </Swiper>
       </div> */}
       <Banner3D />
-      <main>
+      <main className="!mt-16 sm:!mt-0">
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
           <h1>DANH MỤC SẢN PHẨM</h1>
