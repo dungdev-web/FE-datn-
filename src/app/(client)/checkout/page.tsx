@@ -541,7 +541,7 @@ export default function Checkout() {
             checked={paymentMethodId === 1}
             onChange={() => {
               setPaymentMethodId(1);
-              setPaymentCode(""); // Xóa paymentCode khi chọn COD
+              setPaymentCode(null); // Xóa paymentCode khi chọn COD
             }}
           />
           <label htmlFor="cod">Thanh toán khi nhận hàng</label>
