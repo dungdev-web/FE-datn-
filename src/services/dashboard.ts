@@ -19,8 +19,8 @@ const getToday = () => {
   return `${year}-${month}-${day}`;
 };
 export const getRevernueWeekly = () => fetchDashboardData(`revenue/weekly?date=${getToday()}`);
-export const getRevernueMonthly = () => fetchDashboardData(`revenue/monthly?date=${getToday()}`);
-// export const getRevernueYearly = () => fetchDashboardData("revenue/yearly");
+// export const getRevernueMonthly = () => fetchDashboardData(`revenue/monthly?date=${getToday()}`);
+export const getRevernueYearly = () => fetchDashboardData(`revenue/yearly?date=${getToday()}`);
 export const getTotalRevenueByDay = () => fetchDashboardData(`revenue/totalbyday?date=${getToday()}`);
 export const getTotalRevenueByWeek = () => fetchDashboardData(`revenue/totalbyweek?week=${getToday()}`);
 export const getTotalRevenueByMonth = () => fetchDashboardData(`revenue/totalbymonth?month=${getToday()}`);

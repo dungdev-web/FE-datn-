@@ -13,7 +13,7 @@ import {
   TooltipItem,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
-import { getRevernueWeekly, getRevernueMonthly } from "@/services/dashboard";
+import { getRevernueWeekly, getRevernueYearly } from "@/services/dashboard";
 
 ChartJS.register(
   CategoryScale,
@@ -67,9 +67,9 @@ const RevenueAndVisitsChart = () => {
   useEffect(() => {
     const fetchMonthlyRevenue = async () => {
       try {
-        const data = await getRevernueMonthly();
+        const data = await getRevernueYearly();
 
-        const labelList = data.map((item: any) => item.day); // giữ nguyên "01/08", "02/08", ...
+        const labelList = data.map((item: any) => item.month); 
         const revenueList = data.map((item: any) => item.revenue);
 
         setLabelsMonthly(labelList);
