@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,6 +13,7 @@ import {
   TooltipItem,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
+import { getRevernueWeekly, getRevernueYearly } from "@/services/dashboard";
 
 ChartJS.register(
   CategoryScale,
@@ -24,15 +26,68 @@ ChartJS.register(
   Legend
 );
 
+const dayMap: { [key: string]: string } = {
+  Monday: "Thứ 2",
+  Tuesday: "Thứ 3",
+  Wednesday: "Thứ 4",
+  Thursday: "Thứ 5",
+  Friday: "Thứ 6",
+  Saturday: "Thứ 7",
+  Sunday: "CN",
+};
+
 const RevenueAndVisitsChart = () => {
-  const labels = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
+  const [labelsWeekly, setLabelsWeekly] = useState<string[]>([]);
+  const [labelsMonthly, setLabelsMonthly] = useState<string[]>([]);
+  const [revenuesWeekly, setRevenuesWeekly] = useState<number[]>([]);
+  const [revenuesMonthly, setRevenuesMonthly] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchWeeklyRevenue = async () => {
+      try {
+        const data = await getRevernueWeekly();
+
+        const labelList = data.map((item: any) => {
+          const [engDay] = item.day.split(" ");
+          return dayMap[engDay] || engDay;
+        });
+
+        const revenueList = data.map((item: any) => item.revenue);
+
+        setLabelsWeekly(labelList);
+        setRevenuesWeekly(revenueList);
+      } catch (err) {
+        console.error("Lỗi khi fetch doanh thu tuần:", err);
+      }
+    };
+
+    fetchWeeklyRevenue();
+  }, []);
+
+  useEffect(() => {
+    const fetchMonthlyRevenue = async () => {
+      try {
+        const data = await getRevernueYearly();
+
+        const labelList = data.map((item: any) => item.month); 
+        const revenueList = data.map((item: any) => item.revenue);
+
+        setLabelsMonthly(labelList);
+        setRevenuesMonthly(revenueList);
+      } catch (err) {
+        console.error("Lỗi khi fetch doanh thu tháng:", err);
+      }
+    };
+
+    fetchMonthlyRevenue();
+  }, []);
 
   const revenueData = {
-    labels,
+    labels: labelsWeekly,
     datasets: [
       {
-        label: "Doanh thu (VNĐ)",
-        data: [1200000, 1500000, 1100000, 1800000, 1700000, 2000000, 2200000],
+        label: "Doanh thu theo tuần (VNĐ)",
+        data: revenuesWeekly,
         backgroundColor: "rgba(0, 123, 255, 0.2)",
         borderColor: "rgba(0, 123, 255, 1)",
         borderWidth: 2,
@@ -43,12 +98,12 @@ const RevenueAndVisitsChart = () => {
     ],
   };
 
-  const visitData = {
-    labels,
+  const revenueMonthlyData = {
+    labels: labelsMonthly,
     datasets: [
       {
-        label: "Lượt truy cập",
-        data: [320, 450, 380, 600, 570, 710, 800],
+        label: "Doanh thu theo tháng (VNĐ)",
+        data: revenuesMonthly,
         backgroundColor: "rgba(40, 167, 69, 0.5)",
         borderColor: "rgba(40, 167, 69, 1)",
         borderWidth: 1,
@@ -65,13 +120,7 @@ const RevenueAndVisitsChart = () => {
             const value = context.raw as number;
             const label = context.dataset.label;
 
-            if (label?.includes("Doanh thu")) {
-              return `${label}: ${value.toLocaleString("vi-VN")} ₫`;
-            }
-
-            return label
-              ? `${label}: ${value.toLocaleString("vi-VN")}`
-              : `${value.toLocaleString("vi-VN")}`;
+            return `${label ?? ""}: ${value.toLocaleString("vi-VN")} ₫`;
           },
         },
       },
@@ -97,8 +146,8 @@ const RevenueAndVisitsChart = () => {
       </div>
 
       <div className="chart-container">
-        <h3>📈 Lượt truy cập theo tuần</h3>
-        <Bar data={visitData} options={commonOptions} />
+        <h3>📈 Doanh thu theo tháng</h3>
+        <Bar data={revenueMonthlyData} options={commonOptions} />
       </div>
     </div>
   );

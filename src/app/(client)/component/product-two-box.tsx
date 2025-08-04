@@ -31,7 +31,7 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
       <div className="content">
         <h3>{products[0]?.category?.name}</h3>
         <p>
-          Xem tất cả <i className="fa-solid fa-angles-right"></i>
+          <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
         </p>
       </div>
       <div className="flex w-full">

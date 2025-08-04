@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import "../css/checkout.css";
 import { District, Province, Ward } from "@/types/Country";
 import { useAuthUser } from "@/hooks/useAuthUser";

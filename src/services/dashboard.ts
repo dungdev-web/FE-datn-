@@ -11,11 +11,22 @@ async function fetchDashboardData(endpoint: string) {
     throw error;
   }
 }
-
-// export const getRevernueWeekly = () => fetchDashboardData("revenue/weekly");
-// export const getRevernueMonthly = () => fetchDashboardData("revenue/monthly");
-// export const getRevernueYearly = () => fetchDashboardData("revenue/yearly");
-
+const getToday = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+export const getRevernueWeekly = () => fetchDashboardData(`revenue/weekly?date=${getToday()}`);
+// export const getRevernueMonthly = () => fetchDashboardData(`revenue/monthly?date=${getToday()}`);
+export const getRevernueYearly = () => fetchDashboardData(`revenue/yearly?date=${getToday()}`);
+export const getTotalRevenueByDay = () => fetchDashboardData(`revenue/totalbyday?date=${getToday()}`);
+export const getTotalRevenueByWeek = () => fetchDashboardData(`revenue/totalbyweek?week=${getToday()}`);
+export const getTotalRevenueByMonth = () => fetchDashboardData(`revenue/totalbymonth?month=${getToday()}`);
+export const getTotalRevenueByYear = () => fetchDashboardData(`revenue/totalbyyear?year=${getToday()}`);
+export const getStockinProduct = () => fetchDashboardData("stock");
+export const getBestSSellingProducts = () => fetchDashboardData("best-selling-products");
 export const getCountProduct = () => fetchDashboardData("products");
 export const getCountBrand = () => fetchDashboardData("brands");
 export const getCountCategories = () => fetchDashboardData("categories");
