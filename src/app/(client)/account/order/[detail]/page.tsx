@@ -191,7 +191,6 @@ export default function OrderDetail() {
     }
   }, [orderId]);
 
-  // Cải thiện logic hiển thị trạng thái với icon và màu sắc
   const getShippingStatusInfo = (status: string) => {
     switch (status) {
       case "pending":
@@ -277,7 +276,6 @@ export default function OrderDetail() {
     }
   };
 
-  // Cập nhật logic xử lý các action theo trạng thái
   const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
       Swal.fire({
@@ -402,7 +400,6 @@ export default function OrderDetail() {
     });
   };
 
-  // Logic hiển thị các nút action theo trạng thái
   const getActionButtons = () => {
     const status = order?.status;
     const buttons = [];
@@ -516,7 +513,6 @@ export default function OrderDetail() {
     return buttons;
   };
 
-  // Tính toán ngày dự kiến giao hàng
   const getEstimatedDeliveryDate = () => {
     if (!order || order.status !== "shipping") return null;
 
@@ -1012,7 +1008,6 @@ export default function OrderDetail() {
         </div>
       </main>
 
-      {/* Modal hủy đơn hàng được cải thiện */}
       {showCancelModal && (
         <div className="fixed inset-0 !bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg !p-6 w-full max-w-md !mx-4 shadow-2xl">
@@ -1027,7 +1022,6 @@ export default function OrderDetail() {
               chúng tôi cải thiện dịch vụ tốt hơn.
             </p>
 
-            {/* Các lý do hủy có sẵn */}
             <div className="!mb-4">
               <p className="text-sm font-medium text-gray-700 !mb-2">
                 Lý do thường gặp:
