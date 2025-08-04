@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./css/style.css";
 import "./css/product.css";
-
+import "react-phone-input-2/lib/style.css";
 import Header from "./component/header";
 import Footer from "./component/footer";
 import ButtonToTop from "./component/ButtonToTop";
