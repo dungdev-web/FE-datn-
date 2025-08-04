@@ -191,24 +191,74 @@ export default function OrderDetail() {
     }
   }, [orderId]);
 
-  const getShippingStatusLabel = (status: string) => {
+  // Cải thiện logic hiển thị trạng thái với icon và màu sắc
+  const getShippingStatusInfo = (status: string) => {
     switch (status) {
       case "pending":
-        return "Chờ xử lý";
+        return {
+          label: "Chờ xác nhận",
+          icon: "⏳",
+          color: "text-yellow-600",
+          bgColor: "bg-yellow-100",
+          description: "Đơn hàng của bạn đang được xử lý",
+        };
+      case "confirmed":
       case "processing":
-        return "Đang xử lý";
+        return {
+          label: "Đã xác nhận, đang chuẩn bị hàng",
+          icon: "📦",
+          color: "text-blue-600",
+          bgColor: "bg-blue-100",
+          description: "Cửa hàng đang chuẩn bị hàng cho bạn",
+        };
       case "shipping":
-        return "Đang giao";
+        return {
+          label: "Đang giao hàng",
+          icon: "🚚",
+          color: "text-purple-600",
+          bgColor: "bg-purple-100",
+          description: "Đơn hàng đang trên đường giao đến bạn",
+        };
       case "delivered":
-        return "Đã giao";
+        return {
+          label: "Đã giao hàng",
+          icon: "✅",
+          color: "text-green-600",
+          bgColor: "bg-green-100",
+          description: "Đơn hàng đã được giao thành công",
+        };
       case "completed":
-        return "Hoàn thành";
+        return {
+          label: "Hoàn thành",
+          icon: "🎉",
+          color: "text-green-600",
+          bgColor: "bg-green-100",
+          description: "Giao hàng thành công",
+        };
       case "cancelled":
-        return "Đã hủy";
+        return {
+          label: "Đã hủy",
+          icon: "❌",
+          color: "text-red-600",
+          bgColor: "bg-red-100",
+          description: "Đơn hàng đã được hủy",
+        };
       case "returned":
-        return "Hoàn đơn";
+        return {
+          label: "Hoàn đơn",
+          icon: "🔄",
+          color: "text-orange-600",
+          bgColor: "bg-orange-100",
+          description: "Đơn hàng đã được hoàn trả",
+        };
       default:
-        return "Không xác định";
+        return {
+          label: "Không xác định",
+          icon: "❓",
+          color: "text-gray-600",
+          bgColor: "bg-gray-100",
+          description: "",
+        };
     }
   };
 
@@ -227,7 +277,7 @@ export default function OrderDetail() {
     }
   };
 
-  // Hàm xử lý hủy đơn hàng
+  // Cập nhật logic xử lý các action theo trạng thái
   const handleCancelOrder = async () => {
     if (!cancelReason.trim()) {
       Swal.fire({
@@ -325,26 +375,165 @@ export default function OrderDetail() {
     router.push("/cart");
   };
 
-  const handleViewProducts = () => {
-    // Logic để xem lại các sản phẩm trong đơn hàng đã hủy
-    // Có thể navigate đến trang danh sách sản phẩm hoặc hiển thị modal
-    console.log("Xem lại sản phẩm trong đơn hàng đã hủy");
+  const handleContactStore = () => {
+    // Logic liên hệ cửa hàng
+    Swal.fire({
+      icon: "info",
+      title: "Liên hệ cửa hàng",
+      html: `
+        <p>Bạn có thể liên hệ cửa hàng qua:</p>
+        <p><strong>Hotline:</strong> 0559947252</p>
+        <p><strong>Email:</strong> terashoesshop@gmail.com</p>
+      `,
+    });
   };
 
-  // Cập nhật logic hiển thị các nút action
-  const canCancelOrder =
-    order?.status === "pending" || order?.status === "processing";
-  const canConfirmReceived = order?.status === "shipping";
-  const canReviewAndBuyAgain = order?.status === "delivered";
-  const canViewProducts = order?.status === "cancelled";
-  const canTrackOrder = [
-    "shipping",
-    "delivered",
-    "cancelled",
-    "returned",
-  ].includes(order?.status || "");
+  const handleContactShipping = () => {
+    // Logic liên hệ đơn vị vận chuyển
+    Swal.fire({
+      icon: "info",
+      title: "Liên hệ vận chuyển",
+      html: `
+        <p>Mã vận đơn: <strong>VD${order?.orders_id
+          ?.toString()
+          .padStart(6, "0")}</strong></p>
+        <p>Bạn có thể liên hệ đơn vị vận chuyển để biết thêm chi tiết.</p>
+      `,
+    });
+  };
+
+  // Logic hiển thị các nút action theo trạng thái
+  const getActionButtons = () => {
+    const status = order?.status;
+    const buttons = [];
+
+    switch (status) {
+      case "pending":
+        buttons.push(
+          <button
+            key="cancel"
+            onClick={() => setShowCancelModal(true)}
+            disabled={actionLoading}
+            className="bg-red-600 hover:bg-red-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {actionLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
+          </button>
+        );
+        break;
+
+      case "confirmed":
+      case "processing":
+        buttons.push(
+          <button
+            key="track"
+            onClick={handleTrackOrder}
+            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Theo dõi đơn hàng
+          </button>,
+          <button
+            key="contact"
+            onClick={handleContactStore}
+            className="bg-gray-600 hover:bg-gray-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Liên hệ cửa hàng
+          </button>
+        );
+        break;
+
+      case "shipping":
+        buttons.push(
+          <button
+            key="confirm"
+            onClick={handleConfirmReceived}
+            disabled={actionLoading}
+            className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {actionLoading ? "Đang xử lý..." : "Đã nhận được hàng"}
+          </button>,
+          <button
+            key="track"
+            onClick={handleTrackOrder}
+            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Theo dõi đơn hàng
+          </button>,
+          <button
+            key="contact-shipping"
+            onClick={handleContactShipping}
+            className="bg-purple-600 hover:bg-purple-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Liên hệ vận chuyển
+          </button>
+        );
+        break;
+
+      case "delivered":
+      case "completed":
+        buttons.push(
+          <button
+            key="review"
+            onClick={handleReviewProducts}
+            className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Đánh giá sản phẩm
+          </button>,
+          <button
+            key="buy-again"
+            onClick={handleBuyAgain}
+            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Mua lại
+          </button>
+        );
+        break;
+
+      case "cancelled":
+        buttons.push(
+          <button
+            key="buy-again"
+            onClick={handleBuyAgain}
+            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Mua lại sản phẩm
+          </button>
+        );
+        break;
+
+      case "returned":
+        buttons.push(
+          <button
+            key="track"
+            onClick={handleTrackOrder}
+            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+          >
+            Theo dõi hoàn đơn
+          </button>
+        );
+        break;
+    }
+
+    return buttons;
+  };
+
+  // Tính toán ngày dự kiến giao hàng
+  const getEstimatedDeliveryDate = () => {
+    if (!order || order.status !== "shipping") return null;
+
+    const orderDate = new Date(order.created_at);
+    const estimatedDate = new Date(
+      orderDate.getTime() + 3 * 24 * 60 * 60 * 1000
+    ); // +3 ngày
+
+    return estimatedDate.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   const isPaid = order?.status === "completed" || order?.status === "delivered";
+  const statusInfo = order ? getShippingStatusInfo(order.status) : null;
 
   if (loading) {
     return (
@@ -446,61 +635,43 @@ export default function OrderDetail() {
               })}
             </p>
 
+            {/* Cải thiện hiển thị trạng thái đơn hàng */}
+            {statusInfo && (
+              <div
+                className={`${
+                  statusInfo.bgColor
+                } !p-4 rounded-lg !mb-6 border-l-4 border-${
+                  statusInfo.color.split("-")[1]
+                }-500`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{statusInfo.icon}</span>
+                  <div>
+                    <h3 className={`font-semibold ${statusInfo.color}`}>
+                      {statusInfo.label}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {statusInfo.description}
+                    </p>
+                    {order.status === "shipping" &&
+                      getEstimatedDeliveryDate() && (
+                        <p className="text-sm font-medium text-purple-700 mt-1">
+                          Dự kiến giao: {getEstimatedDeliveryDate()}
+                        </p>
+                      )}
+                    {order.status === "cancelled" && order.comment && (
+                      <p className="text-sm text-red-700 mt-1">
+                        Lý do hủy: {order.comment}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Các nút action theo trạng thái */}
             <div className="flex flex-wrap gap-3 !mb-6">
-              {canCancelOrder && (
-                <button
-                  onClick={() => setShowCancelModal(true)}
-                  disabled={actionLoading}
-                  className="bg-red-600 hover:bg-red-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {actionLoading ? "Đang xử lý..." : "Hủy đơn hàng"}
-                </button>
-              )}
-
-              {canConfirmReceived && (
-                <button
-                  onClick={handleConfirmReceived}
-                  disabled={actionLoading}
-                  className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {actionLoading ? "Đang xử lý..." : "Đã nhận được hàng"}
-                </button>
-              )}
-
-              {canReviewAndBuyAgain && (
-                <>
-                  <button
-                    onClick={handleReviewProducts}
-                    className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
-                  >
-                    Đánh giá sản phẩm
-                  </button>
-                  <button
-                    onClick={handleBuyAgain}
-                    className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
-                  >
-                    Mua lại
-                  </button>
-                </>
-              )}
-
-              {canViewProducts && (
-                <button
-                  onClick={handleViewProducts}
-                  className="bg-gray-600 hover:bg-gray-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
-                >
-                  Xem lại sản phẩm
-                </button>
-              )}
-
-              {canTrackOrder && (
-                <button
-                  onClick={handleTrackOrder}
-                  className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-4xl font-medium transition-colors"
-                >
-                  Theo dõi đơn hàng
-                </button>
-              )}
+              {getActionButtons()}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 !mb-6">
@@ -522,15 +693,22 @@ export default function OrderDetail() {
                 <h2 className="text-lg font-semibold !mb-2">
                   Trạng thái vận chuyển
                 </h2>
-                <p className="text-gray-700 font-semibold">
-                  {getShippingStatusLabel(order.status)}
+                <p
+                  className={`font-semibold ${
+                    statusInfo?.color || "text-gray-700"
+                  }`}
+                >
+                  {statusInfo?.label || "Không xác định"}
                 </p>
               </div>
               <div className="box bg-white !p-4 rounded shadow">
-                <h2 className="text-lg font-semibold !mb-2">Mã vận đơn</h2>
+                <h2 className="text-lg font-semibold !mb-2">Mã đơn hàng</h2>
                 <p className="text-blue-600 uppercase font-bold">
-                  {order.orders_id
-                    ? `VD${order.orders_id.toString().padStart(6, "0")}`
+                  {order.created_at && order.orders_id
+                    ? `TERA${new Date(order.created_at)
+                        .toLocaleDateString("vi-VN")
+                        .slice(0, 5)
+                        .replace("/", "")}${order.orders_id}`
                     : "---"}
                 </p>
               </div>
@@ -619,10 +797,10 @@ export default function OrderDetail() {
               <table className="table-auto w-full border-t border-gray-200">
                 <thead className="bg-gray-100">
                   <tr className="text-left">
-                    <th className="!p-4 font-semibold">Sản phẩm</th>
+                    <th className="!p-4 font-semibold">Tổng</th>
                     <th className="!p-4 font-semibold">Đơn giá</th>
                     <th className="!p-4 font-semibold">Số lượng</th>
-                    <th className="!p-4 font-semibold">Tổng</th>
+                    <th className="!p-4 font-semibold">Tổng cộng</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -738,24 +916,152 @@ export default function OrderDetail() {
                 </div>
               </div>
             </div>
+
+            {/* Gợi ý sản phẩm tương tự cho trạng thái completed */}
+            {(order.status === "completed" || order.status === "delivered") && (
+              <div className="mt-6 bg-white rounded shadow !p-6">
+                <h3 className="text-lg font-semibold !mb-4 text-gray-800">
+                  💡 Sản phẩm bạn có thể quan tâm
+                </h3>
+                <div className="bg-blue-50 !p-4 rounded-lg">
+                  <p className="text-blue-800 text-sm">
+                    Khám phá thêm những sản phẩm tương tự với đơn hàng của bạn
+                  </p>
+                  <button
+                    onClick={() => router.push("/products")}
+                    className="mt-2 text-blue-600 hover:text-blue-800 font-medium text-sm underline"
+                  >
+                    Xem ngay →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Hiển thị thông tin chi tiết cho đơn hàng đã hủy */}
+            {order.status === "cancelled" && (
+              <div className="mt-6 bg-red-50 border border-red-200 rounded-lg !p-6">
+                <h3 className="text-lg font-semibold text-red-800 !mb-3">
+                  ❌ Thông tin đơn hàng đã hủy
+                </h3>
+                <div className="space-y-2 text-sm">
+                  <p className="text-red-700">
+                    <strong>Thời gian hủy:</strong>{" "}
+                    {new Date(
+                      order.updated_at || order.created_at
+                    ).toLocaleDateString("vi-VN", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  {order.comment && (
+                    <p className="text-red-700">
+                      <strong>Lý do hủy:</strong> {order.comment}
+                    </p>
+                  )}
+                  <p className="text-red-600 bg-red-100 !p-3 rounded mt-3">
+                    💰 Nếu bạn đã thanh toán, số tiền sẽ được hoàn lại trong 3-5
+                    ngày làm việc.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Thông tin bổ sung cho trạng thái shipping */}
+            {order.status === "shipping" && (
+              <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg !p-6">
+                <h3 className="text-lg font-semibold text-purple-800 !mb-3">
+                  🚚 Thông tin vận chuyển
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-purple-700">
+                      <strong>Mã đơn hàng: </strong>
+                      {order.created_at && order.orders_id
+                        ? `TERA${new Date(order.created_at)
+                            .toLocaleDateString("vi-VN")
+                            .slice(0, 5)
+                            .replace("/", "")}${order.orders_id}`
+                        : "---"}
+                    </p>
+                    <p className="text-purple-700">
+                      <strong>Đơn vị vận chuyển:</strong> Giao hàng nhanh
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-purple-700">
+                      <strong>Dự kiến giao:</strong>{" "}
+                      {getEstimatedDeliveryDate()}
+                    </p>
+                    <p className="text-purple-700">
+                      <strong>Thời gian giao:</strong> 8:00 - 18:00
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 !p-3 bg-purple-100 rounded">
+                  <p className="text-purple-800 text-sm">
+                    📱 <strong>Lưu ý:</strong> Bạn sẽ nhận được SMS/cuộc gọi từ
+                    shipper trước khi giao hàng 30 phút.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </main>
 
+      {/* Modal hủy đơn hàng được cải thiện */}
       {showCancelModal && (
-        <div className="fixed inset-0 !bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg !p-6 w-full max-w-md !mx-4">
-            <h3 className="text-lg font-semibold !mb-4">Hủy đơn hàng</h3>
+        <div className="fixed inset-0 !bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg !p-6 w-full max-w-md !mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 !mb-4">
+              <span className="text-2xl">⚠️</span>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Hủy đơn hàng
+              </h3>
+            </div>
             <p className="text-gray-600 !mb-4">
-              Vui lòng cho biết lý do bạn muốn hủy đơn hàng này:
+              Vui lòng cho biết lý do bạn muốn hủy đơn hàng này. Điều này giúp
+              chúng tôi cải thiện dịch vụ tốt hơn.
             </p>
+
+            {/* Các lý do hủy có sẵn */}
+            <div className="!mb-4">
+              <p className="text-sm font-medium text-gray-700 !mb-2">
+                Lý do thường gặp:
+              </p>
+              <div className="space-y-2">
+                {[
+                  "Thay đổi ý định",
+                  "Tìm được giá tốt hơn",
+                  "Sản phẩm không cần thiết",
+                  "Khác",
+                ].map((reason) => (
+                  <button
+                    key={reason}
+                    onClick={() => setCancelReason(reason)}
+                    className={`block w-full text-left !px-3 !py-2 rounded text-sm border transition-colors ${
+                      cancelReason === reason
+                        ? "bg-red-100 border-red-300 text-red-700"
+                        : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                    }`}
+                  >
+                    {reason}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <textarea
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg !p-3 !mb-4 resize-none"
-              rows={4}
-              placeholder="Nhập lý do hủy đơn hàng..."
+              className="w-full border border-gray-300 rounded-lg !p-3 !mb-4 resize-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+              rows={3}
+              placeholder="Hoặc nhập lý do khác..."
             />
+
             <div className="flex gap-3">
               <button
                 onClick={() => {
@@ -765,16 +1071,20 @@ export default function OrderDetail() {
                 className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 !py-2 !px-6 rounded-lg font-medium transition-colors"
                 disabled={actionLoading}
               >
-                Hủy bỏ
+                Quay lại
               </button>
               <button
                 onClick={handleCancelOrder}
                 disabled={actionLoading || !cancelReason.trim()}
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white !py-2 !px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {actionLoading ? "Đang xử lý..." : "Xác nhận hủy"}
+                {actionLoading ? "Đang hủy..." : "Xác nhận hủy"}
               </button>
             </div>
+
+            <p className="text-xs text-gray-500 mt-3 text-center">
+              Sau khi hủy, đơn hàng không thể khôi phục lại được.
+            </p>
           </div>
         </div>
       )}
