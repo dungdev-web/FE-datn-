@@ -251,7 +251,7 @@ export default function Cart() {
                       để thêm nhiều sản phẩm hơn vào giỏ hàng của bạn và nhận
                       giao hàng miễn phí
                       <br />
-                      <span className="target-price">9.000.000₫</span>.
+                      <span className="target-price">3.000.000₫</span>.
                     </p>
                   </>
                 ) : (
