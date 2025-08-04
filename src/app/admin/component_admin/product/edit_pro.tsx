@@ -4,41 +4,48 @@ import "../../css/product_add.css";
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 import { API_BASE_URL } from "@/config/env";
-import Quill from "quill";
+import type QuillType from "quill"; // import type
 import "quill/dist/quill.snow.css";
 
 export default function Edit_pro() {
   const editorRef = useRef<HTMLDivElement>(null);
-  const quillRef = useRef<Quill | null>(null);
+  const quillRef = useRef<InstanceType<typeof QuillType> | null>(null);
 
   const defaultContent = `🔸 Chất lượng Rep 1:1 - Nên mang lên 1 size
 so với tiêu chuẩn - Vận chuyển toàn quốc | Kiểm Tra Hàng
 Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
 - Bảo Hành Trọn Đời Sản Phẩm - Đổi Trả 7 Ngày Không Kể Lý Do`;
   useEffect(() => {
-    if (editorRef.current) {
-      quillRef.current = new Quill(editorRef.current, {
-        theme: "snow",
-        placeholder: "Nhập nội dung...",
-        modules: {
-          toolbar: [
-            [{ header: [1, 2, false] }],
-            ["bold", "italic", "underline"],
-            ["link", "image"],
-            [{ list: "ordered" }, { list: "bullet" }],
-            ["clean"],
-          ],
-        },
-      });
-
-      quillRef.current.root.innerHTML = defaultContent;
-
-      quillRef.current.on("text-change", () => {
-        const html = quillRef.current?.root.innerHTML;
-        console.log("Nội dung mới:", html);
-      });
-    }
-  }, []);
+      const loadQuill = async () => {
+        const QuillModule = await import("quill");
+        const Quill = QuillModule.default;
+  
+        if (editorRef.current && !quillRef.current) {
+          quillRef.current = new Quill(editorRef.current, {
+            theme: "snow",
+            placeholder: "Nhập nội dung...",
+            modules: {
+              toolbar: [
+                [{ header: [1, 2, false] }],
+                ["bold", "italic", "underline"],
+                ["link", "image"],
+                [{ list: "ordered" }, { list: "bullet" }],
+                ["clean"],
+              ],
+            },
+          });
+  
+          quillRef.current.root.innerHTML = defaultContent;
+  
+          quillRef.current.on("text-change", () => {
+            const html = quillRef.current?.root.innerHTML;
+            console.log("Nội dung mới:", html);
+          });
+        }
+      };
+  
+      loadQuill();
+    }, []);
   useEffect(() => {
     // ============ Tabs =============
     const tabs = document.querySelectorAll(".tab");
