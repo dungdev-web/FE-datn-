@@ -111,7 +111,7 @@ export default function Checkout() {
     const rawProvince = parts[parts.length - 1]?.trim() || "";
     return normalizeProvinceName(rawProvince);
   };
-  const { appliedCoupons, applyCoupon, error, getDiscountAmount, resetCoupon } =
+  const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
     useCoupon(subtotal, cart?.carts_id || "default");
 
   const [couponInput, setCouponInput] = useState("");
@@ -126,6 +126,7 @@ export default function Checkout() {
     const payment = searchParams.get("payment");
     const orderIdParam = searchParams.get("orderId");
     const transId = localStorage.getItem("zalopay_app_trans_id");
+
     if (payment === "success") {
       if (!transId) {
         Swal.fire({
@@ -140,7 +141,7 @@ export default function Checkout() {
 
       getZaloPayOrderStatus(transId)
         .then((status) => {
-    
+          console.log("📦 ZaloPay status response:", status);
 
           if (status.return_code === 1 && status.order_id) {
             Swal.fire({
@@ -304,7 +305,7 @@ export default function Checkout() {
         user_id: user.id,
         shipping_address_id: selectedAddressId,
         payment_method,
-        coupon_code: appliedCoupons[0]?.code,
+        coupon_code: appliedCoupon?.code || null,
         shipping_fee: shippingFee,
         comment: comment || undefined,
       };
@@ -603,17 +604,17 @@ export default function Checkout() {
           </button>
         </div>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-        {appliedCoupons.map((coupon) => (
-          <p key={coupon.code} className="text-green-600 mt-1">
-            Đã áp dụng mã <strong>{coupon.code}</strong>{" "}
+        {appliedCoupon && (
+          <p className="text-green-600 mt-1">
+            Đã áp dụng mã <strong>{appliedCoupon.code}</strong>{" "}
             <button
-              className=" ml-2 text-blue-600 underline"
-              onClick={() => resetCoupon(coupon.code)}
+              className="ml-2 text-blue-600 underline"
+              onClick={resetCoupon}
             >
               Hủy
             </button>
           </p>
-        ))}
+        )}
 
         <div className="tinhtien mt-4 space-y-2">
           <div className="tamtinh flex justify-between">

@@ -22,7 +22,7 @@ export default function Cart() {
     handleRemoveItem,
   } = useCart(); // 👉 Gọi trước để lấy subtotal
 
-  const { appliedCoupons, applyCoupon, error, getDiscountAmount, resetCoupon } =
+  const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
     useCoupon(subtotal, cart?.carts_id || "default");
 
   const [couponInput, setCouponInput] = useState("");
@@ -31,10 +31,10 @@ export default function Cart() {
     console.log("🛒 Cart items:", cart?.cart_items);
   }, [cart]);
   useEffect(() => {
-    if (appliedCoupons && appliedCoupons.length > 0) {
-      setCouponInput(appliedCoupons[0].code); // Hiện lại trong input
+    if (appliedCoupon && appliedCoupon.length > 0) {
+      setCouponInput(appliedCoupon[0].code); // Hiện lại trong input
     }
-  }, [appliedCoupons]);
+  }, [appliedCoupon]);
 
   if (!cart) {
     return (
@@ -279,17 +279,17 @@ export default function Cart() {
                 </button>
               </div>
               {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-              {appliedCoupons.map((coupon) => (
-                <p key={coupon.code} className="text-green-600 mt-1">
-                  Đã áp dụng mã <strong>{coupon.code}</strong>{" "}
+              {appliedCoupon && (
+                <p className="text-green-600 mt-1">
+                  Đã áp dụng mã <strong>{appliedCoupon.code}</strong>{" "}
                   <button
                     className="ml-2 text-blue-600 underline"
-                    onClick={() => resetCoupon(coupon.code)}
+                    onClick={resetCoupon}
                   >
                     Hủy
                   </button>
                 </p>
-              ))}
+              )}
             </div>
 
             <div className="cart-total-box">
