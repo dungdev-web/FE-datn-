@@ -24,8 +24,8 @@ import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
 import Banner3D from "./component/Home/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
-import ProductIcons from "./component/products/ProductIcons";
-import HotProductIcons from "./component/products/HotProductIcons";
+import ProductIcons from "./component/Products/ProductIcons";
+import HotProductIcons from "./component/Products/HotProductIcons";
 import HotspotLookbook from "./component/Home/HotspotProduct";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
@@ -39,7 +39,7 @@ export default function Home() {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
- 
+
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
 
   const handlePlay = () => {
@@ -282,17 +282,25 @@ export default function Home() {
               ở bất cứ nơi đâu bạn đến.
             </p>
             <div className="buttons">
-              <button ><Link  className="btn-lookbook"  href={`/product?gender=nam`}>GIÀY NAM</Link></button>  
-              <button ><Link  className="btn-lookbook"  href={`/product?gender=nữ`}>GIÀY NỮ</Link></button> 
+              <button>
+                <Link className="btn-lookbook" href={`/product?gender=nam`}>
+                  GIÀY NAM
+                </Link>
+              </button>
+              <button>
+                <Link className="btn-lookbook" href={`/product?gender=nữ`}>
+                  GIÀY NỮ
+                </Link>
+              </button>
             </div>
           </div>
 
           <HotspotLookbook
-        openIndex={openIndex}
-        setOpenIndex={setOpenIndex}
-        togglePopup={togglePopup}
-        containerRef={containerRef}
-      />
+            openIndex={openIndex}
+            setOpenIndex={setOpenIndex}
+            togglePopup={togglePopup}
+            containerRef={containerRef}
+          />
         </div>
         <div className="shipping-main">
           <div className="shipping1">
@@ -359,14 +367,20 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
-
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
+                          "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
+                    <HotProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants[0]?.product_variants_id
+                      }
+                      price={product.sale_price}
+                    />
 
                     <span className="tag-discount">-{discount}%</span>
                   </div>
@@ -471,15 +485,20 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
-
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
+                          "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
-
+                    <HotProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants[0]?.product_variants_id
+                      }
+                      price={product.sale_price}
+                    />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
