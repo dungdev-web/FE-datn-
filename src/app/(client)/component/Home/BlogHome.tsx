@@ -1,5 +1,5 @@
 "use client";
-import "../css/home.css";
+import "../../css/home.css";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import { useEffect, useState } from "react";

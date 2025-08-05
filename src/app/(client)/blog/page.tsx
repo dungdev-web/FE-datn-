@@ -7,7 +7,7 @@ import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
 import { getLocalViews, increaseLocalViews } from "@/shared/until/viewTracker";
-import AsideBlog from "@/app/(client)/component/blog/AsideBlog";
+import AsideBlog from "@/app/(client)/component/Blog/AsideBlog";
 import Link from "next/link";
 export default function Blog() {
   const [post, setPost] = useState<IBlog[]>([]);
@@ -97,12 +97,12 @@ export default function Blog() {
               return (
                 <div className="box-blog" key={item.post_id}>
                   <Link href="#" onClick={handleViewDetail}>
-                  <img
-                    src={`${API_BASE_URL}/uploads/blog/${item.thumbnail}`}
-                    alt={item.title}
-                  />
-                  </Link >
-                  <div className="content-blog" style={{width: "70%"}}>
+                    <img
+                      src={`${API_BASE_URL}/uploads/blog/${item.thumbnail}`}
+                      alt={item.title}
+                    />
+                  </Link>
+                  <div className="content-blog" style={{ width: "70%" }}>
                     <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
                     <p>
                       <span>{item.author.name} -</span>{" "}

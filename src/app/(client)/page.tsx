@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef, use } from "react";
 import Show1sanpham from "./component/product_home";
-import BlogHome from "./component/blog_home";
+import BlogHome from "./component/Home/BlogHome";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
@@ -22,11 +22,11 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
-import Banner3D from "./component/Banner3D";
+import Banner3D from "./component/Home/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "./component/products/ProductIcons";
 import HotProductIcons from "./component/products/HotProductIcons";
-import HotspotLookbook from "./component/home/HotspotProduct";
+import HotspotLookbook from "./component/Home/HotspotProduct";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
