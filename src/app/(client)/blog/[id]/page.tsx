@@ -5,12 +5,12 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { getPostById } from "@/services/blogService";
 import { IBlog } from "@/types/blog";
-import AsideBlog from "../../component/blog/AsideBlog";
+import AsideBlog from "../../component/Blog/AsideBlog";
 import DOMPurify from "dompurify";
 import { usePostsByCategory } from "@/hooks/useBlog";
 
 export default function Detail_blog() {
- const params = useParams();
+  const params = useParams();
   const idParam = params.id;
   const [strongTexts, setStrongTexts] = useState<string[]>([]);
   const [modifiedContent, setModifiedContent] = useState("");
@@ -64,11 +64,12 @@ export default function Detail_blog() {
   }, [post]);
 
   // Dùng hook sau khi có categoryId
-  const { posts, loading, error } = usePostsByCategory(categoryId ? categoryId : 0);
-console.log("test:",categoryId);
+  const { posts, loading, error } = usePostsByCategory(
+    categoryId ? categoryId : 0
+  );
+  console.log("test:", categoryId);
 
   if (!post) return <div>Đang tải bài viết...</div>;
-
 
   return (
     <>

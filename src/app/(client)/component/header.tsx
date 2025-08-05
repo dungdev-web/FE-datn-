@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import Search from "./showsearch";
-import TopCart from "./top_cart";
+import Search from "./ShowSearch";
+import TopCart from "./TopCart";
 import MenuRight from "./menu_right";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";

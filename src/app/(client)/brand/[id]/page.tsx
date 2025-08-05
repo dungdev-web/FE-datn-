@@ -13,9 +13,9 @@ import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import SidebarFilter from "../../component/products/SidebarFilter";
-import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
-import ProductIcons from "../../component/products/ProductIcons";
+import SidebarFilter from "../../component/Products/SidebarFilter";
+import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
+import ProductIcons from "../../component/Products/ProductIcons";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -70,7 +70,7 @@ export default function CategoryPage() {
 
     setPage(1); // reset lại trang đầu tiên khi sort
   };
-   const resetAllFilters = () => {
+  const resetAllFilters = () => {
     setSelectedBrandIds([]);
     setSelectedGender(null);
     setSelectedPriceRange(null);
