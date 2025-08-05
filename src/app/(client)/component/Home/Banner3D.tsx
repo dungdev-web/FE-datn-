@@ -3,6 +3,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { Group } from "three";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type GLTFResult = {
   scene: Group;
@@ -102,7 +103,7 @@ export default function Banner3D() {
       <div className="absolute inset-0 bg-black/10"></div>
 
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 items-center !gap-4 md:!gap-6 lg:!gap-8 !px-4 sm:px-6 lg:!px-8 relative z-10">
-        <div className="flex flex-col space-y-4 lg:space-y-6 order-2 lg:order-1">
+        <div className="flex flex-col !space-y-4 lg:!space-y-6 order-2 lg:order-1">
           <div className="relative h-auto min-h-[450px] md:min-h-[400px] lg:min-h-[450px] overflow-hidden">
             {slides.map((slide, i) => (
               <div
@@ -115,7 +116,7 @@ export default function Banner3D() {
                     : "transform translate-x-full opacity-0"
                 }`}
               >
-                <div className="space-y-3 lg:space-y-4">
+                <div className="!space-y-1">
                   <div className="inline-block">
                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white !px-3 !py-1 rounded-full text-xs sm:text-sm font-semibold">
                       NEW ARRIVAL
@@ -210,14 +211,14 @@ export default function Banner3D() {
         className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-600 !p-2 sm:!p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-20 text-lg sm:text-xl"
         aria-label="Previous slide"
       >
-        ←
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
       <button
         onClick={nextSlide}
         className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-600 !p-2 sm:!p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-20 text-lg sm:text-xl"
         aria-label="Next slide"
       >
-        →
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
       </button>
     </div>
   );
