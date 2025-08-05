@@ -163,6 +163,28 @@ export async function registerUser(
 
   return data;
 }
+export async function confirmEmailService(email: string, token: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/confirm-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, token }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Xác nhận email thất bại.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[Service] Lỗi xác nhận email:", error);
+    throw error;
+  }
+}
 
 // --------- GET USER INFO ---------
 export async function getInfoUser(id: number | string): Promise<IUser> {
@@ -242,7 +264,7 @@ export async function sendResetPassword(
     return { message: "Đã gửi mã OTP đến email", otp };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/send-reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/forget`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -280,7 +302,7 @@ export async function resetPassword(
     return { message: "Đổi mật khẩu thành công" };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, otp, newPassword }),

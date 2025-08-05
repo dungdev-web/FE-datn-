@@ -59,7 +59,7 @@ export default function Register() {
         timer: 2000,
         timerProgressBar: true,
       });
-      window.location.href = "/login";
+      window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
     } catch (err: any) {
       Swal.fire({
         title: "Đăng ký thất bại",
@@ -79,7 +79,7 @@ export default function Register() {
         />
 
         <div className="form-container">
-          <h2>Đăng Ký email</h2>
+          <h2>Đăng ký email</h2>
 
           <div className="register-link">
             <p>Hãy đăng ký để được hưởng nhiều đặc quyền riêng dành cho bạn</p>
@@ -92,6 +92,13 @@ export default function Register() {
                 placeholder="Họ và Tên"
                 id="fullName"
                 value={name}
+                className={`input ${
+                  errors.fullName
+                    ? "error"
+                    : name.trim() !== ""
+                    ? "success"
+                    : ""
+                }`}
                 onChange={(e) => {
                   setName(e.target.value);
                   setErrors((prev) => ({ ...prev, fullName: "" }));
@@ -107,6 +114,7 @@ export default function Register() {
                   }))
                 }
               />
+
               {errors.fullName && (
                 <p className="text-sm text-red-500 mt-1">{errors.fullName}</p>
               )}
@@ -118,6 +126,9 @@ export default function Register() {
                 placeholder="Email"
                 id="email"
                 value={email}
+                className={`input ${
+                  errors.email ? "error" : email.trim() !== "" ? "success" : ""
+                }`}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setErrors((prev) => ({ ...prev, email: "" }));
@@ -133,6 +144,7 @@ export default function Register() {
                   }))
                 }
               />
+
               {errors.email && (
                 <p className="text-sm text-red-500 mt-1">{errors.email}</p>
               )}
@@ -144,6 +156,13 @@ export default function Register() {
                 placeholder="Mật Khẩu"
                 id="password"
                 value={password}
+                className={`input ${
+                  errors.password
+                    ? "error"
+                    : password.trim() !== ""
+                    ? "success"
+                    : ""
+                }`}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setErrors((prev) => ({ ...prev, password: "" }));
@@ -159,6 +178,7 @@ export default function Register() {
                   }))
                 }
               />
+
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">{errors.password}</p>
               )}

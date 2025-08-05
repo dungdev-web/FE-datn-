@@ -1572,3 +1572,6 @@ input[type="submit"] {
     display: flex !important;
   }
 }
+.overflow-hidden {
+  overflow: hidden !important;
+}

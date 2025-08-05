@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IBlog,Category } from "@/types/blog";
+import { IBlog,Category,IBlogCreate } from "@/types/blog";
 import { getMockBlog } from "@/mocks/mockBlog";
 // Lấy bài viết
 export async function getPost(
@@ -135,3 +135,25 @@ export async function getPostsByCategory(
     return { posts: [] };
   }
 }
+//thêm bài viết
+// services/blogService.ts
+
+export async function addPost(formData: FormData): Promise<IBlog | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post`, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Không thể thêm bài viết mới.");
+
+    const data = await res.json();
+    return data.data || null;
+  } catch (error) {
+    console.error("Lỗi khi thêm bài viết:", error);
+    return null;
+  }
+}
+
+
+

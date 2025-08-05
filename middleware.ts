@@ -1,3 +1,5 @@
+// middleware.ts
+"use client";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
@@ -11,7 +13,7 @@ interface DecodedToken {
   iat: number;
 }
 
-export function middlewareAdmin(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith("/admin")) {
@@ -19,17 +21,18 @@ export function middlewareAdmin(req: NextRequest) {
       const token = req.cookies.get("token")?.value;
 
       if (!token) {
-        console.warn(" Không có token");
+        console.warn("Không có token");
         throw new Error("Không có token");
       }
 
       const decoded = jwt.verify(token, JWT_SECRET) as DecodedToken;
 
-      if (!decoded.role || decoded.role !== "admin") {
+      if (decoded.role !== "admin") {
         console.warn("⚠️ Người dùng không có quyền admin");
         return NextResponse.redirect(new URL("/403", req.url));
       }
-      // console.log("✅ Middleware Authenticated:", decoded.email, decoded.role);
+
+      console.log("✅ Middleware Authenticated:", decoded.email, decoded.role);
 
     } catch (err) {
       console.error("❌ Middleware error:", err);
@@ -40,6 +43,5 @@ export function middlewareAdmin(req: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/admin/:path*"],
-};
+export const runtime = "nodejs";
+export const matcher = ["/admin/:path*"];

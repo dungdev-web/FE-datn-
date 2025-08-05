@@ -12,9 +12,9 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-import SidebarFilter from "../component/products/SidebarFilter";
-import MobileSidebarFilter from "../component/products/MobileSidebarFilter";
-import ProductIcons from "../component/products/ProductIcons";
+import SidebarFilter from "./Products/SidebarFilter";
+import MobileSidebarFilter from "./Products/MobileSidebarFilter";
+import ProductIcons from "./Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
@@ -497,6 +497,7 @@ export default function Product() {
                           <div
                             className="product-itemlist-main"
                             key={sp.products_id}
+                            style={{ display: "block" }}
                           >
                             <div
                               className="product-card-list"
@@ -515,6 +516,7 @@ export default function Product() {
                                         : "/images/placeholder.png"
                                     }
                                     alt={sp.name}
+                                    style={{ height: "221px" }}
                                   />
                                 </Link>
                                 <ProductIcons
