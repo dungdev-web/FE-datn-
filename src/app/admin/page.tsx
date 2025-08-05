@@ -70,7 +70,9 @@ export default function Home_admin() {
         ]);
         console.log("📦 tổng theo năm:", recentOreders);
 
+
         setData({
+         
           products,
           brands,
           categories,
@@ -105,12 +107,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu ngày</p>
-            <p className="number">
-              {" "}
-              {data.totalDay != null
-                ? data.totalDay.toLocaleString("vi") + "₫"
-                : "0₫"}
-            </p>
+            <p className="number">12.000.000₫</p>
           </div>
         </div>
         <div className="revenue-card">
@@ -119,12 +116,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu tuần</p>
-            <p className="number">
-              {" "}
-              {data.totalWeek != null
-                ? data.totalWeek.toLocaleString("vi") + "₫"
-                : "0₫"}
-            </p>
+            <p className="number">0₫</p>
           </div>
         </div>
         <div className="revenue-card">
@@ -133,12 +125,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu tháng</p>
-            <p className="number">
-              {" "}
-              {data.totalWeek != null
-                ? data.totalWeek.toLocaleString("vi") + "₫"
-                : "0₫"}
-            </p>
+            <p className="number">230.000.000₫</p>
           </div>
         </div>
         <div className="revenue-card">
@@ -147,12 +134,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu năm</p>
-            <p className="number">
-              {" "}
-              {data.totalYear != null
-                ? data.totalYear.toLocaleString("vi") + "₫"
-                : "0₫"}
-            </p>
+            <p className="number">2.800.000.000₫</p>
           </div>
         </div>
       </div>
@@ -163,7 +145,9 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Số lượng sản phẩm</p>
-            <p className="number">{data.products?.totalProducts}</p>
+            <p className="number">
+              {data.products?.totalProducts}
+            </p>
             <a href="#" className="details-link">
               (Xem chi tiết)
             </a>
@@ -334,6 +318,7 @@ export default function Home_admin() {
             ) : (
               <p className="no-products">Không có sản phẩm bán chạy nào</p>
             )}
+
           </div>
         </div>
 
@@ -342,31 +327,48 @@ export default function Home_admin() {
             <i className="fas fa-triangle-exclamation text-warning"></i> Cảnh
             báo tồn kho thấp
           </h3>
-          {data.stockinProduct?.data?.length > 0 ? (
-            data.stockinProduct.data.map((item: any, index: number) => (
-              <div className="stock-list" key={index}>
-                <div className="stock-item">
-                  <img
-                    src={`${API_BASE_URL}/uploads/${
-                      item.color?.images || "images/default.jpg"
-                    }`}
-                    alt="Sản phẩm"
-                  />
-                  <div className="stock-info">
-                    <p className="name">
-                      {item.product?.name || "Không rõ tên"}
-                    </p>
-                    <p className="stock">
-                      Tồn kho:{" "}
-                      <span className="low">{item.stock_quantity}</span> cái
-                    </p>
-                  </div>
-                </div>
+          <div className="stock-list">
+            <div className="stock-item">
+              <img
+                src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
+                alt="Sản phẩm"
+              />
+              <div className="stock-info">
+                <p className="name">Áo Hoodie Local Brand</p>
+                <p className="stock">
+                  Tồn kho: <span className="low">3</span> cái
+                </p>
               </div>
-            ))
-          ) : (
-            <p className="no-stock">Không có sản phẩm nào tồn kho thấp</p>
-          )}
+            </div>
+          </div>
+          <div className="stock-list">
+            <div className="stock-item">
+              <img
+                src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
+                alt="Sản phẩm"
+              />
+              <div className="stock-info">
+                <p className="name">Áo Hoodie Local Brand</p>
+                <p className="stock">
+                  Tồn kho: <span className="low">3</span> cái
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="stock-list">
+            <div className="stock-item">
+              <img
+                src={`${API_BASE_URL}/uploads/GiàyNamJordanMaxAura.webp`}
+                alt="Sản phẩm"
+              />
+              <div className="stock-info">
+                <p className="name">Áo Hoodie Local Brand</p>
+                <p className="stock">
+                  Tồn kho: <span className="low">3</span> cái
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="notification-box">
@@ -395,7 +397,7 @@ export default function Home_admin() {
         </div>
       </div>
 
-      <div className="dashboard-section" style={{ display: "none" }}>
+      <div className="dashboard-section">
         <div className="internal-news">
           <h3>
             <i className="fas fa-bullhorn"></i> Tin nội bộ

@@ -103,7 +103,7 @@ export default function Banner3D() {
 
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 items-center !gap-4 md:!gap-6 lg:!gap-8 !px-4 sm:px-6 lg:!px-8 relative z-10">
         <div className="flex flex-col space-y-4 lg:space-y-6 order-2 lg:order-1">
-          <div className="relative h-auto min-h-[350px] md:min-h-[400px] lg:min-h-[450px] overflow-hidden">
+          <div className="relative h-auto min-h-[450px] md:min-h-[400px] lg:min-h-[450px] overflow-hidden">
             {slides.map((slide, i) => (
               <div
                 key={i}

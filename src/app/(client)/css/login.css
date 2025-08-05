@@ -50,7 +50,12 @@
 .form-container input:focus {
   border-color: #4bd963;
 }
-
+.form-container input.success {
+  border-color: #4bd963;
+}
+.form-container input.error {
+  border-color: red !important;
+}
 /* Submit button */
 .form-container button {
   width: 100%;
@@ -452,12 +457,13 @@
 }
 
 .otp-valid {
-  border-color: #22c55e;
+  border: 1px solid #22c55e !important; /* xanh */
 }
 
 .otp-invalid {
-  border-color: #ef4444;
+  border: 1px solid #ef4444 !important; /* đỏ */
 }
+
 
 .otp-input {
   width: 100%;
