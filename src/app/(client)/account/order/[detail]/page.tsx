@@ -264,15 +264,11 @@ export default function OrderDetail() {
   const getPaymentMethodLabel = (paymentMethodId: number) => {
     switch (paymentMethodId) {
       case 1:
-        return "Thu hộ (COD)";
+        return "Thanh toán khi nhận hàng (COD)";
       case 2:
         return "Chuyển khoản ngân hàng";
-      case 3:
-        return "Ví điện tử";
-      case 4:
-        return "Thẻ tín dụng";
       default:
-        return "Thu hộ (COD)";
+        return "Thanh toán khi nhận hàng (COD)";
     }
   };
 
@@ -392,11 +388,18 @@ export default function OrderDetail() {
       icon: "info",
       title: "Liên hệ vận chuyển",
       html: `
-        <p>Mã vận đơn: <strong>VD${order?.orders_id
-          ?.toString()
-          .padStart(6, "0")}</strong></p>
-        <p>Bạn có thể liên hệ đơn vị vận chuyển để biết thêm chi tiết.</p>
-      `,
+  <p>Mã đơn hàng: <strong>${
+    order?.created_at && order?.orders_id
+      ? `TERA${(() => {
+          const date = new Date(order?.created_at);
+          const day = String(date.getDate()).padStart(2, "0");
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          return `${day}${month}${order?.orders_id}`;
+        })()}`
+      : "---"
+  }</strong></p>
+  <p>Bạn có thể liên hệ đơn vị vận chuyển để biết thêm chi tiết.</p>
+`,
     });
   };
 
@@ -527,8 +530,20 @@ export default function OrderDetail() {
       year: "numeric",
     });
   };
-
-  const isPaid = order?.status === "completed" || order?.status === "delivered";
+  function renderPaymentStatus(status: string | undefined) {
+    switch (status) {
+      case "PAID":
+        return <p className="text-green-600 font-semibold">Đã thanh toán</p>;
+      case "PROCESSING":
+        return <p className="text-yellow-600 font-semibold">Đang xử lý</p>;
+      case "FAILED":
+        return (
+          <p className="text-red-600 font-semibold">Thanh toán thất bại</p>
+        );
+      default:
+        return <p className="text-gray-500">Không xác định</p>;
+    }
+  }
   const statusInfo = order ? getShippingStatusInfo(order.status) : null;
 
   if (loading) {
@@ -675,15 +690,7 @@ export default function OrderDetail() {
                 <h2 className="text-lg font-semibold !mb-2">
                   Trạng thái thanh toán
                 </h2>
-                <p
-                  className={
-                    isPaid
-                      ? "text-green-600 font-semibold"
-                      : "text-red-600 font-semibold"
-                  }
-                >
-                  {isPaid ? "Đã thanh toán" : "Chưa thanh toán"}
-                </p>
+                <p>{renderPaymentStatus(order?.payment_status)}</p>
               </div>
               <div className="box bg-white !p-4 rounded shadow">
                 <h2 className="text-lg font-semibold !mb-2">
@@ -701,10 +708,15 @@ export default function OrderDetail() {
                 <h2 className="text-lg font-semibold !mb-2">Mã đơn hàng</h2>
                 <p className="text-blue-600 uppercase font-bold">
                   {order.created_at && order.orders_id
-                    ? `TERA${new Date(order.created_at)
-                        .toLocaleDateString("vi-VN")
-                        .slice(0, 5)
-                        .replace("/", "")}${order.orders_id}`
+                    ? `TERA${(() => {
+                        const date = new Date(order.created_at);
+                        const day = String(date.getDate()).padStart(2, "0");
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${day}${month}${order.orders_id}`;
+                      })()}`
                     : "---"}
                 </p>
               </div>
@@ -891,9 +903,9 @@ export default function OrderDetail() {
                     <div className="flex justify-between text-gray-700">
                       <span>Phí vận chuyển:</span>
                       <span className="font-medium">
-                        {order.shipping_address_id
-                          ? order.shipping_address_id.toLocaleString("vi-VN")
-                          : ""}
+                        {order.shipping_fee
+                          ? order.shipping_fee.toLocaleString("vi-VN")
+                          : 0}
                         ₫
                       </span>
                     </div>
@@ -924,8 +936,8 @@ export default function OrderDetail() {
                     Khám phá thêm những sản phẩm tương tự với đơn hàng của bạn
                   </p>
                   <button
-                    onClick={() => router.push("/products")}
-                    className="mt-2 text-blue-600 hover:text-blue-800 font-medium text-sm underline"
+                    onClick={() => router.push("/product")}
+                    className="!mt-2 text-blue-600 hover:text-blue-800 font-medium text-sm underline"
                   >
                     Xem ngay →
                   </button>
@@ -967,7 +979,7 @@ export default function OrderDetail() {
 
             {/* Thông tin bổ sung cho trạng thái shipping */}
             {order.status === "shipping" && (
-              <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg !p-6">
+              <div className="!mt-3 bg-purple-50 border border-purple-200 rounded-lg !p-6">
                 <h3 className="text-lg font-semibold text-purple-800 !mb-3">
                   🚚 Thông tin vận chuyển
                 </h3>
@@ -976,10 +988,15 @@ export default function OrderDetail() {
                     <p className="text-purple-700">
                       <strong>Mã đơn hàng: </strong>
                       {order.created_at && order.orders_id
-                        ? `TERA${new Date(order.created_at)
-                            .toLocaleDateString("vi-VN")
-                            .slice(0, 5)
-                            .replace("/", "")}${order.orders_id}`
+                        ? `TERA${(() => {
+                            const date = new Date(order.created_at);
+                            const day = String(date.getDate()).padStart(2, "0");
+                            const month = String(date.getMonth() + 1).padStart(
+                              2,
+                              "0"
+                            );
+                            return `${day}${month}${order.orders_id}`;
+                          })()}`
                         : "---"}
                     </p>
                     <p className="text-purple-700">

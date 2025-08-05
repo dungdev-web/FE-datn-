@@ -8,6 +8,8 @@ export interface IOrder {
   total_amount: number;
   payment_method_id: number;
   shipping_address_id: number;
+  shipping_fee: number;
+  payment_status: string;
   coupons_id: number | null;
   comment: string | null;
   created_at: string;
