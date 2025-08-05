@@ -50,7 +50,12 @@
 .form-container input:focus {
   border-color: #4bd963;
 }
-
+.form-container input.success {
+  border-color: #4bd963;
+}
+.form-container input.error {
+  border-color: red !important;
+}
 /* Submit button */
 .form-container button {
   width: 100%;

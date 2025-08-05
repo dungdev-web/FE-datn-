@@ -19,6 +19,7 @@ export default function Login() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [rememberMe, setRememberMe] = useState(false);
   const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -82,12 +83,12 @@ export default function Login() {
       const timer = setTimeout(() => {
         setShowLoader(false);
         Swal.fire({
-  title: "Đăng nhập thành công!",
-  icon: "success",
-  showConfirmButton: false,
-  timer: 2000, 
-  timerProgressBar: true,
-});
+          title: "Đăng nhập thành công!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
         window.location.href = "/account";
       }, 2000);
       router.refresh();
@@ -115,6 +116,13 @@ export default function Login() {
               <div>
                 <input
                   value={usernameOrEmail}
+                  className={`input ${
+                    errors.email
+                      ? "error"
+                      : usernameOrEmail.trim() !== ""
+                      ? "success"
+                      : ""
+                  }`}
                   onChange={(e) => {
                     setIdentifier(e.target.value);
                     setErrors((prev) => ({ ...prev, email: "" }));
@@ -140,6 +148,13 @@ export default function Login() {
               <div style={{ position: "relative" }}>
                 <input
                   type={showPassword ? "text" : "password"}
+                  className={`input ${
+                    errors.password
+                      ? "error"
+                      : password.trim() !== ""
+                      ? "success"
+                      : ""
+                  }`}
                   placeholder="Mật Khẩu"
                   value={password}
                   onChange={(e) => {
@@ -172,11 +187,6 @@ export default function Login() {
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </div>
-              </div>
-
-              <div className="remember-me">
-                <input type="checkbox" />
-                Lưu tài khoản
               </div>
 
               <button type="submit">Đăng nhập ngay</button>
