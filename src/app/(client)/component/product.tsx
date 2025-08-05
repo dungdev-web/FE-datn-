@@ -1,7 +1,7 @@
 "use client";
 
 import { IProduct } from "@/types/product";
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "./products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 import Link from "next/link";
 export default function Product4box(props: any) {

@@ -9,7 +9,7 @@ import "swiper/css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { IProduct } from "@/types/product";
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "./products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 export default function Show2sanpham({ products }: { products: IProduct[] }) {
   const images = [

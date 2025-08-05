@@ -6,7 +6,7 @@ import { IWishlistItemWithProduct } from "@/types/wishlist";
 import "../css/product.css";
 import "../css/wishlist.css";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import ProductIcons from "../component/Products/ProductIcons";
+import ProductIcons from "../component/products/ProductIcons";
 import Link from "next/link";
 import { API_BASE_URL } from "@/config/env";
 
