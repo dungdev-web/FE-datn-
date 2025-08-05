@@ -15,7 +15,7 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
               <div className="wrap_item">
                 <a
                   className="product-image"
-                  href={`/product/${item.variant?.product.product_id}`}
+                  href={`/product/${item.variant?.product.products_id}`}
                   title={item.variant?.product.name}
                 >
                   <img
@@ -38,7 +38,7 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
                       <i className="fa-solid fa-trash text-red-600"></i>
                     </button>
                     <h3 className="product-name">
-                      <a href={`/product/${item.variant?.product.product_id}`}>
+                      <a href={`/product/${item.variant?.product.products_id}`}>
                         {item.variant?.product.name} -{" "}
                         {item.variant?.color.name_color} -{" "}
                         {item.variant?.size.number_size}
