@@ -1,7 +1,7 @@
 :root {
     --swiper-navigation-size: 23px !important;
   }
-@import "react-phone-input-2/lib/style.css";
+/* @import "react-phone-input-2/lib/style.css"; */
 
 @import "tailwindcss";
  .bg-flash-sale {

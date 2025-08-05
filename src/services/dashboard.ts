@@ -18,6 +18,25 @@ const getToday = () => {
   const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
+// Ví dụ: Chuyển đổi mã trạng thái sang tiếng Việt
+export const getStatusText = (status: string)=> {
+  switch (status) {
+    case "pending": return "Chờ xác nhận";
+    case "confirmed": return "Đã xác nhận";
+    case "shipping": return "Đang giao hàng";
+    case "delivered": return "Đã giao";
+    case "cancelled": return "Đã hủy";
+    case "returned": return "Hoàn trả";
+    default: return "Không xác định";
+  }
+}
+
+// Format ngày (ISO -> dd-mm-yyyy)
+export const formatDate = (dateString: string)=> {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("vi-VN");
+}
+
 export const getRevernueWeekly = () => fetchDashboardData(`revenue/weekly?date=${getToday()}`);
 // export const getRevernueMonthly = () => fetchDashboardData(`revenue/monthly?date=${getToday()}`);
 export const getRevernueYearly = () => fetchDashboardData(`revenue/yearly?date=${getToday()}`);
@@ -27,6 +46,7 @@ export const getTotalRevenueByMonth = () => fetchDashboardData(`revenue/totalbym
 export const getTotalRevenueByYear = () => fetchDashboardData(`revenue/totalbyyear?year=${getToday()}`);
 export const getStockinProduct = () => fetchDashboardData("stock");
 export const getBestSSellingProducts = () => fetchDashboardData("best-selling-products");
+export const getPendingOrders = () => fetchDashboardData("pending-orders");
 export const getCountProduct = () => fetchDashboardData("products");
 export const getCountBrand = () => fetchDashboardData("brands");
 export const getCountCategories = () => fetchDashboardData("categories");
@@ -35,3 +55,4 @@ export const getCountReviews = () => fetchDashboardData("reviews");
 export const getCountPosts = () => fetchDashboardData("posts");
 export const getCountPostCategories = () => fetchDashboardData("post-categories");
 export const getCountOrders = () => fetchDashboardData("orders");
+export const getRecentOrders = () => fetchDashboardData("recent-orders");

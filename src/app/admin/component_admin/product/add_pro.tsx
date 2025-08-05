@@ -47,7 +47,56 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
     loadQuill();
   }, []);
   useEffect(() => {
-    // ============ Tabs =============
+    // ===== Hàm gắn lại sự kiện cho dòng biến thể mới =====
+    const attachEventsToRow = (row: HTMLElement) => {
+      // Dropdown option chọn màu
+      row.querySelectorAll(".dropdown-option").forEach((option) => {
+        option.addEventListener("click", (e) => {
+          const opt = e.currentTarget as HTMLElement;
+          const wrapper = opt.closest(".custom-select-wrapper")!;
+          const selected = wrapper.querySelector(".selected-option")!;
+          const input = wrapper.querySelector(
+            "input[type=hidden]"
+          ) as HTMLInputElement;
+
+          const colorCircle = selected.querySelector(
+            ".color-circle"
+          ) as HTMLElement;
+          const colorName = selected.querySelector(
+            ".color-name"
+          ) as HTMLElement;
+          const chosenName = opt.querySelector(".color-name")?.textContent;
+
+          colorCircle.style.backgroundColor =
+            opt.style.getPropertyValue("--color");
+          colorName.textContent = chosenName || "";
+          input.value = opt.getAttribute("data-defaultvalue") || "";
+
+          wrapper.querySelector(".dropdown")?.classList.remove("show");
+        });
+      });
+
+      // Toggle dropdown
+      row.querySelectorAll(".custom-select").forEach((select) => {
+        select.addEventListener("click", (e) => {
+          e.stopPropagation();
+          document
+            .querySelectorAll(".dropdown")
+            .forEach((dropdown) => dropdown.classList.remove("show"));
+          const dropdown = select.querySelector(".dropdown");
+          dropdown?.classList.toggle("show");
+        });
+      });
+
+      // Ngăn dropdown đóng khi click bên trong
+      row.querySelectorAll(".dropdown").forEach((dropdown) => {
+        dropdown.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+      });
+    };
+
+    // ===== Tabs =====
     const tabs = document.querySelectorAll(".tab");
     const tabContents = document.querySelectorAll(".tab-content");
 
@@ -63,7 +112,7 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       });
     });
 
-    // ============ Variant Add/Remove ============
+    // ===== Variant Add/Remove =====
     const variantList = document.getElementById("variant-list");
     if (variantList) {
       variantList.addEventListener("click", (e: Event) => {
@@ -85,6 +134,7 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
           }
 
           variantList.appendChild(newRow);
+          attachEventsToRow(newRow); // 🔁 Gắn lại sự kiện dropdown màu
         }
 
         if (target.classList.contains("btn-remove-variant")) {
@@ -94,7 +144,7 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       });
     }
 
-    // ============ Dropdown Color Select ============
+    // ===== Dropdown chọn màu ban đầu =====
     document.querySelectorAll(".dropdown-option").forEach((option) => {
       option.addEventListener("click", (e) => {
         const opt = e.currentTarget as HTMLElement;
@@ -113,25 +163,19 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
         colorCircle.style.backgroundColor =
           opt.style.getPropertyValue("--color");
         colorName.textContent = chosenName || "";
-        input.value = opt.getAttribute("data-value") || "";
+        input.value = opt.getAttribute("data-defaultvalue") || "";
 
         wrapper.querySelector(".dropdown")?.classList.remove("show");
       });
     });
 
-    // ============ Custom Select Dropdown ============
-    function closeAllDropdowns(current?: Element) {
-      document.querySelectorAll(".custom-select").forEach((select) => {
-        if (!current || select !== current) {
-          select.querySelector(".dropdown")?.classList.remove("show");
-        }
-      });
-    }
-
+    // ===== Custom dropdown toggle ban đầu =====
     document.querySelectorAll(".custom-select").forEach((select) => {
       select.addEventListener("click", (e) => {
         e.stopPropagation();
-        closeAllDropdowns(select);
+        document
+          .querySelectorAll(".dropdown")
+          .forEach((dropdown) => dropdown.classList.remove("show"));
         const dropdown = select.querySelector(".dropdown");
         dropdown?.classList.toggle("show");
       });
@@ -143,7 +187,7 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       });
     });
 
-    // ============ Multi-select Danh Mục ============
+    // ===== Multi-select Danh Mục (nếu dùng) =====
     const danhMucWrapper = document.getElementById("danh-muc-wrapper");
     const dropdownSelected = document.getElementById("dropdown-selected");
     const dropdownOptions = document.getElementById("dropdown-options");
@@ -190,7 +234,7 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       });
     }
 
-    // ============ Close dropdowns on outside click ============
+    // ===== Close dropdowns on outside click =====
     const handleClickOutside = () => {
       document.querySelectorAll(".dropdown").forEach((dropdown) => {
         dropdown.classList.remove("show");
