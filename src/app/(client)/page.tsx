@@ -323,7 +323,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM MỚI NHẤT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
@@ -439,7 +439,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
             <h4>
-              <a href="">Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
