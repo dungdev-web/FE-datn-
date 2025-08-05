@@ -425,7 +425,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <a href="">Xem tất cả</a>
             </h4>
           </div>
 
