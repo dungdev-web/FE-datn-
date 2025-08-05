@@ -1,5 +1,10 @@
-import ConfirmEmailOtp from "../component/ConfirmEmailOtp";
+import { Suspense } from "react";
+import ConfirmEmailOtpWrapper from "../component/Register/ConfirmEmailOtpWrapper";
 
 export default function VerifyEmailPage() {
-  return <ConfirmEmailOtp />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ConfirmEmailOtpWrapper />
+    </Suspense>
+  );
 }
