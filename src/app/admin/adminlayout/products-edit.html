@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../css/css.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+        }
+..
+        .main-content {
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-left: 250px;
+            width: 100%;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: #021688;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            margin-right: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .tab.active {
+            background-color: white;
+            color: #000;
+            border-bottom: 1px solid white;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px;
+            min-height: 40px;
+            background-color: #fff;
+        }
+
+        .tag {
+            background-color: #007bff;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        #mo_ta {
+            min-height: 200px;
+        }
+
+        .btn-add {
+            background-color: #021688;
+            color: white;
+            padding: 12px 20px;
+            font-size: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add:hover {
+            background-color: #00125e;
+        }
+
+        .product-images {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .image-thumb {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-thumb img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+
+        .choose-image-btn {
+            background-color: #0d6efd;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .choose-image-btn:hover {
+            background-color: #0b5ed7;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+
+        .dropdown-multiselect {
+            position: relative;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 8px 12px;
+            background-color: #fff;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .dropdown-selected {
+            font-size: 14px;
+        }
+
+        .dropdown-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            z-index: 100;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown-multiselect.open .dropdown-options {
+            display: block;
+        }
+
+        .dropdown-options label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select {
+            border: 1px solid #ccc;
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            background: white;
+        }
+
+        .selected-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .color-circle {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--color);
+            border: 1px solid #999;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            border: 1px solid #ccc;
+            background: white;
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .dropdown-option {
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .dropdown-option:hover {
+            background: #f0f0f0;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .color-search {
+            width: 100%;
+            padding: 8px 10px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .dropdown-options {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .dropdown-option {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .dropdown-option:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-option:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-option span.color-name {
+            font-size: 14px;
+            color: #333;
+        }
+    </style>
+
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-wrapper">
+                <img src="/images/logo/logo-den.png" alt="Logo" class="logo">
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="user-info">
+                <img src="/images/logo/anhdep.jpg" alt="Admin" class="avatar">
+                <div class="email-role">
+                    <div class="email">admin@gmail.com</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="sub-header">
+        <div class="sub-header-left">
+            <button class="menu-toggle"><i class="fa-solid fa-list"></i></button>
+        </div>
+        <div class="sub-header-right">
+            <span class="home-icon"><i class="fa-solid fa-house"></i></span> / <span>Danh sách sản phẩm</span>
+        </div>
+    </div>
+
+
+    <div class="container">
+        <nav class="sidebar">
+            <ul class="menu">
+                <li><a href="#"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-list"></i> Quản lý danh mục <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách danh mục</a></li>
+                        <li><a href="#">Thêm mới danh mục</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-tags"></i> Quản lý nhãn hiệu <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách nhãn hiệu</a></li>
+                        <li><a href="#">Thêm mới nhãn hiệu</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-box"></i> Quản lý sản phẩm <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách sản phẩm</a></li>
+                        <li><a href="#">Thêm mới sản phẩm</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-newspaper"></i> Quản lý bài viết <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách bài viết</a></li>
+                        <li><a href="#">Thêm mới bài viết</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-gift"></i> Quản lý khuyến mại <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách khuyến mại</a></li>
+                        <li><a href="#">Thêm mới khuyến mại</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-shopping-cart"></i> Quản lý đơn hàng <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách đơn hàng</a></li>
+                        <li><a href="#">Thêm mới đơn hàng</a></li>
+                    </ul>
+                </li>
+
+                <li class="has-submenu">
+                    <a href="#"><i class="fa-solid fa-user"></i> Quản lý tài khoản <i
+                            class="fa-solid fa-chevron-down submenu-icon"></i></a>
+                    <ul class="submenu">
+                        <li><a href="#">Danh sách tài khoản</a></li>
+                        <li><a href="#">Thêm mới tài khoản</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            <div class="header-bar">
+                <div class="header-left">
+                    <button class="btn btn-back"><i class="fa-solid fa-arrow-left"></i> Trở về</button>
+                    <button class="btn-add" type="submit" form="add-product-form">
+                        <i class="fa fa-plus"></i> Cập nhật sản phẩm
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab active">Thông tin sản phẩm</div>
+                <div class="tab">Nhập số lượng sản phẩm</div>
+                <div class="tab">Thêm ảnh feedback cho sản phẩm</div>
+            </div>
+
+            <!-- Nội dung tab 1: Thông tin sản phẩm -->
+            <div class="tab-content" style="display: block;">
+                <form id="add-product-form" class="add-product-form">
+                    <div class="form-grid">
+                        <!-- LEFT -->
+                        <div>
+                            <div class="form-group">
+                                <label for="ten_sp">Tên sản phẩm *</label>
+                                <input type="text" id="ten_sp" name="ten_sp" value="VANS VAULT STYLE 36 BLACK" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="mo_ta">Mô tả *</label>
+                                <textarea id="mo_ta" name="mo_ta">🔸 <a href="#">Chất lượng</a> Rep 1:1  
+- Nên mang lên 1 size so với tiêu chuẩn  
+- Vận chuyển toàn quốc | Kiểm Tra Hàng Trước Khi Thanh Toán  
+- 100% Ảnh chụp trực tiếp tại Tu Shoes  
+- Bảo Hành Trọn Đời Sản Phẩm  
+- Đổi Trả 7 Ngày Không Kể Lý Do</textarea>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT -->
+                        <div>
+                            <div class="form-group">
+                                <label for="trang_thai">Trạng thái</label>
+                                <select id="trang_thai">
+                                    <option>Mở bán</option>
+                                    <option>Ngưng bán</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nhan_hieu">Nhãn hiệu sản phẩm *</label>
+                                <select id="nhan_hieu">
+                                    <option selected>VANZ</option>
+                                    <option>Nike</option>
+                                    <option>Adidas</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Danh mục sản phẩm *</label>
+                                <div class="dropdown-multiselect" id="danh-muc-wrapper">
+                                    <div class="dropdown-selected" id="dropdown-selected">Chọn danh mục</div>
+                                    <div class="dropdown-options" id="dropdown-options">
+                                        <label><input type="checkbox" value="Giày Nam"> Giày Nam</label>
+                                        <label><input type="checkbox" value="Giày Nữ"> Giày Nữ</label>
+                                        <label><input type="checkbox" value="Giày Trẻ em"> Giày Trẻ em</label>
+                                        <label><input type="checkbox" value="Sneaker"> Sneaker</label>
+                                        <label><input type="checkbox" value="Chạy bộ"> Chạy bộ</label>
+                                        <label><input type="checkbox" value="Thể thao"> Thể thao</label>
+                                    </div>
+                                </div>
+                                <div id="selected-tags" class="tags-input" style="margin-top: 10px;"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gia_goc">
+                                    Giá gốc tham khảo (VND)
+                                    <small>(Giá này sẽ được dùng mặc định nếu không nhập giá riêng trong tab 2)</small>
+                                </label>
+                                <input type="number" id="gia_goc" name="gia_goc" value="">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="gia_ban">
+                                    Giá bán tham khảo (VND)
+                                    <small>(Giá này sẽ được dùng mặc định nếu không nhập giá riêng trong tab 2)</small>
+                                </label>
+                                <input type="number" id="gia_ban" name="gia_ban" value="">
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+
+                <div class="form-group">
+                    <label>Ảnh sản phẩm <small>(Lưu ý: Nền đế nền trắng)</small></label>
+                    <div class="product-images">
+                        <div class="image-thumb"><img src="/images/products/chaybo/ConverseRunStarMotion(1).webp"
+                                alt="Ảnh 1"></div>
+                        <div class="image-thumb"><img src="/images/products/chaybo/ConverseRunStarMotion(2).webp"
+                                alt="Ảnh 2"></div>
+                        <div class="image-thumb"><img src="/images/products/chaybo/ConverseRunStarMotion(3).webp"
+                                alt="Ảnh 3"></div>
+                        <div class="image-thumb"><img src="/images/products/chaybo/ConverseRunStarMotion.webp"
+                                alt="Ảnh 4"></div>
+                    </div>
+                    <button type="button" class="choose-image-btn">Chọn ảnh</button>
+                </div>
+            </div>
+
+            <!-- Nội dung tab 2: Nhập số lượng sản phẩm -->
+            <div class="tab-content" id="so-luong-tab" style="display: none;">
+                <div class="form-group">
+                    <label>Nhập biến thể sản phẩm (Màu - Size - Giá - Số lượng)</label>
+                    <div id="variant-list">
+                        <div class="variant-row"
+                            style="display: flex; gap: 10px; margin-bottom: 10px; align-items: center;">
+                            <div class="custom-select-wrapper" style="flex: 1;">
+                                <div class="custom-select" onclick="toggleDropdown(this)">
+                                    <div class="selected-option">
+                                        <span class="color-circle" style="background-color: black;"></span>
+                                        <span class="color-name">Đen</span>
+                                    </div>
+
+
+                                    <div class="dropdown">
+                                        <input type="text" class="color-search" placeholder="Tìm màu..."
+                                            onkeyup="filterColors(this)">
+                                        <div class="dropdown-option" data-value="black|Đen" style="--color: black;">
+                                            <span class="color-circle"></span><span class="color-name">Đen</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="white|Trắng" style="--color: white;">
+                                            <span class="color-circle"></span><span class="color-name">Trắng</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="gray|Xám" style="--color: gray;">
+                                            <span class="color-circle"></span><span class="color-name">Xám</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="lightgray|Xám nhạt"
+                                            style="--color: lightgray;">
+                                            <span class="color-circle"></span><span class="color-name">Xám nhạt</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="red|Đỏ" style="--color: red;">
+                                            <span class="color-circle"></span><span class="color-name">Đỏ</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="darkred|Đỏ đậm"
+                                            style="--color: darkred;">
+                                            <span class="color-circle"></span><span class="color-name">Đỏ đậm</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="maroon|Nâu đỏ"
+                                            style="--color: maroon;">
+                                            <span class="color-circle"></span><span class="color-name">Nâu đỏ</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="pink|Hồng" style="--color: pink;">
+                                            <span class="color-circle"></span><span class="color-name">Hồng</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="hotpink|Hồng đậm"
+                                            style="--color: hotpink;">
+                                            <span class="color-circle"></span><span class="color-name">Hồng đậm</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="blue|Xanh dương"
+                                            style="--color: blue;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh dương</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="navy|Xanh navy" style="--color: navy;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh navy</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="skyblue|Xanh da trời"
+                                            style="--color: skyblue;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh da
+                                                trời</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="teal|Xanh ngọc" style="--color: teal;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh ngọc</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="green|Xanh lá" style="--color: green;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh lá</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="lime|Xanh neon" style="--color: lime;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh neon</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="olive|Xanh oliu"
+                                            style="--color: olive;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh oliu</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="orange|Cam" style="--color: orange;">
+                                            <span class="color-circle"></span><span class="color-name">Cam</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="darkorange|Cam đậm"
+                                            style="--color: darkorange;">
+                                            <span class="color-circle"></span><span class="color-name">Cam đậm</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="yellow|Vàng" style="--color: yellow;">
+                                            <span class="color-circle"></span><span class="color-name">Vàng</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="gold|Vàng kim" style="--color: gold;">
+                                            <span class="color-circle"></span><span class="color-name">Vàng kim</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="beige|Be" style="--color: beige;">
+                                            <span class="color-circle"></span><span class="color-name">Be</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="ivory|Trắng ngà"
+                                            style="--color: ivory;">
+                                            <span class="color-circle"></span><span class="color-name">Trắng ngà</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="purple|Tím" style="--color: purple;">
+                                            <span class="color-circle"></span><span class="color-name">Tím</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="violet|Tím nhạt"
+                                            style="--color: violet;">
+                                            <span class="color-circle"></span><span class="color-name">Tím nhạt</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="indigo|Chàm" style="--color: indigo;">
+                                            <span class="color-circle"></span><span class="color-name">Chàm</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="brown|Nâu" style="--color: brown;">
+                                            <span class="color-circle"></span><span class="color-name">Nâu</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="saddlebrown|Nâu yên ngựa"
+                                            style="--color: saddlebrown;">
+                                            <span class="color-circle"></span><span class="color-name">Nâu yên
+                                                ngựa</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="chocolate|Socola"
+                                            style="--color: chocolate;">
+                                            <span class="color-circle"></span><span class="color-name">Socola</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="silver|Bạc" style="--color: silver;">
+                                            <span class="color-circle"></span><span class="color-name">Bạc</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="cyan|Xanh cyan" style="--color: cyan;">
+                                            <span class="color-circle"></span><span class="color-name">Xanh cyan</span>
+                                        </div>
+                                        <div class="dropdown-option" data-value="magenta|Hồng tím"
+                                            style="--color: magenta;">
+                                            <span class="color-circle"></span><span class="color-name">Hồng tím</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <input type="hidden" name="color[]" value="black|Đen" />
+                            </div>
+                            <input type="text" name="size[]" placeholder="Size (VD: 39)" style="flex: 1;" />
+                            <input type="number" name="price[]" placeholder="Giá bán (VND)" style="flex: 1;" />
+                            <input type="number" name="price[]" placeholder="Giá khuyến mãi (VND)" style="flex: 1;" />
+                            <input type="number" name="quantity[]" placeholder="Số lượng" style="flex: 1;" />
+                            <button type="button" class="btn btn-add-variant">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Nội dung tab 3: Ảnh feedback -->
+            <div class="tab-content" id="feedback-tab" style="display: none;">
+                <div class="form-group">
+                    <label>Thêm ảnh feedback từ khách hàng</label>
+                    <div class="product-images">
+                        <!-- Ảnh ví dụ hoặc trống -->
+                    </div>
+                    <button type="button" class="choose-image-btn">Tải ảnh lên</button>
+                </div>
+            </div>
+        </main>
+
+
+
+
+    </div>
+
+</body>
+<script>
+    const submenuToggles = document.querySelectorAll('.has-submenu > a');
+
+    submenuToggles.forEach(toggle => {
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+            const parent = this.parentElement;
+            parent.classList.toggle('open');
+        });
+    });
+</script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#mo_ta'))
+        .then(editor => {
+            const editableElement = editor.ui.view.editable.element;
+            editableElement.style.height = '300px';
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+<script>
+    const dropdownWrapper = document.getElementById("danh-muc-wrapper");
+    const dropdownSelected = document.getElementById("dropdown-selected");
+    const dropdownOptions = document.getElementById("dropdown-options");
+    const checkboxes = dropdownOptions.querySelectorAll('input[type="checkbox"]');
+    const selectedTagsContainer = document.getElementById("selected-tags");
+
+    dropdownWrapper.addEventListener("click", () => {
+        dropdownWrapper.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!dropdownWrapper.contains(e.target)) {
+            dropdownWrapper.classList.remove("open");
+        }
+    });
+
+    function renderTags() {
+        selectedTagsContainer.innerHTML = "";
+        const selected = [];
+
+        checkboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                selected.push(checkbox.value);
+
+                const tag = document.createElement("span");
+                tag.className = "tag";
+                tag.textContent = checkbox.value;
+
+                const removeBtn = document.createElement("span");
+                removeBtn.textContent = " ×";
+                removeBtn.style.marginLeft = "5px";
+                removeBtn.style.cursor = "pointer";
+                removeBtn.onclick = () => {
+                    checkbox.checked = false;
+                    renderTags();
+                };
+
+                tag.appendChild(removeBtn);
+                selectedTagsContainer.appendChild(tag);
+            }
+        });
+
+        dropdownSelected.textContent = selected.length > 0 ? selected.join(", ") : "Chọn danh mục";
+    }
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", renderTags);
+    });
+
+    window.addEventListener("DOMContentLoaded", renderTags);
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // =================== Tabs ===================
+        const tabs = document.querySelectorAll(".tab");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+
+                tabContents.forEach((content, i) => {
+                    content.style.display = i === index ? "block" : "none";
+                });
+            });
+        });
+
+        // =================== Variant Add/Remove ===================
+        const variantList = document.getElementById("variant-list");
+        if (variantList) {
+            variantList.addEventListener("click", function (e) {
+                if (e.target.classList.contains("btn-add-variant")) {
+                    const row = e.target.closest(".variant-row");
+                    const newRow = row.cloneNode(true);
+
+                    newRow.querySelectorAll("input").forEach(input => {
+                        if (input.type === "hidden") {
+                            input.value = "black|Đen";
+                        } else {
+                            input.value = "";
+                        }
+                    });
+
+                    const btn = newRow.querySelector(".btn-add-variant");
+                    btn.textContent = "-";
+                    btn.classList.remove("btn-add-variant");
+                    btn.classList.add("btn-remove-variant");
+
+                    variantList.appendChild(newRow);
+                }
+
+                if (e.target.classList.contains("btn-remove-variant")) {
+                    const row = e.target.closest(".variant-row");
+                    variantList.removeChild(row);
+                }
+            });
+        }
+
+        // =================== Dropdown Selection (Color) ===================
+        document.querySelectorAll(".dropdown-option").forEach(option => {
+            option.addEventListener("click", function () {
+                const wrapper = this.closest(".custom-select-wrapper");
+                const selected = wrapper.querySelector(".selected-option");
+                const input = wrapper.querySelector("input[type=hidden]");
+
+                selected.querySelector(".color-circle").style.backgroundColor = this.style["--color"];
+                selected.querySelector(".color-name").textContent = this.querySelector(".color-name").textContent;
+                input.value = this.dataset.value;
+
+                wrapper.querySelector(".dropdown").classList.remove("show");
+            });
+        });
+
+        // =================== Custom Select Dropdown ===================
+        document.querySelectorAll(".custom-select").forEach(select => {
+            select.addEventListener("click", function (e) {
+                e.stopPropagation();
+                closeAllDropdowns(this);
+                const dropdown = this.querySelector(".dropdown");
+                dropdown.classList.toggle("show");
+            });
+        });
+
+        // Ngăn dropdown bị đóng khi click vào trong nó
+        document.querySelectorAll(".dropdown").forEach(dropdown => {
+            dropdown.addEventListener("click", function (e) {
+                e.stopPropagation();
+            });
+        });
+
+        // =================== Helper ===================
+        function closeAllDropdowns(current) {
+            document.querySelectorAll(".custom-select").forEach(select => {
+                if (select !== current) {
+                    select.querySelector(".dropdown")?.classList.remove("show");
+                }
+            });
+        }
+    });
+
+    // =================== Đóng dropdown khi click ra ngoài ===================
+    document.addEventListener("click", function () {
+        document.querySelectorAll(".dropdown").forEach(dropdown => {
+            dropdown.classList.remove("show");
+        });
+    });
+</script>
+
+</html>
