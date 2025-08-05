@@ -105,7 +105,7 @@ export default function Blog() {
                   <div className="content-blog" style={{width: "70%"}}>
                     <h2 style={{ textTransform: "uppercase" }}>{item.title}</h2>
                     <p>
-                      <span>{item.author.name} -</span>{" "}
+                      <span>{item.author?.name} -</span>{" "}
                       {new Date(item.created_at).toLocaleDateString("vi-VN")} -{" "}
                       <span>{localViews}</span> lượt xem
                     </p>
