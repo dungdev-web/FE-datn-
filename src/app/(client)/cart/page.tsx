@@ -8,6 +8,9 @@ import { useCart } from "@/hooks/useCart";
 import { API_BASE_URL } from "@/config/env";
 import { useEffect, useState } from "react";
 import { useCoupon } from "@/hooks/useCoupon";
+import { ICoupon } from "@/types/coupon";
+import { checkToken } from "@/services/authService";
+import { getSavedUserCoupons } from "@/services/couponService";
 export default function Cart() {
   const {
     cart,
@@ -24,9 +27,25 @@ export default function Cart() {
 
   const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
     useCoupon(subtotal, cart?.carts_id || "default");
-
+  const [savedCoupons, setSavedCoupons] = useState<ICoupon[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const [couponInput, setCouponInput] = useState("");
   const discountAmount = getDiscountAmount();
+  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (!event.target.closest(".coupon-dropdown")) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   useEffect(() => {
     console.log("🛒 Cart items:", cart?.cart_items);
   }, [cart]);
@@ -35,6 +54,24 @@ export default function Cart() {
       setCouponInput(appliedCoupon[0].code); // Hiện lại trong input
     }
   }, [appliedCoupon]);
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (tokenData?.user?.id) {
+          const uid = tokenData.user.id;
+          setUserId(uid);
+
+          const coupons = await getSavedUserCoupons(uid);
+          setSavedCoupons(coupons);
+        }
+      } catch (err) {
+        console.error("Không thể lấy mã giảm giá đã lưu:", err);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
 
   if (!cart) {
     return (
@@ -266,21 +303,89 @@ export default function Cart() {
 
           <div className="cart-summary">
             <div className="discount-section">
-              <h3>Áp Dụng Khuyến Mãi</h3>
-              <div className="discount">
+              <h3 className="text-lg font-semibold mb-2">Áp Dụng Khuyến Mãi</h3>
+
+              {savedCoupons.length > 0 && (
+                <div
+                  className={`relative w-full mb-4 coupon-dropdown ${
+                    isOpen ? "open" : ""
+                  }`}
+                >
+                  <button onClick={() => setIsOpen(!isOpen)}>
+                    {couponInput
+                      ? `Đã chọn: ${couponInput}`
+                      : "-- Chọn mã giảm giá đã lưu --"}
+                  </button>
+
+                  {isOpen && (
+                    <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg max-h-80 overflow-auto">
+                      <div className="coupon-section">
+                        {savedCoupons.map((coupon) => (
+                          <div
+                            key={coupon.code}
+                            onClick={() => {
+                              setCouponInput(coupon.code);
+                              applyCoupon(coupon.code);
+                              setIsOpen(false);
+                            }}
+                            className="coupon cursor-pointer"
+                          >
+                            {/* PHIẾU GIẢM GIÁ - label dọc */}
+                            <div className="right-part">PHIẾU GIẢM GIÁ</div>
+
+                            {/* Nội dung chính của voucher */}
+                            <div className="left-part">
+                              <p className="code">Mã: {coupon.code}</p>
+
+                              <div className="discount-box">
+                                <span className="title">MÃ GIẢM</span>
+                                <div className="percent">
+                                  {coupon.discount_type === "percentage"
+                                    ? `Giảm ${coupon.discount_value}%`
+                                    : `Giảm ${parseInt(
+                                        coupon.discount_value
+                                      ).toLocaleString("vi")}đ`}
+                                </div>
+                              </div>
+
+                              <p className="desc">
+                                Áp dụng từ{" "}
+                                {new Date(coupon.start_date).toLocaleDateString(
+                                  "vi-VN"
+                                )}{" "}
+                                đến{" "}
+                                {new Date(coupon.end_date).toLocaleDateString(
+                                  "vi-VN"
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* Nhập tay */}
+              <div className="discount flex gap-2">
                 <input
                   type="text"
                   placeholder="Nhập mã giảm giá..."
+                  className="flex-1 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value)}
                 />
-                <button onClick={() => applyCoupon(couponInput)}>
+                <button
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
+                  onClick={() => applyCoupon(couponInput)}
+                >
                   Áp Dụng
                 </button>
               </div>
-              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+
+              {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               {appliedCoupon && (
-                <p className="text-green-600 mt-1">
+                <p className="text-green-600 mt-2 text-sm">
                   Đã áp dụng mã <strong>{appliedCoupon.code}</strong>{" "}
                   <button
                     className="ml-2 text-blue-600 underline"

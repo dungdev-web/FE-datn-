@@ -19,6 +19,9 @@ import { useRouter } from "next/navigation";
 import { checkoutOrder, getZaloPayOrderStatus } from "@/services/cartService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { useSearchParams } from "next/navigation";
+import { checkToken } from "@/services/authService";
+import { getSavedUserCoupons } from "@/services/couponService";
+import { ICoupon } from "@/types/coupon";
 
 export default function Checkout() {
   const [phone, setPhone] = useState("");
@@ -122,6 +125,40 @@ export default function Checkout() {
     null
   );
   const searchParams = useSearchParams();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [savedCoupons, setSavedCoupons] = useState<ICoupon[]>([]);
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (!event.target.closest(".voucher-dropdown")) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (tokenData?.user?.id) {
+          const uid = tokenData.user.id;
+          setUserId(uid);
+
+          const coupons = await getSavedUserCoupons(uid);
+          setSavedCoupons(coupons); 
+        }
+      } catch (err) {
+        console.error("Không thể lấy mã giảm giá đã lưu:", err);
+      }
+    };
+
+    fetchCoupons();
+  }, []);
   useEffect(() => {
     const payment = searchParams.get("payment");
     const orderIdParam = searchParams.get("orderId");
@@ -314,7 +351,7 @@ export default function Checkout() {
 
       // Nếu là chuyển khoản (ZaloPay, MoMo) → redirect sang cổng thanh toán
       if (response.payment?.order_url) {
-        // ✅ Lưu app_trans_id để kiểm tra trạng thái sau này
+        //  Lưu app_trans_id để kiểm tra trạng thái sau này
         if (response.payment.app_trans_id) {
           localStorage.setItem(
             "zalopay_app_trans_id",
@@ -587,8 +624,9 @@ export default function Checkout() {
             );
           })}
         </div>
-
+       
         <div className="discound mt-4 flex gap-2">
+          
           <input
             type="text"
             placeholder="Nhập mã giảm giá"
@@ -603,6 +641,64 @@ export default function Checkout() {
             Áp dụng
           </button>
         </div>
+         {savedCoupons.length > 0 && (
+         <div className={`relative w-full mb-4 voucher-dropdown ${isOpen ? "open" : ""}`}>
+
+            <button onClick={() => setIsOpen(!isOpen)}>
+              {couponInput
+                ? `Đã chọn: ${couponInput}`
+                : "-- Chọn mã giảm giá đã lưu --"}
+            </button>
+
+            {isOpen && (
+              <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg max-h-80 overflow-auto">
+                <div className="coupon-section">
+                  {savedCoupons.map((coupon) => (
+                    <div
+                      key={coupon.code}
+                      onClick={() => {
+                        setCouponInput(coupon.code);
+                        applyCoupon(coupon.code);
+                        setIsOpen(false);
+                      }}
+                      className="coupon cursor-pointer"
+                    >
+                      {/* PHIẾU GIẢM GIÁ - label dọc */}
+                      <div className="right-part">PHIẾU GIẢM GIÁ</div>
+
+                      {/* Nội dung chính của voucher */}
+                      <div className="left-part">
+                        <p className="code">Mã: {coupon.code}</p>
+
+                        <div className="discount-box">
+                          <span className="title">MÃ GIẢM</span>
+                          <div className="percent">
+                            {coupon.discount_type === "percentage"
+                              ? `Giảm ${coupon.discount_value}%`
+                              : `Giảm ${parseInt(
+                                  coupon.discount_value
+                                ).toLocaleString("vi")}đ`}
+                          </div>
+                        </div>
+
+                        <p className="desc">
+                          Áp dụng từ{" "}
+                          {new Date(coupon.start_date).toLocaleDateString(
+                            "vi-VN"
+                          )}{" "}
+                          đến{" "}
+                          {new Date(coupon.end_date).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         {appliedCoupon && (
           <p className="text-green-600 mt-1">
