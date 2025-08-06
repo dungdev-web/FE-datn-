@@ -2,13 +2,73 @@
 
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
-
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [orderStatus, setOrderStatus] = useState("Chờ xác nhận");
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const exportStyledExcel = async (data: any[], fileName: string) => {
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet("Danh sách đơn hàng");
+
+    // Header
+   sheet.columns = [
+  { header: "Mã đơn hàng", key: "maDonHang", width: 20 },
+  { header: "Người nhận", key: "nguoiNhan", width: 25 },
+  { header: "Điện thoại", key: "dienThoai", width: 15 },
+  { header: "Trạng thái", key: "trangThai", width: 20 },
+  { header: "Sản phẩm", key: "sanPham", width: 30 },
+  { header: "Ngày đặt", key: "ngayDat", width: 15 },
+];
+
+
+    // Style header
+    sheet.getRow(1).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFCCE5FF" },
+      };
+      cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+      };
+    });
+
+    // Thêm dữ liệu
+    data.forEach((item) => {
+      sheet.addRow(item);
+    });
+
+    // Tạo file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, `${fileName}.xlsx`);
+  };
+  const dummyData = [
+    {
+      maDonHang: "ORD10001",
+      nguoiNhan: "Nguyễn Văn A",
+      dienThoai: "0901234567",
+      trangThai: "Chờ xác nhận",
+      sanPham: "Giày thể thao",
+      ngayDat: "08-05-2025",
+    },
+    {
+      maDonHang: "ORD10002",
+      nguoiNhan: "Trần Thị B",
+      dienThoai: "0907654321",
+      trangThai: "Đã xác nhận",
+      sanPham: "Áo thể thao",
+      ngayDat: "07-05-2025",
+    },
+  ];
 
   const handleCloseModal = (modal: "view" | "update") => {
     if (modal === "view") setIsViewModalOpen(false);
@@ -56,9 +116,13 @@ export default function OrderPage() {
           <button className="btn btn-refresh">
             <i className="fa-solid fa-rotate-right"></i> Refresh
           </button>
-          <button className="btn btn-export">
-            <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
-          </button>
+          <button
+  className="btn btn-export"
+  onClick={() => exportStyledExcel(dummyData, "don-hang")}
+>
+  <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
+</button>
+
         </div>
 
         <table className="order-table">

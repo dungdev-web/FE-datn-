@@ -14,7 +14,18 @@ import {
   getCountPosts,
   getCountPostCategories,
   getCountOrders,
+  getTotalRevenueByDay,
+  getTotalRevenueByWeek,
+  getTotalRevenueByMonth,
+  getTotalRevenueByYear,
+  getStockinProduct,
+  getBestSSellingProducts,
+  getPendingOrders,
+  getRecentOrders,
+  getStatusText,
+  formatDate,
 } from "@/services/dashboard";
+
 export default function Home_admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [data, setData] = useState<any>({});
@@ -31,6 +42,14 @@ export default function Home_admin() {
           posts,
           postCategories,
           orders,
+          totalDay,
+          totalWeek,
+          totalMonth,
+          totalYear,
+          stockinProduct,
+          bestSellingProducts,
+          pendingOrders,
+          recentOreders,
         ] = await Promise.all([
           getCountProduct(),
           getCountBrand(),
@@ -40,8 +59,17 @@ export default function Home_admin() {
           getCountPosts(),
           getCountPostCategories(),
           getCountOrders(),
+          getTotalRevenueByDay(),
+          getTotalRevenueByWeek(),
+          getTotalRevenueByMonth(),
+          getTotalRevenueByYear(),
+          getStockinProduct(),
+          getBestSSellingProducts(),
+          getPendingOrders(),
+          getRecentOrders(),
         ]);
-      console.log("📦 Sản phẩm:", products);
+        console.log("📦 tổng theo năm:", recentOreders);
+
 
         setData({
          
@@ -53,6 +81,14 @@ export default function Home_admin() {
           posts,
           postCategories,
           orders,
+          totalDay,
+          totalWeek,
+          totalMonth,
+          totalYear,
+          stockinProduct,
+          bestSellingProducts,
+          pendingOrders,
+          recentOreders,
         });
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
@@ -220,90 +256,35 @@ export default function Home_admin() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>ORD10001</td>
-              <td>Nguyễn Văn A</td>
-              <td>0901234567</td>
-              <td>
-                <span className="status-label status-pending">
-                  Chờ xác nhận
-                </span>
-              </td>
-              <td>
-                <span className="category-tag">Giày thể thao</span>
-              </td>
-              <td>300.000 đ</td>
-              <td>08-05-2025</td>
-            </tr>
-            <tr>
-              <td>ORD10002</td>
-              <td>Nguyễn Văn A</td>
-              <td>0912345678</td>
-              <td>
-                <span className="status-label status-confirmed">
-                  Đã xác nhận
-                </span>
-              </td>
-              <td>
-                <span className="category-tag">Áo hoodie</span>
-              </td>
-              <td>300.000 đ</td>
-              <td>08-05-2025</td>
-            </tr>
-            <tr>
-              <td>ORD10003</td>
-              <td>Nguyễn Văn A</td>
-              <td>0923456789</td>
-              <td>
-                <span className="status-label status-shipping">
-                  Đang giao hàng
-                </span>
-              </td>
-              <td>
-                <span className="category-tag">Ba lô</span>
-              </td>
-              <td>300.000 đ</td>
-              <td>08-05-2025</td>
-            </tr>
-            <tr>
-              <td>ORD10004</td>
-              <td>Nguyễn Văn A</td>
-              <td>0934567890</td>
-              <td>
-                <span className="status-label status-delivered">Đã giao</span>
-              </td>
-              <td>
-                <span className="category-tag">Túi xách</span>
-              </td>
-              <td>300.000 đ</td>
-              <td>08-05-2025</td>
-            </tr>
-            <tr>
-              <td>ORD10005</td>
-              <td>Nguyễn Văn A</td>
-              <td>0945678901</td>
-              <td>
-                <span className="status-label status-cancelled">Đã hủy</span>
-              </td>
-              <td>
-                <span className="category-tag">Mũ lưỡi trai</span>
-              </td>
-              <td>300.000 đ</td>
-              <td>08-05-2025</td>
-            </tr>
-            <tr>
-              <td>ORD10006</td>
-              <td>Nguyễn Văn A</td>
-              <td>0956789012</td>
-              <td>
-                <span className="status-label status-returned">Hoàn trả</span>
-              </td>
-              <td>
-                <span className="category-tag">Áo thun</span>
-              </td>
-              <td>300.000 đ</td>
-              <td>08-05-2025</td>
-            </tr>
+            {data.recentOreders?.data?.length > 0 ? (
+              data.recentOreders.data.map((order: any, index: number) => (
+                <tr key={index}>
+                  <td>{order.orders_id}</td>
+                  <td>{order.user.name}</td>
+                  <td>{order.user.phone || "Không có số điện thoại"}</td>
+                  <td>
+                    <span className={`status-label status-${order.status}`}>
+                      {getStatusText(order.status)}
+                    </span>
+                  </td>
+                  <td>
+                    <td>
+                      {order.order_items.map((item: any, idx: number) => (
+                        <div key={idx}>
+                          {item.variant.product.name} ({item.quantity} cái)
+                        </div>
+                      ))}
+                    </td>
+                  </td>
+                  <td>{order.total_amount.toLocaleString("vi-VN")} ₫</td>
+                  <td>{formatDate(order.created_at)}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={7}>Không có đơn hàng nào gần đây</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -313,55 +294,31 @@ export default function Home_admin() {
             <i className="fas fa-fire text-red"></i> Top sản phẩm bán chạy
           </h3>
           <div className="product-list">
-            <div className="product-card">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                alt="Sản phẩm"
-              />
-              <div className="product-info">
-                <p className="name">Giày Nike Air Max</p>
-                <p className="sold">
-                  Đã bán: <strong>120</strong> đôi
-                </p>
-                <p className="revenue">
-                  Doanh thu: <strong>24,000,000 ₫</strong>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="product-list">
-            <div className="product-card">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                alt="Sản phẩm"
-              />
-              <div className="product-info">
-                <p className="name">Giày Nike Air Max</p>
-                <p className="sold">
-                  Đã bán: <strong>120</strong> đôi
-                </p>
-                <p className="revenue">
-                  Doanh thu: <strong>24,000,000 ₫</strong>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div className="product-list">
-            <div className="product-card">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                alt="Sản phẩm"
-              />
-              <div className="product-info">
-                <p className="name">Giày Nike Air Max</p>
-                <p className="sold">
-                  Đã bán: <strong>120</strong> đôi
-                </p>
-                <p className="revenue">
-                  Doanh thu: <strong>24,000,000 ₫</strong>
-                </p>
-              </div>
-            </div>
+            {data.bestSellingProducts?.length > 0 ? (
+              data.bestSellingProducts.map((item: any, index: number) => (
+                <div className="product-card" key={index}>
+                  <img
+                    src={`${API_BASE_URL}/uploads/${
+                      item.image || "images/default.jpg"
+                    }`}
+                    alt={item.name}
+                  />
+                  <div className="product-info">
+                    <p className="name">{item.name}</p>
+                    <p className="sold">
+                      Đã bán: <strong>{item.sold_count}</strong> cái
+                    </p>
+                    <p className="revenue">
+                      Doanh thu:{" "}
+                      <strong>{item.revenue.toLocaleString("vi-VN")} ₫</strong>
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="no-products">Không có sản phẩm bán chạy nào</p>
+            )}
+
           </div>
         </div>
 
@@ -419,26 +376,23 @@ export default function Home_admin() {
             <i className="fas fa-bell text-info"></i> Đơn hàng đang chờ xác nhận
           </h3>
           <ul className="notification-list">
-            <li>
-              <strong>Đơn #1023</strong> – Khách: <em>Nguyễn Văn A</em>
-              <br />
-              Ngày đặt: 12/05/2025 – Tổng tiền: <strong>1,200,000₫</strong>
-            </li>
-            <li>
-              <strong>Đơn #1024</strong> – Khách: <em>Trần Thị B</em>
-              <br />
-              Ngày đặt: 12/05/2025 – Tổng tiền: <strong>850,000₫</strong>
-            </li>
-            <li>
-              <strong>Đơn #1025</strong> – Khách: <em>Lê Văn C</em>
-              <br />
-              Ngày đặt: 13/05/2025 – Tổng tiền: <strong>2,450,000₫</strong>
-            </li>
-            <li>
-              <strong>Đơn #1025</strong> – Khách: <em>Lê Văn C</em>
-              <br />
-              Ngày đặt: 13/05/2025 – Tổng tiền: <strong>2,450,000₫</strong>
-            </li>
+            {data.pendingOrders?.data.length > 0 ? (
+              data.pendingOrders.data.map((order: any, index: number) => (
+                <li key={index}>
+                  <strong>Đơn #{order.orders_id}</strong> – Khách:{" "}
+                  <em>{order.user.name}</em>
+                  <br />
+                  Ngày đặt:{" "}
+                  {new Date(order.created_at).toLocaleDateString("vi-VN")} –
+                  Tổng tiền:{" "}
+                  <strong>
+                    {order?.total_amount.toLocaleString("vi-VN")}₫
+                  </strong>
+                </li>
+              ))
+            ) : (
+              <li>Không có đơn hàng nào đang chờ xác nhận</li>
+            )}
           </ul>
         </div>
       </div>

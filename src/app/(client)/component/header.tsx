@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import Search from "./ShowSearch";
+import Search from "./showsearch";
 import TopCart from "./TopCart";
 import MenuRight from "./menu_right";
 import Link from "next/link";
