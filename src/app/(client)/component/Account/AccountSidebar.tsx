@@ -10,6 +10,8 @@ export default function AccountSidebar({ user }: { user: IUser | null }) {
   const isActive = (path: string) => pathname === path;
   const addressCount = useGlobalStore((state) => state.addressCount);
   const orderCount = useGlobalStore((state) => state.orderCount);
+  const voucherCount = useGlobalStore((state) => state.voucherCount);
+
   return (
     <div className="block-account">
       <h5 className="title-account">Trang tài khoản</h5>
@@ -38,6 +40,16 @@ export default function AccountSidebar({ user }: { user: IUser | null }) {
             href="/account/order"
           >
             Đơn hàng của bạn ({orderCount})
+          </Link>
+        </li>
+        <li>
+          <Link
+            className={`title-info ${
+              isActive("/account/my_voucher") ? "active" : ""
+            }`}
+            href="/account/my_voucher"
+          >
+            Kho lưu trữ mã giảm giá ({voucherCount})
           </Link>
         </li>
         <li>

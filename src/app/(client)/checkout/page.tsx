@@ -22,6 +22,7 @@ import "../css/checkout.css";
 import CheckoutContent from "../component/Checkout/CheckoutContent";
 import CheckoutLoading from "../component/Checkout/CheckoutLoading";
 
+
 // export default function Checkout() {
 //   const [phone, setPhone] = useState("");
 //   const [provinces, setProvinces] = useState<Province[]>([]);
@@ -107,7 +108,6 @@ import CheckoutLoading from "../component/Checkout/CheckoutLoading";
 //   const normalizeProvinceName = (province: string): string => {
 //     return province.replace("Thành phố ", "").replace("Tỉnh ", "").trim();
 //   };
-
 //   const getProvinceFromAddress = (address: string): string => {
 //     const parts = address.split(",");
 //     const rawProvince = parts[parts.length - 1]?.trim() || "";
@@ -312,7 +312,6 @@ import CheckoutLoading from "../component/Checkout/CheckoutLoading";
 //       };
 
 //       const response = await checkoutOrder(payload);
-
 //       // Nếu là chuyển khoản (ZaloPay, MoMo) → redirect sang cổng thanh toán
 //       if (response.payment?.order_url) {
 //         // ✅ Lưu app_trans_id để kiểm tra trạng thái sau này
