@@ -7,7 +7,7 @@ import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
 import { getLocalViews, increaseLocalViews } from "@/shared/until/viewTracker";
-import AsideBlog from "../component/Blog/AsideBlog";
+import AsideBlog from "../component/blog/AsideBlog";
 
 import Link from "next/link";
 export default function Blog() {
