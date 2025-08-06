@@ -1,5 +1,4 @@
 export interface ICoupon {
-  length: number;
   coupons_id: number;
   code: string;
   discount_type: "percentage" | "fixed"; 
@@ -10,4 +9,5 @@ export interface ICoupon {
   used_count: number;
   created_at: string;
   updated_at: string;
+  min_order: number;
 }

@@ -9,6 +9,8 @@ import { ICoupon } from "@/types/coupon";
 import AccountSidebar from "../../component/Account/AccountSidebar";
 import { useGlobalStore } from "@/store/useGlobalStore"; // ✅ Import thêm
 import "../../css/account.css";
+import { useAuthUser } from "@/hooks/useAuthUser";
+
 
 // ======================= CouponCard =======================
 function CouponCard({
@@ -109,7 +111,7 @@ function Modal({
 export default function MyVoucher() {
   const [coupons, setCoupons] = useState<ICoupon[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
-
+const { user } = useAuthUser();
   const setVoucherCount = useGlobalStore((state) => state.setVoucherCount); // ✅ dùng store
 
   // Modal states
@@ -209,7 +211,7 @@ export default function MyVoucher() {
         <div className="container1">
           <div className="row">
             <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">
-              <AccountSidebar />
+              <AccountSidebar user={user} />
             </div>
             <div className="col-xs-12 col-sm-12 col-lg-9">
               <div className="coupon-section">
