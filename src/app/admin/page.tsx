@@ -268,13 +268,11 @@ export default function Home_admin() {
                     </span>
                   </td>
                   <td>
-                    <td>
                       {order.order_items.map((item: any, idx: number) => (
                         <div key={idx}>
                           {item.variant.product.name} ({item.quantity} cái)
                         </div>
                       ))}
-                    </td>
                   </td>
                   <td>{order.total_amount.toLocaleString("vi-VN")} ₫</td>
                   <td>{formatDate(order.created_at)}</td>

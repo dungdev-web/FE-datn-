@@ -18,13 +18,13 @@ const getToday = () => {
   const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
-// Ví dụ: Chuyển đổi mã trạng thái sang tiếng Việt
 export const getStatusText = (status: string)=> {
   switch (status) {
-    case "pending": return "Chờ xác nhận";
-    case "confirmed": return "Đã xác nhận";
+    case "pending": return "Chờ xử lý";
+    case "processing": return "Đang xử lý";
     case "shipping": return "Đang giao hàng";
     case "delivered": return "Đã giao";
+    case "completed": return "Hoàn thành";
     case "cancelled": return "Đã hủy";
     case "returned": return "Hoàn trả";
     default: return "Không xác định";
@@ -55,4 +55,4 @@ export const getCountReviews = () => fetchDashboardData("reviews");
 export const getCountPosts = () => fetchDashboardData("posts");
 export const getCountPostCategories = () => fetchDashboardData("post-categories");
 export const getCountOrders = () => fetchDashboardData("orders");
-export const getRecentOrders = () => fetchDashboardData("recent-orders");
+export const getRecentOrders = (query = "") => fetchDashboardData("recent-orders?" + query);
