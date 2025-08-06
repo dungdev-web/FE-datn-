@@ -15,6 +15,7 @@ import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
 import { useGlobalStore } from "@/store/useGlobalStore";
+import SearchWithSuggestions from "./SearchWithSuggestions";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -375,20 +376,7 @@ export default function Header() {
                 <LinkWithLoader href="/account">Tài khoản</LinkWithLoader>
               </li>
             </ul>
-            <div className="seach-nav">
-              <input
-                type="text"
-                placeholder="Tìm kiếm sản phẩm"
-                className="input-search-nav !text-black"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                onKeyDown={handleKeyPress}
-              />
-              <i
-                className="fa-solid fa-magnifying-glass"
-                onClick={handleSearch}
-              ></i>
-            </div>
+             <SearchWithSuggestions />
           </div>
         </nav>
       )}
