@@ -36,14 +36,14 @@ export default function Header() {
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
-   const {
-  wishlistCount,
-  compareCount,
-  cartCount: cartItemCount,
-  setWishlistCount,
-  setCompareCount,
-  setCartCount,
-} = useGlobalStore();
+  const {
+    wishlistCount,
+    compareCount,
+    cartCount: cartItemCount,
+    setWishlistCount,
+    setCompareCount,
+    setCartCount,
+  } = useGlobalStore();
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
@@ -259,57 +259,56 @@ export default function Header() {
           </div>
         </div>
         <div className="icon-header">
-  <div
-    className={`iconuser-header div1 ${
-      user ? "logged-in" : "logged-out"
-    }`}
-  >
-    <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-      {user ? (
-        <Link
-          href="/account"
-          className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
-        >
-          Chào {user.name}
-        </Link>
-      ) : (
-        <Link href="/login">
-          <i className="fa-solid fa-user cursor-pointer text-white"></i>
-        </Link>
-      )}
-    </div>
-  </div>
+          <div
+            className={`iconuser-header div1 ${
+              user ? "logged-in" : "logged-out"
+            }`}
+          >
+            <div className="login-mini inline-flex items-center px-2 py-1 rounded">
+              {user ? (
+                <Link
+                  href="/account"
+                  className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
+                >
+                  Chào {user.name}
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <i className="fa-solid fa-user cursor-pointer text-white"></i>
+                </Link>
+              )}
+            </div>
+          </div>
 
-  <div
-    className="iconheart-header div data_wishlist"
-    data-count={user ? wishlistCount : 0}
-  >
-    <Link href="/wishlist">
-      <i className="fa-solid fa-heart"></i>
-    </Link>
-  </div>
+          <div
+            className="iconheart-header div data_wishlist"
+            data-count={user ? wishlistCount : 0}
+          >
+            <Link href="/wishlist">
+              <i className="fa-solid fa-heart"></i>
+            </Link>
+          </div>
 
-  <div
-    className="iconcompare-header div data_compare_product"
-    data-count={user ? compareCount : 0}
-  >
-    <Link href="/compare_product">
-      <i className="fa fa-exchange"></i>
-    </Link>
-  </div>
+          <div
+            className="iconcompare-header div data_compare_product"
+            data-count={user ? compareCount : 0}
+          >
+            <Link href="/compare_product">
+              <i className="fa fa-exchange"></i>
+            </Link>
+          </div>
 
-  <div className="cart-wrapper">
-    <div
-      className="iconcart-header div data_cart"
-      data-count={user ? cartItemCount : 0}
-    >
-      <Link href="/cart">
-        <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
-      </Link>
-    </div>
-  </div>
-</div>
-
+          <div className="cart-wrapper">
+            <div
+              className="iconcart-header div data_cart"
+              data-count={user ? cartItemCount : 0}
+            >
+              <Link href="/cart">
+                <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
+              </Link>
+            </div>
+          </div>
+        </div>
       </header>
       <Search isSearchOpen={isSearchOpen} closeSearch={closeSearch} />
       <TopCart ref={cartPopupRef} />
@@ -376,7 +375,7 @@ export default function Header() {
                 <LinkWithLoader href="/account">Tài khoản</LinkWithLoader>
               </li>
             </ul>
-             <SearchWithSuggestions />
+            <SearchWithSuggestions />
           </div>
         </nav>
       )}
