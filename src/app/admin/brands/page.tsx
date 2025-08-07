@@ -1,11 +1,12 @@
-"use client"
+"use client";
 import { API_BASE_URL } from "@/config/env";
 import "../../admin/css/brands_admin.css";
 import Link from "next/link";
-import { useEffect, useState } from "react";import { getBrands } from "@/services/brandService";
+import { useEffect, useState } from "react";
+import { getBrands } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 export default function Brands() {
-   const [brands, setBrands] = useState<IBrand[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
 
@@ -83,28 +84,39 @@ export default function Brands() {
               <th></th>
             </tr>
           </thead>
-            <tbody>
-          {brands.map((brand) => (
-            <tr key={brand.brand_id}>
-              <td>{brand.brand_id}</td>
-              <td>{brand.name}</td>
-              <td>
-                <img
-                  src={brand.logo_url}
-                  alt={brand.name}
-                  className="brand-logo"
-                />
-              </td>
-              <td>{brand.slug}</td>
-              <td>
-                <Link href={`/admin/brands/edit/${brand.brand_id}`}>
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa nhãn hiệu"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa nhãn hiệu"></i>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+          <tbody>
+            {brands.map((brand) => (
+              <tr key={brand.brand_id}>
+                <td>{brand.brand_id}</td>
+                <td>{brand.name}</td>
+                <td>
+                  <img
+                    src={
+                          `${API_BASE_URL}/uploads/${brand.logo_url}` ||
+                          "/images/placeholder.png"
+                        }
+                    alt={brand.name}
+                    className="brand-logo"
+                  />
+                </td>
+                <td>{brand.slug}</td>
+                <td>Chưa có ngày tạo</td>
+                <td> chưa có ngày cập nhật</td>
+                <td>
+                  <Link href={`/admin/brands/edit/${brand.brand_id}`}>
+                    <i
+                      className="fa-solid fa-pen edit-icon"
+                      title="Sửa nhãn hiệu"
+                    ></i>
+                  </Link>
+                  <i
+                    className="fa-solid fa-trash delete-icon"
+                    title="Xóa nhãn hiệu"
+                  ></i>
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
 
         <div className="pagination">
@@ -119,6 +131,6 @@ export default function Brands() {
           </button>
         </div>
       </div>
-      </>
+    </>
   );
 }
