@@ -255,34 +255,33 @@ th select:focus {
 }
 
 .status-pending {
-  background-color: #ffc107;
-  /* vàng */
+  background-color: #ffc107; /* vàng */
 }
 
-.status-confirmed {
-  background-color: #17a2b8;
-  /* xanh dương nhạt */
+.status-processing {
+  background-color: #20c997; /* xanh ngọc */
 }
 
 .status-shipping {
-  background-color: #007bff;
-  /* xanh dương */
+  background-color: #007bff; /* xanh dương */
 }
 
 .status-delivered {
-  background-color: #28a745;
-  /* xanh lá */
+  background-color: #6610f2; /* tím đậm */
+}
+
+.status-completed {
+  background-color: #28a745; /* xanh lá */
 }
 
 .status-cancelled {
-  background-color: #dc3545;
-  /* đỏ */
+  background-color: #dc3545; /* đỏ */
 }
 
 .status-returned {
-  background-color: #6c757d;
-  /* xám */
+  background-color: #6c757d; /* xám */
 }
+
 /* Modal overlay */
 .modal-overlay {
   position: fixed;

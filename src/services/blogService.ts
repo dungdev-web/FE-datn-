@@ -3,7 +3,9 @@ import { IBlog,Category,IBlogCreate } from "@/types/blog";
 import { getMockBlog } from "@/mocks/mockBlog";
 // Lấy bài viết
 export async function getPost(
-  page: number
+  page: number,
+  title?: string,
+  status?: string
 ): Promise<{ posts: IBlog[]; totalPages: number }> {
   if (IS_MOCK) {
     const allPosts = getMockBlog();
@@ -14,7 +16,18 @@ export async function getPost(
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/post?page=${page}&limit=5`, {
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: "5",
+    });
+
+    if (title) queryParams.append("title", title);
+    if (status !== undefined && status !== "") {
+  queryParams.append("status", status.toString());
+}
+
+
+    const res = await fetch(`${API_BASE_URL}/post?${queryParams.toString()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -36,6 +49,9 @@ export async function getPost(
     return { posts: [], totalPages: 1 };
   }
 }
+
+
+// 
 // Lấy bài viết theo ID
 export async function getPostById(id: number): Promise<IBlog | null> {
   if (IS_MOCK) {
@@ -155,5 +171,22 @@ export async function addPost(formData: FormData): Promise<IBlog | null> {
   }
 }
 
+export async function updatePost(postId: number | undefined, formData: FormData): Promise<IBlog | null> {
+  if (!postId) return null;
 
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/update/${postId}`, {
+      method: "PUT", // 🔁 dùng PUT vì bạn đã khai báo trong router
+      body: formData,
+    });
+
+    if (!res.ok) throw new Error("Không thể cập nhật bài viết.");
+
+    const data = await res.json();
+    return data.data || null;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật bài viết:", error);
+    return null;
+  }
+}
 

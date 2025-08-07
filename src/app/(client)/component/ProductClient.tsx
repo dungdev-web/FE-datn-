@@ -12,9 +12,9 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-import SidebarFilter from "./Products/SidebarFilter";
-import MobileSidebarFilter from "./Products/MobileSidebarFilter";
-import ProductIcons from "./Products/ProductIcons";
+import SidebarFilter from "./products/SidebarFilter";
+import MobileSidebarFilter from "./products/MobileSidebarFilter";
+import ProductIcons from "./products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";

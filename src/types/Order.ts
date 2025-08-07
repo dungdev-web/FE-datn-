@@ -6,9 +6,24 @@ export interface IOrder {
   user_id: number;
   status: string;
   total_amount: number;
+  payment_method: {
+    payment_method_id: number;
+    name_method: string;
+    description: string;
+  };
   payment_method_id: number;
   shipping_address_id: number;
+  shipping_address: {
+    shipping_address_id: number;
+    address_line: string;
+  };
   shipping_fee: number;
+  user: {
+    user_id: number;
+    name: string;
+    email: string;
+    phone: string;
+  }
   payment_status: string;
   coupons_id: number | null;
   comment: string | null;
