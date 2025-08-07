@@ -435,6 +435,7 @@ export default function Home() {
             })}
           </div>
         </div>
+        {featureproducts.length > 0 && (
         <div className="hot-products">
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
@@ -559,6 +560,7 @@ export default function Home() {
             })}
           </div>
         </div>
+        )}
 
         <div className="product-two-box-main">
           <h1 className="h1">SẢN PHẨM THEO DANH MỤC</h1>
