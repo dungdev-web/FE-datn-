@@ -395,74 +395,7 @@ export default function Home_admin() {
         </div>
       </div>
 
-      <div className="dashboard-section">
-        <div className="internal-news">
-          <h3>
-            <i className="fas fa-bullhorn"></i> Tin nội bộ
-          </h3>
-          <ul className="news-list">
-            <li>
-              <i className="fas fa-server text-blue"></i> Hệ thống đã được
-              backup lúc 03:00 sáng
-            </li>
-            <li>
-              <i className="fas fa-exclamation-triangle text-warning"></i> Lỗi
-              kết nối API lúc 10:30 – đã khắc phục
-            </li>
-            <li>
-              <i className="fas fa-bolt text-purple"></i> Chiến dịch khuyến mãi
-              “Hè rực rỡ” sẽ bắt đầu 20/05
-            </li>
-            <li>
-              <i className="fas fa-check text-green"></i> 3 bài viết marketing
-              mới đã được duyệt
-            </li>
-          </ul>
-        </div>
-
-        <div className="quick-actions">
-          <h3>
-            <i className="fas fa-bolt"></i> Hành động nhanh
-          </h3>
-          <div className="action-buttons">
-            <button>
-              <i className="fas fa-plus-circle"></i> Tạo sản phẩm mới
-            </button>
-            <button>
-              <i className="fas fa-receipt"></i> Tạo đơn hàng thủ công
-            </button>
-            <button>
-              <i className="fas fa-envelope"></i> Gửi email khuyến mãi
-            </button>
-            <button>
-              <i className="fas fa-tags"></i> Quản lý giảm giá
-            </button>
-            <button>
-              <i className="fas fa-newspaper"></i> Duyệt bài viết
-            </button>
-          </div>
-        </div>
-
-        <div className="alerts-system">
-          <h3>
-            <i className="fas fa-exclamation-circle"></i> Cảnh báo hệ thống
-          </h3>
-          <ul className="alert-list">
-            <li>
-              <i className="fas fa-clock text-danger"></i> 5 đơn hàng chưa xử lý
-              24h
-            </li>
-            <li>
-              <i className="fas fa-star-half-alt text-orange"></i> 2 đánh giá
-              mới cần kiểm duyệt
-            </li>
-            <li>
-              <i className="fas fa-box-open text-red"></i> 4 sản phẩm thiếu ảnh
-              hoặc giá = 0
-            </li>
-          </ul>
-        </div>
-      </div>
+  
     </div>
   );
 }

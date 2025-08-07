@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import Search from "./ShowSearch";
+
 import TopCart from "./TopCart";
 import MenuRight from "./menu_right";
 import Link from "next/link";
@@ -16,6 +16,7 @@ import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import SearchWithSuggestions from "./SearchWithSuggestions";
+import Search from "./showsearch";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
