@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import "../css/order_admin.css";
 import exportStyledExcel from "../component_admin/excel";
 import { IOrder } from "@/types/Order";
+import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -41,37 +42,46 @@ export default function OrderPage() {
     if (type === "view") setIsViewModalOpen(true);
     else if (type === "update") setIsUpdateModalOpen(true);
   };
-  const updateorderStatus = async () => {
+  const handleUpdateClick = async () => {
+    if (!selectedOrder?.orders_id) {
+      console.error("orders_id is undefined");
+      return;
+    }
     try {
-      if (!selectedOrder?.orders_id) {
-        console.error("orders_id is undefined");
-        return;
-      }
       const data = await updateOrderStatus(
-        selectedOrder?.orders_id,
+        selectedOrder.orders_id,
         orderStatus
       );
       if (data.success) {
-        fetchOrders();
+        await Swal.fire({
+          title: "Cập nhật thành công!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          didOpen: () => {
+            const swalContainer = document.querySelector(
+              ".swal2-container"
+            ) as HTMLElement;
+            if (swalContainer) {
+              swalContainer.style.zIndex = "9999";
+            }
+          },
+        });
+
+        // Đóng modal và làm mới trang
         setIsUpdateModalOpen(false);
+        location.reload();
       }
     } catch (err) {
-      console.error("Lỗi cập nhật:", err);
-    }
-  };
-  const handleUpdateClick = () => {
-    if (!selectedOrder?.orders_id) return;
+      const error = err as Error;
+      console.error("Lỗi cập nhật:", error);
 
-    updateOrderStatus(selectedOrder.orders_id, orderStatus)
-      .then((data) => {
-        if (data.success) {
-          fetchOrders();
-          setIsUpdateModalOpen(false);
-        }
-      })
-      .catch((err) => {
-        console.error("Lỗi cập nhật:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Đã xảy ra lỗi khi cập nhật",
+        text: error.message || "Vui lòng thử lại sau.",
       });
+    }
   };
 
   const fetchOrders = async () => {
@@ -407,12 +417,12 @@ export default function OrderPage() {
                 value={orderStatus}
                 onChange={(e) => setOrderStatus(e.target.value)}
               >
-                <option value="Chờ xác nhận">Chờ xác nhận</option>
-                <option value="Đã xác nhận">Đã xác nhận</option>
-                <option value="Đang giao hàng">Đang giao hàng</option>
-                <option value="Đã giao">Đã giao</option>
-                <option value="Đã hủy">Đã hủy</option>
-                <option value="Hoàn trả">Hoàn trả</option>
+                <option value="pending">Chờ xử lý</option>
+                <option value="processing">Đang xử lý</option>
+                <option value="shipping">Đang giao hàng</option>
+                <option value="delivered">Đã giao</option>
+                <option value="cancelle">Đã hủy</option>
+                <option value="returned">Hoàn trả</option>
               </select>
             </div>
             <div className="modal-footer">

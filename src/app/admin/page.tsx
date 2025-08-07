@@ -107,7 +107,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu ngày</p>
-            <p className="number">12.000.000₫</p>
+            <p className="number">{data.totalDay}₫</p>
           </div>
         </div>
         <div className="revenue-card">
@@ -125,7 +125,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu tháng</p>
-            <p className="number">230.000.000₫</p>
+            <p className="number">{data.totalMonth.toLocaleString('vi')}₫</p>
           </div>
         </div>
         <div className="revenue-card">
@@ -134,7 +134,7 @@ export default function Home_admin() {
           </div>
           <div className="info">
             <p className="title">Doanh thu năm</p>
-            <p className="number">2.800.000.000₫</p>
+            <p className="number">{(data.totalYear).toLocaleString('vi')}₫</p>
           </div>
         </div>
       </div>
