@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef, use } from "react";
 import Show1sanpham from "./component/product_home";
-import BlogHome from "./component/Home/BlogHome";
+import BlogHome from "./component/home/BlogHome";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
@@ -22,11 +22,11 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
-import Banner3D from "./component/Home/Banner3D";
+import Banner3D from "./component/home/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
-import ProductIcons from "./component/Products/ProductIcons";
-import HotProductIcons from "./component/Products/HotProductIcons";
-import HotspotLookbook from "./component/Home/HotspotProduct";
+import ProductIcons from "./component/products/ProductIcons";
+import HotProductIcons from "./component/products/HotProductIcons";
+import HotspotLookbook from "./component/home/HotspotProduct";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -323,7 +323,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM MỚI NHẤT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
@@ -440,7 +440,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
             <h4>
-              <a href="">Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 

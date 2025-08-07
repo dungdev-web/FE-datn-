@@ -206,7 +206,7 @@ textarea {
 }
 
 .dropdown-options {
-  display: none;
+  /* display: none; */
   position: absolute;
   top: 100%;
   left: 0;
@@ -296,6 +296,17 @@ textarea {
 
 .dropdown.show {
   display: block;
+}
+
+.dropdown-options.show {
+  display: block !important;
+}
+.dropdown-multiselect .dropdown-options {
+  display: none;
+}
+
+.dropdown-multiselect.open .dropdown-options {
+  display: block !important;
 }
 
 .color-search {
