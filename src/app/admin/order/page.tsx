@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import "../css/order_admin.css";
 import exportStyledExcel from "../component_admin/excel";
 import { IOrder } from "@/types/Order";
+import { updateOrderStatus } from "@/services/orderService";
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -15,22 +16,20 @@ export default function OrderPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
   const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
-
-  // Các bộ lọc
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
-  
- const excelData = orders.map((order:any) => ({
-  maDonHang: order.orders_id,
-  nguoiNhan: order.user?.name,
-  dienThoai: order.user?.phone,
-  trangThai: order.status,
-  sanPham: order.order_items?.map((i: any) => i.variant?.product?.name).join(", "),
-  ngayDat: new Date(order.created_at).toLocaleDateString("vi-VN"),
-}));
-
+  const excelData = orders.map((order: any) => ({
+    maDonHang: order.orders_id,
+    nguoiNhan: order.user?.name,
+    dienThoai: order.user?.phone,
+    trangThai: order.status,
+    sanPham: order.order_items
+      ?.map((i: any) => i.variant?.product?.name)
+      .join(", "),
+    ngayDat: new Date(order.created_at).toLocaleDateString("vi-VN"),
+  }));
 
   const handleCloseModal = (modal: "view" | "update") => {
     if (modal === "view") setIsViewModalOpen(false);
@@ -42,18 +41,16 @@ export default function OrderPage() {
     if (type === "view") setIsViewModalOpen(true);
     else if (type === "update") setIsUpdateModalOpen(true);
   };
-  const updateOrderStatus = async () => {
+  const updateorderStatus = async () => {
     try {
-      const res = await fetch(
-        `http://localhost:3000/orders/${selectedOrder?.orders_id}/status`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: orderStatus }),
-        }
+      if (!selectedOrder?.orders_id) {
+        console.error("orders_id is undefined");
+        return;
+      }
+      const data = await updateOrderStatus(
+        selectedOrder?.orders_id,
+        orderStatus
       );
-
-      const data = await res.json();
       if (data.success) {
         fetchOrders();
         setIsUpdateModalOpen(false);
@@ -61,6 +58,20 @@ export default function OrderPage() {
     } catch (err) {
       console.error("Lỗi cập nhật:", err);
     }
+  };
+  const handleUpdateClick = () => {
+    if (!selectedOrder?.orders_id) return;
+
+    updateOrderStatus(selectedOrder.orders_id, orderStatus)
+      .then((data) => {
+        if (data.success) {
+          fetchOrders();
+          setIsUpdateModalOpen(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Lỗi cập nhật:", err);
+      });
   };
 
   const fetchOrders = async () => {
@@ -86,7 +97,6 @@ export default function OrderPage() {
 
   useEffect(() => {
     fetchOrders();
-    updateOrderStatus();
   }, [page, limit, search, statusFilter, categoryFilter]);
 
   return (
@@ -406,7 +416,7 @@ export default function OrderPage() {
               </select>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-close" onClick={updateOrderStatus}>
+              <button className="btn btn-close" onClick={handleUpdateClick}>
                 Cập nhật
               </button>
             </div>

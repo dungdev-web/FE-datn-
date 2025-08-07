@@ -11,6 +11,8 @@ export interface IOrder {
     name_method: string;
     description: string;
   };
+  payment_method_id: number;
+  shipping_address_id: number;
   shipping_address: {
     shipping_address_id: number;
     address_line: string;
