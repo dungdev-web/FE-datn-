@@ -2,11 +2,20 @@
 import { API_BASE_URL } from "@/config/env";
 import "../../admin/css/brands_admin.css";
 import Link from "next/link";
-import { useState } from "react"; 
-
+import { useEffect, useState } from "react";import { getBrands } from "@/services/brandService";
+import { IBrand } from "@/types/IBrand";
 export default function Brands() {
+   const [brands, setBrands] = useState<IBrand[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+
+  useEffect(() => {
+    async function fetchBrands() {
+      const data = await getBrands();
+      setBrands(data);
+    }
+    fetchBrands();
+  }, []);
   return (
     <>
       <div className="brand-list">
@@ -74,84 +83,28 @@ export default function Brands() {
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>4</td>
-              <td>NIKE</td>
+            <tbody>
+          {brands.map((brand) => (
+            <tr key={brand.brand_id}>
+              <td>{brand.brand_id}</td>
+              <td>{brand.name}</td>
               <td>
                 <img
-                  src={`${API_BASE_URL}/ConverseRunStarMotion.webp`}
-                  alt="NIKE"
+                  src={brand.logo_url}
+                  alt={brand.name}
                   className="brand-logo"
                 />
               </td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>22-08-2021 20:50</td>
-              <td>27-11-2021 19:08</td>
+              <td>{brand.slug}</td>
               <td>
-                <Link href={"/admin/brands/edit"}>
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+                <Link href={`/admin/brands/edit/${brand.brand_id}`}>
+                  <i className="fa-solid fa-pen edit-icon" title="Sửa nhãn hiệu"></i>
                 </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+                <i className="fa-solid fa-trash delete-icon" title="Xóa nhãn hiệu"></i>
               </td>
             </tr>
-            <tr>
-              <td>4</td>
-              <td>NIKE</td>
-              <td>
-                <img
-                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                  alt="NIKE"
-                  className="brand-logo"
-                />
-              </td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>22-08-2021 20:50</td>
-              <td>27-11-2021 19:08</td>
-              <td>
-                <Link href={"/admin/brands/edit"}>
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>4</td>
-              <td>NIKE</td>
-              <td>
-                <img
-                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                  alt="NIKE"
-                  className="brand-logo"
-                />
-              </td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>22-08-2021 20:50</td>
-              <td>27-11-2021 19:08</td>
-              <td>
-                <Link href={"/admin/brands/edit"}>
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-            {/* Thêm các dòng khác tại đây */}
-          </tbody>
+          ))}
+        </tbody>
         </table>
 
         <div className="pagination">
