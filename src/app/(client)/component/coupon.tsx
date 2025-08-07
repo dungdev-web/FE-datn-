@@ -2,9 +2,12 @@
 import React, { useState, useEffect } from "react";
 import "../css/coupon.css";
 import { ICoupon } from "@/types/coupon";
-import { getCouponList } from "@/services/couponService";
+import { getCouponList, saveUserCoupon } from "@/services/couponService";
+import { checkToken } from "@/services/authService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-// Component hiển thị từng coupon
+// ======================= CouponCard =======================
 type CouponCardProps = {
   code: string;
   discount: string;
@@ -14,15 +17,16 @@ type CouponCardProps = {
     code: string,
     desc: string
   ) => void;
+  onSaveCoupon: (code: string) => void;
 };
 
-function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code).then(() => {
-      alert("Đã sao chép mã: " + code);
-    });
-  };
-
+function CouponCard({
+  code,
+  discount,
+  desc,
+  onApplyClick,
+  onSaveCoupon,
+}: CouponCardProps) {
   return (
     <div className="coupon">
       <div className="left-part">
@@ -39,8 +43,8 @@ function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
           >
             Điều kiện áp dụng
           </a>
-          <button className="copy-button" onClick={handleCopy}>
-            Sao chép mã
+          <button className="copy-button" onClick={() => onSaveCoupon(code)}>
+            Lưu mã
           </button>
         </div>
       </div>
@@ -49,13 +53,12 @@ function CouponCard({ code, discount, desc, onApplyClick }: CouponCardProps) {
   );
 }
 
-// Modal hiển thị khi click "Điều kiện áp dụng"
+// ======================= Modal =======================
 type ModalProps = {
   visible: boolean;
   code: string;
   desc: string;
   usageLimit: number;
-
   onClose: () => void;
 };
 
@@ -64,7 +67,7 @@ function Modal({ visible, code, desc, usageLimit, onClose }: ModalProps) {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code).then(() => {
-      alert("Đã sao chép mã: " + code);
+      toast.success("Đã sao chép mã: " + code);
     });
   };
 
@@ -97,13 +100,14 @@ function Modal({ visible, code, desc, usageLimit, onClose }: ModalProps) {
   );
 }
 
-// Component chính
+// ======================= Main Component =======================
 export default function CouponApp() {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCode, setSelectedCode] = useState("");
   const [selectedDesc, setSelectedDesc] = useState("");
-  const [coupons, setCoupons] = useState<ICoupon[]>([]);
   const [selectedUsageLimit, setSelectedUsageLimit] = useState<number>(1);
+  const [coupons, setCoupons] = useState<ICoupon[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchDataVoucher = async () => {
@@ -114,7 +118,20 @@ export default function CouponApp() {
         console.error("Lỗi khi lấy voucher:", err);
       }
     };
+
+    const fetchUserId = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (tokenData?.user?.id) {
+          setUserId(tokenData.user.id);
+        }
+      } catch (err) {
+        console.error("Lỗi khi lấy user từ token:", err);
+      }
+    };
+
     fetchDataVoucher();
+    fetchUserId();
   }, []);
 
   const handleApplyClick = (
@@ -128,6 +145,21 @@ export default function CouponApp() {
     setSelectedDesc(desc);
     setModalVisible(true);
     setSelectedUsageLimit(usageLimit);
+  };
+
+  const handleSaveCoupon = async (code: string) => {
+    if (!userId) {
+      toast.warning("Vui lòng đăng nhập để lưu mã giảm giá.");
+      return;
+    }
+
+    const result = await saveUserCoupon(userId, code);
+
+    if (result.error) {
+      toast.error(" " + result.error);
+    } else {
+      toast.success(" " + result.message);
+    }
   };
 
   return (
@@ -161,6 +193,7 @@ export default function CouponApp() {
                 coupon.usage_limit
               )
             }
+            onSaveCoupon={handleSaveCoupon}
           />
         ))}
       </div>

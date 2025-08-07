@@ -4,18 +4,18 @@ import { ICoupon } from "@/types/coupon";
 import { toast } from "react-toastify";
 
 export function useCoupon(subtotal: number, cartId: number | string) {
-  const [appliedCoupons, setAppliedCoupons] = useState<ICoupon[]>([]);
+  const [appliedCoupon, setAppliedCoupon] = useState<ICoupon | null>(null);
   const [error, setError] = useState<string>("");
 
-  const storageKey = `appliedCoupons_${cartId}`;
+  const storageKey = `appliedCoupon_${cartId}`;
 
   // Khôi phục mã từ localStorage
   useEffect(() => {
     const stored = localStorage.getItem(storageKey);
     if (stored) {
       try {
-        const parsed: ICoupon[] = JSON.parse(stored);
-        setAppliedCoupons(parsed);
+        const parsed: ICoupon = JSON.parse(stored);
+        setAppliedCoupon(parsed);
       } catch {
         localStorage.removeItem(storageKey);
       }
@@ -42,80 +42,60 @@ export function useCoupon(subtotal: number, cartId: number | string) {
       return setError("Mã đã được sử dụng hết lượt.");
     }
 
-    if (subtotal < 500_000) {
+    if (subtotal < coupon.min_order) {
       return setError(
-        "Đơn hàng phải từ 500.000₫ mới được áp dụng mã giảm giá."
+        `Đơn hàng cần tối thiểu ${coupon.min_order.toLocaleString("vi")}₫ để áp dụng mã này.`
       );
     }
 
-    if (appliedCoupons.find((c) => c.code === coupon.code)) {
+    if (appliedCoupon && appliedCoupon.code === coupon.code) {
       return setError("Bạn đã áp dụng mã này.");
     }
 
-    if (subtotal < 1_000_000 && appliedCoupons.length > 0) {
-      return setError("Đơn hàng dưới 1 triệu chỉ được áp dụng 1 mã.");
+    if (appliedCoupon) {
+      return setError("Chỉ được áp dụng một mã giảm giá mỗi đơn hàng.");
     }
 
-    const sameType = appliedCoupons.find(
-      (c) => c.discount_type === coupon.discount_type
-    );
-    if (sameType) {
-      return setError(
-        `Chỉ được áp dụng 1 mã giảm ${
-          coupon.discount_type === "percentage" ? "phần trăm" : "cố định"
-        }.`
-      );
-    }
-
-    if (appliedCoupons.length >= 2) {
-      return setError("Chỉ được áp dụng tối đa 2 mã.");
-    }
-
-    const newCoupons = [...appliedCoupons, coupon];
-    setAppliedCoupons(newCoupons);
-    localStorage.setItem(storageKey, JSON.stringify(newCoupons));
+    setAppliedCoupon(coupon);
+    localStorage.setItem(storageKey, JSON.stringify(coupon));
     toast.success(`Áp dụng mã ${coupon.code} thành công!`);
     setError("");
   };
 
   const getDiscountAmount = (): number => {
-    return appliedCoupons.reduce((total: number, coupon: ICoupon) => {
-      const discountValue = Number(coupon.discount_value); 
-      if (coupon.discount_type === "percentage") {
-        return total + Math.floor((subtotal * discountValue) / 100);
-      } else {
-        return total + discountValue;
-      }
-    }, 0);
+    if (!appliedCoupon) return 0;
+
+    const discountValue = Number(appliedCoupon.discount_value);
+    if (appliedCoupon.discount_type === "percentage") {
+      return Math.floor((subtotal * discountValue) / 100);
+    } else {
+      return discountValue;
+    }
   };
 
-  const resetCoupon = (code: string) => {
-    const updated = appliedCoupons.filter((c) => c.code !== code);
-    setAppliedCoupons(updated);
-    localStorage.setItem(storageKey, JSON.stringify(updated));
-    toast.warn(`Đã hủy mã ${code}`);
+  const resetCoupon = () => {
+    if (appliedCoupon) {
+      toast.warn(`Đã hủy mã ${appliedCoupon.code}`);
+    }
+    setAppliedCoupon(null);
+    localStorage.removeItem(storageKey);
     setError("");
   };
 
-  // Theo dõi subtotal, tự gỡ mã nếu không còn hợp lệ
+  // Gỡ mã nếu không còn hợp lệ khi subtotal thay đổi
   useEffect(() => {
-    const updated = appliedCoupons.filter((coupon, index) => {
-      if (subtotal < 500000) return false;
-      if (subtotal < 1_000_000 && appliedCoupons.length > 1) {
-        return index === 0;
-      }
-      return true;
-    });
-
-    if (updated.length !== appliedCoupons.length) {
-      setAppliedCoupons(updated);
-      localStorage.setItem(storageKey, JSON.stringify(updated));
-      toast.warn("Một số mã đã bị gỡ do đơn hàng không đủ điều kiện.");
+    if (
+      appliedCoupon &&
+      subtotal < appliedCoupon.min_order
+    ) {
+      setAppliedCoupon(null);
+      localStorage.removeItem(storageKey);
+      toast.warn("Mã giảm giá đã bị gỡ do đơn hàng không đủ điều kiện.");
     }
-  }, [subtotal, appliedCoupons, storageKey]);
+  }, [subtotal, appliedCoupon, storageKey]);
 
   return {
-    appliedCoupons,
+    appliedCoupon,
     applyCoupon,
     error,
     getDiscountAmount,
