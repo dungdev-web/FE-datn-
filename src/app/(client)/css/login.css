@@ -1,4 +1,3 @@
-
 .auth-container {
   display: flex;
   align-items: center;
@@ -45,6 +44,18 @@
   font-size: 16px;
   outline: none;
   transition: border-color 0.3s;
+}
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  display: none;
+}
+
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
 }
 
 .form-container input:focus {
@@ -132,7 +143,7 @@
 .form-container .register-link p {
   font-size: 16px;
   color: black;
-  padding:  10px 0px;
+  padding: 10px 0px;
 }
 .form-container .register-link .p {
   padding: 20px;
@@ -160,7 +171,10 @@
   font-size: 12px;
   text-decoration: none;
 }
-
+.form-container .foget-pw a {
+  color: blue;
+  font-size: 14px;
+}
 /* Responsive Design */
 @media (max-width: 991px) {
   .auth-container img {
@@ -169,7 +183,6 @@
     height: 200px;
     border-radius: 10px;
   }
-  
 }
 /* Medium-sized devices (e.g., tablets) */
 @media (max-width: 768px) {
@@ -178,10 +191,10 @@
     flex-direction: column; /* Stack image and form vertically */
     margin: 80px auto;
   }
-  .intro-banner{
+  .intro-banner {
     display: none;
   }
-    /* .auth-container img {
+  /* .auth-container img {
         display: none;
     } */
 
@@ -215,17 +228,17 @@
   .auth-container img {
     display: none;
   }
-  .auth-container{
-    margin-bottom: 30px;
+  .auth-container {
+    /* margin-bottom: 30px; */
     width: 100%;
   }
-  .form-container .remember-me{
+  .form-container .remember-me {
     font-size: 12px;
   }
-  header:before{
-   background-color: #021688;
+  header:before {
+    background-color: #021688;
   }
-   .forgot-wrapper{
+  .forgot-wrapper {
     margin-top: 0 !important;
   }
 }
@@ -233,7 +246,6 @@
 /* Small-sized devices (e.g., mobile phones) */
 @media (max-width: 480px) {
   .auth-container {
-
     margin-top: 100px;
     padding: 15px;
   }
@@ -261,7 +273,6 @@
   .form-container .register-link p {
     font-size: 11px;
   }
- 
 }
 /* forgot-password.css */
 /* forgot-password.css */
@@ -463,7 +474,6 @@
 .otp-invalid {
   border: 1px solid #ef4444 !important; /* đỏ */
 }
-
 
 .otp-input {
   width: 100%;

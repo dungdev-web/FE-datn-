@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { registerUser } from "@/services/authService";
 import "../css/login.css";
 import { validateField } from "@/hooks/validate_login_register";
@@ -10,7 +11,20 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+ const googleLogin = () => {
+    const clientId =
+      "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
+    const redirectUri = encodeURIComponent(
+      `http://localhost:3001/google/callback`
+    );
+    const scope = encodeURIComponent("profile email");
+    const responseType = "code";
+
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
+    window.location.href = url;
+  };
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -79,7 +93,7 @@ export default function Register() {
         />
 
         <div className="form-container">
-          <h2>Đăng ký email</h2>
+          <h2>Đăng ký tài khoản Tera Shoes</h2>
 
           <div className="register-link">
             <p>Hãy đăng ký để được hưởng nhiều đặc quyền riêng dành cho bạn</p>
@@ -151,33 +165,54 @@ export default function Register() {
             </div>
 
             <div>
-              <input
-                type="password"
-                placeholder="Mật Khẩu"
-                id="password"
-                value={password}
-                className={`input ${
-                  errors.password
-                    ? "error"
-                    : password.trim() !== ""
-                    ? "success"
-                    : ""
-                }`}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setErrors((prev) => ({ ...prev, password: "" }));
-                }}
-                onBlur={(e) =>
-                  setErrors((prev) => ({
-                    ...prev,
-                    password: validateField({
-                      name: "password",
-                      value: e.target.value,
-                      formType: "register",
-                    }),
-                  }))
-                }
-              />
+              <div style={{ position: "relative" }}>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`input ${
+                    errors.password
+                      ? "error"
+                      : password.trim() !== ""
+                      ? "success"
+                      : ""
+                  }`}
+                  placeholder="Mật Khẩu"
+                  id="password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setErrors((prev) => ({ ...prev, password: "" }));
+                  }}
+                  onBlur={(e) =>
+                    setErrors((prev) => ({
+                      ...prev,
+                      password: validateField({
+                        name: "password",
+                        value: e.target.value,
+                        formType: "register",
+                      }),
+                    }))
+                  }
+                  style={{ paddingRight: "40px" }} // Thêm padding để tránh icon bị che
+                />
+                <div
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                    zIndex: 10, // Đảm bảo icon luôn ở trên
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "24px",
+                    height: "24px",
+                  }}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </div>
+              </div>
 
               {errors.password && (
                 <p className="text-sm text-red-500 mt-1">{errors.password}</p>
@@ -195,9 +230,9 @@ export default function Register() {
 
           <h3>Hoặc</h3>
 
-          <div className="google-login">
-            <i className="fab fa-google"></i> Đăng nhập bằng Google
-          </div>
+          <button className="google-login" onClick={googleLogin}>
+              <i className="fab fa-google"></i> Đăng nhập bằng Google
+            </button>
         </div>
       </div>
     </main>
