@@ -4,6 +4,11 @@ import { Settings } from "@mui/icons-material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ScrollingNotification from "./ThongBao_dashboard";
 import { useState, useEffect, useRef } from "react";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { logoutUser as apiLogoutUser } from "@/services/authService";
+import { API_BASE_URL } from "@/config/env";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 interface HeaderAdminProps {
   toggleSidebar: () => void;
 }
@@ -75,11 +80,13 @@ const notifications = [
 export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
   const [showDarkMenu, setShowDarkMenu] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const { user } = useAuthUser();
   const menuRef = useRef<HTMLUListElement | null>(null);
   const [open, setOpen] = useState(false);
   const [openNote, setOpenNote] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef1 = useRef<HTMLDivElement>(null);
+const router = useRouter();
 
   // Đóng khi click ra ngoài
   useEffect(() => {
@@ -104,6 +111,16 @@ export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
     return () =>
       document.removeEventListener("mousedown", handleClickOutsideNote);
   }, []);
+  const handleLogout = async () => {
+  try {
+    await apiLogoutUser();
+    toast.success("Đăng xuất thành công");
+    router.push("/login"); // hoặc "/" nếu bạn muốn quay về trang chủ
+  } catch (err: any) {
+    console.error("Lỗi đăng xuất:", err.message);
+    toast.error("Đăng xuất thất bại: " + err.message);
+  }
+};
   // Toggle menu hiển thị
   const toggleDarkMenu = () => {
     setShowDarkMenu((prev) => !prev);
@@ -260,13 +277,13 @@ export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
                 {/* Header */}
                 <div className="bg-sky-500 text-white !p-4 flex items-center gap-3">
                   <img
-                    src={`/images/logo/anhdep.jpg`} // Thay bằng avatar thực tế
-                    className="w-10 h-10 rounded-full border-2 border-white"
+                    src={`${API_BASE_URL}/uploads/${user?.avatar}`}
+                    className="w-10 h-10 object-cover rounded-full border-2 border-white"
                     alt="avatar"
                   />
                   <div>
-                    <p className="font-semibold">lÊ cHÌ bẢO 👋</p>
-                    <p className="text-sm">CC@company.io</p>
+                    <p className="font-semibold">{user?.name} 👋</p>
+                    <p className="text-sm">{user?.email}</p>
                   </div>
                 </div>
                 <div className="!px-4 !py-3 space-y-2 text-gray-700 dark:text-gray-200">
@@ -284,7 +301,10 @@ export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
                   </div>
                 </div>
                 <div className="!px-4 !pb-4 !pt-2">
-                  <button className="w-full bg-sky-500 hover:bg-sky-600 text-white !py-2 rounded-md flex justify-center items-center gap-2">
+                  <button
+                    onClick={handleLogout}
+                    className="w-full bg-sky-500 hover:bg-sky-600 text-white !py-2 rounded-md flex justify-center items-center gap-2"
+                  >
                     <i className="fa-solid fa-arrow-right-from-bracket"></i>{" "}
                     Logout
                   </button>

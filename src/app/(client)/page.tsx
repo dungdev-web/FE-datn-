@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef, use } from "react";
 import Show1sanpham from "./component/product_home";
-import BlogHome from "./component/blog_home";
+import BlogHome from "./component/home/BlogHome";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
@@ -22,7 +22,7 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
-import Banner3D from "./component/Banner3D";
+import Banner3D from "./component/home/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "./component/products/ProductIcons";
 import HotProductIcons from "./component/products/HotProductIcons";
@@ -216,7 +216,7 @@ export default function Home() {
         </Swiper>
       </div> */}
       <Banner3D />
-      <main>
+      <main className="!mt-16 sm:!mt-0">
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
           <h1>DANH MỤC SẢN PHẨM</h1>
@@ -242,11 +242,12 @@ export default function Home() {
         <div className="marquee-wrapper">
           <div className="marquee" ref={marqueeRef}>
             <div className="marquee-content">
-              <span>⚡ ƯU ĐÃI CỰC HẤP DẪN CHO NHỮNG ĐƠN HÀNG LỚN</span>
-              <span>⚡ MIỄN PHÍ VẬN CHUYỂN CHO MỌI ĐƠN HÀNG TỪ 3TR</span>
-              <span>⚡ NHẬP MÃ *FREESHIP* ĐỂ MIỄN PHÍ SHIP TỪ 500K</span>
-              <span>⚡ NHẶT MÃ GIẢM GIÁ SIÊU HỜI CHO CÁC ĐƠN HÀNG</span>
-              <span>⚡ ƯU ĐÃI HẤP DẪN – FREESHIP TOÀN QUỐC ĐƠN TỪ 3TR ⚡</span>
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K 599K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH</span>
+              <span>⚡ GIẢM 20% CHO ĐH TỪ 1.500K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K</span>
+              <span>⚡ GIẢM 15% CHO ĐH ĐẦU TIÊN TỪ 699K</span>
+              <span>⚡ MIỄN PHÍ VẬN CHUYỂN TỪ ĐH 599K ⚡</span>
             </div>
           </div>
         </div>
@@ -322,7 +323,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM MỚI NHẤT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
@@ -434,11 +435,12 @@ export default function Home() {
             })}
           </div>
         </div>
+        {featureproducts.length > 0 && (
         <div className="hot-products">
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
@@ -558,6 +560,7 @@ export default function Home() {
             })}
           </div>
         </div>
+        )}
 
         <div className="product-two-box-main">
           <h1 className="h1">SẢN PHẨM THEO DANH MỤC</h1>

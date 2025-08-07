@@ -28,3 +28,13 @@ export interface Category {
   slug: string;
   parent_id: number | null;
 }
+export interface IBlogCreate {
+  title: string;
+  slug: string;
+  content: string;
+  images?: string[];
+  category_post_id: number;
+  author_id: number;
+  status?: number; 
+  thumbnail?: string;
+}

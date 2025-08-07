@@ -70,7 +70,7 @@ export default function CategoryPage() {
 
     setPage(1); // reset lại trang đầu tiên khi sort
   };
-   const resetAllFilters = () => {
+  const resetAllFilters = () => {
     setSelectedBrandIds([]);
     setSelectedGender(null);
     setSelectedPriceRange(null);

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import "../css/checkout.css";
@@ -768,5 +768,6 @@ export default function Checkout() {
         </p>
       </div>
     </div>
+
   );
 }

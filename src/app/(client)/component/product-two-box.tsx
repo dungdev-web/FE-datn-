@@ -100,8 +100,8 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
                         <ProductIcons
                           productId={productId}
                           variant_id={
-                            sp.product_variants?.[0]
-                              ?.product_variants_id ?? null
+                            sp.product_variants?.[0]?.product_variants_id ??
+                            null
                           }
                           price={sp.sale_price}
                         />

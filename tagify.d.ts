@@ -5,3 +5,4 @@ declare module '@yaireo/tagify' {
 }
 declare module 'jsonwebtoken';
 // declare module 'react-image-magnifiers';
+declare module 'quill-image-uploader';
