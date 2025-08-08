@@ -14,8 +14,8 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import "@/app/(client)/css/pagination.css";
 import { IBrand } from "@/types/IBrand";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
-import SidebarFilter from "../../component/products/SidebarFilter";
-import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
+import SidebarFilter from "../../component/Products/SidebarFilter";
+import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
 import ProductIcons from "../../component/products/ProductIcons";
 
 interface Params {
