@@ -20,6 +20,14 @@ export default function OrderPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const statusOrderFlow = [
+    "pending", // Chờ xử lý
+    "processing", // Đang xử lý
+    "shipping", // Đang giao hàng
+    "delivered", // Đã giao
+    "completed", // Hoàn thành
+    "cancelled", // Đã hủy (cho phép chọn mọi lúc nếu muốn)
+  ];
 
   const excelData = orders.map((order: any) => ({
     maDonHang: order.orders_id,
@@ -47,6 +55,30 @@ export default function OrderPage() {
       console.error("orders_id is undefined");
       return;
     }
+
+    const currentIndex = statusOrderFlow.indexOf(selectedOrder.status);
+    const newIndex = statusOrderFlow.indexOf(orderStatus);
+
+    // Kiểm tra nếu thứ tự mới nhỏ hơn hiện tại (quay ngược trạng thái) và không phải huỷ
+    if (orderStatus !== "cancelled" && newIndex < currentIndex) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Không thể quay lại trạng thái trước",
+        text: `Không thể thay đổi từ "${getStatusText(
+          selectedOrder.status
+        )}" về "${getStatusText(orderStatus)}"`,
+        didOpen: () => {
+          const swalContainer = document.querySelector(
+            ".swal2-container"
+          ) as HTMLElement;
+          if (swalContainer) {
+            swalContainer.style.zIndex = "9999";
+          }
+        },
+      });
+      return;
+    }
+
     try {
       const data = await updateOrderStatus(
         selectedOrder.orders_id,
@@ -417,12 +449,20 @@ export default function OrderPage() {
                 value={orderStatus}
                 onChange={(e) => setOrderStatus(e.target.value)}
               >
-                <option value="pending">Chờ xử lý</option>
-                <option value="processing">Đang xử lý</option>
-                <option value="shipping">Đang giao hàng</option>
-                <option value="delivered">Đã giao</option>
-                <option value="cancelle">Đã hủy</option>
-                <option value="returned">Hoàn trả</option>
+                {statusOrderFlow
+                  .filter((status) => {
+                    const currentIndex = statusOrderFlow.indexOf(orderStatus);
+                    const nextIndex = statusOrderFlow.indexOf(status);
+                    return (
+                      status === "cancelled" || // luôn cho phép hủy
+                      nextIndex >= currentIndex // không cho quay lại
+                    );
+                  })
+                  .map((status) => (
+                    <option key={status} value={status}>
+                      {getStatusText(status)}
+                    </option>
+                  ))}
               </select>
             </div>
             <div className="modal-footer">

@@ -11,6 +11,7 @@ export interface IAddressFormData {
 }
 export interface AddressResponse {
   shipping_address_id: any;
+  ship_address_id: any;
   user: any;
   length: number;
   address: string;
