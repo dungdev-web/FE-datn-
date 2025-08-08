@@ -313,3 +313,22 @@ export async function resetPassword(
 
   return data;
 }
+
+
+// Admin 
+export async function getAllUsers(page = 1, limit = 20) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/all-user?page=${page}&limit=${limit}`);
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log(data)
+    return data;
+  } catch (error) {
+    console.error('Lỗi khi fetch danh sách người dùng:', error);
+    throw error;
+  }
+}

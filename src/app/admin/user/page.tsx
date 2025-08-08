@@ -1,15 +1,19 @@
 "use client";
 import "../css/auth_admin.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../css/css.css";
 import "../css/dashboard.css";
 import Link from "next/link";
+import { getAllUsers } from "@/services/authService";
+import { IUser } from "@/types/user";
 export default function ListUser() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUserName, setModalUserName] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
-
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const openModal = (userName: string) => {
     setModalUserName(userName);
     setIsModalOpen(true);
@@ -19,6 +23,20 @@ export default function ListUser() {
     setIsModalOpen(false);
     setModalUserName("");
   };
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await getAllUsers();
+setUsers(res.data.users); // Đúng, res.data.users là mảng
+
+      } catch (err) {
+        console.error("Lỗi khi fetch users:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   return (
     <>
@@ -99,45 +117,42 @@ export default function ListUser() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>U01</td>
-              <td>Nguyễn Văn A</td>
-              <td>a.nguyen@example.com</td>
-              <td>0901234567</td>
-              <td>Admin</td>
-              <td>
-                <span className="status-label status-active">Hoạt động</span>
-              </td>
-              <td>
-                <Link href={"/admin/user/view"}>
-                  {" "}
-                  <i className="fa-solid fa-eye view-icon" title="Xem"></i>
-                </Link>
-                <i
-                  className="fa-solid fa-user-pen view-status-icon"
-                  title="Chỉnh sửa"
-                  onClick={() => openModal("Nguyễn Văn A")}
-                ></i>
-              </td>
-            </tr>
-            <tr>
-              <td>U02</td>
-              <td>Trần Thị B</td>
-              <td>b.tran@example.com</td>
-              <td>0912345678</td>
-              <td>Người dùng</td>
-              <td>
-                <span className="status-label status-inactive">Tạm khóa</span>
-              </td>
-              <td>
-                <i className="fa-solid fa-eye view-icon" title="Xem"></i>
-                <i
-                  className="fa-solid fa-user-pen view-status-icon"
-                  title="Chỉnh sửa"
-                  onClick={() => openModal("Trần Thị B")}
-                ></i>
-              </td>
-            </tr>
+            {Array.isArray(users) && users.length === 0 ? (
+              <tr>
+                <td>Không có người dùng.</td>
+              </tr>
+            ) : (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.name || "Chưa có tên"}</td>
+                  <td>{user.email || "–"}</td>
+                  <td>{user.phone || "–"}</td>
+                  <td>{user.role === "admin" ? "Admin" : "Người dùng"}</td>
+                  <td>
+                    <span
+                      className={`status-label ${
+                        user.role === "admin"
+                          ? "status-active"
+                          : "status-inactive"
+                      }`}
+                    >
+                      {user.role === "admin" ? "Hoạt động" : "Tạm khóa"}
+                    </span>
+                  </td>
+                  <td>
+                    <Link href={`/admin/user/view/${user.id}`}>
+                      <i className="fa-solid fa-eye view-icon" title="Xem"></i>
+                    </Link>
+                    <i
+                      className="fa-solid fa-user-pen view-status-icon"
+                      title="Chỉnh sửa"
+                      onClick={() => openModal(user.name || "Không tên")}
+                    ></i>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
