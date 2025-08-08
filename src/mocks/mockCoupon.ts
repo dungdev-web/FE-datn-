@@ -12,6 +12,9 @@ const defaultCoupon: ICoupon[] = [
     used_count: 100,
     created_at: "2025-05-31T08:31:52.000Z",
     updated_at: "2025-07-11T11:07:05.000Z",
+    min_order: 100000, // Giả sử đơn hàng tối thiểu là 100.000đ
+    length: 1, // Thêm trường length để phù hợp với interface
+  userId: 1, // Giả sử mã này được lưu cho người dùng có ID 1
   },
   {
     coupons_id: 2,
@@ -24,6 +27,9 @@ const defaultCoupon: ICoupon[] = [
     used_count: 100,
     created_at: "2025-05-31T08:31:52.000Z",
     updated_at: "2025-07-11T11:07:05.000Z",
+    min_order: 100000, // Giả sử đơn hàng tối thiểu là 100.000đ
+    length: 1, // Thêm trường length để phù hợp với interface
+  userId: 1, // Giả sử mã này được lưu cho người dùng có ID 1
   },
   {
     coupons_id: 3,
@@ -36,6 +42,9 @@ const defaultCoupon: ICoupon[] = [
     used_count: 100,
     created_at: "2025-05-31T08:31:52.000Z",
     updated_at: "2025-07-11T11:07:05.000Z",
+    min_order: 100000, // Giả sử đơn hàng tối thiểu là 100.000đ
+    length: 1, // Thêm trường length để phù hợp với interface
+  userId: 1, // Giả sử mã này được lưu cho người dùng có ID 1
   }
 ];
 

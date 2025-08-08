@@ -51,7 +51,7 @@ export default function Cart() {
   }, [cart]);
   useEffect(() => {
     if (appliedCoupon && appliedCoupon.length > 0) {
-      setCouponInput(appliedCoupon[0].code); // Hiện lại trong input
+      setCouponInput(appliedCoupon.code); // Hiện lại trong input
     }
   }, [appliedCoupon]);
   useEffect(() => {
