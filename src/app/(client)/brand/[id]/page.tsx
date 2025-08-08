@@ -13,6 +13,7 @@ import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
+
 import SidebarFilter from "../../component/Products/SidebarFilter";
 import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
 import ProductIcons from "../../component/Products/ProductIcons";

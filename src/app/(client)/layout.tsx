@@ -4,6 +4,7 @@ import "./globals.css";
 import "./css/style.css";
 import "./css/product.css";
 
+
 import Header from "./component/Header";
 import Footer from "./component/Footer";
 import ButtonToTop from "./component/ButtonToTop";
