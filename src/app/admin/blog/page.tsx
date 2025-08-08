@@ -14,19 +14,28 @@ export default function Blog() {
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<"created_at" | "updated_at" | "title">(
+    "created_at"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
     fetchPosts();
   }, [page]);
   useEffect(() => {
     async function fetchData() {
-      const result = await getPost(page, searchText, statusFilter);
+      const result = await getPost(
+        page,
+        searchText,
+        statusFilter,
+        sortBy,
+        sortOrder
+      );
       setPosts(result.posts);
       setTotalPages(result.totalPages);
     }
-
     fetchData();
-  }, [page, searchText, statusFilter]);
+  }, [page, searchText, statusFilter, sortBy, sortOrder]);
 
   const fetchPosts = async () => {
     try {
@@ -35,6 +44,14 @@ export default function Blog() {
       setTotalPages(res.totalPages);
     } catch (error) {
       console.error("Lỗi khi lấy danh sách bài viết:", error);
+    }
+  };
+  const toggleSort = (field: "created_at" | "updated_at" | "title") => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
     }
   };
 
@@ -81,11 +98,30 @@ export default function Blog() {
         <table className="post-table">
           <thead>
             <tr>
-              <th>Tên bài viết</th>
+              <th>
+                Tên bài viết
+                <i
+                  className="fa-solid fa-sort cursor-pointer "
+                  onClick={() => toggleSort("title")}
+                ></i>
+              </th>
               <th>Ảnh</th>
               <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th>Ngày sửa</th>
+              <th>
+                Ngày tạo
+                <i
+                  className="fa-solid fa-sort cursor-pointer "
+                  onClick={() => toggleSort("created_at")}
+                ></i>
+              </th>
+              <th>
+                Ngày sửa
+                <i
+                  className="fa-solid fa-sort cursor-pointer ml-1"
+                  onClick={() => toggleSort("updated_at")}
+                ></i>
+              </th>
+
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">

@@ -20,6 +20,16 @@ export default function OrderPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const statusOrderFlow = [
+    "pending", // Chờ xử lý
+    "processing", // Đang xử lý
+    "shipping", // Đang giao hàng
+    "delivered", // Đã giao
+    "completed", // Hoàn thành
+    "cancelled", // Đã hủy (cho phép chọn mọi lúc nếu muốn)
+  ];
 
   const excelData = orders.map((order: any) => ({
     maDonHang: order.orders_id,
@@ -47,6 +57,29 @@ export default function OrderPage() {
       console.error("orders_id is undefined");
       return;
     }
+
+    const currentIndex = statusOrderFlow.indexOf(selectedOrder.status);
+    const newIndex = statusOrderFlow.indexOf(orderStatus);
+
+    if (orderStatus !== "cancelled" && newIndex < currentIndex) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Không thể quay lại trạng thái trước",
+        text: `Không thể thay đổi từ "${getStatusText(
+          selectedOrder.status
+        )}" về "${getStatusText(orderStatus)}"`,
+        didOpen: () => {
+          const swalContainer = document.querySelector(
+            ".swal2-container"
+          ) as HTMLElement;
+          if (swalContainer) {
+            swalContainer.style.zIndex = "9999";
+          }
+        },
+      });
+      return;
+    }
+
     try {
       const data = await updateOrderStatus(
         selectedOrder.orders_id,
@@ -92,6 +125,7 @@ export default function OrderPage() {
         search,
         status: statusFilter,
         categoryId: categoryFilter,
+        sort: sortOrder, // Thêm dòng này
       });
 
       const data = await getRecentOrders(params.toString());
@@ -107,7 +141,7 @@ export default function OrderPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, [page, limit, search, statusFilter, categoryFilter]);
+  }, [page, limit, search, statusFilter, categoryFilter,sortOrder]);
 
   return (
     <div>
@@ -160,7 +194,19 @@ export default function OrderPage() {
               <th>Điện thoại</th>
               <th>Trạng thái</th>
               <th>Sản phẩm</th>
-              <th>Ngày đặt</th>
+              <th
+                onClick={() =>
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+                }
+                style={{ cursor: "pointer" }}
+              >
+                Ngày đặt{" "}
+                <i
+                  className={`fa-solid ${
+                    sortOrder === "asc" ? "fa-arrow-up" : "fa-arrow-down"
+                  }`}
+                ></i>
+              </th>
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">
@@ -417,12 +463,20 @@ export default function OrderPage() {
                 value={orderStatus}
                 onChange={(e) => setOrderStatus(e.target.value)}
               >
-                <option value="pending">Chờ xử lý</option>
-                <option value="processing">Đang xử lý</option>
-                <option value="shipping">Đang giao hàng</option>
-                <option value="delivered">Đã giao</option>
-                <option value="cancelle">Đã hủy</option>
-                <option value="returned">Hoàn trả</option>
+                {statusOrderFlow
+                  .filter((status) => {
+                    const currentIndex = statusOrderFlow.indexOf(orderStatus);
+                    const nextIndex = statusOrderFlow.indexOf(status);
+                    return (
+                      status === "cancelled" || // luôn cho phép hủy
+                      nextIndex >= currentIndex // không cho quay lại
+                    );
+                  })
+                  .map((status) => (
+                    <option key={status} value={status}>
+                      {getStatusText(status)}
+                    </option>
+                  ))}
               </select>
             </div>
             <div className="modal-footer">

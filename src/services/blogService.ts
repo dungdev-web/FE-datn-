@@ -5,7 +5,9 @@ import { getMockBlog } from "@/mocks/mockBlog";
 export async function getPost(
   page: number,
   title?: string,
-  status?: string
+  status?: string,
+  sortBy: string = "created_at", // mặc định sort theo created_at
+  sortOrder: "asc" | "desc" = "desc" // mặc định mới nhất trước
 ): Promise<{ posts: IBlog[]; totalPages: number }> {
   if (IS_MOCK) {
     const allPosts = getMockBlog();
@@ -19,13 +21,14 @@ export async function getPost(
     const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: "5",
+      sortBy,
+      sortOrder,
     });
 
     if (title) queryParams.append("title", title);
     if (status !== undefined && status !== "") {
-  queryParams.append("status", status.toString());
-}
-
+      queryParams.append("status", status.toString());
+    }
 
     const res = await fetch(`${API_BASE_URL}/post?${queryParams.toString()}`, {
       method: "GET",
@@ -49,6 +52,7 @@ export async function getPost(
     return { posts: [], totalPages: 1 };
   }
 }
+
 
 
 // 
