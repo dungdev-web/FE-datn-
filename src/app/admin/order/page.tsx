@@ -59,7 +59,6 @@ export default function OrderPage() {
     const currentIndex = statusOrderFlow.indexOf(selectedOrder.status);
     const newIndex = statusOrderFlow.indexOf(orderStatus);
 
-    // Kiểm tra nếu thứ tự mới nhỏ hơn hiện tại (quay ngược trạng thái) và không phải huỷ
     if (orderStatus !== "cancelled" && newIndex < currentIndex) {
       await Swal.fire({
         icon: "warning",
