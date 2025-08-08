@@ -13,9 +13,10 @@ import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import SidebarFilter from "@/app/(client)/component/Products/SidebarFilter";
-import MobileSidebarFilter from "@/app/(client)/component/Products/MobileSidebarFilter";
-import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
+
+import SidebarFilter from "../../component/Products/SidebarFilter";
+import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
+import ProductIcons from "../../component/Products/ProductIcons";
 
 export default function CategoryPage() {
   const params = useParams();

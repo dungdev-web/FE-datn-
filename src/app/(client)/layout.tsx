@@ -4,14 +4,15 @@ import "./globals.css";
 import "./css/style.css";
 import "./css/product.css";
 
-import Header from "src/app/(client)/component/Header";
-import Footer from "src/app/(client)/component/Footer";
+
+import Header from "./component/Header";
+import Footer from "./component/Footer";
 import ButtonToTop from "./component/ButtonToTop";
 import { CompareProvider } from "./component/product_compare/compare_context";
 import { LoaderProvider } from "./component/LinkWithLoader";
 import ContactFloatingButton from "./component/ContactFloatingButton";
 import { ToastContainer } from "react-toastify";
-// import TawkToWidget from "./component/TawkToWidget";
+import TawkToWidget from "./component/TawkToWidget";
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,7 +33,7 @@ export default function RootLayout({
           </LoaderProvider>
         </div>
         <ToastContainer position="top-right" autoClose={2000} />
-        {/* <TawkToWidget /> */}
+        <TawkToWidget />
       </body>
     </html>
   );

@@ -38,8 +38,8 @@ const pathname = usePathname();
     <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <ul className="menu">
         <li>
-          <div className="logo bg-[#000]">
-            <img src="/images/logo/E.png" alt="" />
+          <div className="logo">
+            <img src="/images/logo/logo-xanh.png" alt="" />
              
           </div>
         </li>
