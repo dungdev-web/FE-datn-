@@ -2,7 +2,7 @@
 
 import { IProduct } from "@/types/product";
 import Link from "next/link";
-import ProductIcons from "./products/ProductIcons";
+import ProductIcons from "./Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {

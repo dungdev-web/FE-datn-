@@ -16,7 +16,7 @@ import { IBrand } from "@/types/IBrand";
 import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import SidebarFilter from "../../component/Products/SidebarFilter";
 import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
-import ProductIcons from "../../component/products/ProductIcons";
+import ProductIcons from "../../component/Products/ProductIcons";
 
 interface Params {
   params: {

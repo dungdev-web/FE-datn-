@@ -15,7 +15,7 @@ import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import SidebarFilter from "../../component/Products/SidebarFilter";
 import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
-import ProductIcons from "../../component/products/ProductIcons";
+import ProductIcons from "../../component/Products/ProductIcons";
 
 export default function CategoryPage() {
   const params = useParams();
