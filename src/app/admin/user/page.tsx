@@ -7,6 +7,15 @@ import Link from "next/link";
 import { getAllUsers, updateUser } from "@/services/authService";
 import { InterfaceUser } from "@/types/user";
 import Swal from "sweetalert2";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+
+type SortField = 'user_id' | 'name' | 'email' | 'phone' | 'role' | 'status';
+type SortDirection = 'asc' | 'desc' | null;
+
+interface SortConfig {
+  field: SortField | null;
+  direction: SortDirection;
+}
 
 export default function ListUser() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,6 +34,12 @@ export default function ListUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Sort states
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    field: null,
+    direction: null,
+  });
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -64,6 +79,83 @@ export default function ListUser() {
     }
   };
 
+  // Sort function
+  const sortData = (data: InterfaceUser[], field: SortField, direction: SortDirection) => {
+    if (!field || !direction) return data;
+
+    return [...data].sort((a, b) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (field) {
+        case 'user_id':
+          aValue = a.user_id;
+          bValue = b.user_id;
+          break;
+        case 'name':
+          aValue = (a.name || '').toLowerCase();
+          bValue = (b.name || '').toLowerCase();
+          break;
+        case 'email':
+          aValue = (a.email || '').toLowerCase();
+          bValue = (b.email || '').toLowerCase();
+          break;
+        case 'phone':
+          aValue = a.phone || '';
+          bValue = b.phone || '';
+          break;
+        case 'role':
+          aValue = a.role;
+          bValue = b.role;
+          break;
+        case 'status':
+          aValue = a.status;
+          bValue = b.status;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) {
+        return direction === 'asc' ? -1 : 1;
+      }
+      if (aValue > bValue) {
+        return direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  // Handle sort
+  const handleSort = (field: SortField) => {
+    let direction: SortDirection = 'asc';
+
+    if (sortConfig.field === field) {
+      if (sortConfig.direction === 'asc') {
+        direction = 'desc';
+      } else if (sortConfig.direction === 'desc') {
+        direction = null;
+      }
+    }
+
+    setSortConfig({ field: direction ? field : null, direction });
+  };
+
+  // Get sort icon
+  const getSortIcon = (field: SortField) => {
+    if (sortConfig.field !== field) {
+      return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
+    }
+
+    if (sortConfig.direction === 'asc') {
+      return <ArrowUp className="w-4 h-4 text-blue-500" />;
+    } else if (sortConfig.direction === 'desc') {
+      return <ArrowDown className="w-4 h-4 text-blue-500" />;
+    }
+
+    return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
+  };
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -71,6 +163,7 @@ export default function ListUser() {
   useEffect(() => {
     let filtered = users;
 
+    // Apply filters
     if (searchText.trim()) {
       filtered = filtered.filter(
         (user) =>
@@ -107,10 +200,15 @@ export default function ListUser() {
       filtered = filtered.filter((user) => user.status === statusValue);
     }
 
+    // Apply sorting
+    if (sortConfig.field && sortConfig.direction) {
+      filtered = sortData(filtered, sortConfig.field, sortConfig.direction);
+    }
+
     setFilteredUsers(filtered);
     setTotalPages(Math.ceil(filtered.length / itemsPerPage));
     setCurrentPage(1);
-  }, [searchText, filters, users, itemsPerPage]);
+  }, [searchText, filters, users, itemsPerPage, sortConfig]);
 
   const getCurrentPageData = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -136,6 +234,7 @@ export default function ListUser() {
     });
     setSearchText("");
     setIsSearching(false);
+    setSortConfig({ field: null, direction: null });
   };
 
   const handleRefresh = () => {
@@ -212,6 +311,7 @@ export default function ListUser() {
       });
     }
   };
+
   const renderPagination = () => {
     const pages = [];
     const maxVisiblePages = 5;
@@ -321,18 +421,65 @@ export default function ListUser() {
         <table className="order-table">
           <thead>
             <tr>
-              <th className="col-short">Mã</th>
-              <th>Tên người dùng</th>
-              <th>Email</th>
-              <th>Điện thoại</th>
-              <th>Vai trò</th>
-              <th>Trạng thái</th>
+              <th className="col-short">
+                <div 
+                  className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
+                  onClick={() => handleSort('user_id')}
+                >
+                  Mã
+                  {getSortIcon('user_id')}
+                </div>
+              </th>
+              <th>
+                <div 
+                  className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
+                  onClick={() => handleSort('name')}
+                >
+                  Tên người dùng
+                  {getSortIcon('name')}
+                </div>
+              </th>
+              <th>
+                <div 
+                  className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
+                  onClick={() => handleSort('email')}
+                >
+                  Email
+                  {getSortIcon('email')}
+                </div>
+              </th>
+              <th>
+                <div 
+                  className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
+                  onClick={() => handleSort('phone')}
+                >
+                  Điện thoại
+                  {getSortIcon('phone')}
+                </div>
+              </th>
+              <th>
+                <div 
+                  className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
+                  onClick={() => handleSort('role')}
+                >
+                  Vai trò
+                  {getSortIcon('role')}
+                </div>
+              </th>
+              <th>
+                <div 
+                  className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
+                  onClick={() => handleSort('status')}
+                >
+                  Trạng thái
+                  {getSortIcon('status')}
+                </div>
+              </th>
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">
               <th>
                 <input
-                  className="text-gray-200"
                   type="text"
                   placeholder="Lọc mã..."
                   value={filters.id}
@@ -441,8 +588,7 @@ export default function ListUser() {
             )}
           </tbody>
         </table>
-{filteredUsers.length > itemsPerPage && renderPagination()} 
-
+        {filteredUsers.length > itemsPerPage && renderPagination()}
       </div>
 
       {isModalOpen && (
