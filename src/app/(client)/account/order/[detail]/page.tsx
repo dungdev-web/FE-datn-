@@ -138,6 +138,7 @@ export default function OrderDetail() {
               if (user) {
                 const fallbackAddress: AddressResponse = {
                   shipping_address_id: orderData.shipping_address_id,
+                  ship_address_id: orderData.ship_address_id,
                   user: user || null,
                   length: 0,
                   id: orderData.shipping_address_id,
@@ -158,6 +159,7 @@ export default function OrderDetail() {
           } catch (addressError) {
             const fallbackAddress: AddressResponse = {
               shipping_address_id: orderData.shipping_address_id,
+              ship_address_id: orderData.ship_address_id,
               user: user || null,
               id: orderData.shipping_address_id || 0,
               length: 0,

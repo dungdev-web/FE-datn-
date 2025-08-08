@@ -332,3 +332,27 @@ export async function getAllUsers(page = 1, limit = 20) {
     throw error;
   }
 }
+export const updateUser = async (
+  userId: number | string,
+  updateData: { role: string; status: number }
+) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/update-user/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('[Service] Lỗi updateUser:', error);
+    throw error;
+  }
+};
