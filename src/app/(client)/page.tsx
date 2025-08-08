@@ -21,11 +21,11 @@ import {
   getProductsByCategory,
 } from "@/services/productService";
 import Link from "next/link";
-import Show2sanpham from "./component/product-two-box";
-import Banner3D from "./component/Home/Banner3D";
+import Show2sanpham from "src/app/(client)/component/product-two-box";
+import Banner3D from "src/app/(client)/component/Home/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
-import ProductIcons from "./component/Products/ProductIcons";
-import HotProductIcons from "./component/Products/HotProductIcons";
+import ProductIcons from "src/app/(client)/component/Products/ProductIcons";
+import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
 import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
