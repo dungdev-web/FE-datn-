@@ -111,7 +111,7 @@ export default function CheckoutContent() {
     const rawProvince = parts[parts.length - 1]?.trim() || "";
     return normalizeProvinceName(rawProvince);
   };
-  const { appliedCoupons, applyCoupon, error, getDiscountAmount, resetCoupon } =
+  const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
     useCoupon(subtotal, cart?.carts_id || "default");
 
   const [couponInput, setCouponInput] = useState("");
@@ -212,7 +212,7 @@ export default function CheckoutContent() {
             setPhone(addressData.phone);
             setDefaultAddress(addressData.address_line);
             setEmail(addressData.user?.email || "");
-            setSelectedAddressId(addressData.ship_address_id);
+            setSelectedAddressId(addressData.shipping_address_id);
           } else {
             const first = allAddresses[0];
             setFullName(first.full_name);
@@ -302,7 +302,7 @@ export default function CheckoutContent() {
         user_id: user.id,
         shipping_address_id: selectedAddressId,
         payment_method,
-        coupon_code: appliedCoupons[0]?.code,
+        coupon_code: appliedCoupon?.code,
         shipping_fee: shippingFee,
         comment: comment || undefined,
       };
@@ -595,17 +595,17 @@ export default function CheckoutContent() {
           </button>
         </div>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-        {appliedCoupons.map((coupon) => (
-          <p key={coupon.code} className="text-green-600 mt-1">
-            Đã áp dụng mã <strong>{coupon.code}</strong>{" "}
+        {appliedCoupon && (
+          <p className="text-green-600 mt-1">
+            Đã áp dụng mã <strong>{appliedCoupon.code}</strong>{" "}
             <button
-              className=" ml-2 text-blue-600 underline"
-              onClick={() => resetCoupon(coupon.code)}
+              className="ml-2 text-blue-600 underline"
+              onClick={() => resetCoupon()}
             >
               Hủy
             </button>
           </p>
-        ))}
+        )}
 
         <div className="tinhtien mt-4 space-y-2">
           <div className="tamtinh flex justify-between">

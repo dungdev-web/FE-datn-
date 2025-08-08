@@ -15,7 +15,6 @@ export async function getCouponList(): Promise<ICoupon[]> {
         "Content-Type": "application/json",
       },
     });
-
     if (!res.ok) {
       throw new Error("Không thể lấy danh sách coupon từ API.");
     }
@@ -29,8 +28,26 @@ export async function getCouponList(): Promise<ICoupon[]> {
 }
 export async function saveUserCoupon(userId: number, couponCode: string): Promise<any> {
   if (IS_MOCK) {
-    return saveMockCoupon(userId, couponCode);
-  }
+  const now = new Date().toISOString();
+  const coupon: ICoupon = {
+    length: 1,
+    userId: userId,
+    coupons_id: Date.now(), // hoặc dùng uuid/random
+    code: couponCode,
+    discount_type: "percentage", // hoặc "fixed"
+    discount_value: "10", // string như interface yêu cầu
+    start_date: now,
+    end_date: "2025-12-31T23:59:59.000Z", // tùy bạn mock
+    usage_limit: 1,
+    used_count: 0,
+    created_at: now,
+    updated_at: now,
+    min_order: 100000, // tùy bạn
+  };
+
+  return saveMockCoupon([coupon]);
+}
+
 
   try {
     const res = await fetch(`${API_BASE_URL}/user-vouchers`, {
