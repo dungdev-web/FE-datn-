@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef, use } from "react";
 import Show1sanpham from "./component/product_home";
-import BlogHome from "./component/home/BlogHome";
+import BlogHome from "./component/Home/BlogHome";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
@@ -22,11 +22,9 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "./component/product-two-box";
-import Banner3D from "./component/home/Banner3D";
-import { useAddToCart } from "@/hooks/useAddToCart";
-import ProductIcons from "./component/products/ProductIcons";
-import HotProductIcons from "./component/products/HotProductIcons";
-import HotspotLookbook from "./component/home/HotspotProduct";
+import Banner3D from "./component/Home/Banner3D";
+import HotProductIcons from "./component/Products/HotProductIcons";
+import HotspotLookbook from "./component/Home/HotspotProduct";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -175,46 +173,6 @@ export default function Home() {
 
   return (
     <div>
-      {/* <div className="banner-home relative">
-        <Swiper
-          modules={[Autoplay]}
-          autoplay={{ delay: 3000 }}
-          loop={true}
-          spaceBetween={0}
-          slidesPerView={1}
-        >
-          <SwiperSlide>
-            <div className="banner-slider relative w-full h-[650px]">
-              <Image
-                src="/images/banner/slider_1.png"
-                alt="Banner 1"
-                fill
-                style={{ objectFit: "cover", objectPosition: "center" }}
-              />
-              <div className="button-banner-left absolute bottom-32 left-32">
-                <button className="border border-white text-white text-xl font-bold px-12 py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
-                  Mua ngay
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="banner-slider relative w-full h-[650px]">
-              <Image
-                src="/images/banner/slider_2.png"
-                alt="Banner 2"
-                fill
-                style={{ objectFit: "cover", objectPosition: "center" }}
-              />
-              <div className="button-banner-right absolute bottom-44 right-44">
-                <button className="border border-white text-white text-xl font-bold px-12 py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
-                  Mua ngay
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </div> */}
       <Banner3D />
       <main className="!mt-16 sm:!mt-0">
         <div className="category-main">
