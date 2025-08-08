@@ -2,7 +2,7 @@
 import { useEffect, useState, Suspense } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-// import "../css/checkout.css";
+import "../../css/checkout.css";
 import { District, Province, Ward } from "@/types/Country";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import {
@@ -212,7 +212,7 @@ export default function CheckoutContent() {
             setPhone(addressData.phone);
             setDefaultAddress(addressData.address_line);
             setEmail(addressData.user?.email || "");
-            setSelectedAddressId(addressData.shipping_address_id);
+            setSelectedAddressId(addressData.ship_address_id);
           } else {
             const first = allAddresses[0];
             setFullName(first.full_name);
