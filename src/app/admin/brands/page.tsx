@@ -3,9 +3,11 @@ import { API_BASE_URL } from "@/config/env";
 import "../../admin/css/brands_admin.css";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getBrands } from "@/services/brandService";
+import { getBrands, updateBrandStatus } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { ArrowUpDown } from "lucide-react";
+import { toast } from "react-toastify";
+import { Toaster } from "react-hot-toast";
 
 export default function Brands() {
   const [brands, setBrands] = useState<IBrand[]>([]);
@@ -27,6 +29,9 @@ export default function Brands() {
     sortBy: string;
     sortOrder: "asc" | "desc";
   }>({ sortBy: "", sortOrder: "asc" });
+
+  // State để lưu brand đang đổi trạng thái (đang loading)
+  const [loadingStatusId, setLoadingStatusId] = useState<number | null>(null);
 
   const fetchBrands = async () => {
     const result = await getBrands({
@@ -55,13 +60,11 @@ export default function Brands() {
   const handleSort = (field: string) => {
     setSortConfig((prev) => {
       if (prev.sortBy === field) {
-        // Đảo chiều sắp xếp
         return {
           sortBy: field,
           sortOrder: prev.sortOrder === "asc" ? "desc" : "asc",
         };
       }
-      // Chuyển sang cột mới, mặc định asc
       return { sortBy: field, sortOrder: "asc" };
     });
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
@@ -89,6 +92,28 @@ export default function Brands() {
         onClick={() => handleSort(field)}
       />
     );
+  };
+
+  const handleToggleStatus = async (brandId: number, currentStatus: number) => {
+    setLoadingStatusId(brandId);
+    try {
+      await updateBrandStatus(brandId, currentStatus === 1 ? 0 : 1);
+
+      setBrands((prev) =>
+        prev.map((b) =>
+          b.brand_id === brandId
+            ? { ...b, status: currentStatus === 1 ? 0 : 1 }
+            : b
+        )
+      );
+
+      toast.success("Cập nhật trạng thái thành công!");
+    } catch (error) {
+      console.error("Lỗi đổi trạng thái:", error);
+      toast.error("Cập nhật trạng thái thất bại!");
+    } finally {
+      setLoadingStatusId(null);
+    }
   };
 
   return (
@@ -207,7 +232,10 @@ export default function Brands() {
                   <input
                     type="checkbox"
                     checked={brand.status === 1}
-                    readOnly
+                    disabled={loadingStatusId === brand.brand_id} // disable khi đang loading
+                    onChange={() =>
+                      handleToggleStatus(brand.brand_id, brand.status)
+                    }
                   />
                   <span className="slider round"></span>
                 </label>
@@ -258,6 +286,7 @@ export default function Brands() {
           <i className="fa-solid fa-angle-right"></i>
         </button>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 }

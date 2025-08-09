@@ -125,19 +125,63 @@ export async function addBrand(brand: {
   }
 }
 
+// Lấy chi tiết 1 brand theo ID
+export async function getBrandById(id: number): Promise<IBrand | null> {
+  if (!id) return null;
 
-
-// Sửa brand
-export async function updateBrand(id: number, brand: Partial<IBrand>) {
   try {
+    const response = await fetch(`${API_BASE_URL}/brand/${id}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.error("Lỗi khi gọi API lấy brand theo ID:", response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
+    return data || null;
+  } catch (error) {
+    console.error("Lỗi khi gọi API lấy brand theo ID:", error);
+    return null;
+  }
+}
+
+// Sửa brand (có thể upload ảnh mới hoặc giữ ảnh cũ)
+export async function updateBrand(
+  id: number,
+  brand: {
+    name?: string;
+    status?: number;
+    logo_url?: File; // chỉ gửi file mới nếu có
+  }
+) {
+  try {
+    const formData = new FormData();
+
+    if (brand.name !== undefined) {
+      formData.append("name", brand.name);
+    }
+
+    if (brand.status !== undefined) {
+      formData.append("status", String(brand.status));
+    }
+
+    // Chỉ gửi nếu có file mới
+    if (brand.logo_url instanceof File) {
+      formData.append("logo_url", brand.logo_url);
+    }
+
     const response = await fetch(`${API_BASE_URL}/brand/update/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(brand),
+      body: formData,
     });
 
     const result = await response.json();
-    if (!response.ok) throw new Error(result.message || "Cập nhật brand thất bại");
+
+    if (!response.ok) {
+      throw new Error(result.message || "Cập nhật brand thất bại");
+    }
 
     return result;
   } catch (error) {
@@ -145,6 +189,31 @@ export async function updateBrand(id: number, brand: Partial<IBrand>) {
     throw error;
   }
 }
+
+// Cập nhật trạng thái brand (PATCH /brands/:id/status)
+export async function updateBrandStatus(id: number, status: number) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/brand/${id}/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Cập nhật trạng thái thất bại");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật trạng thái brand:", error);
+    throw error;
+  }
+}
+
 
 // Xóa brand
 export async function deleteBrand(id: number) {
