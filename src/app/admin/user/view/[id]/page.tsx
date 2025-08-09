@@ -1,18 +1,34 @@
 "use client";
 import Link from "next/link";
-import "../../css/auth_admin.css";
-import "../../css/css.css";
-import "../../css/dashboard.css";
-import { useEffect, useState } from "react";
+import "../../../css/auth_admin.css";
+import "../../../css/css.css";
+import "../../../css/dashboard.css";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import { getInfoUser } from "@/services/authService";
+import { getAllUsersV2 } from "@/services/authService";
 import { getOrdersByUserService } from "@/services/orderService";
 import { InterfaceUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
+import { debounce } from "lodash";
+import { API_BASE_URL } from "@/config/env";
 
 interface GetOrdersParams {
   userId: number;
   page?: number;
+  limit?: number;
+  status?: string;
+  searchQuery?: string;
+  sortField?: string;
+  sortDirection?: string;
+}
+
+interface OrdersApiResponse {
+  orders?: IOrder[];
+  data?: IOrder[];
+  total?: number;
+  totalCount?: number;
+  currentPage?: number;
+  totalPages?: number;
   limit?: number;
 }
 
@@ -20,48 +36,57 @@ export default function ViewUser() {
   const params = useParams();
   const userId = params?.id as string;
 
-  // User states
   const [user, setUser] = useState<InterfaceUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Orders states
   const [orders, setOrders] = useState<IOrder[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<IOrder[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+  console.log("Tớ nè " + JSON.stringify(orders, null, 2));
 
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
 
-  // Filter states
   const [filters, setFilters] = useState({
     orderId: "",
     status: "",
     products: "",
   });
 
-  // Status mapping
   const statusMap = {
     pending: { label: "Chờ xác nhận", class: "status-pending" },
     confirmed: { label: "Đã xác nhận", class: "status-confirmed" },
     shipping: { label: "Đang giao hàng", class: "status-shipping" },
     delivered: { label: "Đã giao", class: "status-delivered" },
     cancelled: { label: "Đã hủy", class: "status-cancelled" },
+    returned: { label: "Hoàn trả", class: "status-returned" },
   };
 
-  // Fetch user data
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
   const fetchUser = async () => {
     if (!userId) return;
 
     setLoading(true);
     try {
-      const userData = await getInfoUser(parseInt(userId));
-      setUser(userData);
+      const users = await getAllUsersV2({ user_id: parseInt(userId) });
+      setUser(users[0] || null);
       setError("");
     } catch (err: any) {
       console.error("Lỗi khi fetch user:", err);
@@ -71,90 +96,63 @@ export default function ViewUser() {
     }
   };
 
-  // Fetch user orders
-  const fetchOrders = async (page: number = 1) => {
+  const fetchOrders = async (page: number = 1, resetPage: boolean = false) => {
     if (!userId) return;
 
     setOrdersLoading(true);
     try {
-      const ordersData = await getOrdersByUserService({
+      const params: GetOrdersParams = {
         userId: parseInt(userId),
-        page: page,
+        page: resetPage ? 1 : page,
         limit: itemsPerPage,
-      });
-      const ordersList =
-        ordersData?.orders || ordersData?.data || ordersData || [];
+        sortField: "created_at",
+        sortDirection: "desc",
+      };
+
+      if (filters.status) {
+        params.status = filters.status;
+      }
+
+      const searchQuery = [searchText, filters.orderId, filters.products]
+        .filter(Boolean)
+        .join(" ");
+
+      if (searchQuery) {
+        params.searchQuery = searchQuery;
+      }
+
+      const ordersData: OrdersApiResponse = await getOrdersByUserService(
+        params
+      );
+
+      const ordersList = ordersData?.orders || ordersData?.data || [];
       const total =
         ordersData?.total || ordersData?.totalCount || ordersList.length;
+      const pages = ordersData?.totalPages || Math.ceil(total / itemsPerPage);
+      const currentPageNum = ordersData?.currentPage || (resetPage ? 1 : page);
 
       setOrders(ordersList);
-      setFilteredOrders(ordersList);
       setTotalOrders(total);
-      setTotalPages(Math.ceil(total / itemsPerPage));
+      setTotalPages(pages);
+      setCurrentPage(currentPageNum);
     } catch (err: any) {
       console.error("Lỗi khi fetch orders:", err);
       setOrders([]);
-      setFilteredOrders([]);
       setTotalOrders(0);
       setTotalPages(1);
+      setCurrentPage(1);
     } finally {
       setOrdersLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchUser();
-    fetchOrders(1);
-  }, [userId]);
+  const debouncedSearch = useCallback(
+    debounce(() => {
+      fetchOrders(1, true);
+    }, 500),
+    [filters, searchText, userId]
+  );
 
-  // Handle search and filter (local filtering)
-  useEffect(() => {
-    let filtered = orders;
-
-    // Search by text
-    if (searchText.trim()) {
-      filtered = filtered.filter(
-        (order) =>
-          order.orders_id.toLowerCase().includes(searchText.toLowerCase()) ||
-          order.user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-          order.user.phone.includes(searchText) ||
-          order.order_items.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    // Apply filters
-    if (filters.orderId) {
-      filtered = filtered.filter((order) =>
-        order.orders_id.toLowerCase().includes(filters.orderId.toLowerCase())
-      );
-    }
-    if (filters.status) {
-      filtered = filtered.filter((order) => order.status === filters.status);
-    }
-    if (filters.products) {
-      filtered = filtered.filter((order) =>
-        order.order_items.toLowerCase().includes(filters.products.toLowerCase())
-      );
-    }
-
-    setFilteredOrders(filtered);
-
-    // For local filtering, recalculate pagination
-    const localPages = Math.ceil(filtered.length / itemsPerPage);
-    setTotalPages(localPages);
-    if (currentPage > localPages && localPages > 0) {
-      setCurrentPage(1);
-    }
-  }, [searchText, filters, orders, itemsPerPage, currentPage]);
-
-  // Get current page data (for local pagination)
-  const getCurrentPageData = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredOrders.slice(startIndex, endIndex);
-  };
-
-  // Handle filter change
   const handleFilterChange = (field: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
@@ -162,7 +160,10 @@ export default function ViewUser() {
     }));
   };
 
-  // Clear all filters
+  const handleSearchChange = (value: string) => {
+    setSearchText(value);
+  };
+
   const clearFilters = () => {
     setFilters({
       orderId: "",
@@ -171,74 +172,109 @@ export default function ViewUser() {
     });
     setSearchText("");
     setIsSearching(false);
+    setCurrentPage(1);
   };
 
-  // Handle refresh
   const handleRefresh = () => {
     clearFilters();
-    setCurrentPage(1);
-    fetchOrders(1);
+    fetchUser();
+    fetchOrders(1, true);
   };
 
-  // Handle export
-  const handleExport = () => {
-    const headers = [
-      "Mã đơn hàng",
-      "Người nhận",
-      "Điện thoại",
-      "Trạng thái",
-      "Sản phẩm",
-      "Ngày đặt",
-    ];
-    const csvContent = [
-      headers.join(","),
-      ...filteredOrders.map((order) =>
-        [
-          order.orders_id,
-          `"${order.user.name}"`,
-          order.user.phone,
-          `"${
-            statusMap[order.status as keyof typeof statusMap]?.label ||
-            order.status
-          }"`,
-          `"${order.order_items}"`,
-          order.created_at,
-        ].join(",")
-      ),
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `orders_user_${userId}_${new Date().toISOString().split("T")[0]}.csv`
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchOrders(page);
   };
 
-  // Format date
-  const formatDate = (dateString: string) => {
+  const handleExport = async () => {
+    if (!userId) return;
+
     try {
-      return new Date(dateString).toLocaleDateString("vi-VN");
-    } catch {
-      return dateString;
+      setOrdersLoading(true);
+
+      const params: GetOrdersParams = {
+        userId: parseInt(userId),
+        limit: totalOrders || 1000,
+        sortField: "created_at",
+        sortDirection: "desc",
+      };
+
+      if (filters.status) params.status = filters.status;
+
+      const searchQuery = [searchText, filters.orderId, filters.products]
+        .filter(Boolean)
+        .join(" ");
+
+      if (searchQuery) params.searchQuery = searchQuery;
+
+      const ordersData: OrdersApiResponse = await getOrdersByUserService(
+        params
+      );
+      const allOrders = ordersData?.orders || ordersData?.data || [];
+
+      if (allOrders.length === 0) {
+        alert("Không có đơn hàng nào để xuất");
+        return;
+      }
+
+      const headers = [
+        "Mã đơn hàng",
+        "Người nhận",
+        "Điện thoại",
+        "Trạng thái",
+        "Sản phẩm",
+        "Tổng tiền",
+        "Ngày đặt",
+      ];
+
+      const csvContent = [
+        headers.join(","),
+        ...allOrders.map((order) => {
+          const statusInfo = statusMap[order.status as keyof typeof statusMap];
+          const products = Array.isArray(order.order_items)
+            ? order.order_items
+                .map((item: any) => item.variant || item.name)
+                .join("; ")
+            : order.order_items || "";
+
+          return [
+            `"${order.orders_id}"`,
+            `"${(order.user?.name || "").replace(/"/g, '""')}"`,
+            `"${order.user?.phone || ""}"`,
+            `"${statusInfo?.label || order.status}"`,
+            `"${products.replace(/"/g, '""')}"`,
+            order.total_amount || "",
+            `"${formatDate(order.created_at)}"`,
+          ].join(",");
+        }),
+      ].join("\n");
+
+      const blob = new Blob(["\uFEFF" + csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `orders_user_${userId}_${new Date().toISOString().split("T")[0]}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Lỗi khi xuất file:", error);
+      alert("Lỗi khi xuất file!");
+    } finally {
+      setOrdersLoading(false);
     }
   };
 
-  // Handle pagination change
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    // If you want server-side pagination, uncomment the next line
-    // fetchOrders(page);
-  };
-
-  // Pagination component
   const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
     const pages = [];
     const maxVisiblePages = 5;
 
@@ -247,6 +283,25 @@ export default function ViewUser() {
 
     if (endPage - startPage < maxVisiblePages - 1) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          className="page-btn"
+          onClick={() => handlePageChange(1)}
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        pages.push(
+          <span key="ellipsis1" className="pagination-ellipsis">
+            ...
+          </span>
+        );
+      }
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -261,12 +316,31 @@ export default function ViewUser() {
       );
     }
 
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(
+          <span key="ellipsis2" className="pagination-ellipsis">
+            ...
+          </span>
+        );
+      }
+      pages.push(
+        <button
+          key={totalPages}
+          className="page-btn"
+          onClick={() => handlePageChange(totalPages)}
+        >
+          {totalPages}
+        </button>
+      );
+    }
+
     return (
       <div className="pagination">
         <button
           className="page-btn"
           disabled={currentPage === 1}
-          onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+          onClick={() => handlePageChange(currentPage - 1)}
         >
           <i className="fa-solid fa-angle-left"></i>
         </button>
@@ -274,19 +348,34 @@ export default function ViewUser() {
         <button
           className="page-btn"
           disabled={currentPage === totalPages}
-          onClick={() =>
-            handlePageChange(Math.min(totalPages, currentPage + 1))
-          }
+          onClick={() => handlePageChange(currentPage + 1)}
         >
           <i className="fa-solid fa-angle-right"></i>
         </button>
         <span className="pagination-info">
-          Trang {currentPage} / {totalPages} - Hiển thị{" "}
-          {getCurrentPageData().length} / {filteredOrders.length} đơn hàng
+          Trang {currentPage} / {totalPages} - Hiển thị {orders.length} /{" "}
+          {totalOrders} đơn hàng
         </span>
       </div>
     );
   };
+
+  // Effects
+  useEffect(() => {
+    if (userId) {
+      fetchUser();
+      fetchOrders(1, true);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      debouncedSearch();
+    }
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [filters, searchText, debouncedSearch, userId]);
 
   if (loading) {
     return (
@@ -306,7 +395,7 @@ export default function ViewUser() {
       </div>
     );
   }
-
+  console.log(user);
   if (!user) {
     return (
       <div className="error-container">
@@ -323,7 +412,11 @@ export default function ViewUser() {
       <section className="user-detail-card">
         <div className="user-header">
           <img
-            src={user.avatar || "/images/logo/anhdep.jpg"}
+            src={
+              user?.avatar
+                ? `${API_BASE_URL}/uploads/${user.avatar}`
+                : "/images/logo/anhdep.jpg"
+            }
             alt="Ảnh đại diện"
             className="user-avatar"
             onError={(e) => {
@@ -423,8 +516,7 @@ export default function ViewUser() {
 
       <div className="order-list">
         <h2>
-          Danh sách đơn hàng của {user.name || "người dùng"} (
-          {filteredOrders.length})
+          Danh sách đơn hàng của {user.name || "người dùng"} ({totalOrders})
         </h2>
 
         <div className="actions">
@@ -436,7 +528,7 @@ export default function ViewUser() {
                 autoFocus
                 placeholder="Tìm kiếm đơn hàng..."
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 onBlur={() => {
                   if (searchText === "") setIsSearching(false);
                 }}
@@ -461,16 +553,20 @@ export default function ViewUser() {
             <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
 
-          <button className="btn btn-clear" onClick={clearFilters}>
+          <button className="btn btn-clear bg-blue-700" onClick={clearFilters}>
             <i className="fa-solid fa-filter-circle-xmark"></i> Xóa bộ lọc
           </button>
 
-          <button className="btn btn-export" onClick={handleExport}>
+          <button
+            className="btn btn-export"
+            onClick={handleExport}
+            disabled={ordersLoading || totalOrders === 0}
+          >
             <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
           </button>
         </div>
 
-        {ordersLoading ? (
+        {ordersLoading && orders.length === 0 ? (
           <div className="loading">Đang tải danh sách đơn hàng...</div>
         ) : (
           <>
@@ -482,6 +578,7 @@ export default function ViewUser() {
                   <th>Điện thoại</th>
                   <th>Trạng thái</th>
                   <th>Sản phẩm</th>
+                  <th>Tổng tiền</th>
                   <th>Ngày đặt</th>
                   <th>Thao tác</th>
                 </tr>
@@ -526,48 +623,82 @@ export default function ViewUser() {
                   </th>
                   <th></th>
                   <th></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                {getCurrentPageData().length === 0 ? (
+                {orders.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       style={{ textAlign: "center", padding: "2rem" }}
                     >
-                      {filteredOrders.length === 0 && orders.length > 0
-                        ? "Không tìm thấy đơn hàng phù hợp với bộ lọc"
-                        : "Người dùng chưa có đơn hàng nào"}
+                      {totalOrders === 0
+                        ? "Người dùng chưa có đơn hàng nào"
+                        : "Không tìm thấy đơn hàng phù hợp với bộ lọc"}
                     </td>
                   </tr>
                 ) : (
-                  getCurrentPageData().map((order) => {
+                  orders.map((order) => {
                     const statusInfo = statusMap[
                       order.status as keyof typeof statusMap
-                    ] || { label: order.status, class: "status-default" };
+                    ] || {
+                      label: order.status,
+                      class: "status-default",
+                    };
+
+                    const displayProducts = Array.isArray(order.order_items)
+                      ? order.order_items
+                          .map((item: any) => {
+                            if (typeof item === "object") {
+                              return (
+                                item.variant?.product?.name ||
+                                item.variant?.sku ||
+                                item.name ||
+                                JSON.stringify(item)
+                              );
+                            }
+                            return String(item);
+                          })
+                          .join(", ")
+                      : order.order_items || "Không có thông tin";
 
                     return (
                       <tr key={order.orders_id}>
                         <td>
                           <strong>{order.orders_id}</strong>
                         </td>
-                        <td>{order.user?.name}</td>
-                        <td>{order.user?.phone}</td>
-
+                        <td>{order.user?.name || "N/A"}</td>
+                        <td>{order.user?.phone || "N/A"}</td>
                         <td>
                           <span className={`status-label ${statusInfo.class}`}>
                             {statusInfo.label}
                           </span>
                         </td>
                         <td>
-                          <span className="category-tag">
-                            {order.order_items
-                              .map((item) => item.variant)
-                              .join(", ")}
+                          <span
+                            className="category-tag"
+                            title={displayProducts}
+                          >
+                            {displayProducts.length > 50
+                              ? displayProducts.substring(0, 50) + "..."
+                              : displayProducts}
                           </span>
                         </td>
-
-                        <td>{formatDate(order.created_at)}</td>
+                        <td>
+                          {typeof order.total_amount === "number" &&
+                          !isNaN(order.total_amount)
+                            ? new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(order.total_amount)
+                            : "N/A"}
+                        </td>
+                        <td>
+                          {order.created_at
+                            ? formatDate(order.created_at)
+                            : "N/A"}
+                        </td>
                         <td>
                           <div className="action-buttons">
                             <Link
@@ -586,8 +717,14 @@ export default function ViewUser() {
               </tbody>
             </table>
 
-            {filteredOrders.length > itemsPerPage && renderPagination()}
+            {renderPagination()}
           </>
+        )}
+
+        {ordersLoading && orders.length > 0 && (
+          <div className="loading-overlay">
+            <div className="loading">Đang tải...</div>
+          </div>
         )}
       </div>
     </>

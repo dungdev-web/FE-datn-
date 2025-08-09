@@ -7,7 +7,7 @@ export interface IUser {
   picture: string | null;
   phone: string | null;
   address: string | null;
-  role: string | "customer" | "admin";
+  role: string | "admin" | "user";
   created_at: Date;
   updated_at: Date;
   reset_otp?: string;
@@ -31,7 +31,7 @@ export interface InterfaceUser {
   phone: string | null;
   role: 'admin' | 'user' | string;
   status: number;
-  avatar: string | null;
+  avatar: string;
   verify_otp: string | null;
   created_at: string;
   updated_at: string;

@@ -38,7 +38,7 @@ export const getOrdersByUserService = async ({ userId, page = 1, limit = 10 }: G
     
     const data = await res.json();
     console.log("Orders data:", data);
-    
+    console.log(data.data)
     return data.data;
   } catch (error: any) {
     console.error("Service error:", error);
