@@ -648,20 +648,21 @@ export default function ViewUser() {
                     };
 
                     const displayProducts = Array.isArray(order.order_items)
-                      ? order.order_items
-                          .map((item: any) => {
-                            if (typeof item === "object") {
-                              return (
-                                item.variant?.product?.name ||
-                                item.variant?.sku ||
-                                item.name ||
-                                JSON.stringify(item)
-                              );
-                            }
-                            return String(item);
-                          })
-                          .join(", ")
-                      : order.order_items || "Không có thông tin";
+  ? order.order_items
+      .map((item: any) => {
+        if (typeof item === "object") {
+          const productName = item.variant?.product?.name || "Không tên";
+          const color = item.variant?.color?.name_color || "Không màu";
+          const size = item.variant?.size?.number_size || "Không size";
+          const quantity = item.quantity || 1;
+
+          return `${productName} (Màu: ${color}, Size: ${size}, SL: ${quantity})`;
+        }
+        return String(item);
+      })
+      .join(", ")
+  : order.order_items || "Không có thông tin";
+
 
                     return (
                       <tr key={order.orders_id}>
