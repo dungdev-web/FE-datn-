@@ -314,21 +314,56 @@ export async function resetPassword(
   return data;
 }
 
-
+interface GetAllUsersParams {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortDirection?: string;
+  role?: string;
+  status?: number;
+  name?: string;
+  email?: string;
+  user_id?: number;
+  phone?: string;
+}
 // Admin 
-export async function getAllUsers(page = 1, limit = 20) {
+export async function getAllUsers({
+  page = 1,
+  limit = 20,
+  sortField = "created_at",
+  sortDirection = "desc",
+  role,
+  status,
+  name,
+  email,
+  user_id,
+  phone
+}: GetAllUsersParams = {}) {
   try {
-    const res = await fetch(`${API_BASE_URL}/all-user?page=${page}&limit=${limit}`);
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      sortField,
+      sortDirection
+    });
+
+    if (role) params.append("role", role);
+    if (status !== undefined) params.append("status", String(status));
+    if (name) params.append("name", name);
+    if (email) params.append("email", email);
+    if (user_id) params.append("user_id", String(user_id));
+    if (phone) params.append("phone", phone);
+
+    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
 
     if (!res.ok) {
       throw new Error(`Lỗi server: ${res.status}`);
     }
 
     const data = await res.json();
-    console.log(data)
     return data;
   } catch (error) {
-    console.error('Lỗi khi fetch danh sách người dùng:', error);
+    console.error("Lỗi khi fetch danh sách người dùng:", error);
     throw error;
   }
 }

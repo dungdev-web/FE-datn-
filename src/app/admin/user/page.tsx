@@ -1,6 +1,6 @@
 "use client";
 import "../css/auth_admin.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "../css/css.css";
 import "../css/dashboard.css";
 import Link from "next/link";
@@ -8,13 +8,24 @@ import { getAllUsers, updateUser } from "@/services/authService";
 import { InterfaceUser } from "@/types/user";
 import Swal from "sweetalert2";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { debounce } from "lodash";
 
-type SortField = 'user_id' | 'name' | 'email' | 'phone' | 'role' | 'status';
-type SortDirection = 'asc' | 'desc' | null;
+type SortField = 'user_id' | 'name' | 'email' | 'phone' | 'role' | 'status' | 'created_at';
+type SortDirection = 'asc' | 'desc';
 
 interface SortConfig {
-  field: SortField | null;
+  field: SortField;
   direction: SortDirection;
+}
+
+interface ApiResponse {
+  data: {
+    users: InterfaceUser[];
+    total: number;
+    currentPage: number;
+    totalPages: number;
+    limit: number;
+  };
 }
 
 export default function ListUser() {
@@ -23,7 +34,6 @@ export default function ListUser() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [users, setUsers] = useState<InterfaceUser[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<InterfaceUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -33,12 +43,13 @@ export default function ListUser() {
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
   // Sort states
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    field: null,
-    direction: null,
+    field: 'created_at',
+    direction: 'desc',
   });
 
   // Filter states
@@ -64,81 +75,55 @@ export default function ListUser() {
     setModalUserName("");
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = currentPage, resetPage = false) => {
     setLoading(true);
     try {
-      const res = await getAllUsers();
+      const params = {
+        page: resetPage ? 1 : page,
+        limit: itemsPerPage,
+        sortField: sortConfig.field,
+        sortDirection: sortConfig.direction,
+        ...(filters.role && { role: filters.role }),
+        ...(filters.status && { status: filters.status === "active" ? 1 : 0 }),
+        ...(filters.name && { name: filters.name }),
+        ...(filters.email && { email: filters.email }),
+        ...(filters.phone && { phone: filters.phone }),
+        ...(filters.id && { user_id: parseInt(filters.id) }),
+        ...(searchText && { name: searchText }), // Use search text as name filter
+      };
+
+      const res: ApiResponse = await getAllUsers(params);
+      
       setUsers(res.data.users);
-      setFilteredUsers(res.data.users);
+      setTotalUsers(res.data.total);
+      setTotalPages(res.data.totalPages);
+      setCurrentPage(res.data.currentPage);
       setError("");
     } catch (err) {
       console.error("Lỗi khi fetch users:", err);
       setError("Không thể tải danh sách người dùng");
+      setUsers([]);
+      setTotalUsers(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
-  // Sort function
-  const sortData = (data: InterfaceUser[], field: SortField, direction: SortDirection) => {
-    if (!field || !direction) return data;
-
-    return [...data].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
-
-      switch (field) {
-        case 'user_id':
-          aValue = a.user_id;
-          bValue = b.user_id;
-          break;
-        case 'name':
-          aValue = (a.name || '').toLowerCase();
-          bValue = (b.name || '').toLowerCase();
-          break;
-        case 'email':
-          aValue = (a.email || '').toLowerCase();
-          bValue = (b.email || '').toLowerCase();
-          break;
-        case 'phone':
-          aValue = a.phone || '';
-          bValue = b.phone || '';
-          break;
-        case 'role':
-          aValue = a.role;
-          bValue = b.role;
-          break;
-        case 'status':
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        default:
-          return 0;
-      }
-
-      if (aValue < bValue) {
-        return direction === 'asc' ? -1 : 1;
-      }
-      if (aValue > bValue) {
-        return direction === 'asc' ? 1 : -1;
-      }
-      return 0;
-    });
-  };
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce(() => {
+      fetchUsers(1, true);
+    }, 500),
+    [sortConfig, filters]
+  );
 
   // Handle sort
   const handleSort = (field: SortField) => {
-    let direction: SortDirection = 'asc';
-
-    if (sortConfig.field === field) {
-      if (sortConfig.direction === 'asc') {
-        direction = 'desc';
-      } else if (sortConfig.direction === 'desc') {
-        direction = null;
-      }
-    }
-
-    setSortConfig({ field: direction ? field : null, direction });
+    const newDirection: SortDirection = 
+      sortConfig.field === field && sortConfig.direction === 'asc' ? 'desc' : 'asc';
+    
+    setSortConfig({ field, direction: newDirection });
   };
 
   // Get sort icon
@@ -149,78 +134,22 @@ export default function ListUser() {
 
     if (sortConfig.direction === 'asc') {
       return <ArrowUp className="w-4 h-4 text-blue-500" />;
-    } else if (sortConfig.direction === 'desc') {
+    } else {
       return <ArrowDown className="w-4 h-4 text-blue-500" />;
     }
-
-    return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    let filtered = users;
-
-    // Apply filters
-    if (searchText.trim()) {
-      filtered = filtered.filter(
-        (user) =>
-          user.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-          user.email?.toLowerCase().includes(searchText.toLowerCase()) ||
-          user.phone?.includes(searchText) ||
-          user.user_id.toString().includes(searchText)
-      );
-    }
-
-    if (filters.id) {
-      filtered = filtered.filter((user) =>
-        user.user_id.toString().includes(filters.id)
-      );
-    }
-    if (filters.name) {
-      filtered = filtered.filter((user) =>
-        user.name?.toLowerCase().includes(filters.name.toLowerCase())
-      );
-    }
-    if (filters.email) {
-      filtered = filtered.filter((user) =>
-        user.email?.toLowerCase().includes(filters.email.toLowerCase())
-      );
-    }
-    if (filters.phone) {
-      filtered = filtered.filter((user) => user.phone?.includes(filters.phone));
-    }
-    if (filters.role) {
-      filtered = filtered.filter((user) => user.role === filters.role);
-    }
-    if (filters.status) {
-      const statusValue = filters.status === "active" ? 1 : 0;
-      filtered = filtered.filter((user) => user.status === statusValue);
-    }
-
-    // Apply sorting
-    if (sortConfig.field && sortConfig.direction) {
-      filtered = sortData(filtered, sortConfig.field, sortConfig.direction);
-    }
-
-    setFilteredUsers(filtered);
-    setTotalPages(Math.ceil(filtered.length / itemsPerPage));
-    setCurrentPage(1);
-  }, [searchText, filters, users, itemsPerPage, sortConfig]);
-
-  const getCurrentPageData = () => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredUsers.slice(startIndex, endIndex);
-  };
-
+  // Handle filter change
   const handleFilterChange = (field: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
       [field]: value,
     }));
+  };
+
+  // Handle search text change
+  const handleSearchChange = (value: string) => {
+    setSearchText(value);
   };
 
   const clearFilters = () => {
@@ -234,67 +163,100 @@ export default function ListUser() {
     });
     setSearchText("");
     setIsSearching(false);
-    setSortConfig({ field: null, direction: null });
+    setSortConfig({ field: 'created_at', direction: 'desc' });
+    setCurrentPage(1);
   };
 
   const handleRefresh = () => {
     clearFilters();
-    fetchUsers();
+    fetchUsers(1, true);
   };
 
-  const handleExport = () => {
-    const headers = [
-      "ID",
-      "Tên",
-      "Email",
-      "Điện thoại",
-      "Vai trò",
-      "Trạng thái",
-    ];
-    const csvContent = [
-      headers.join(","),
-      ...filteredUsers.map((user) =>
-        [
-          user.user_id,
-          user.name || "",
-          user.email || "",
-          user.phone || "",
-          user.role === "admin" ? "Admin" : "Người dùng",
-          user.status === 1 ? "Hoạt động" : "Bị khóa",
-        ].join(",")
-      ),
-    ].join("\n");
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    fetchUsers(newPage);
+  };
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `users_${new Date().toISOString().split("T")[0]}.csv`
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+      // Fetch all users for export (without pagination)
+      const res: ApiResponse = await getAllUsers({
+        limit: totalUsers, // Get all users
+        sortField: sortConfig.field,
+        sortDirection: sortConfig.direction,
+        ...(filters.role && { role: filters.role }),
+        ...(filters.status && { status: filters.status === "active" ? 1 : 0 }),
+        ...(filters.name && { name: filters.name }),
+        ...(filters.email && { email: filters.email }),
+        ...(filters.phone && { phone: filters.phone }),
+        ...(filters.id && { user_id: parseInt(filters.id) }),
+        ...(searchText && { name: searchText }),
+      });
+
+      const headers = [
+        "ID",
+        "Tên",
+        "Email",
+        "Điện thoại",
+        "Vai trò",
+        "Trạng thái",
+      ];
+      
+      const csvContent = [
+        headers.join(","),
+        ...res.data.users.map((user) =>
+          [
+            user.user_id,
+            `"${(user.name || "").replace(/"/g, '""')}"`, // Handle commas in names
+            `"${(user.email || "").replace(/"/g, '""')}"`,
+            user.phone || "",
+            user.role === "admin" ? "Admin" : "Người dùng",
+            user.status === 1 ? "Hoạt động" : "Bị khóa",
+          ].join(",")
+        ),
+      ].join("\n");
+
+      const blob = new Blob(["\uFEFF" + csvContent], { 
+        type: "text/csv;charset=utf-8;" 
+      }); // Add BOM for proper UTF-8 encoding
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        `users_${new Date().toISOString().split("T")[0]}.csv`
+      );
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Lỗi khi xuất file:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Không thể xuất file!",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveUpdate = async () => {
     if (!selectedUserId) return;
 
     try {
-      const res = await updateUser(selectedUserId, {
+      await updateUser(selectedUserId, {
         role: selectedRole,
         status: selectedStatus,
       });
-      const updatedUserList = users.map((user) =>
-        user.user_id === selectedUserId
-          ? { ...user, role: selectedRole, status: selectedStatus }
-          : user
-      );
 
-      setUsers(updatedUserList);
+      // Refresh current page data
+      fetchUsers();
       closeModal();
+      
       Swal.fire({
         icon: "success",
         title: "Thành công",
@@ -313,6 +275,8 @@ export default function ListUser() {
   };
 
   const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
     const pages = [];
     const maxVisiblePages = 5;
 
@@ -323,14 +287,47 @@ export default function ListUser() {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
+    // First page
+    if (startPage > 1) {
+      pages.push(
+        <button
+          key={1}
+          className="page-btn"
+          onClick={() => handlePageChange(1)}
+        >
+          1
+        </button>
+      );
+      if (startPage > 2) {
+        pages.push(<span key="ellipsis1">...</span>);
+      }
+    }
+
+    // Visible pages
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <button
           key={i}
           className={`page-btn ${i === currentPage ? "active" : ""}`}
-          onClick={() => setCurrentPage(i)}
+          onClick={() => handlePageChange(i)}
         >
           {i}
+        </button>
+      );
+    }
+
+    // Last page
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(<span key="ellipsis2">...</span>);
+      }
+      pages.push(
+        <button
+          key={totalPages}
+          className="page-btn"
+          onClick={() => handlePageChange(totalPages)}
+        >
+          {totalPages}
         </button>
       );
     }
@@ -340,7 +337,7 @@ export default function ListUser() {
         <button
           className="page-btn"
           disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          onClick={() => handlePageChange(currentPage - 1)}
         >
           <i className="fa-solid fa-angle-left"></i>
         </button>
@@ -348,32 +345,45 @@ export default function ListUser() {
         <button
           className="page-btn"
           disabled={currentPage === totalPages}
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(totalPages, prev + 1))
-          }
+          onClick={() => handlePageChange(currentPage + 1)}
         >
           <i className="fa-solid fa-angle-right"></i>
         </button>
         <span className="pagination-info">
-          Trang {currentPage} / {totalPages} - Hiển thị{" "}
-          {getCurrentPageData().length} / {filteredUsers.length} người dùng
+          Trang {currentPage} / {totalPages} - Hiển thị {users.length} / {totalUsers} người dùng
         </span>
       </div>
     );
   };
 
-  if (loading) {
+  // Effects
+  useEffect(() => {
+    fetchUsers(1, true);
+  }, []); // Initial load
+
+  useEffect(() => {
+    fetchUsers(1, true);
+  }, [sortConfig]); // Reload when sort changes
+
+  useEffect(() => {
+    debouncedSearch();
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [filters, searchText, debouncedSearch]); // Debounced search on filter/search changes
+
+  if (loading && users.length === 0) {
     return <div className="loading">Đang tải...</div>;
   }
 
-  if (error) {
+  if (error && users.length === 0) {
     return <div className="error">{error}</div>;
   }
 
   return (
     <>
       <div className="user-list">
-        <h2>Danh sách người dùng ({filteredUsers.length})</h2>
+        <h2>Danh sách người dùng ({totalUsers})</h2>
 
         <div className="actions">
           <div className={`search-toggle ${isSearching ? "active" : ""}`}>
@@ -384,7 +394,7 @@ export default function ListUser() {
                 autoFocus
                 placeholder="Nhập từ khóa tìm kiếm..."
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 onBlur={() => {
                   if (searchText === "") setIsSearching(false);
                 }}
@@ -413,7 +423,11 @@ export default function ListUser() {
             <i className="fa-solid fa-filter-circle-xmark"></i> Xóa bộ lọc
           </button>
 
-          <button className="btn btn-export" onClick={handleExport}>
+          <button 
+            className="btn btn-export" 
+            onClick={handleExport}
+            disabled={loading}
+          >
             <i className="fa-solid fa-file-export"></i> Xuất Excel
           </button>
         </div>
@@ -534,19 +548,20 @@ export default function ListUser() {
             </tr>
           </thead>
           <tbody>
-            {getCurrentPageData().length === 0 ? (
+            {loading && users.length === 0 ? (
               <tr>
-                <td
-                  colSpan={7}
-                  style={{ textAlign: "center", padding: "2rem" }}
-                >
-                  {filteredUsers.length === 0 && users.length > 0
-                    ? "Không tìm thấy người dùng phù hợp với bộ lọc"
-                    : "Không có người dùng nào"}
+                <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
+                  Đang tải...
+                </td>
+              </tr>
+            ) : users.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
+                  Không tìm thấy người dùng nào
                 </td>
               </tr>
             ) : (
-              getCurrentPageData().map((user) => (
+              users.map((user) => (
                 <tr key={user.user_id}>
                   <td>{user.user_id}</td>
                   <td>{user.name || "Chưa có tên"}</td>
@@ -588,7 +603,8 @@ export default function ListUser() {
             )}
           </tbody>
         </table>
-        {filteredUsers.length > itemsPerPage && renderPagination()}
+        
+        {renderPagination()}
       </div>
 
       {isModalOpen && (
