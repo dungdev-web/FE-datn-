@@ -4,61 +4,76 @@ import "@/app/admin/css/brand_add_admin.css";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { addBrand } from "@/services/brandService"; // import service vừa tạo
+import { addBrand } from "@/services/brandService";
+import Swal from "sweetalert2"; // import SweetAlert2
 
 export default function BrandAdd() {
   const router = useRouter();
 
   const [name, setName] = useState("");
   const [status, setStatus] = useState("active");
-  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (!name.trim()) {
-      alert("Vui lòng nhập tên nhãn hiệu");
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu thông tin",
+        text: "Vui lòng nhập tên nhãn hiệu",
+      });
+      return;
+    }
+
+    if (!logoFile) {
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu ảnh",
+        text: "Vui lòng chọn ảnh nhãn hiệu",
+      });
       return;
     }
 
     try {
       setLoading(true);
 
-      const slug = name
-        .toLowerCase()
-        .normalize("NFD") // bỏ dấu tiếng Việt
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]/g, "");
-
       const payload = {
         name,
-        slug,
-        logo_url: logoUrl,
         status: status === "active" ? 1 : 0,
+        logo_url: logoFile!, // gửi File thay vì base64
       };
-
       await addBrand(payload);
 
-      alert("Thêm nhãn hiệu thành công!");
-      router.push("/admin/brands");
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Thêm nhãn hiệu thành công!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        router.push("/admin/brands");
+      }, 1500);
     } catch (error: any) {
-      alert(error.message || "Lỗi khi thêm nhãn hiệu");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: error.message || "Lỗi khi thêm nhãn hiệu",
+      });
     } finally {
       setLoading(false);
     }
   }
 
-  // Xử lý upload ảnh (tạm thời chỉ đọc URL local preview)
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
     }
   }
 
@@ -79,7 +94,7 @@ export default function BrandAdd() {
               placeholder="Nhập tên nhãn hiệu"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
+       
             />
           </div>
 
@@ -107,10 +122,10 @@ export default function BrandAdd() {
               accept="image/*"
               onChange={handleImageChange}
             />
-            {logoUrl && (
+            {logoPreview && (
               <div style={{ marginTop: "10px" }}>
                 <img
-                  src={logoUrl}
+                  src={logoPreview}
                   alt="Preview"
                   style={{ maxWidth: "150px", borderRadius: "8px" }}
                 />

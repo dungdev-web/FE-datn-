@@ -95,18 +95,24 @@ export async function getProductsByBrandId(
   }
 }
 
-// Thêm brand
+// Thêm brand (có upload ảnh)
 export async function addBrand(brand: {
   name: string;
-  slug: string;
-  logo_url?: string;
   status?: number;
+  logo_url?: File; // ảnh dạng file
 }) {
   try {
+    const formData = new FormData();
+    formData.append("name", brand.name);
+    formData.append("status", String(brand.status ?? 1));
+
+    if (brand.logo_url) {
+      formData.append("logo_url", brand.logo_url); // file ảnh
+    }
+
     const response = await fetch(`${API_BASE_URL}/brand`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(brand),
+      body: formData, // gửi trực tiếp FormData
     });
 
     const result = await response.json();
@@ -118,6 +124,8 @@ export async function addBrand(brand: {
     throw error;
   }
 }
+
+
 
 // Sửa brand
 export async function updateBrand(id: number, brand: Partial<IBrand>) {
