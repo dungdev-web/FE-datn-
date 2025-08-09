@@ -170,9 +170,10 @@ export default function CategoryPage() {
           setCategory(matched || null);
 
           setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
-          const matchedBrand = fetchedBrands.find(
-            (b) => b.brand_id === brandId
-          );
+          const matchedBrand = Array.isArray(fetchedBrands.data)
+            ? fetchedBrands.data.find((b) => b.brand_id === brandId)
+            : null;
+
           setBrand(matchedBrand || null);
         }
       } catch (error) {

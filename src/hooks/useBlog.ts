@@ -43,3 +43,6 @@ export function usePostsByCategory(categoryId: number) {
 
   return { posts, loading, error };
 }
+export function useAddCategoryPost(){
+  
+}
