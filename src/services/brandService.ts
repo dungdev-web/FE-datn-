@@ -214,7 +214,6 @@ export async function updateBrandStatus(id: number, status: number) {
   }
 }
 
-
 // Xóa brand
 export async function deleteBrand(id: number) {
   try {
@@ -223,9 +222,13 @@ export async function deleteBrand(id: number) {
     });
 
     const result = await response.json();
-    if (!response.ok) throw new Error(result.message || "Xóa brand thất bại");
 
-    return result;
+    if (!response.ok) {
+      // Nếu API trả lỗi, ném ra message cụ thể
+      throw new Error(result.error || result.message || "Xóa brand thất bại");
+    }
+
+    return result; // { message, result }
   } catch (error) {
     console.error("Lỗi khi xóa brand:", error);
     throw error;

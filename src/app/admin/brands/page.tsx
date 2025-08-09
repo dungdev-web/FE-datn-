@@ -3,11 +3,12 @@ import { API_BASE_URL } from "@/config/env";
 import "../../admin/css/brands_admin.css";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getBrands, updateBrandStatus } from "@/services/brandService";
+import { getBrands, updateBrandStatus, deleteBrand } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { ArrowUpDown } from "lucide-react";
 import { toast } from "react-toastify";
 import { Toaster } from "react-hot-toast";
+import Swal from "sweetalert2";
 
 export default function Brands() {
   const [brands, setBrands] = useState<IBrand[]>([]);
@@ -19,19 +20,17 @@ export default function Brands() {
     currentPage: 1,
   });
 
-  // Bộ lọc
   const [filterId, setFilterId] = useState("");
   const [filterName, setFilterName] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
-  // Sắp xếp
   const [sortConfig, setSortConfig] = useState<{
     sortBy: string;
     sortOrder: "asc" | "desc";
   }>({ sortBy: "", sortOrder: "asc" });
 
-  // State để lưu brand đang đổi trạng thái (đang loading)
   const [loadingStatusId, setLoadingStatusId] = useState<number | null>(null);
+  const [loadingDeleteId, setLoadingDeleteId] = useState<number | null>(null); // loading khi xóa
 
   const fetchBrands = async () => {
     const result = await getBrands({
@@ -115,6 +114,37 @@ export default function Brands() {
       setLoadingStatusId(null);
     }
   };
+
+  const handleDeleteBrand = async (brandId: number, brandName: string) => {
+  const result = await Swal.fire({
+    title: `Bạn có chắc muốn xóa nhãn hiệu "${brandName}" không?`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Có, xóa đi!",
+    cancelButtonText: "Hủy",
+  });
+
+  if (result.isConfirmed) {
+    setLoadingDeleteId(brandId);
+    try {
+      await deleteBrand(brandId);
+      setBrands((prev) => prev.filter((b) => b.brand_id !== brandId));
+
+      Swal.fire("Đã xóa!", "Nhãn hiệu đã được xóa thành công.", "success");
+
+      if (brands.length === 1 && pagination.currentPage > 1) {
+        changePage(pagination.currentPage - 1);
+      }
+    } catch (error: any) {
+      console.error("Lỗi khi xóa nhãn hiệu:", error);
+      Swal.fire("Lỗi!", error.message || "Xóa nhãn hiệu thất bại!", "error");
+    } finally {
+      setLoadingDeleteId(null);
+    }
+  }
+};
 
   return (
     <div className="brand-list">
@@ -232,7 +262,7 @@ export default function Brands() {
                   <input
                     type="checkbox"
                     checked={brand.status === 1}
-                    disabled={loadingStatusId === brand.brand_id} // disable khi đang loading
+                    disabled={loadingStatusId === brand.brand_id}
                     onChange={() =>
                       handleToggleStatus(brand.brand_id, brand.status)
                     }
@@ -252,6 +282,11 @@ export default function Brands() {
                 <i
                   className="fa-solid fa-trash delete-icon"
                   title="Xóa nhãn hiệu"
+                  style={{ cursor: loadingDeleteId === brand.brand_id ? "not-allowed" : "pointer", opacity: loadingDeleteId === brand.brand_id ? 0.5 : 1 }}
+                  onClick={() => {
+                    if (loadingDeleteId === brand.brand_id) return; // đang xóa thì không cho click
+                    handleDeleteBrand(brand.brand_id, brand.name);
+                  }}
                 ></i>
               </td>
             </tr>
@@ -286,6 +321,7 @@ export default function Brands() {
           <i className="fa-solid fa-angle-right"></i>
         </button>
       </div>
+
       <Toaster position="top-right" />
     </div>
   );
