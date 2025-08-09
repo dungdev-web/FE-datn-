@@ -27,6 +27,8 @@ export interface Category {
   name: string;
   slug: string;
   parent_id: number | null;
+  created_at?: Date;
+  updated_at?: Date;
 }
 export interface IBlogCreate {
   title: string;
@@ -37,4 +39,10 @@ export interface IBlogCreate {
   author_id: number;
   status?: number; 
   thumbnail?: string;
+}
+export interface CategoryResponse {
+  data: Category[];
+  total: number;
+  currentPage: number;
+  totalPages: number;
 }

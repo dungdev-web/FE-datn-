@@ -85,43 +85,47 @@ export async function getPostById(id: number): Promise<IBlog | null> {
 //lấy danh mục bài viết
 
 
-export async function getCategory(): Promise<Category[]> {
-  if (IS_MOCK) {
-    return [
-      {
-        category_post_id: 1,
-        name: "Tin tức",
-        slug: "tin-tuc",
-        parent_id: null,
-      },
-      {
-        category_post_id: 2,
-        name: "Khuyến mãi",
-        slug: "khuyen-mai",
-        parent_id: null,
-      },
-    ];
+export async function getCategory(
+  params?: {
+    page?: number;
+    name: string;
+    id?: number;
+    slug?: string;
+    sortBy?: "name" | "created_at" | "updated_at";
+    sortOrder?: "asc" | "desc";
   }
+): Promise<Category[]> {
+ 
 
   try {
-    const res = await fetch(`${API_BASE_URL}/post/category`, {
+    const query = new URLSearchParams({
+      page: String(params?.page ?? 1),
+      limit: "10",
+      name: params?.name ?? "",
+      id: params?.id ? String(params.id) : "",
+      slug: params?.slug ?? "",
+      sortBy: params?.sortBy ?? "created_at",
+      sortOrder: params?.sortOrder ?? "desc",
+    });
+    
+
+    const res = await fetch(`${API_BASE_URL}/post/category?${query}`, {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!res.ok) {
       throw new Error("Không thể lấy danh mục bài viết từ API.");
     }
 
-    const data = await res.json();
-    return data.data || [];
+    const { data,totalPages } = await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("Lỗi khi lấy danh mục bài viết:", error);
     return [];
   }
 }
+
 
 //lấy bài viết theo danh mục
 export async function getPostsByCategory(
@@ -191,6 +195,20 @@ export async function updatePost(postId: number | undefined, formData: FormData)
   } catch (error) {
     console.error("Lỗi khi cập nhật bài viết:", error);
     return null;
+  }
+}
+export async function deletePost(postId: number): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/delete/${postId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Không thể xóa bài viết.");
+
+    return true;
+  } catch (error) {
+    console.error("Lỗi khi xóa bài viết:", error);
+    return false;
   }
 }
 

@@ -58,9 +58,10 @@ export default function Header() {
   useEffect(() => {
     getCategories().then(setCategories);
   }, []);
-  useEffect(() => {
-    getBrands().then(setBrands);
-  }, []);
+ useEffect(() => {
+  getBrands().then(res => setBrands(res.data || []));
+}, []);
+
   useEffect(() => {
     const cartIcon = cartIconRef.current;
     const cartPopup = cartPopupRef.current;
