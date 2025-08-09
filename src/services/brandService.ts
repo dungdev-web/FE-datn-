@@ -94,3 +94,63 @@ export async function getProductsByBrandId(
     return [];
   }
 }
+
+// Thêm brand
+export async function addBrand(brand: {
+  name: string;
+  slug: string;
+  logo_url?: string;
+  status?: number;
+}) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/brand`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(brand),
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Thêm brand thất bại");
+
+    return result;
+  } catch (error) {
+    console.error("Lỗi khi thêm brand:", error);
+    throw error;
+  }
+}
+
+// Sửa brand
+export async function updateBrand(id: number, brand: Partial<IBrand>) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/brand/update/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(brand),
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Cập nhật brand thất bại");
+
+    return result;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật brand:", error);
+    throw error;
+  }
+}
+
+// Xóa brand
+export async function deleteBrand(id: number) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/brand/delete/${id}`, {
+      method: "DELETE",
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || "Xóa brand thất bại");
+
+    return result;
+  } catch (error) {
+    console.error("Lỗi khi xóa brand:", error);
+    throw error;
+  }
+}
