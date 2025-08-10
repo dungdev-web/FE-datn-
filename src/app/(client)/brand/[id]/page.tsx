@@ -2,14 +2,13 @@
 import { useEffect, useState } from "react";
 import {
   getCategories,
-  getProductsByCategorySlug,
 } from "@/services/categoryService";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
-import { getBrands, getProductsByBrandId } from "@/services/brandService";
+import { getBrands } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight, XCircle } from "lucide-react";
@@ -17,6 +16,7 @@ import ProductIcons from "../../component/Products/ProductIcons";
 import SidebarFilter from "../../component/products/SidebarFilter";
 import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
 import { API_BASE_URL } from "@/config/env";
+import { getFilteredProducts } from "@/services/productService"; 
 
 export default function CategoryPage() {
   const params = useParams();
@@ -43,7 +43,7 @@ export default function CategoryPage() {
     undefined
   );
 
-  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
+  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>(brandId ? [brandId] : []);
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [selectedPriceRange, setSelectedPriceRange] = useState<{
     min: number;
@@ -94,11 +94,13 @@ export default function CategoryPage() {
     setSelectedBrandIds((prev) =>
       prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
     );
+    setPage(1);
   };
 
   const handleGenderChange = (gender: string) => {
     setSelectedGender(gender);
     setSelectedBrandIds([]);
+    setPage(1);
   };
 
   const handlePriceChange = (range: { min: number; max: number } | null) => {
@@ -115,66 +117,76 @@ export default function CategoryPage() {
     setOpenCategoryId(openCategoryId === id ? null : id);
   };
 
- useEffect(() => {
-  async function fetchData() {
-    if (!brandId) return;
+  // --- Thay đổi fetch data, dùng getFilteredProducts ---
 
-    try {
-      const [fetchedProducts, fetchedBrandsRes, fetchedCategoriesRes] =
-        await Promise.all([
-          getProductsByBrandId(brandId),
-          getBrands(),
-          getCategories(),
-        ]);
-
-      // Sản phẩm
-      setProducts(Array.isArray(fetchedProducts) ? fetchedProducts : []);
-      setTotal(Array.isArray(fetchedProducts) ? fetchedProducts.length : 0);
-
-      // Brand list
-      setBrandsList(Array.isArray(fetchedBrandsRes.data) ? fetchedBrandsRes.data : []);
-
-      // Category list
-      setCategories(Array.isArray(fetchedCategoriesRes.data) ? fetchedCategoriesRes.data : []);
-
-      // Brand đang được chọn
-      const matchedBrand = fetchedBrandsRes.data?.find(
-        (b) => b.brand_id === brandId
-      );
-      setBrand(matchedBrand || null);
-    } catch (err) {
-      console.error("Lỗi khi load dữ liệu:", err);
-    }
-  }
-
-  fetchData();
-}, [brandId]);
-
-  // Lọc sản phẩm khi chọn brand filter
   useEffect(() => {
-    async function fetchFilteredProducts() {
-      if (selectedBrandIds.length === 0) return;
-
+    async function fetchBrandsAndCategories() {
       try {
-        const results = await Promise.all(
-          selectedBrandIds.map((id) => getProductsByBrandId(id))
-        );
-        const combined = results.flat();
-        setProducts(combined);
-        setTotal(combined.length);
+        const [brandsRes, categoriesRes] = await Promise.all([getBrands(), getCategories()]);
+        setBrandsList(Array.isArray(brandsRes.data) ? brandsRes.data : []);
+        setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
+
+        const matchedBrand = brandsRes.data?.find((b: { brand_id: number; }) => b.brand_id === brandId);
+        setBrand(matchedBrand || null);
       } catch (err) {
-        console.error("Lỗi khi lọc sản phẩm:", err);
+        console.error("Lỗi khi load brands/categories:", err);
       }
     }
+    fetchBrandsAndCategories();
+  }, [brandId]);
 
-    fetchFilteredProducts();
-  }, [selectedBrandIds]);
+  useEffect(() => {
+    async function fetchProducts() {
+      if (selectedBrandIds.length === 0) {
+        setProducts([]);
+        setTotal(0);
+        setTotalPages(1);
+        return;
+      }
+      try {
+        const filterParams: any = {
+          brand: selectedBrandIds.map(String),
+          keyword: keyword || undefined,
+          page,
+          limit: productsPerPage,
+          sortBy,
+          sortOrder,
+        };
 
+        if (selectedGender) filterParams.gender = selectedGender;
+        if (selectedPriceRange) {
+          filterParams.minPrice = selectedPriceRange.min;
+          filterParams.maxPrice = selectedPriceRange.max;
+        }
+
+        const result = await getFilteredProducts(filterParams);
+        setProducts(result.products);
+        setTotal(result.total);
+        setTotalPages(result.totalPages);
+      } catch (err) {
+        console.error("Lỗi khi lấy sản phẩm:", err);
+        setProducts([]);
+        setTotal(0);
+        setTotalPages(1);
+      }
+    }
+    fetchProducts();
+  }, [
+    selectedBrandIds,
+    selectedGender,
+    selectedPriceRange,
+    keyword,
+    page,
+    productsPerPage,
+    sortBy,
+    sortOrder,
+  ]);
+
+  // Phân trang cắt sản phẩm nếu muốn (hoặc dùng backend phân trang)
   const paginatedProducts = products.slice(
     (page - 1) * productsPerPage,
     page * productsPerPage
   );
-
   return (
     <>
       <section

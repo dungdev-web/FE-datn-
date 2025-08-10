@@ -94,7 +94,28 @@ export async function getProductsByBrandId(
     return [];
   }
 }
+export async function getAllBrands() {
+  try {
+    if (IS_MOCK) {
+      return getMockBrands();
+    }
 
+    const url = `${API_BASE_URL}/brand/all`;
+
+    const response = await fetch(url, { cache: "no-store" });
+
+    if (!response.ok) {
+      console.error("Lỗi API brand:", response.statusText);
+      return [];
+    }
+
+    const result = await response.json();
+    return result as IBrand[]; // API trả về mảng brand không phân trang
+  } catch (error) {
+    console.error("Lỗi khi gọi API brand:", error);
+    return [];
+  }
+}
 // Thêm brand (có upload ảnh)
 export async function addBrand(brand: {
   name: string;

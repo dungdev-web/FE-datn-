@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
-import { getCategories } from "@/services/categoryService";
-import { getBrands } from "@/services/brandService";
+import { getAllCategories } from "@/services/categoryService"; // service lấy all category trả về ICategory[]
+import { getAllBrands } from "@/services/brandService"; // service lấy all brand trả về IBrand[]
 import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
@@ -56,36 +56,20 @@ export default function Header() {
       handleSearch();
     }
   };
+  // Lấy danh mục categories (all)
   useEffect(() => {
-    getCategories()
-      .then((res) => {
-        // Nếu API trả về { data: [...] } thì lấy res.data
-        if (Array.isArray(res)) {
-          setCategories(res);
-        } else if (Array.isArray(res?.data)) {
-          setCategories(res.data);
-        } else {
-          setCategories([]); // fallback
-        }
-      })
+    getAllCategories()
+      .then((res) => setCategories(res || []))
       .catch((err) => {
         console.error("Lỗi khi lấy categories:", err);
         setCategories([]);
       });
   }, []);
 
-
+  // Lấy danh sách brands (all)
   useEffect(() => {
-    getBrands()
-      .then((res) => {
-        if (Array.isArray(res)) {
-          setBrands(res);
-        } else if (Array.isArray(res?.data)) {
-          setBrands(res.data);
-        } else {
-          setBrands([]); // fallback nếu không phải mảng
-        }
-      })
+    getAllBrands()
+      .then((res) => setBrands(res || []))
       .catch((err) => {
         console.error("Lỗi khi lấy brands:", err);
         setBrands([]);

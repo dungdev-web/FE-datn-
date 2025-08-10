@@ -1,9 +1,9 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
 import {
-  getCategories,
-  getProductsByCategorySlug,
+  getAllCategories,
 } from "@/services/categoryService";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,12 +13,13 @@ import { ICategory } from "@/types/ICategory";
 import { ChevronDown, ChevronRight, XCircle } from "lucide-react";
 import "@/app/(client)/css/pagination.css";
 import { IBrand } from "@/types/IBrand";
-import { getBrands, getProductsByBrandId } from "@/services/brandService";
+import { getAllBrands } from "@/services/brandService";
+import { getFilteredProducts } from "@/services/productService"; // Thêm
 
-import SidebarFilter from "../../component/Products/SidebarFilter";
-import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
 import ProductIcons from "../../component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
+import SidebarFilter from "../../component/products/SidebarFilter";
+import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
 
 interface Params {
   params: {
@@ -93,12 +94,11 @@ export default function CategoryPage() {
     min: number;
     max: number;
   } | null>(null);
-  const handleBrandCheckboxChange = (brandId: number) => {
+ const handleBrandCheckboxChange = (id: number) => {
     setSelectedBrandIds((prev) =>
-      prev.includes(brandId)
-        ? prev.filter((id) => id !== brandId)
-        : [...prev, brandId]
+      prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
     );
+    setPage(1);
   };
 
   const toggleSidebar = () => {
@@ -123,74 +123,70 @@ export default function CategoryPage() {
     page * productsPerPage
   );
 
-  useEffect(() => {
-    async function fetchFilteredProducts() {
+useEffect(() => {
+  async function fetchFiltered() {
+    try {
+      if (!slug) return;
+
+      // Chuẩn bị params cho getFilteredProducts
+      const params: any = {
+        keyword: keyword || undefined,
+        gender: selectedGender || undefined,
+        brand: selectedBrandIds.length > 0 ? selectedBrandIds.map(String) : undefined,
+        minPrice: selectedPriceRange?.min,
+        maxPrice: selectedPriceRange?.max,
+        status: 1,
+        limit: productsPerPage,
+        page,
+        sortBy,
+        sortOrder,
+      };
+
+      // Nếu đã chọn brand thì bỏ filter theo category
       if (selectedBrandIds.length === 0) {
-        const allProducts = await getProductsByBrandId(brandId);
-        setProducts(Array.isArray(allProducts) ? allProducts : []);
-        setTotal(Array.isArray(allProducts) ? allProducts.length : 0);
-        return;
+        (params as any).categorySlug = slug; // hoặc categoryId nếu có
       }
-      let combinedProducts: IProduct[] = [];
-      for (const id of selectedBrandIds) {
-        const brandProducts = await getProductsByBrandId(id);
-        combinedProducts = [
-          ...combinedProducts,
-          ...(Array.isArray(brandProducts) ? brandProducts : []),
-        ];
-      }
-      setProducts(combinedProducts);
-      setTotal(combinedProducts.length);
+
+      const result = await getFilteredProducts(params);
+
+      setProducts(result.products);
+      setTotal(result.total);
+      setTotalPages(result.totalPages);
+
+      // Lấy categories và brands như cũ
+      const fetchedCategories = await getAllCategories();
+      setCategories(Array.isArray(fetchedCategories) ? fetchedCategories : []);
+
+      const fetchedBrands = await getAllBrands();
+      setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
+
+      // Tìm category, brand tương ứng
+      const matchedCategory = fetchedCategories.find((cat) => cat.slug === slug);
+      setCategory(matchedCategory || null);
+
+      const matchedBrand = fetchedBrands.find((b) => selectedBrandIds.includes(b.brand_id));
+      setBrand(matchedBrand || null);
+    } catch (error) {
+      console.error("Lỗi khi fetch sản phẩm lọc:", error);
+      setProducts([]);
+      setTotal(0);
+      setTotalPages(1);
     }
-    fetchFilteredProducts();
-  }, [selectedBrandIds, brandId]);
+  }
+  fetchFiltered();
+}, [
+  slug,
+  keyword,
+  selectedBrandIds,
+  selectedGender,
+  selectedPriceRange,
+  page,
+  sortBy,
+  sortOrder,
+  productsPerPage,
+]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        if (!slug) return;
 
-        // Fetch data
-        const fetchedProducts = await getProductsByCategorySlug(slug as string);
-        const fetchedCategories = await getCategories();
-        const fetchedBrands = await getBrands();
-
-        // Products
-        const productArray = Array.isArray(fetchedProducts)
-          ? fetchedProducts
-          : Array.isArray(fetchedProducts?.data)
-          ? fetchedProducts.data
-          : [];
-        setProducts(productArray);
-        setTotal(productArray.length);
-
-        // Categories
-        const categoryArray = Array.isArray(fetchedCategories)
-          ? fetchedCategories
-          : Array.isArray(fetchedCategories?.data)
-          ? fetchedCategories.data
-          : [];
-        setCategories(categoryArray);
-
-        const matchedCategory = categoryArray.find((cat) => cat.slug === slug);
-        setCategory(matchedCategory || null);
-
-        // Brands
-        const brandsArray = Array.isArray(fetchedBrands)
-          ? fetchedBrands
-          : Array.isArray(fetchedBrands?.data)
-          ? fetchedBrands.data
-          : [];
-        setBrandsList(brandsArray);
-
-        const matchedBrand = brandsArray.find((b) => b.brand_id === brandId);
-        setBrand(matchedBrand || null);
-      } catch (error) {
-        console.error("Lỗi khi fetch data:", error);
-      }
-    }
-    fetchData();
-  }, [slug, brandId]);
   const handlePriceChange = (range: { min: number; max: number } | null) => {
     setSelectedPriceRange(range);
     setPage(1);
@@ -760,3 +756,7 @@ export default function CategoryPage() {
     </>
   );
 }
+function getProductsByCategorySlug(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+
