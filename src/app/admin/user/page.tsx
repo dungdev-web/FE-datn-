@@ -10,8 +10,15 @@ import Swal from "sweetalert2";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { debounce } from "lodash";
 
-type SortField = 'user_id' | 'name' | 'email' | 'phone' | 'role' | 'status' | 'created_at';
-type SortDirection = 'asc' | 'desc';
+type SortField =
+  | "user_id"
+  | "name"
+  | "email"
+  | "phone"
+  | "role"
+  | "status"
+  | "created_at";
+type SortDirection = "asc" | "desc";
 
 interface SortConfig {
   field: SortField;
@@ -48,8 +55,8 @@ export default function ListUser() {
 
   // Sort states
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    field: 'created_at',
-    direction: 'desc',
+    field: "created_at",
+    direction: "desc",
   });
 
   // Filter states
@@ -93,7 +100,7 @@ export default function ListUser() {
       };
 
       const res: ApiResponse = await getAllUsers(params);
-      
+
       setUsers(res.data.users);
       setTotalUsers(res.data.total);
       setTotalPages(res.data.totalPages);
@@ -120,9 +127,11 @@ export default function ListUser() {
 
   // Handle sort
   const handleSort = (field: SortField) => {
-    const newDirection: SortDirection = 
-      sortConfig.field === field && sortConfig.direction === 'asc' ? 'desc' : 'asc';
-    
+    const newDirection: SortDirection =
+      sortConfig.field === field && sortConfig.direction === "asc"
+        ? "desc"
+        : "asc";
+
     setSortConfig({ field, direction: newDirection });
   };
 
@@ -132,7 +141,7 @@ export default function ListUser() {
       return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
     }
 
-    if (sortConfig.direction === 'asc') {
+    if (sortConfig.direction === "asc") {
       return <ArrowUp className="w-4 h-4 text-blue-500" />;
     } else {
       return <ArrowDown className="w-4 h-4 text-blue-500" />;
@@ -163,7 +172,7 @@ export default function ListUser() {
     });
     setSearchText("");
     setIsSearching(false);
-    setSortConfig({ field: 'created_at', direction: 'desc' });
+    setSortConfig({ field: "created_at", direction: "desc" });
     setCurrentPage(1);
   };
 
@@ -202,7 +211,7 @@ export default function ListUser() {
         "Vai trò",
         "Trạng thái",
       ];
-      
+
       const csvContent = [
         headers.join(","),
         ...res.data.users.map((user) =>
@@ -217,9 +226,9 @@ export default function ListUser() {
         ),
       ].join("\n");
 
-      const blob = new Blob(["\uFEFF" + csvContent], { 
-        type: "text/csv;charset=utf-8;" 
-      }); // Add BOM for proper UTF-8 encoding
+      const blob = new Blob(["\uFEFF" + csvContent], {
+        type: "text/csv;charset=utf-8;",
+      });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
@@ -256,7 +265,7 @@ export default function ListUser() {
       // Refresh current page data
       fetchUsers();
       closeModal();
-      
+
       Swal.fire({
         icon: "success",
         title: "Thành công",
@@ -350,7 +359,8 @@ export default function ListUser() {
           <i className="fa-solid fa-angle-right"></i>
         </button>
         <span className="pagination-info">
-          Trang {currentPage} / {totalPages} - Hiển thị {users.length} / {totalUsers} người dùng
+          Trang {currentPage} / {totalPages} - Hiển thị {users.length} /{" "}
+          {totalUsers} người dùng
         </span>
       </div>
     );
@@ -423,8 +433,8 @@ export default function ListUser() {
             <i className="fa-solid fa-filter-circle-xmark"></i> Xóa bộ lọc
           </button>
 
-          <button 
-            className="btn btn-export" 
+          <button
+            className="btn btn-export"
             onClick={handleExport}
             disabled={loading}
           >
@@ -436,57 +446,57 @@ export default function ListUser() {
           <thead>
             <tr>
               <th className="col-short">
-                <div 
+                <div
                   className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
-                  onClick={() => handleSort('user_id')}
+                  onClick={() => handleSort("user_id")}
                 >
                   Mã
-                  {getSortIcon('user_id')}
+                  {getSortIcon("user_id")}
                 </div>
               </th>
               <th>
-                <div 
+                <div
                   className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
-                  onClick={() => handleSort('name')}
+                  onClick={() => handleSort("name")}
                 >
                   Tên người dùng
-                  {getSortIcon('name')}
+                  {getSortIcon("name")}
                 </div>
               </th>
               <th>
-                <div 
+                <div
                   className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
-                  onClick={() => handleSort('email')}
+                  onClick={() => handleSort("email")}
                 >
                   Email
-                  {getSortIcon('email')}
+                  {getSortIcon("email")}
                 </div>
               </th>
               <th>
-                <div 
+                <div
                   className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
-                  onClick={() => handleSort('phone')}
+                  onClick={() => handleSort("phone")}
                 >
                   Điện thoại
-                  {getSortIcon('phone')}
+                  {getSortIcon("phone")}
                 </div>
               </th>
               <th>
-                <div 
+                <div
                   className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
-                  onClick={() => handleSort('role')}
+                  onClick={() => handleSort("role")}
                 >
                   Vai trò
-                  {getSortIcon('role')}
+                  {getSortIcon("role")}
                 </div>
               </th>
               <th>
-                <div 
+                <div
                   className="flex items-center gap-1 cursor-pointer select-none hover:bg-gray-100 p-1 rounded"
-                  onClick={() => handleSort('status')}
+                  onClick={() => handleSort("status")}
                 >
                   Trạng thái
-                  {getSortIcon('status')}
+                  {getSortIcon("status")}
                 </div>
               </th>
               <th>Thao tác</th>
@@ -550,13 +560,19 @@ export default function ListUser() {
           <tbody>
             {loading && users.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
+                <td
+                  colSpan={7}
+                  style={{ textAlign: "center", padding: "2rem" }}
+                >
                   Đang tải...
                 </td>
               </tr>
             ) : users.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ textAlign: "center", padding: "2rem" }}>
+                <td
+                  colSpan={7}
+                  style={{ textAlign: "center", padding: "2rem" }}
+                >
                   Không tìm thấy người dùng nào
                 </td>
               </tr>
@@ -603,7 +619,7 @@ export default function ListUser() {
             )}
           </tbody>
         </table>
-        
+
         {renderPagination()}
       </div>
 
@@ -633,8 +649,12 @@ export default function ListUser() {
                   id="userStatus"
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(Number(e.target.value))}
+                  disabled={selectedRole === "admin"}
+                  style={
+                    selectedRole === "admin" ? { cursor: "not-allowed" } : {}
+                  }
                 >
-                  <option value={1}>Hoạt động</option>
+                  <option value=  {1}>Hoạt động</option>
                   <option value={0}>Tạm khóa</option>
                 </select>
               </div>

@@ -5,6 +5,7 @@ import { addAddressService, updateAddress } from "@/services/addressService";
 import { toast } from "react-toastify";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAddressFormValidation } from "@/hooks/useAddressFormValidation";
+import { getDistricts, getProvinces, getWards } from "@/services/locationService";
 
 type AddressFormData = {
   id?: number;
@@ -12,17 +13,20 @@ type AddressFormData = {
   phone: string;
   address_line_part: string;
   country: string;
-  province: string;
-  district: string;
-  ward: string;
+  province_code: string;
+  province_name: string; 
+  district_code: string;
+  district_name: string;
+  ward_code: string;
+  ward_name: string;
   is_default: boolean;
   address_line?: string;
   user_id?: number;
 };
 
-type Province = { name: string; code: number };
-type District = { name: string; code: number };
-type Ward = { name: string; code: number };
+type Province = { name: string; code: string };
+type District = { name: string; code: string };
+type Ward = { name: string; code: string };
 
 type Props = {
   initialData: AddressFormData;
@@ -54,55 +58,83 @@ export default function EditAddressForm({
   }, [initialData]);
 
   useEffect(() => {
-    fetch("https://provinces.open-api.vn/api/p/")
-      .then((res) => res.json())
-      .then((data) => setProvinces(data));
-  }, []);
+  // Lấy danh sách tỉnh/thành lúc component mount
+  getProvinces()
+    .then(setProvinces)
+    .catch((err) => console.error("Lỗi lấy tỉnh:", err));
+}, []);
 
-  useEffect(() => {
-    if (formData.province && provinces.length) {
-      const selectedProvince = provinces.find(
-        (p) => p.name === formData.province
-      );
-      if (selectedProvince) {
-        fetch(
-          `https://provinces.open-api.vn/api/p/${selectedProvince.code}?depth=2`
-        )
-          .then((res) => res.json())
-          .then((data) => setDistricts(data.districts || []));
-      }
-    }
-  }, [formData.province, provinces]);
+useEffect(() => {
+  // Khi province_code thay đổi, lấy danh sách huyện
+  if (formData.province_code) {
+    getDistricts(formData.province_code)
+      .then((districts) => {
+        setDistricts(districts);
+        setWards([]); // reset xã/phường khi tỉnh thay đổi
+      })
+      .catch((err) => console.error("Lỗi lấy huyện:", err));
+  } else {
+    setDistricts([]);
+    setWards([]);
+  }
+}, [formData.province_code]);
 
-  useEffect(() => {
-    if (formData.district && districts.length) {
-      const selectedDistrict = districts.find(
-        (d) => d.name === formData.district
-      );
-      if (selectedDistrict) {
-        fetch(
-          `https://provinces.open-api.vn/api/d/${selectedDistrict.code}?depth=2`
-        )
-          .then((res) => res.json())
-          .then((data) => setWards(data.wards || []));
-      }
-    }
-  }, [formData.district, districts]);
+useEffect(() => {
+  // Khi district_code thay đổi, lấy danh sách xã
+  if (formData.district_code) {
+    getWards(formData.district_code)
+      .then(setWards)
+      .catch((err) => console.error("Lỗi lấy xã:", err));
+  } else {
+    setWards([]);
+  }
+}, [formData.district_code]);
+
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const target = e.target;
-    const { name, value, type } = target;
-    validateField(name, value);
-    setFormData((prev) => ({
+  e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value } = e.target;
+
+  if (name === "province_code") {
+    const selected = provinces.find(p => p.code.toString() === value);
+    setFormData(prev => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? (target as HTMLInputElement).checked : value,
-      ...(name === "province" ? { district: "", ward: "" } : {}),
-      ...(name === "district" ? { ward: "" } : {}),
+      province_code: value,
+      province_name: selected?.name || "",
+      district_code: "",
+      district_name: "",
+      ward_code: "",
+      ward_name: "",
     }));
-  };
+    validateField("province_code", value);
+  } else if (name === "district_code") {
+    const selected = districts.find(d => d.code.toString() === value);
+    setFormData(prev => ({
+      ...prev,
+      district_code: value,
+      district_name: selected?.name || "",
+      ward_code: "",
+      ward_name: "",
+    }));
+    validateField("district_code", value);
+  } else if (name === "ward_code") {
+    const selected = wards.find(w => w.code.toString() === value);
+    setFormData(prev => ({
+      ...prev,
+      ward_code: value,
+      ward_name: selected?.name || "",
+    }));
+    validateField("ward_code", value);
+  } else {
+    validateField(name, value);
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+};
+
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -206,72 +238,69 @@ export default function EditAddressForm({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Tỉnh / Thành
-            </label>
-            <select
-              name="province"
-              className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
-              value={formData.province}
-              onChange={handleChange}
-            >
-              <option value="">-- Chọn tỉnh --</option>
-              {provinces.map((p) => (
-                <option key={p.code} value={p.name}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-            {errors.province && (
-              <p className="text-sm text-red-500 mt-1">{errors.province}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Quận / Huyện
-            </label>
-            <select
-              name="district"
-              className="w-full border border-gray-300 rounded !px-3 !py-2"
-              value={formData.district}
-              onChange={handleChange}
-              disabled={!formData.province}
-            >
-              <option value="">-- Chọn quận --</option>
-              {districts.map((d) => (
-                <option key={d.code} value={d.name}>
-                  {d.name}
-                </option>
-              ))}
-            </select>
-            {errors.district && (
-              <p className="text-sm text-red-500 mt-1">{errors.district}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Phường / Xã
-            </label>
-            <select
-              name="ward"
-              className="w-full border border-gray-300 rounded !px-3 !py-2"
-              value={formData.ward}
-              onChange={handleChange}
-              disabled={!formData.district}
-            >
-              <option value="">-- Chọn phường --</option>
-              {wards.map((w) => (
-                <option key={w.code} value={w.name}>
-                  {w.name}
-                </option>
-              ))}
-            </select>
-            {errors.ward && (
-              <p className="text-sm text-red-500 mt-1">{errors.ward}</p>
-            )}
-          </div>
-        </div>
+  <div>
+    <label className="block text-sm font-medium mb-1">Tỉnh / Thành</label>
+    <select
+      name="province_code"
+      className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
+      value={formData.province_code || ""}
+      onChange={handleChange}
+    >
+      <option value="">-- Chọn tỉnh --</option>
+      {provinces.map((p) => (
+        <option key={p.code} value={p.code}>
+          {p.name}
+        </option>
+      ))}
+    </select>
+    {errors.province_code && (
+      <p className="text-sm text-red-500 mt-1">{errors.province_code}</p>
+    )}
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium mb-1">Quận / Huyện</label>
+    <select
+      name="district_code"
+      className="w-full border border-gray-300 rounded !px-3 !py-2"
+      value={formData.district_code || ""}
+      onChange={handleChange}
+      disabled={!formData.province_code}
+    >
+      <option value="">-- Chọn quận --</option>
+      {districts.map((d) => (
+        <option key={d.code} value={d.code}>
+          {d.name}
+        </option>
+      ))}
+    </select>
+    {errors.district_code && (
+      <p className="text-sm text-red-500 mt-1">{errors.district_code}</p>
+    )}
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium mb-1">Phường / Xã</label>
+    <select
+      name="ward_code"
+      className="w-full border border-gray-300 rounded !px-3 !py-2"
+      value={formData.ward_code || ""}
+      onChange={handleChange}
+      disabled={!formData.district_code}
+    >
+      <option value="">-- Chọn phường --</option>
+      {wards.map((w) => (
+        <option key={w.code} value={w.code}>
+          {w.name}
+        </option>
+      ))}
+    </select>
+    {errors.ward_code && (
+      <p className="text-sm text-red-500 mt-1">{errors.ward_code}</p>
+    )}
+  </div>
+</div>
+
 
         <div className="flex items-center !space-x-2">
           <input
