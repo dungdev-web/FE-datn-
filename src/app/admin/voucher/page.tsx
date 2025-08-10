@@ -81,21 +81,121 @@ export default function Voucher() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>BLA01</td>
-              <td>BLACK FRIDAY</td>
-              <td>30%</td>
-              <td>11-12-2021</td>
-              <td>11-12-2021</td>
-              <td>5</td>
-              <td>5</td>
-              <td>
-                <Link href={"/admin/voucher/edit"}>
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
+           <tr>
+  <td>BLA01</td>
+  <td>BLACK FRIDAY</td>
+  <td>30%</td>
+  <td>11-12-2021</td>
+  <td>11-12-2021</td>
+  <td>5</td>
+  <td>5</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+<tr>
+  <td>WELCOME10</td>
+  <td>WELCOME - Khách mới</td>
+  <td>10%</td>
+  <td>01-01-2025</td>
+  <td>31-12-2025</td>
+  <td>100</td>
+  <td>12</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+<tr>
+  <td>SUMMER25</td>
+  <td>SUMMER SALE</td>
+  <td>25%</td>
+  <td>01-06-2025</td>
+  <td>31-08-2025</td>
+  <td>200</td>
+  <td>87</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+<tr>
+  <td>FREESHIP50</td>
+  <td>Free Ship trên 500k</td>
+  <td>100%</td>
+  <td>01-07-2025</td>
+  <td>31-12-2025</td>
+  <td>500</td>
+  <td>210</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+<tr>
+  <td>STUDENT15</td>
+  <td>Ưu đãi Sinh viên</td>
+  <td>15%</td>
+  <td>01-09-2025</td>
+  <td>30-11-2025</td>
+  <td>300</td>
+  <td>34</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+<tr>
+  <td>WEEKEND20</td>
+  <td>Weekend Deal</td>
+  <td>20%</td>
+  <td>01-01-2025</td>
+  <td>31-12-2025</td>
+  <td>1000</td>
+  <td>456</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+<tr>
+  <td>FLASH30</td>
+  <td>Flash Sale 24H</td>
+  <td>30%</td>
+  <td>10-08-2025</td>
+  <td>11-08-2025</td>
+  <td>50</td>
+  <td>50</td>
+  <td>
+    <Link href={"/admin/voucher/edit"}>
+      <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
+    </Link>
+    <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
+  </td>
+</tr>
+
+
+
+
           </tbody>
         </table>
 

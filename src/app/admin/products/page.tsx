@@ -100,7 +100,7 @@ export default function Products() {
           </thead>
           <tbody>
             <tr>
-              <td>4iKReQ</td>
+              <td>ADUB-W-40</td>
               <td>VANS VAULT STYLE 36 BLACK</td>
               <td>
                 <img
@@ -111,9 +111,82 @@ export default function Products() {
               </td>
               <td>VANZ</td>
               <td>
-                <span className="category-tag">Giày Nam</span>
-                <span className="category-tag">Giày Nữ</span>
-                <span className="category-tag">Giày Trẻ em</span>
+                <span className="category-tag">Giày thời trang</span>
+              </td>
+
+              <td>550,000</td>
+              <td>1,350,000</td>
+              <td>27-11-2021</td>
+              <td>27-11-2021</td>
+              <td>0</td>
+              <td>
+                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
+                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>NAZ-B-40</td>
+              <td>Giày Bóng Rổ Adidas Dame 8</td>
+              <td>
+                <img
+                  src={`${API_BASE_URL}/uploads/AdidasDame8.webp`}
+                  alt="Vans"
+                  className="product-img"
+                />
+              </td>
+              <td>ADIDAS</td>
+              <td>
+                <span className="category-tag">Giày thể thao</span>
+              </td>
+
+              <td>550,000</td>
+              <td>1,350,000</td>
+              <td>27-11-2021</td>
+              <td>27-11-2021</td>
+              <td>0</td>
+              <td>
+                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
+                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>NBFF-G-38</td>
+              <td>Giày Bóng Rổ Puma MB.01</td>
+              <td>
+                <img
+                  src={`${API_BASE_URL}/uploads/PumaMB.01.jpg`}
+                  alt="Vans"
+                  className="product-img"
+                />
+              </td>
+              <td>PUMA</td>
+              <td>
+                <span className="category-tag">Giày thể thao</span>
+              </td>
+
+              <td>550,000</td>
+              <td>1,350,000</td>
+              <td>27-11-2021</td>
+              <td>27-11-2021</td>
+              <td>0</td>
+              <td>
+                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
+                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
+              </td>
+            </tr>
+            <tr>
+              <td>GCG-B-36</td>
+              <td>Giày Sneaker New Balance 990v5</td>
+              <td>
+                <img
+                  src={`${API_BASE_URL}/uploads/SneakerNewBalance990v5.jpg`}
+                  alt="Vans"
+                  className="product-img"
+                />
+              </td>
+              <td>New Balance</td>
+              <td>
+                <span className="category-tag">Giày thời trang</span>
               </td>
 
               <td>550,000</td>
