@@ -1,6 +1,8 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IBlog,Category,IBlogCreate } from "@/types/blog";
+import { IBlog,Category,IBlogCreate,CategoryResponse } from "@/types/blog";
 import { getMockBlog } from "@/mocks/mockBlog";
+import { promises } from "dns";
+import { ICategory } from "@/types/ICategory";
 // Lấy bài viết
 export async function getPost(
   page: number,
@@ -85,18 +87,14 @@ export async function getPostById(id: number): Promise<IBlog | null> {
 //lấy danh mục bài viết
 
 
-export async function getCategory(
-  params?: {
-    page?: number;
-    name: string;
-    id?: number;
-    slug?: string;
-    sortBy?: "name" | "created_at" | "updated_at";
-    sortOrder?: "asc" | "desc";
-  }
-): Promise<Category[]> {
- 
-
+export async function getCategory(params?: {
+  page?: number;
+  name?: string;
+  id?: number;
+  slug?: string;
+  sortBy?: "name" | "created_at" | "updated_at";
+  sortOrder?: "asc" | "desc";
+}): Promise<CategoryResponse> {
   try {
     const query = new URLSearchParams({
       page: String(params?.page ?? 1),
@@ -107,7 +105,6 @@ export async function getCategory(
       sortBy: params?.sortBy ?? "created_at",
       sortOrder: params?.sortOrder ?? "desc",
     });
-    
 
     const res = await fetch(`${API_BASE_URL}/post/category?${query}`, {
       method: "GET",
@@ -118,13 +115,19 @@ export async function getCategory(
       throw new Error("Không thể lấy danh mục bài viết từ API.");
     }
 
-    const { data,totalPages } = await res.json();
-    return Array.isArray(data) ? data : [];
+    const json: CategoryResponse = await res.json();
+    return json;
   } catch (error) {
     console.error("Lỗi khi lấy danh mục bài viết:", error);
-    return [];
+    return {
+      data: [],
+      total: 0,
+      currentPage: 1,
+      totalPages: 1,
+    };
   }
 }
+
 
 
 //lấy bài viết theo danh mục
@@ -160,8 +163,6 @@ export async function getPostsByCategory(
   }
 }
 //thêm bài viết
-// services/blogService.ts
-
 export async function addPost(formData: FormData): Promise<IBlog | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/post`, {
@@ -212,3 +213,29 @@ export async function deletePost(postId: number): Promise<boolean> {
   }
 }
 
+//category
+export async function addCategoryPost(data: {
+  name: string;
+  slug: string;
+  parent_id?: number | null;
+}): Promise<Category> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/post/create-category`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Lỗi khi tạo danh mục");
+    }
+
+    const result = await response.json();
+    // Giả sử API trả về dạng { message: string, data: Category }
+    return result.data;
+  } catch (error) {
+    console.error("addCategoryPost error:", error);
+    throw error;
+  }
+}

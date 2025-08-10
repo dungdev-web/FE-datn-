@@ -81,7 +81,7 @@ const SearchWithSuggestions = () => {
       currency: "VND",
     }).format(price);
   };
-  console.log("Suggestions:", suggestions);
+  
   return (
     <div className="search-container relative" ref={searchRef}>
       <div className="seach-nav relative">

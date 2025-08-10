@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import "../css/categories_admin.css";
 import Link from "next/link";
 import { Category } from "@/types/blog";
-import { useCategories } from "@/hooks/useBlog";
+import { getCategory } from "@/services/blogService";
 import { ArrowUpDown } from "lucide-react";
 
 export default function Categories() {
@@ -17,87 +17,38 @@ export default function Categories() {
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  const { categories: fetchedCategories, loading, error } = useCategories();
-
   const [sortBy, setSortBy] = useState<"name" | "created_at" | "updated_at">(
     "created_at"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const res = await getCategory({
+        page,
+        name: filterName || searchText,
+        id: filterId ? Number(filterId) : undefined,
+        slug: filterActive || undefined,
+        sortBy,
+        sortOrder,
+      });
+      setCategories(res.data);
+      setTotalPages(res.totalPages);
+    } catch (error) {
+      console.error("Lỗi khi load categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (fetchedCategories.length > 0) {
-      setCategories(fetchedCategories);
-    }
-  }, [fetchedCategories]);
-
-  const filteredCategories = useMemo(() => {
-    let data = [...categories];
-
-    if (filterId.trim() !== "") {
-      data = data.filter((cat) =>
-        cat.category_post_id.toString().includes(filterId.trim())
-      );
-    }
-
-    if (filterName.trim() !== "") {
-      data = data.filter((cat) =>
-        cat.name.toLowerCase().includes(filterName.trim().toLowerCase())
-      );
-    }
-    if (filterActive.trim() !== "") {
-      data = data.filter((cat) =>
-        cat.slug.toLowerCase().includes(filterActive.trim().toLowerCase())
-      );
-    }
-
-    if (searchText.trim() !== "") {
-      const s = searchText.trim().toLowerCase();
-      data = data.filter(
-        (cat) =>
-          cat.name.toLowerCase().includes(s) ||
-          cat.slug.toLowerCase().includes(s) ||
-          cat.category_post_id.toString().includes(s)
-      );
-    }
-
-    // Sort
-    data.sort((a, b) => {
-      let aVal: any = a[sortBy];
-      let bVal: any = b[sortBy];
-
-      if (sortBy === "created_at" || sortBy === "updated_at") {
-        aVal = aVal ? new Date(aVal).getTime() : 0;
-        bVal = bVal ? new Date(bVal).getTime() : 0;
-      }
-
-      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-
-    return data;
-  }, [
-    categories,
-    filterId,
-    filterName,
-    filterActive,
-    searchText,
-    sortBy,
-    sortOrder,
-  ]);
-
-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
-
-  const currentPageData = filteredCategories.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
-
-  useEffect(() => {
-    setPage(1);
-  }, [filterId, filterName, filterActive, searchText]);
+    fetchData();
+  }, [page, filterId, filterName, filterActive, searchText, sortBy, sortOrder]);
 
   const handleSort = (field: "name" | "created_at" | "updated_at") => {
     if (sortBy === field) {
@@ -160,9 +111,8 @@ export default function Categories() {
               Tên danh mục{" "}
               <ArrowUpDown
                 className="inline-block ml-2 w-4 h-4 cursor-pointer"
-                style={{ cursor: "pointer" }}
                 onClick={() => handleSort("name")}
-              />{" "}
+              />
             </th>
             <th>Slug</th>
             <th>Parent ID</th>
@@ -170,17 +120,15 @@ export default function Categories() {
               Ngày tạo{" "}
               <ArrowUpDown
                 className="inline-block ml-2 w-4 h-4 cursor-pointer"
-                style={{ cursor: "pointer" }}
                 onClick={() => handleSort("created_at")}
-              />{" "}
+              />
             </th>
             <th title="Sort by Updated At">
               Ngày sửa{" "}
               <ArrowUpDown
                 className="inline-block ml-2 w-4 h-4 cursor-pointer"
-                style={{ cursor: "pointer" }}
                 onClick={() => handleSort("updated_at")}
-              />{" "}
+              />
             </th>
             <th>Thao tác</th>
           </tr>
@@ -202,7 +150,6 @@ export default function Categories() {
               />
             </th>
             <th>
-              {/* Lọc theo trạng thái active, nếu có */}
               <input
                 type="text"
                 placeholder="Lọc slug..."
@@ -217,8 +164,12 @@ export default function Categories() {
           </tr>
         </thead>
         <tbody>
-          {currentPageData.length > 0 ? (
-            currentPageData.map((cat) => (
+          {loading ? (
+            <tr>
+              <td colSpan={7}>Đang tải...</td>
+            </tr>
+          ) : categories.length > 0 ? (
+            categories.map((cat) => (
               <tr key={cat.category_post_id}>
                 <td className="!text-center">{cat.category_post_id}</td>
                 <td>{cat.name}</td>

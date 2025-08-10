@@ -1,9 +1,13 @@
 export interface ICategory {
+  image: any;
+  status: number; // 0 hoặc 1
   categories_id: number;
   name: string;
   slug: string;
   parent_id: number | null;
-  children?: ICategory[]; // danh mục con (nếu có)
+  children?: ICategory[];
+  created_at: string;
+  updated_at: string;
 }
 export interface CategoryFilters {
   id?: number;
