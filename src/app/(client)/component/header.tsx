@@ -56,12 +56,39 @@ export default function Header() {
     }
   };
   useEffect(() => {
-  getCategories().then(res => setCategories(res.data || []));
-}, []);
+    getCategories()
+      .then((res) => {
+        // Nếu API trả về { data: [...] } thì lấy res.data
+        if (Array.isArray(res)) {
+          setCategories(res);
+        } else if (Array.isArray(res?.data)) {
+          setCategories(res.data);
+        } else {
+          setCategories([]); // fallback
+        }
+      })
+      .catch((err) => {
+        console.error("Lỗi khi lấy categories:", err);
+        setCategories([]);
+      });
+  }, []);
 
- useEffect(() => {
-  getBrands().then(res => setBrands(res.data || []));
-}, []);
+  useEffect(() => {
+    getBrands()
+      .then((res) => {
+        if (Array.isArray(res)) {
+          setBrands(res);
+        } else if (Array.isArray(res?.data)) {
+          setBrands(res.data);
+        } else {
+          setBrands([]); // fallback nếu không phải mảng
+        }
+      })
+      .catch((err) => {
+        console.error("Lỗi khi lấy brands:", err);
+        setBrands([]);
+      });
+  }, []);
 
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -335,27 +362,29 @@ export default function Header() {
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
                       <h4>DANH MỤC MỚI NHẤT</h4>
-                      {categories.map((cat) => (
-                        <a
-                          key={cat.categories_id}
-                          href={`/category/${cat.slug}`}
-                        >
-                          {cat.name}
-                        </a>
-                      ))}
+                      {Array.isArray(categories) &&
+                        categories.map((cat) => (
+                          <a
+                            key={cat.categories_id}
+                            href={`/category/${cat.slug}`}
+                          >
+                            {cat.name}
+                          </a>
+                        ))}
                     </div>
 
                     <div className="mega-column">
                       <h4>NHÃN HIỆU MỚI NHẤT</h4>
                       <div className="mega-brands">
-                        {brands.map((brand) => (
-                          <a
-                            key={brand.brand_id}
-                            href={`/brand/${brand.brand_id}`}
-                          >
-                            {brand.name}
-                          </a>
-                        ))}
+                        {Array.isArray(brands) &&
+                          brands.map((brand) => (
+                            <a
+                              key={brand.brand_id}
+                              href={`/brand/${brand.brand_id}`}
+                            >
+                              {brand.name}
+                            </a>
+                          ))}
                       </div>
                     </div>
                   </div>
