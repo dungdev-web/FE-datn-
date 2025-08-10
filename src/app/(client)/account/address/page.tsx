@@ -22,9 +22,12 @@ const initialAddress = {
   phone: "",
   address_line_part: "",
   country: "Vietnam",
-  province: "",
-  district: "",
-  ward: "",
+  province_code: "",
+  province_name: "",
+  district_code: "",
+  district_name: "",
+  ward_code: "",
+  ward_name: "",
   is_default: false,
 };
 
@@ -55,13 +58,19 @@ export default function Address() {
             .map((item: any) => {
               const parsed = parseAddressLine(item.address_line || "");
               return {
-                id: item.ship_address_id,
+                id: item.id,
                 full_name: item.full_name,
                 phone: item.phone,
-                ...parsed,
-                country: "Vietnam",
-                is_default: item.is_default ?? false,
-                address_line: item.address_line ?? "",
+                address_line_part: item.address_line_part,
+                country: item.country,
+                province_code: "",
+                province_name: item.province || "",
+                district_code: "",
+                district_name: item.district || "",
+                ward_code: "",
+                ward_name: item.ward || "",
+                address_line: item.address_line,
+                is_default: item.is_default,
               };
             })
         : [];
@@ -99,9 +108,9 @@ export default function Address() {
 
       const address_line = [
         data.address_line_part,
-        data.ward,
-        data.district,
-        data.province,
+        data.ward_name,
+        data.district_name,
+        data.province_name,
       ]
         .filter(Boolean)
         .join(", ");

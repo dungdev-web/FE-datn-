@@ -18,8 +18,8 @@ import { getFilteredProducts } from "@/services/productService"; // Thêm
 
 import ProductIcons from "../../component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "../../component/products/SidebarFilter";
-import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
+import SidebarFilter from "../../component/Products/SidebarFilter";
+import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
 
 interface Params {
   params: {

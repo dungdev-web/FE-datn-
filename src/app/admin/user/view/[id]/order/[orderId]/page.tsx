@@ -19,14 +19,14 @@ import {
   Clock,
   RotateCcw
 } from 'lucide-react';
-import { IOrder, IOrderDetail } from '@/types/Order';
-import { getOrderDetailService } from '@/services/orderService'; // Import service
+import { IOrder } from '@/types/Order';
+import { getOrderDetailService } from '@/services/orderService';
 
 interface OrderDetailProps {
-  params: {
+  params: Promise<{
     id: string;
     orderId: string;
-  };
+  }>;
 }
 
 export default function OrderDetailPage({ params }: OrderDetailProps) {
@@ -34,24 +34,39 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resolvedParams, setResolvedParams] = useState<{ id: string; orderId: string } | null>(null);
 
   useEffect(() => {
-    fetchOrderDetails();
-  }, [params.orderId]);
+    const resolveParams = async () => {
+      try {
+        const resolved = await params;
+        setResolvedParams(resolved);
+      } catch (error) {
+        console.error('Error resolving params:', error);
+        setError('Không thể tải thông tin trang');
+        setLoading(false);
+      }
+    };
+
+    resolveParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (resolvedParams) {
+      fetchOrderDetails();
+    }
+  }, [resolvedParams]);
 
   const fetchOrderDetails = async () => {
+    if (!resolvedParams) return;
+    
     try {
       setLoading(true);
       setError(null);
-      
-      // Gọi API thật thay vì simulation
-      const data = await getOrderDetailService(parseInt(params.orderId));
-      
-      // Kiểm tra structure của data trả về
+      const data = await getOrderDetailService(parseInt(resolvedParams.orderId));
       if (data && data.order) {
         setOrder(data.order);
       } else if (data) {
-        // Nếu API trả về trực tiếp order object
         setOrder(data);
       } else {
         throw new Error("Dữ liệu đơn hàng không hợp lệ");
@@ -70,11 +85,6 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
     try {
       setUpdating(true);
       setError(null);
-      
-      // TODO: Thêm API update status khi có endpoint
-      // await updateOrderStatusService(order.orders_id, newStatus);
-      
-      // Temporary simulation - remove when API is ready
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       setOrder({ 
@@ -149,7 +159,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
     });
   };
 
-  if (loading) {
+  if (loading || !resolvedParams) {
     return (
       <div className="min-h-screen bg-gray-50 !p-6">
         <div className="max-w-7xl !mx-auto">
@@ -169,7 +179,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl !mx-auto">
           <Link 
-            href={`/admin/user/view/${params.id}`}
+            href={`/admin/user/view/${resolvedParams.id}`}
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium !mb-4 transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -200,7 +210,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
           <Link 
-            href={`/admin/user/view/${params.id}`}
+            href={`/admin/user/view/${resolvedParams.id}`}
             className="inline-flex items-center !gap-2 text-blue-600 hover:text-blue-700 font-medium !mb-4 transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -212,7 +222,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
                 <Package className="w-10 h-10 text-gray-400" />
               </div>
               <h3 className="text-xl font-semibold text-gray-700 mb-2">Không tìm thấy đơn hàng</h3>
-              <p className="text-gray-500">Đơn hàng #{params.orderId} không tồn tại hoặc đã bị xóa</p>
+              <p className="text-gray-500">Đơn hàng #{resolvedParams.orderId} không tồn tại hoặc đã bị xóa</p>
             </div>
           </div>
         </div>
@@ -223,18 +233,16 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
   const statusInfo = getStatusInfo(order.status);
   const StatusIcon = statusInfo.icon;
 
-  // Tính toán các giá trị cho payment summary
   const subtotal = order.order_items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
-  const discountAmount = order.coupons_id ? subtotal * 0.1 : 0; // Giả sử discount 10%
+  const discountAmount = order.coupons_id ? subtotal * 0.1 : 0; 
   const shippingFee = order.shipping_fee || 0;
 
   return (
     <div className="min-h-screen bg-gray-50 !p-6">
       <div className="max-w-7xl !mx-auto">
-        {/* Header */}
         <div className="!mb-8">
           <Link 
-            href={`/admin/user/view/${params.id}`}
+            href={`/admin/user/view/${resolvedParams.id}`}
             className="inline-flex items-center !gap-2 text-blue-600 hover:text-blue-700 font-medium !mb-4 transition-colors duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -263,7 +271,6 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
           </div>
         </div>
 
-        {/* Error Display */}
         {error && (
           <div className="!mb-6 bg-red-50 border border-red-200 rounded-lg !p-4">
             <div className="flex items-center !gap-2 text-red-800">
@@ -274,9 +281,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 !gap-3">
-          {/* Main Content */}
           <div className="lg:col-span-2 !space-y-3">
-            {/* Order Items */}
             <div className="bg-white rounded-xl shadow-lg !p-6 border border-gray-100">
               <div className="flex items-center !gap-3 !mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -315,7 +320,6 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
               </div>
             </div>
 
-            {/* Status Update */}
             <div className="bg-white rounded-xl shadow-lg !p-6 border border-gray-100">
               <div className="flex items-center !gap-3 !mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
@@ -353,9 +357,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
             </div>
           </div>
 
-          {/* Sidebar */}
           <div className="!space-y-3">
-            {/* Customer Info */}
             <div className="bg-white rounded-xl shadow-lg !p-6 border border-gray-100">
               <div className="flex items-center !gap-3 !mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -393,7 +395,6 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
               </div>
             </div>
 
-            {/* Shipping Info */}
             <div className="bg-white rounded-xl shadow-lg !p-6 border border-gray-100">
               <div className="flex items-center !gap-3 !mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center">

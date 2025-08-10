@@ -17,8 +17,8 @@ import ProductIcons from "./Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "./products/SidebarFilter";
-import MobileSidebarFilter from "./products/MobileSidebarFilter";
+import SidebarFilter from "./Products/SidebarFilter";
+import MobileSidebarFilter from "./Products/MobileSidebarFilter";
 
 export default function Product() {
   const params = useParams();
