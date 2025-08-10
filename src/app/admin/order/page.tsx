@@ -1,5 +1,9 @@
 "use client";
-import { getRecentOrders, getStatusText } from "@/services/dashboard";
+import {
+  getRecentOrders,
+  getStatusText,
+  getAllCategoryProduct,
+} from "@/services/dashboard";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
 import exportStyledExcel from "../component_admin/excel";
@@ -7,6 +11,7 @@ import { IOrder } from "@/types/Order";
 import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
 import { ArrowUpDown } from "lucide-react";
+import { ICategory } from "@/types/ICategory";
 
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -26,6 +31,7 @@ export default function OrderPage() {
     "created_at"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [categoryProducts, setCategoryProducts] = useState<ICategory[]>([]);
 
   const statusOrderFlow = [
     "pending", // Chờ xử lý
@@ -158,6 +164,18 @@ export default function OrderPage() {
       setSortOrder("asc");
     }
   };
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await getAllCategoryProduct();
+        // res có dạng { message: string, data: CategoryProduct[] }
+        setCategoryProducts(res.data);
+      } catch (error) {
+        console.error("Lỗi lấy danh mục sản phẩm:", error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <div>
@@ -265,11 +283,19 @@ export default function OrderPage() {
                 </select>
               </th>
               <th>
-                <select onChange={(e) => setCategoryFilter(e.target.value)}>
+                <select
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  value={categoryFilter}
+                >
                   <option value="">Tất cả</option>
-                  <option value="1">Nike</option>
-                  <option value="2">Adidas</option>
-                  <option value="3">Puma</option>
+                  {categoryProducts.map((cat) => (
+                    <option
+                      key={cat.categories_id}
+                      value={String(cat.categories_id)}
+                    >
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </th>
               <th></th>

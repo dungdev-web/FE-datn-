@@ -120,8 +120,13 @@ export async function getCategory(
       throw new Error("Không thể lấy danh mục bài viết từ API.");
     }
 
-    const { data,totalPages } = await res.json();
-    return Array.isArray(data) ? data : [];
+    const json  = await res.json();
+     return {
+      data: Array.isArray(json.data) ? json.data : [],
+      total: json.total ?? 0,
+      currentPage: json.currentPage ?? 1,
+      totalPages: json.totalPages ?? 1,
+    };
   } catch (error) {
     console.error("Lỗi khi lấy danh mục bài viết:", error);
     return [];

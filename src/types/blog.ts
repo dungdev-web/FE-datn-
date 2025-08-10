@@ -29,6 +29,13 @@ export interface Category {
   parent_id: number | null;
   created_at?: Date;
   updated_at?: Date;
+  data:CategoryResponse[];
+}
+export interface AddCategory{
+    name: string;
+  slug: string;
+  parent_id: number | null;
+
 }
 export interface IBlogCreate {
   title: string;

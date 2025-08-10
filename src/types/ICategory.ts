@@ -3,5 +3,9 @@ export interface ICategory {
   name: string;
   slug: string;
   parent_id: number | null;
-  children?: ICategory[]; // danh mục con (nếu có)
+  children?: ICategory[];
+  image?: string | null;
+  status: number;
+  created_at: string;
+  updated_at: string;
 }
