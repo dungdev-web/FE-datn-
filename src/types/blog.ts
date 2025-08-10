@@ -29,7 +29,6 @@ export interface Category {
   parent_id: number | null;
   created_at?: Date;
   updated_at?: Date;
-  data:CategoryResponse[];
 }
 export interface AddCategory{
     name: string;
@@ -47,7 +46,10 @@ export interface IBlogCreate {
   status?: number; 
   thumbnail?: string;
 }
+
+
 export interface CategoryResponse {
+  message?: string;
   data: Category[];
   total: number;
   currentPage: number;

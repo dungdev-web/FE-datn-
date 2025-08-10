@@ -72,7 +72,7 @@ export default function Product() {
           getCategories(),
         ]);
         setBrandsList(brands?.data || []);
-        setCategories(categories || []);
+        setCategories(categories.data || []);
       } catch (err) {
         console.error("❌ Lỗi khi lấy dữ liệu brand/category:", err);
       }

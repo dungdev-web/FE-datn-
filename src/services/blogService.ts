@@ -1,5 +1,5 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IBlog,Category,IBlogCreate } from "@/types/blog";
+import { IBlog,Category,IBlogCreate,CategoryResponse } from "@/types/blog";
 import { getMockBlog } from "@/mocks/mockBlog";
 import { promises } from "dns";
 import { ICategory } from "@/types/ICategory";
@@ -87,18 +87,14 @@ export async function getPostById(id: number): Promise<IBlog | null> {
 //lấy danh mục bài viết
 
 
-export async function getCategory(
-  params?: {
-    page?: number;
-    name: string;
-    id?: number;
-    slug?: string;
-    sortBy?: "name" | "created_at" | "updated_at";
-    sortOrder?: "asc" | "desc";
-  }
-): Promise<Category[]> {
- 
-
+export async function getCategory(params?: {
+  page?: number;
+  name?: string;
+  id?: number;
+  slug?: string;
+  sortBy?: "name" | "created_at" | "updated_at";
+  sortOrder?: "asc" | "desc";
+}): Promise<CategoryResponse> {
   try {
     const query = new URLSearchParams({
       page: String(params?.page ?? 1),
@@ -109,7 +105,6 @@ export async function getCategory(
       sortBy: params?.sortBy ?? "created_at",
       sortOrder: params?.sortOrder ?? "desc",
     });
-    
 
     const res = await fetch(`${API_BASE_URL}/post/category?${query}`, {
       method: "GET",
@@ -120,18 +115,19 @@ export async function getCategory(
       throw new Error("Không thể lấy danh mục bài viết từ API.");
     }
 
-    const json  = await res.json();
-     return {
-      data: Array.isArray(json.data) ? json.data : [],
-      total: json.total ?? 0,
-      currentPage: json.currentPage ?? 1,
-      totalPages: json.totalPages ?? 1,
-    };
+    const json: CategoryResponse = await res.json();
+    return json;
   } catch (error) {
     console.error("Lỗi khi lấy danh mục bài viết:", error);
-    return [];
+    return {
+      data: [],
+      total: 0,
+      currentPage: 1,
+      totalPages: 1,
+    };
   }
 }
+
 
 
 //lấy bài viết theo danh mục

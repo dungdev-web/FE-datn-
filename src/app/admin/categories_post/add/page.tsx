@@ -88,7 +88,7 @@ export default function CategoryAdd() {
                 }
               >
                 <option value="">-- Không có danh mục cha --</option>
-                {categories.map((cat) => (
+                {categories?.data.map((cat) => (
                   <option key={cat.category_post_id} value={cat.category_post_id}>
                     {cat.name}
                   </option>
