@@ -1,6 +1,6 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockUsers, saveMockUsers } from "@/mocks/mockUser";
-import { IUser } from "@/types/user";
+import { InterfaceUser, IUser } from "@/types/user";
 import { LoginCredentials } from "@/types/auth";
 import { RegisterCredentials } from "@/types/auth";
 
@@ -313,3 +313,141 @@ export async function resetPassword(
 
   return data;
 }
+
+interface GetAllUsersParams {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortDirection?: string;
+  role?: string;
+  status?: number;
+  name?: string;
+  email?: string;
+  user_id?: number;
+  phone?: string;
+}
+// Admin 
+export async function getAllUsers({
+  page = 1,
+  limit = 20,
+  sortField = "created_at",
+  sortDirection = "desc",
+  role,
+  status,
+  name,
+  email,
+  user_id,
+  phone
+}: GetAllUsersParams = {}) {
+  try {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      sortField,
+      sortDirection
+    });
+
+    if (role) params.append("role", role);
+    if (status !== undefined) params.append("status", String(status));
+    if (name) params.append("name", name);
+    if (email) params.append("email", email);
+    if (user_id) params.append("user_id", String(user_id));
+    if (phone) params.append("phone", phone);
+
+    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi fetch danh sách người dùng:", error);
+    throw error;
+  }
+}
+export async function getAllUsersV2({
+  page = 1,
+  limit = 20,
+  sortField = "created_at",
+  sortDirection = "desc",
+  role,
+  status,
+  name,
+  email,
+  user_id,
+  phone,
+}: Partial<InterfaceUser> & {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortDirection?: string;
+} = {}): Promise<InterfaceUser[]> {
+  try {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      sortField,
+      sortDirection,
+    });
+
+    if (role) params.append("role", role);
+    if (status !== undefined) params.append("status", String(status));
+    if (name) params.append("name", name);
+    if (email) params.append("email", email);
+    if (user_id !== undefined) params.append("user_id", String(user_id));
+    if (phone) params.append("phone", phone);
+
+    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const { data } = await res.json();
+
+    // Map dữ liệu về đúng InterfaceUser
+    return data.users.map((u: any) => ({
+      ship_address_id: String(u.ship_address_id ?? ""),
+      user_id: Number(u.user_id ?? 0),
+      name: u.name ?? "",
+      email: u.email ?? "",
+      password: u.password,
+      phone: u.phone ?? null,
+      role: u.role ?? "user",
+      status: Number(u.status ?? 0),
+      avatar: u.avatar ?? null,
+      verify_otp: u.verify_otp ?? null,
+      created_at: u.created_at ?? "",
+      updated_at: u.updated_at ?? "",
+    })) as InterfaceUser[];
+  } catch (error) {
+    console.error("Lỗi khi fetch danh sách người dùng (V2):", error);
+    throw error;
+  }
+}
+export const updateUser = async (
+  userId: number | string,
+  updateData: { role: string; status: number }
+) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/update-user/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('[Service] Lỗi updateUser:', error);
+    throw error;
+  }
+};
