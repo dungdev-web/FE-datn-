@@ -1,16 +1,152 @@
 "use client";
-import { API_BASE_URL } from "@/config/env";
-import "../css/product_admin.css";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useState } from "react";
+import { ArrowUpDown } from "lucide-react";
+import { API_BASE_URL } from "@/config/env";
+import { getProductsDashboard } from "@/services/productService"; // import đúng đường dẫn service của bạn
+import "../css/product_admin.css";
 
 export default function Products() {
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchText, setSearchText] = useState("");
+  // State dữ liệu
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  // State filter + search
+  const [filters, setFilters] = useState({
+    productCode: "",
+    productName: "",
+    brandId: "",
+    categoryId: "",
+    minPrice: "",
+    maxPrice: "",
+    minQuantity: "",
+    maxQuantity: "",
+  });
+
+  // Sort state
+  const [sortConfig, setSortConfig] = useState({
+    sortBy: "created_at",
+    sortOrder: "desc",
+  });
+
+  // Hàm gọi API lấy dữ liệu theo trang, filter, sort
+  async function fetchProducts() {
+    setLoading(true);
+    try {
+      const res = await getProductsDashboard({
+        page: currentPage,
+        limit: 5,
+        sortField: sortConfig.sortBy,
+        sortOrder: sortConfig.sortOrder,
+        productCode: filters.productCode || undefined,
+        productName: filters.productName || undefined,
+        brandId: filters.brandId ? Number(filters.brandId) : undefined,
+        categoryId: filters.categoryId ? Number(filters.categoryId) : undefined,
+        minSalePrice: filters.minPrice ? Number(filters.minPrice) : undefined,
+        maxSalePrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+        minQuantity: filters.minQuantity ? Number(filters.minQuantity) : undefined,
+        maxQuantity: filters.maxQuantity ? Number(filters.maxQuantity) : undefined,
+      });
+      setProducts(res.data);
+      setTotalPages(res.totalPages);
+      setCurrentPage(res.currentPage);
+    } catch (error) {
+      alert("Lấy dữ liệu thất bại");
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchProducts();
+  }, [currentPage, filters, sortConfig]);
+
+  // Handle sort click
+  function handleSort(field) {
+    if (sortConfig.sortBy === field) {
+      // toggle sort order
+      setSortConfig({
+        sortBy: field,
+        sortOrder: sortConfig.sortOrder === "asc" ? "desc" : "asc",
+      });
+    } else {
+      setSortConfig({
+        sortBy: field,
+        sortOrder: "asc",
+      });
+    }
+    setCurrentPage(1); // reset trang về 1 khi sort
+  }
+
+  // Handle filter input change
+  function handleFilterChange(e) {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+    setCurrentPage(1); // reset trang khi filter thay đổi
+  }
+
+  // Component icon sort
+  const SortIcon = ({ field }) => {
+    const active = sortConfig.sortBy === field;
+    const direction = active ? sortConfig.sortOrder : undefined;
+    return (
+      <ArrowUpDown
+        className={`inline-block ml-2 w-4 h-4 cursor-pointer ${
+          active ? "text-blue-500" : "text-gray-400"
+        } ${direction === "asc" ? "rotate-180" : ""}`}
+        onClick={() => handleSort(field)}
+      />
+    );
+  };
+
+  // Render product rows
+  const renderRows = () => {
+    if (loading) return <tr><td colSpan={12}>Đang tải dữ liệu...</td></tr>;
+    if (products.length === 0) return <tr><td colSpan={12}>Không có dữ liệu</td></tr>;
+
+    return products.map((product) => {
+      // Lấy variant đầu tiên để lấy sku và số lượng kho
+      const firstVariant = product.product_variants?.[0] || {};
+      const sku = firstVariant.sku || "";
+      const stockQuantity = firstVariant.stock_quantity || 0;
+      // Lấy ảnh main đầu tiên
+      const mainImage = product.images?.find((img) => img.type === "main") || product.images?.[0];
+      return (
+        <tr key={product.products_id}>
+          <td>{sku}</td>
+          <td>{product.name}</td>
+          <td>
+            {mainImage ? (
+              <img
+                src={`${API_BASE_URL}/uploads/${mainImage.url}`}
+                alt={mainImage.alt_text || product.name}
+                className="product-img"
+              />
+            ) : (
+              <span>Không có ảnh</span>
+            )}
+          </td>
+          <td>{product.brand?.name || ""}</td>
+          <td>
+            <span className="category-tag">{product.category?.name || ""}</span>
+          </td>
+          <td>{product.price?.toLocaleString()}</td>
+          <td>{product.sale_price?.toLocaleString()}</td>
+          <td>{new Date(product.created_at).toLocaleDateString()}</td>
+          <td>{new Date(product.updated_at).toLocaleDateString()}</td>
+          <td>{stockQuantity}</td>
+          <td>
+            <i className="fa-solid fa-pen edit-icon" title="Sửa SP" />
+            <i className="fa-solid fa-trash delete-icon" title="Xóa SP" />
+          </td>
+        </tr>
+      );
+    });
+  };
 
   return (
     <>
-      {/* sản phẩm ở đây */}
       <div className="product-list">
         <h2>Danh sách sản phẩm</h2>
 
@@ -18,30 +154,12 @@ export default function Products() {
           <Link href={"/admin/products/add"} className="btn btn-add">
             <i className="fa-solid fa-plus"></i> Thêm mới sản phẩm
           </Link>
-          <div className={`search-toggle ${isSearching ? "active" : ""}`}>
-            {isSearching ? (
-              <input
-                type="text"
-                className="search-input"
-                autoFocus
-                placeholder="Nhập từ khóa..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                onBlur={() => {
-                  if (searchText === "") setIsSearching(false);
-                }}
-              />
-            ) : (
-              <button
-                className="btn btn-search"
-                onClick={() => setIsSearching(true)}
-              >
-                <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-              </button>
-            )}
-          </div>
 
-          <button className="btn btn-refresh">
+          <button
+            className="btn btn-refresh"
+            onClick={() => fetchProducts()}
+            disabled={loading}
+          >
             <i className="fa-solid fa-rotate-right"></i> Refresh
           </button>
           <button className="btn btn-export">
@@ -52,168 +170,159 @@ export default function Products() {
         <table className="product-table">
           <thead>
             <tr>
-              <th>Mã SP</th>
-              <th>Tên sản phẩm</th>
+              <th>
+                Mã SP <SortIcon field="sku" />
+              </th>
+              <th>
+                Tên sản phẩm <SortIcon field="name" />
+              </th>
               <th>Ảnh</th>
-              <th>Nhãn hiệu</th>
-              <th>Danh mục</th>
-              <th>Giá nhập</th>
-              <th>Giá bán</th>
-              <th>Ngày tạo</th>
-              <th>Ngày sửa</th>
-              <th>Đã bán</th>
+              <th>
+                Nhãn hiệu <SortIcon field="brand_id" />
+              </th>
+              <th>
+                Danh mục <SortIcon field="category_id" />
+              </th>
+              <th>
+                Giá nhập <SortIcon field="price" />
+              </th>
+              <th>
+                Giá bán <SortIcon field="sale_price" />
+              </th>
+              <th>
+                Ngày tạo <SortIcon field="created_at" />
+              </th>
+              <th>
+                Ngày sửa <SortIcon field="updated_at" />
+              </th>
+              <th>
+                Số lượng <SortIcon field="stock_quantity" />
+              </th>
               <th>Thao tác</th>
             </tr>
+
             <tr className="filter-row">
               <th>
-                <input type="text" placeholder="Lọc mã..." />
+                <input
+                  type="text"
+                  placeholder="Lọc mã..."
+                  name="productCode"
+                  value={filters.productCode}
+                  onChange={handleFilterChange}
+                />
               </th>
               <th>
-                <input type="text" placeholder="Lọc tên..." />
+                <input
+                  type="text"
+                  placeholder="Lọc tên..."
+                  name="productName"
+                  value={filters.productName}
+                  onChange={handleFilterChange}
+                />
               </th>
               <th></th>
               <th>
-                <select>
+                <select
+                  name="brandId"
+                  value={filters.brandId}
+                  onChange={handleFilterChange}
+                >
                   <option value="">Tất cả</option>
-                  <option value="Nike">Nike</option>
-                  <option value="Adidas">Adidas</option>
-                  <option value="Puma">Puma</option>
-                  {/* Thêm các nhãn hiệu khác nếu cần */}
+                  <option value="1">Nike</option>
+                  <option value="2">Adidas</option>
+                  <option value="3">Puma</option>
+                  {/* Có thể lấy động từ API brand */}
                 </select>
               </th>
               <th>
-                <select>
+                <select
+                  name="categoryId"
+                  value={filters.categoryId}
+                  onChange={handleFilterChange}
+                >
                   <option value="">Tất cả</option>
-                  <option value="Giày thể thao">Giày thể thao</option>
-                  <option value="Giày chạy bộ">Giày chạy bộ</option>
-                  <option value="Giày thời trang">Giày thời trang</option>
-                  {/* Thêm các danh mục khác nếu cần */}
+                  <option value="3">Giày Chạy Bộ</option>
+                  <option value="7">Giày Sneaker</option>
+                  <option value="4">Giày Bóng Rổ</option>
+                  {/* Có thể lấy động từ API category */}
                 </select>
+              </th>
+              <th>
+                <input
+                  type="number"
+                  placeholder="Giá nhập từ..."
+                  name="minPrice"
+                  value={filters.minPrice}
+                  onChange={handleFilterChange}
+                />
+              </th>
+              <th>
+                <input
+                  type="number"
+                  placeholder="Giá bán đến..."
+                  name="maxPrice"
+                  value={filters.maxPrice}
+                  onChange={handleFilterChange}
+                />
               </th>
               <th></th>
               <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
+              <th>
+                <input
+                  type="number"
+                  placeholder="Số lượng từ..."
+                  name="minQuantity"
+                  value={filters.minQuantity}
+                  onChange={handleFilterChange}
+                />
+              </th>
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>ADUB-W-40</td>
-              <td>VANS VAULT STYLE 36 BLACK</td>
-              <td>
-                <img
-                  src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                  alt="Vans"
-                  className="product-img"
-                />
-              </td>
-              <td>VANZ</td>
-              <td>
-                <span className="category-tag">Giày thời trang</span>
-              </td>
 
-              <td>550,000</td>
-              <td>1,350,000</td>
-              <td>27-11-2021</td>
-              <td>27-11-2021</td>
-              <td>0</td>
-              <td>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>NAZ-B-40</td>
-              <td>Giày Bóng Rổ Adidas Dame 8</td>
-              <td>
-                <img
-                  src={`${API_BASE_URL}/uploads/AdidasDame8.webp`}
-                  alt="Vans"
-                  className="product-img"
-                />
-              </td>
-              <td>ADIDAS</td>
-              <td>
-                <span className="category-tag">Giày thể thao</span>
-              </td>
-
-              <td>550,000</td>
-              <td>1,350,000</td>
-              <td>27-11-2021</td>
-              <td>27-11-2021</td>
-              <td>0</td>
-              <td>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>NBFF-G-38</td>
-              <td>Giày Bóng Rổ Puma MB.01</td>
-              <td>
-                <img
-                  src={`${API_BASE_URL}/uploads/PumaMB.01.jpg`}
-                  alt="Vans"
-                  className="product-img"
-                />
-              </td>
-              <td>PUMA</td>
-              <td>
-                <span className="category-tag">Giày thể thao</span>
-              </td>
-
-              <td>550,000</td>
-              <td>1,350,000</td>
-              <td>27-11-2021</td>
-              <td>27-11-2021</td>
-              <td>0</td>
-              <td>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>GCG-B-36</td>
-              <td>Giày Sneaker New Balance 990v5</td>
-              <td>
-                <img
-                  src={`${API_BASE_URL}/uploads/SneakerNewBalance990v5.jpg`}
-                  alt="Vans"
-                  className="product-img"
-                />
-              </td>
-              <td>New Balance</td>
-              <td>
-                <span className="category-tag">Giày thời trang</span>
-              </td>
-
-              <td>550,000</td>
-              <td>1,350,000</td>
-              <td>27-11-2021</td>
-              <td>27-11-2021</td>
-              <td>0</td>
-              <td>
-                <i className="fa-solid fa-pen edit-icon" title="Sửa SP"></i>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa SP"></i>
-              </td>
-            </tr>
-            {/* Thêm dòng khác */}
-          </tbody>
+          <tbody>{renderRows()}</tbody>
         </table>
 
+        {/* Pagination */}
         <div className="pagination">
-          <button className="page-btn" disabled>
+          <button
+            className="page-btn"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          >
             <i className="fa-solid fa-angle-left"></i>
           </button>
-          <button className="page-btn active">1</button>
-          <button className="page-btn">2</button>
-          <button className="page-btn">3</button>
-          <button className="page-btn">4</button>
-          <button className="page-btn">...</button>
-          <button className="page-btn">10</button>
-          <button className="page-btn">
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+            if (
+              page === 1 ||
+              page === totalPages ||
+              (page >= currentPage - 1 && page <= currentPage + 1)
+            ) {
+              return (
+                <button
+                  key={page}
+                  className={`page-btn ${page === currentPage ? "active" : ""}`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              );
+            }
+            if (
+              page === currentPage - 2 ||
+              page === currentPage + 2
+            ) {
+              return <span key={page}>...</span>;
+            }
+            return null;
+          })}
+
+          <button
+            className="page-btn"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          >
             <i className="fa-solid fa-angle-right"></i>
           </button>
         </div>
