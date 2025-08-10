@@ -213,7 +213,6 @@ export default function CheckoutContent() {
             setDefaultAddress(addressData.address_line);
             setEmail(addressData.user?.email || "");
             setSelectedAddressId(addressData.ship_address_id);
-            
           } else {
             const first = allAddresses[0];
             setFullName(first.full_name);

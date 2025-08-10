@@ -7,7 +7,7 @@ export interface IUser {
   picture: string | null;
   phone: string | null;
   address: string | null;
-  role: string | "customer" | "admin";
+  role: string | "admin" | "user";
   created_at: Date;
   updated_at: Date;
   reset_otp?: string;
@@ -20,4 +20,19 @@ export interface StoredUser {
 export interface UserData {
   token: string;
   user: IUser;
+}
+
+export interface InterfaceUser {
+  ship_address_id: string;
+  user_id: number;
+  name: string;
+  email: string;
+  password?: string;
+  phone: string | null;
+  role: 'admin' | 'user' | string;
+  status: number;
+  avatar: string;
+  verify_otp: string | null;
+  created_at: string;
+  updated_at: string;
 }
