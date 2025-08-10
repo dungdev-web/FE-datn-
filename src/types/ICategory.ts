@@ -1,6 +1,6 @@
 export interface ICategory {
   image: any;
-  status: number; // 0 hoặc 1
+  status: number;
   categories_id: number;
   name: string;
   slug: string;

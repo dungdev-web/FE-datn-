@@ -111,6 +111,7 @@ export default function Blog() {
         <table className="post-table">
           <thead>
             <tr>
+              <th>Id bài viết</th>
               <th>
                 Tên bài viết
                 <ArrowUpDown
@@ -138,6 +139,7 @@ export default function Blog() {
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">
+              <th></th>
               <th>
                 <input
                   type="text"
@@ -176,6 +178,7 @@ export default function Blog() {
             ) : (
               posts.map((post) => (
                 <tr key={post.post_id}>
+                  <td>#{post.post_id}</td>
                   <td>{post.title}</td>
                   <td>
                     <img
