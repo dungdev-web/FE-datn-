@@ -3,9 +3,11 @@ import "../css/css.css";
 import { useState, useEffect } from "react";
 import "../css/dashboard.css";
 import "../css/blog_add.css";
-import { getPost } from "@/services/blogService"; // đảm bảo đường dẫn đúng
-import { IBlog } from "@/types/blog"; // interface nếu có
+import { getPost } from "@/services/blogService"; 
+import { IBlog } from "@/types/blog"; 
 import Link from "next/link";
+import { ArrowUpDown } from "lucide-react";
+import { useDeletePost } from "@/hooks/useAddBlog";
 export default function Blog() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -18,6 +20,17 @@ export default function Blog() {
     "created_at"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const { deletePost } = useDeletePost();
+  const handleDelete = async (postId: number) => {
+    if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
+      try {
+        await deletePost(postId);
+        setPosts((prevPosts) => prevPosts.filter((post) => post.post_id !== postId));
+      } catch (error) {
+        console.error("Lỗi khi xóa bài viết:", error);
+      }
+    }
+  };
 
   useEffect(() => {
     fetchPosts();
@@ -62,7 +75,7 @@ export default function Blog() {
 
         <div className="post-actions">
           <button className="btn btn-add">
-            <i className="fa-solid fa-plus"></i> Thêm mới bài viết
+            <Link href="/admin/blog/add"><i className="fa-solid fa-plus"></i> Thêm mới bài viết</Link>
           </button>
           <button
             className="btn btn-refresh"
@@ -100,26 +113,26 @@ export default function Blog() {
             <tr>
               <th>
                 Tên bài viết
-                <i
-                  className="fa-solid fa-sort cursor-pointer "
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
                   onClick={() => toggleSort("title")}
-                ></i>
+                ></ArrowUpDown>
               </th>
               <th>Ảnh</th>
               <th>Trạng thái</th>
               <th>
                 Ngày tạo
-                <i
-                  className="fa-solid fa-sort cursor-pointer "
+                <ArrowUpDown
                   onClick={() => toggleSort("created_at")}
-                ></i>
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                />
               </th>
               <th>
                 Ngày sửa
-                <i
-                  className="fa-solid fa-sort cursor-pointer ml-1"
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
                   onClick={() => toggleSort("updated_at")}
-                ></i>
+                ></ArrowUpDown>
               </th>
 
               <th>Thao tác</th>
@@ -196,6 +209,7 @@ export default function Blog() {
                     <i
                       className="fa-solid fa-trash delete-icon"
                       title="Xóa bài viết"
+                      onClick={() => handleDelete(post.post_id)}
                     ></i>
                   </td>
                 </tr>
