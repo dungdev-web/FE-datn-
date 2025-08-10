@@ -12,9 +12,9 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-import SidebarFilter from "./products/SidebarFilter";
-import MobileSidebarFilter from "./products/MobileSidebarFilter";
-import ProductIcons from "./products/ProductIcons";
+import SidebarFilter from "./Products/SidebarFilter";
+import MobileSidebarFilter from "./Products/MobileSidebarFilter";
+import ProductIcons from "./Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
@@ -71,8 +71,8 @@ export default function Product() {
           getBrands(),
           getCategories(),
         ]);
-        setBrandsList(brands || []);
-        setCategories(categories || []);
+        setBrandsList(brands?.data || []);
+        setCategories(categories.data || []);
       } catch (err) {
         console.error("❌ Lỗi khi lấy dữ liệu brand/category:", err);
       }

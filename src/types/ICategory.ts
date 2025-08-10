@@ -5,9 +5,9 @@ export interface ICategory {
   name: string;
   slug: string;
   parent_id: number | null;
+  children?: ICategory[];
   created_at: string;
   updated_at: string;
-  children?: ICategory[]; // danh mục con (nếu có)
 }
 export interface CategoryFilters {
   id?: number;

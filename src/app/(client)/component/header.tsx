@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import Search from "src/app/(client)/component/showsearch";
+import Search from "./ShowSearch";
 import TopCart from "./TopCart";
 import MenuRight from "./menu_right";
 import Link from "next/link";
@@ -72,6 +72,7 @@ export default function Header() {
         setCategories([]);
       });
   }, []);
+
 
   useEffect(() => {
     getBrands()

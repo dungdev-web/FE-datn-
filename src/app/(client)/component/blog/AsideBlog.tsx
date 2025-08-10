@@ -6,31 +6,106 @@ import { API_BASE_URL } from "@/config/env";
 
 export default function AsideBlog() {
   const { categories, loading: catLoading } = useCategories();
-  const [selectedCategoryId, setSelectedCategory] = useState<number | null>(
-    null
-  );
+  const [selectedCategoryId, setSelectedCategory] = useState<number | null>(null);
   const [openParentId, setOpenParentId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const { posts, loading: postLoading } = usePostsByCategory(
-    selectedCategoryId ?? 2
+     2
   );
   console.log(selectedCategoryId);
-
-  // Set danh mục mặc định là cái đầu tiên khi có data
+  
+  // Set danh mục mặc định khi có data
   useEffect(() => {
-    if (categories.length > 0 && selectedCategoryId === null) {
-      setSelectedCategory(3);
+    // console.log("Categories từ hook:", categories);
+
+    if (
+      Array.isArray(categories?.data) &&
+      categories.data.length > 0 &&
+      selectedCategoryId === null
+    ) {
+      setSelectedCategory(categories.data[0].category_post_id);
     }
   }, [categories, selectedCategoryId]);
 
+  const renderCategories = (isMobile = false) => {
+    // console.log("Categories render:", categories);
+
+    if (catLoading) {
+      return <p>Đang tải danh mục...</p>;
+    }
+
+    if (!Array.isArray(categories?.data) || categories.data.length === 0) {
+      return <p>Không có danh mục.</p>;
+    }
+
+    // Lấy danh mục cha
+    const parentCategories = categories.data
+      .filter((cat) => cat.parent_id === null)
+      .slice(0, 10); // Giới hạn hiển thị 10 cha
+
+    return (
+      <ul className={isMobile ? "" : "space-y-1"}>
+        {parentCategories.map((parent) => {
+          const isOpen = openParentId === parent.category_post_id;
+          const childCategories = categories.data.filter(
+            (cat) => cat.parent_id === parent.category_post_id
+          );
+
+          return (
+            <li key={parent.category_post_id}>
+              <div
+                onClick={() =>
+                  setOpenParentId(isOpen ? null : parent.category_post_id)
+                }
+                className="flex justify-between items-center cursor-pointer"
+                style={{
+                  fontWeight:
+                    selectedCategoryId === parent.category_post_id
+                      ? "bold"
+                      : "normal",
+                }}
+              >
+                {parent.name}
+                {childCategories.length > 0 && (
+                  <i
+                    className={`fas fa-chevron-down transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  ></i>
+                )}
+              </div>
+
+              {isOpen && childCategories.length > 0 && (
+                <ul className="!ml-4 !mt-1 space-y-1">
+                  {childCategories.map((child) => (
+                    <li
+                      key={child.category_post_id}
+                      className="cursor-pointer hover:text-blue-500"
+                      onClick={() =>
+                        setSelectedCategory(child.category_post_id)
+                      }
+                    >
+                      + {child.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
+
   return (
-    
     <>
+      {/* Sidebar mobile */}
       <button
         className="toggle-sidebar-btn"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        ☰  
+        ☰
       </button>
       <aside className={`mobile-sidebar ${sidebarOpen ? "open" : ""}`}>
         <button
@@ -39,68 +114,14 @@ export default function AsideBlog() {
         >
           ×
         </button>
-        
+
         <div className="category-blog">
           <h2>DANH MỤC BÀI VIẾT</h2>
-          <ul>
-              {categories
-                .filter((cat) => cat.parent_id === null)
-                .map((parent) => {
-                  const isOpen = openParentId === parent.category_post_id;
-                  const childCategories = categories.filter(
-                    (cat) => cat.parent_id === parent.category_post_id
-                  );
-
-                  return (
-                    <li key={parent.category_post_id}>
-                      <div
-                        onClick={() =>
-                          setOpenParentId(
-                            isOpen ? null : parent.category_post_id
-                          )
-                        }
-                        className="flex justify-between items-center cursor-pointer "
-                        style={{
-                          fontWeight:
-                            selectedCategoryId === parent.category_post_id
-                              ? "bold"
-                              : "normal",
-                        }}
-                      >
-                        {parent.name}
-                        {childCategories.length > 0 && (
-                          <i
-                            className={`fas fa-chevron-down transition-transform duration-300 ${
-                              isOpen ? "rotate-180" : ""
-                            }`}
-                          ></i>
-                        )}
-                      </div>
-
-                      {isOpen && childCategories.length > 0 && (
-                        <ul className="!ml-4 !mt-1">
-                          {childCategories.map((child) => (
-                            <li
-                              key={child.category_post_id}
-                              className="cursor-pointer hover:text-blue-500"
-                              onClick={() =>
-                                setSelectedCategory(child.category_post_id)
-                              }
-                            >
-                              + {child.name}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-            </ul>
+          {renderCategories(true)}
         </div>
 
-       <div className="relate-blog">
+        <div className="relate-blog">
           <h2>BÀI VIẾT NỔI BẬT</h2>
-
           {postLoading ? (
             <p>Đang tải bài viết...</p>
           ) : posts.length === 0 ? (
@@ -135,74 +156,16 @@ export default function AsideBlog() {
           <img src="/images/banner/aside_banner.webp" alt="" />
         </div>
       </aside>
+
+      {/* Sidebar desktop */}
       <aside className="desktop">
-        {/* DANH MỤC BÀI VIẾT */}
         <div className="category-blog">
           <h2>DANH MỤC BÀI VIẾT</h2>
-          {catLoading ? (
-            <p>Đang tải danh mục...</p>
-          ) : (
-            <ul className="space-y-1">
-              {categories
-                .filter((cat) => cat.parent_id === null)
-                .map((parent) => {
-                  const isOpen = openParentId === parent.category_post_id;
-                  const childCategories = categories.filter(
-                    (cat) => cat.parent_id === parent.category_post_id
-                  );
-
-                  return (
-                    <li key={parent.category_post_id}>
-                      <div
-                        onClick={() =>
-                          setOpenParentId(
-                            isOpen ? null : parent.category_post_id
-                          )
-                        }
-                        className="flex justify-between items-center cursor-pointer "
-                        style={{
-                          fontWeight:
-                            selectedCategoryId === parent.category_post_id
-                              ? "bold"
-                              : "normal",
-                        }}
-                      >
-                        {parent.name}
-                        {childCategories.length > 0 && (
-                          <i
-                            className={`fas fa-chevron-down transition-transform duration-300 ${
-                              isOpen ? "rotate-180" : ""
-                            }`}
-                          ></i>
-                        )}
-                      </div>
-
-                      {isOpen && childCategories.length > 0 && (
-                        <ul className="!ml-4 !mt-1 space-y-1">
-                          {childCategories.map((child) => (
-                            <li
-                              key={child.category_post_id}
-                              className="cursor-pointer hover:text-blue-500"
-                              onClick={() =>
-                                setSelectedCategory(child.category_post_id)
-                              }
-                            >
-                              + {child.name}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-            </ul>
-          )}
+          {renderCategories(false)}
         </div>
 
-        {/* BÀI VIẾT LIÊN QUAN */}
         <div className="relate-blog">
           <h2>BÀI VIẾT NỔI BẬT</h2>
-
           {postLoading ? (
             <p>Đang tải bài viết...</p>
           ) : posts.length === 0 ? (
@@ -233,7 +196,6 @@ export default function AsideBlog() {
           )}
         </div>
 
-        {/* BANNER */}
         <div className="banner-relate-blog">
           <Image
             src="/images/banner/aside_banner.webp"

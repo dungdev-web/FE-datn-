@@ -28,8 +28,7 @@ export default function Blog_View() {
   const [strongTexts, setStrongTexts] = useState<string[]>([]);
   const [modifiedContent, setModifiedContent] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [status, setStatus] = useState<string>(""); // lưu dưới dạng chuỗi để khớp với option value
- 
+  const [status, setStatus] = useState<string>("");
 
   const {
     updatePost,
@@ -48,7 +47,7 @@ export default function Blog_View() {
 
   useEffect(() => {
     const init = async () => {
-      if (isInitializedRef.current || quillRef.current) return; // ⛔️ CHẶN LẠI nếu đã có Quill
+      if (isInitializedRef.current || quillRef.current) return;
 
       const { create } = await import("filepond");
       const Tagify = (await import("@yaireo/tagify")).default;
@@ -166,11 +165,11 @@ export default function Blog_View() {
       quillRef.current.root.innerHTML = post.content;
     }
   }, [post]);
-const numericId = typeof idParam === "string" ? parseInt(idParam) : NaN;
-if (isNaN(numericId)) {
-  console.error("❌ ID không hợp lệ");
-  return;
-}
+  const numericId = typeof idParam === "string" ? parseInt(idParam) : NaN;
+  if (isNaN(numericId)) {
+    console.error("❌ ID không hợp lệ");
+    return;
+  }
 
   // Dùng hook sau khi có categoryId
   const { posts, loading, error } = usePostsByCategory(
@@ -184,9 +183,8 @@ if (isNaN(numericId)) {
     const category_post_id = (
       document.getElementById("category") as HTMLSelectElement
     )?.value;
-    const status = (
-      document.querySelector("select:nth-of-type(2)") as HTMLSelectElement
-    )?.value;
+    const status = (document.getElementById("status") as HTMLSelectElement)
+      ?.value;
     const contentHtml = quillRef.current?.root.innerHTML;
 
     const thumbnailFile = filePondRef.current?.pond?.getFiles?.()[0]?.file;
@@ -218,9 +216,9 @@ if (isNaN(numericId)) {
 
     formData.append("content", contentHtml);
     formData.append("author_id", String(user?.id));
-if (thumbnailFile) {
-  formData.append("thumbnail", thumbnailFile);
-}
+    if (thumbnailFile) {
+      formData.append("thumbnail", thumbnailFile);
+    }
 
     const result = await updatePost(numericId, formData);
 
@@ -288,7 +286,7 @@ if (thumbnailFile) {
               className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
             >
               <option value="">-- Chọn danh mục --</option>
-              {categories.map((cat) => (
+              {categories?.data.map((cat) => (
                 <option key={cat.category_post_id} value={cat.category_post_id}>
                   {cat.name}
                 </option>
@@ -303,13 +301,13 @@ if (thumbnailFile) {
               Trạng thái
             </label>
             <select
+              id="status"
               className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
               <option value="1">Công khai</option>
-              <option value="0">Nháp</option>
-              <option value="2">Chờ duyệt</option>
+              <option value="0">Riêng tư</option>
             </select>
           </div>
           <div className="!mb-[12px]">

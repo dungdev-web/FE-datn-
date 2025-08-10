@@ -13,9 +13,10 @@ import { getBrands, getProductsByBrandId } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import SidebarFilter from "../../component/products/SidebarFilter";
-import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
-import ProductIcons from "../../component/products/ProductIcons";
+
+import SidebarFilter from "../../component/Products/SidebarFilter";
+import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
+import ProductIcons from "../../component/Products/ProductIcons";
 
 export default function CategoryPage() {
   const params = useParams();
@@ -127,7 +128,9 @@ export default function CategoryPage() {
         setTotal(fetched.length);
         setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
 
-        const matchedBrand = fetchedBrands.find((b) => b.brand_id === brandId);
+        const matchedBrand = Array.isArray(fetchedBrands.data)
+          ? fetchedBrands.data.find((b) => b.brand_id === brandId)
+          : null;
         setBrand(matchedBrand || null);
       } catch (err) {
         console.error("Lỗi khi load sản phẩm theo brand:", err);
