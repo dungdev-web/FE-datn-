@@ -4,7 +4,7 @@ import { getOrdersByUserService } from "@/services/orderService";
 import { InterfaceUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
 import { debounce } from "lodash";
-
+import { Search, RefreshCw, FilterX, Download, Eye, Filter } from "lucide-react";
 interface GetOrdersParams {
   userId: number;
   page?: number;
@@ -31,12 +31,15 @@ interface UserOrdersListProps {
   onTotalOrdersChange: (total: number) => void;
 }
 
-export default function UserOrdersList({ user, userId, onTotalOrdersChange }: UserOrdersListProps) {
+export default function UserOrdersList({
+  user,
+  userId,
+  onTotalOrdersChange,
+}: UserOrdersListProps) {
   const [orders, setOrders] = useState<IOrder[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -358,50 +361,67 @@ export default function UserOrdersList({ user, userId, onTotalOrdersChange }: Us
         Danh sách đơn hàng của {user.name || "người dùng"} ({totalOrders})
       </h2>
 
-      <div className="actions">
-        <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+      <div className="flex items-center justify-end !gap-3 !mb-6">
+        <div
+          className={`relative transition-all duration-300 ${
+            isSearching ? "w-64" : "w-auto"
+          }`}
+        >
           {isSearching ? (
-            <input
-              type="text"
-              className="search-input"
-              autoFocus
-              placeholder="Tìm kiếm đơn hàng..."
-              value={searchText}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              onBlur={() => {
-                if (searchText === "") setIsSearching(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  setSearchText("");
-                  setIsSearching(false);
-                }
-              }}
-            />
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                className="w-full !pl-10 !pr-4 !py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-400 shadow-sm"
+                autoFocus
+                placeholder="Nhập từ khóa tìm kiếm..."
+                value={searchText}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                onBlur={() => {
+                  if (searchText === "") setIsSearching(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    setSearchText("");
+                    setIsSearching(false);
+                  }
+                }}
+              />
+            </div>
           ) : (
             <button
-              className="btn btn-search"
+              className="bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300 text-gray-700 hover:text-blue-600 font-medium !px-4 !py-2.5 rounded-lg transition-all duration-200 flex items-center !gap-2 shadow-sm hover:shadow-md"
               onClick={() => setIsSearching(true)}
             >
-              <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+              <Search className="w-4 h-4" />
+              Tìm kiếm
             </button>
           )}
         </div>
 
-        <button className="btn btn-refresh" onClick={handleRefresh}>
-          <i className="fa-solid fa-rotate-right"></i> Làm mới
-        </button>
-
-        <button className="btn btn-clear bg-blue-700" onClick={clearFilters}>
-          <i className="fa-solid fa-filter-circle-xmark"></i> Xóa bộ lọc
+        <button
+          className="bg-white hover:bg-emerald-50 border border-gray-200 hover:border-emerald-300 text-gray-700 hover:text-emerald-600 font-medium !px-4 !py-2.5 rounded-lg transition-all duration-200 flex items-center !gap-2 shadow-sm hover:shadow-md"
+          onClick={handleRefresh}
+        >
+          <RefreshCw className="w-4 h-4" />
+          Làm mới
         </button>
 
         <button
-          className="btn btn-export"
-          onClick={handleExport}
-          disabled={ordersLoading || totalOrders === 0}
+          className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium !px-4 !py-2.5 rounded-lg transition-all duration-200 flex items-center !gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+          onClick={clearFilters}
         >
-          <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
+          <FilterX className="w-4 h-4" />
+          Xóa bộ lọc
+        </button>
+
+        <button
+          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium !px-4 !py-2.5 rounded-lg transition-all duration-200 flex items-center !gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg"
+          onClick={handleExport}
+          disabled={ordersLoading}
+        >
+          <Download className="w-4 h-4" />
+          {ordersLoading ? "Đang xuất..." : "Xuất Excel"}
         </button>
       </div>
 
@@ -409,155 +429,220 @@ export default function UserOrdersList({ user, userId, onTotalOrdersChange }: Us
         <div className="loading">Đang tải danh sách đơn hàng...</div>
       ) : (
         <>
-          <table className="order-table">
-            <thead>
-              <tr>
-                <th>Mã đơn hàng</th>
-                <th>Người nhận</th>
-                <th>Điện thoại</th>
-                <th>Trạng thái</th>
-                <th>Sản phẩm</th>
-                <th>Tổng tiền</th>
-                <th>Ngày đặt</th>
-                <th>Thao tác</th>
-              </tr>
-              <tr className="filter-row">
-                <th>
-                  <input
-                    type="text"
-                    placeholder="Lọc mã đơn..."
-                    value={filters.orderId}
-                    onChange={(e) =>
-                      handleFilterChange("orderId", e.target.value)
-                    }
-                  />
-                </th>
-                <th></th>
-                <th></th>
-                <th>
-                  <select
-                    value={filters.status}
-                    onChange={(e) =>
-                      handleFilterChange("status", e.target.value)
-                    }
-                  >
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="pending">Chờ xác nhận</option>
-                    <option value="confirmed">Đã xác nhận</option>
-                    <option value="shipping">Đang giao hàng</option>
-                    <option value="delivered">Đã giao</option>
-                    <option value="cancelled">Đã hủy</option>
-                    <option value="returned">Hoàn trả</option>
-                  </select>
-                </th>
-                <th>
-                  <input
-                    type="text"
-                    placeholder="Lọc sản phẩm..."
-                    value={filters.products}
-                    onChange={(e) =>
-                      handleFilterChange("products", e.target.value)
-                    }
-                  />
-                </th>
-                <th></th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={8}
-                    style={{ textAlign: "center", padding: "2rem" }}
-                  >
-                    {totalOrders === 0
-                      ? "Người dùng chưa có đơn hàng nào"
-                      : "Không tìm thấy đơn hàng phù hợp với bộ lọc"}
-                  </td>
-                </tr>
-              ) : (
-                orders.map((order) => {
-                  const statusInfo = statusMap[
-                    order.status as keyof typeof statusMap
-                  ] || {
-                    label: order.status,
-                    class: "status-default",
-                  };
+<div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+  <table className="w-full">
+    <thead>
+      <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Mã đơn hàng</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Người nhận</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Điện thoại</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Trạng thái</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Sản phẩm</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Tổng tiền</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Ngày đặt</span>
+        </th>
+        <th className="!px-6 !py-4 text-left">
+          <span className="font-semibold text-gray-700">Thao tác</span>
+        </th>
+      </tr>
+      <tr className="bg-white border-b-2 border-gray-100">
+        <th className="!px-6 !py-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Lọc mã đơn..."
+              value={filters.orderId}
+              onChange={(e) => handleFilterChange("orderId", e.target.value)}
+              className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-400"
+            />
+          </div>
+        </th>
+        <th className="!px-6 !py-3"></th>
+        <th className="!px-6 !py-3"></th>
+        <th className="!px-6 !py-3">
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <select
+              value={filters.status}
+              onChange={(e) => handleFilterChange("status", e.target.value)}
+              className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm bg-white appearance-none"
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="pending">Chờ xác nhận</option>
+              <option value="confirmed">Đã xác nhận</option>
+              <option value="shipping">Đang giao hàng</option>
+              <option value="delivered">Đã giao</option>
+              <option value="cancelled">Đã hủy</option>
+              <option value="returned">Hoàn trả</option>
+            </select>
+          </div>
+        </th>
+        <th className="!px-6 !py-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Lọc sản phẩm..."
+              value={filters.products}
+              onChange={(e) => handleFilterChange("products", e.target.value)}
+              className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-400"
+            />
+          </div>
+        </th>
+        <th className="!px-6 !py-3"></th>
+        <th className="!px-6 !py-3"></th>
+        <th className="!px-6 !py-3"></th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-100">
+      {orders.length === 0 ? (
+        <tr>
+          <td colSpan={8} className="!px-6 !py-12 text-center">
+            <div className="flex flex-col items-center !gap-3">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <span className="text-gray-400 text-2xl">📋</span>
+              </div>
+              <span className="text-gray-500 font-medium">
+                {totalOrders === 0
+                  ? "Người dùng chưa có đơn hàng nào"
+                  : "Không tìm thấy đơn hàng phù hợp với bộ lọc"}
+              </span>
+              <span className="text-gray-400 text-sm">Hãy thử điều chỉnh bộ lọc của bạn</span>
+            </div>
+          </td>
+        </tr>
+      ) : (
+        orders.map((order) => {
+          const statusInfo = statusMap[
+            order.status as keyof typeof statusMap
+          ] || {
+            label: order.status,
+            class: "status-default",
+          };
 
-                  const displayProducts = Array.isArray(order.order_items)
-                    ? order.order_items
-                        .map((item: any) => {
-                          if (typeof item === "object") {
-                            const productName =
-                              item.variant?.product?.name || "Không tên";
-                            const color =
-                              item.variant?.color?.name_color || "Không màu";
-                            const size =
-                              item.variant?.size?.number_size || "Không size";
-                            const quantity = item.quantity || 1;
+          const displayProducts = Array.isArray(order.order_items)
+            ? order.order_items
+                .map((item: any) => {
+                  if (typeof item === "object") {
+                    const productName =
+                      item.variant?.product?.name || "Không tên";
+                    const color =
+                      item.variant?.color?.name_color || "Không màu";
+                    const size =
+                      item.variant?.size?.number_size || "Không size";
+                    const quantity = item.quantity || 1;
 
-                            return `${productName} (Màu: ${color}, Size: ${size}, SL: ${quantity})`;
-                          }
-                          return String(item);
-                        })
-                        .join(", ")
-                    : order.order_items || "Không có thông tin";
-
-                  return (
-                    <tr key={order.orders_id}>
-                      <td>
-                        <strong>{order.orders_id}</strong>
-                      </td>
-                      <td>{order.user?.name || "N/A"}</td>
-                      <td>{order.user?.phone || "N/A"}</td>
-                      <td>
-                        <span className={`status-label ${statusInfo.class}`}>
-                          {statusInfo.label}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          className="category-tag"
-                          title={displayProducts}
-                        >
-                          {displayProducts.length > 50
-                            ? displayProducts.substring(0, 50) + "..."
-                            : displayProducts}
-                        </span>
-                      </td>
-                      <td>
-                        {typeof order.total_amount === "number" &&
-                        !isNaN(order.total_amount)
-                          ? new Intl.NumberFormat("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            }).format(order.total_amount)
-                          : "N/A"}
-                      </td>
-                      <td>
-                        {order.created_at
-                          ? formatDate(order.created_at)
-                          : "N/A"}
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          <Link
-                            href={`/admin/order/view/${order.orders_id}`}
-                            className="action-btn view-btn"
-                            title="Xem chi tiết đơn hàng"
-                          >
-                            <i className="fa-solid fa-eye"></i>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                  );
+                    return `${productName} (Màu: ${color}, Size: ${size}, SL: ${quantity})`;
+                  }
+                  return String(item);
                 })
-              )}
-            </tbody>
-          </table>
+                .join(", ")
+            : order.order_items || "Không có thông tin";
+
+          const getStatusStyle = (status: string) => {
+            switch (status) {
+              case 'pending':
+                return 'bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200';
+              case 'confirmed':
+                return 'bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200';
+              case 'shipping':
+                return 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200';
+              case 'delivered':
+                return 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200';
+              case 'cancelled':
+                return 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200';
+              case 'returned':
+                return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200';
+              default:
+                return 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200';
+            }
+          };
+
+          return (
+            <tr key={order.orders_id} className="hover:bg-blue-50 transition-all duration-200 group">
+              <td className="!px-6 !py-4">
+                <div className="flex items-center justify-center !gap-2">
+                  
+                  <span className="font-semibold text-gray-900">#{order.orders_id}</span>
+                </div>
+              </td>
+              <td className="!px-6 !py-4">
+                <div className="flex items-center !gap-3">
+                    <div className="font-semibold text-gray-900">{order.user?.name || "N/A"}</div>
+                    <div className="text-sm text-gray-500">Khách hàng</div>
+                </div>
+              </td>
+              <td className="!px-6 !py-4">
+                <span className="text-gray-900 font-medium">{order.user?.phone || "N/A"}</span>
+              </td>
+              <td className="!px-6 !py-4">
+                <span className={`inline-flex items-center !px-3 !py-1 rounded-full text-sm font-medium ${getStatusStyle(order.status)}`}>
+                  <div className={`w-2 h-2 rounded-full !mr-2 ${
+                    order.status === 'delivered' ? 'bg-green-500' :
+                    order.status === 'cancelled' ? 'bg-red-500' :
+                    order.status === 'shipping' ? 'bg-purple-500' :
+                    order.status === 'confirmed' ? 'bg-blue-500' :
+                    'bg-yellow-500'
+                  }`}></div>
+                  {statusInfo.label}
+                </span>
+              </td>
+              <td className="!px-6 !py-4">
+                <div 
+                  className="bg-gray-50 !px-3 !py-2 rounded-lg border border-gray-200 text-sm text-gray-700 max-w-xs overflow-hidden"
+                  title={displayProducts}
+                >
+                  {displayProducts.length > 50
+                    ? displayProducts.substring(0, 50) + "..."
+                    : displayProducts}
+                </div>
+              </td>
+              <td className="!px-6 !py-4">
+                <span className="font-bold text-green-600 text-lg">
+                  {typeof order.total_amount === "number" &&
+                  !isNaN(order.total_amount)
+                    ? new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(order.total_amount)
+                    : "N/A"}
+                </span>
+              </td>
+              <td className="!px-6 !py-4">
+                <div className="text-gray-900 font-medium">
+                  {order.created_at ? formatDate(order.created_at) : "N/A"}
+                </div>
+              </td>
+              <td className="!px-6 !py-4">
+                <Link
+                  href={`/admin/user/view/${order.user_id}/order/${order.orders_id}`}
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 transition-all duration-200 group/btn"
+                  title="Xem chi tiết đơn hàng"
+                >
+                  <Eye className="w-4 h-4 group-hover/btn:scale-110 transition-transform duration-200" />
+                </Link>
+              </td>
+            </tr>
+          );
+        })
+      )}
+    </tbody>
+  </table>
+</div>
 
           {renderPagination()}
         </>
