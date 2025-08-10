@@ -1,4 +1,6 @@
 export interface ICategory {
+  image: any;
+  status: number; // 0 hoặc 1
   categories_id: number;
   name: string;
   slug: string;
@@ -8,6 +10,7 @@ export interface ICategory {
   status: number;
   created_at: string;
   updated_at: string;
+
 }
 export interface CategoryFilters {
   id?: number;

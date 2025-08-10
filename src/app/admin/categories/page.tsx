@@ -3,18 +3,9 @@ import { useEffect, useState } from "react";
 import "../css/categories_admin.css";
 import Link from "next/link";
 import { ArrowUpDown } from "lucide-react";
-
-interface ICategory {
-  categories_id: number;
-  name: string;
-  slug: string;
-  parent_id: number | null;
-  image: string;
-  status: number;
-  created_at: string;
-  updated_at: string;
-  children?: ICategory[];
-}
+import { ICategory } from "@/types/ICategory";
+import Swal from "sweetalert2";
+import { deleteCategory, updateCategoryStatus } from "@/services/categoryService";
 
 type SortOrder = "asc" | "desc";
 
@@ -30,7 +21,10 @@ export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
 
   // State sort
-  const [sortConfig, setSortConfig] = useState<{ sortBy: string; sortOrder: SortOrder }>({
+  const [sortConfig, setSortConfig] = useState<{
+    sortBy: string;
+    sortOrder: SortOrder;
+  }>({
     sortBy: "",
     sortOrder: "asc",
   });
@@ -59,7 +53,9 @@ export default function Categories() {
         params.append("sortOrder", sortConfig.sortOrder);
       }
 
-      const res = await fetch(`http://localhost:3000/category?${params.toString()}`);
+      const res = await fetch(
+        `http://localhost:3000/category?${params.toString()}`
+      );
       if (!res.ok) throw new Error("Lỗi khi lấy danh mục");
       const json = await res.json();
 
@@ -171,7 +167,10 @@ export default function Categories() {
               }}
             />
           ) : (
-            <button className="btn btn-search" onClick={() => setIsSearching(true)}>
+            <button
+              className="btn btn-search"
+              onClick={() => setIsSearching(true)}
+            >
               <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
             </button>
           )}
@@ -182,18 +181,31 @@ export default function Categories() {
         <thead>
           <tr>
             <th className="px-4 py-2">
-              ID <SortIcon field="categories_id" onClick={() => handleSort("categories_id")} />
+              ID{" "}
+              <SortIcon
+                field="categories_id"
+                onClick={() => handleSort("categories_id")}
+              />
             </th>
             <th>
-              Tên danh mục <SortIcon field="name" onClick={() => handleSort("name")} />
+              Tên danh mục{" "}
+              <SortIcon field="name" onClick={() => handleSort("name")} />
             </th>
             <th>Trạng thái danh mục</th>
             <th>Ảnh</th>
             <th>
-              Ngày tạo <SortIcon field="created_at" onClick={() => handleSort("created_at")} />
+              Ngày tạo{" "}
+              <SortIcon
+                field="created_at"
+                onClick={() => handleSort("created_at")}
+              />
             </th>
             <th>
-              Ngày sửa <SortIcon field="updated_at" onClick={() => handleSort("updated_at")} />
+              Ngày sửa{" "}
+              <SortIcon
+                field="updated_at"
+                onClick={() => handleSort("updated_at")}
+              />
             </th>
             <th>Thao tác</th>
           </tr>
@@ -246,7 +258,54 @@ export default function Categories() {
                 <td>{cat.name}</td>
                 <td className="status-column">
                   <label className="switch">
-                    <input type="checkbox" checked={cat.status === 1} readOnly />
+                    <input
+                      type="checkbox"
+                      checked={cat.status === 1}
+                      onChange={async () => {
+                        const newStatus = cat.status === 1 ? 0 : 1;
+
+                        const result = await Swal.fire({
+                          title: "Xác nhận",
+                          text: `Bạn có chắc muốn ${
+                            newStatus === 1 ? "bật" : "tắt"
+                          } danh mục "${cat.name}"?`,
+                          icon: "question",
+                          showCancelButton: true,
+                          confirmButtonText: "Có",
+                          cancelButtonText: "Hủy",
+                        });
+
+                        if (!result.isConfirmed) return;
+
+                        const ok = await updateCategoryStatus(
+                          cat.categories_id,
+                          newStatus
+                        );
+
+                        if (ok) {
+                          setCategories((prev) =>
+                            prev.map((c) =>
+                              c.categories_id === cat.categories_id
+                                ? { ...c, status: newStatus }
+                                : c
+                            )
+                          );
+                          Swal.fire({
+                            title: "Thành công",
+                            text: "Cập nhật trạng thái thành công!",
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                          });
+                        } else {
+                          Swal.fire({
+                            title: "Lỗi",
+                            text: "Cập nhật trạng thái thất bại!",
+                            icon: "error",
+                          });
+                        }
+                      }}
+                    />
                     <span className="slider round"></span>
                   </label>
                 </td>
@@ -261,13 +320,50 @@ export default function Categories() {
                 <td>{new Date(cat.updated_at).toLocaleString("vi-VN")}</td>
                 <td>
                   <Link href={`/admin/categories/edit/${cat.categories_id}`}>
-                    <i className="fa-solid fa-pen edit-icon" title="Sửa danh mục"></i>
+                    <i
+                      className="fa-solid fa-pen edit-icon"
+                      title="Sửa danh mục"
+                    ></i>
                   </Link>
                   <i
                     className="fa-solid fa-trash delete-icon"
                     title="Xóa danh mục"
                     style={{ cursor: "pointer", marginLeft: 10 }}
-                    onClick={() => alert(`Xóa danh mục ${cat.categories_id} - ${cat.name}`)}
+                    onClick={async () => {
+                      const confirm = await Swal.fire({
+                        title: "Xác nhận xóa",
+                        text: `Bạn có chắc muốn xóa danh mục "${cat.name}"?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Xóa",
+                        cancelButtonText: "Hủy",
+                      });
+
+                      if (!confirm.isConfirmed) return;
+
+                      const res = await deleteCategory(cat.categories_id);
+
+                      if (res.success) {
+                        setCategories((prev) =>
+                          prev.filter(
+                            (c) => c.categories_id !== cat.categories_id
+                          )
+                        );
+                        Swal.fire({
+                          title: "Thành công",
+                          text: res.message,
+                          icon: "success",
+                          timer: 1500,
+                          showConfirmButton: false,
+                        });
+                      } else {
+                        Swal.fire({
+                          title: "Lỗi",
+                          text: res.message,
+                          icon: "error",
+                        });
+                      }
+                    }}
                   ></i>
                 </td>
               </tr>
@@ -277,7 +373,11 @@ export default function Categories() {
       </table>
 
       <div className="pagination">
-        <button className="page-btn" disabled={page <= 1} onClick={() => goToPage(page - 1)}>
+        <button
+          className="page-btn"
+          disabled={page <= 1}
+          onClick={() => goToPage(page - 1)}
+        >
           <i className="fa-solid fa-angle-left"></i>
         </button>
         {Array.from({ length: totalPages }).map((_, i) => (
@@ -289,7 +389,11 @@ export default function Categories() {
             {i + 1}
           </button>
         ))}
-        <button className="page-btn" disabled={page >= totalPages} onClick={() => goToPage(page + 1)}>
+        <button
+          className="page-btn"
+          disabled={page >= totalPages}
+          onClick={() => goToPage(page + 1)}
+        >
           <i className="fa-solid fa-angle-right"></i>
         </button>
       </div>
