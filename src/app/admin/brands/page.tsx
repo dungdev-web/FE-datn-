@@ -3,7 +3,11 @@ import { API_BASE_URL } from "@/config/env";
 import "../../admin/css/brands_admin.css";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getBrands, updateBrandStatus, deleteBrand } from "@/services/brandService";
+import {
+  getBrands,
+  updateBrandStatus,
+  deleteBrand,
+} from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import { ArrowUpDown } from "lucide-react";
 import { toast } from "react-toastify";
@@ -94,57 +98,89 @@ export default function Brands() {
   };
 
   const handleToggleStatus = async (brandId: number, currentStatus: number) => {
+    const newStatus = currentStatus === 1 ? 0 : 1;
+
+    const result = await Swal.fire({
+      title: "Xác nhận",
+      text: `Bạn có chắc muốn ${
+        newStatus === 1 ? "bật" : "tắt"
+      } thương hiệu này?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Có",
+      cancelButtonText: "Hủy",
+    });
+
+    if (!result.isConfirmed) return;
+
     setLoadingStatusId(brandId);
+
     try {
-      await updateBrandStatus(brandId, currentStatus === 1 ? 0 : 1);
+      const ok = await updateBrandStatus(brandId, newStatus);
 
-      setBrands((prev) =>
-        prev.map((b) =>
-          b.brand_id === brandId
-            ? { ...b, status: currentStatus === 1 ? 0 : 1 }
-            : b
-        )
-      );
+      if (ok) {
+        setBrands((prev) =>
+          prev.map((b) =>
+            b.brand_id === brandId ? { ...b, status: newStatus } : b
+          )
+        );
 
-      toast.success("Cập nhật trạng thái thành công!");
+        Swal.fire({
+          title: "Thành công",
+          text: "Cập nhật trạng thái thành công!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          title: "Lỗi",
+          text: "Cập nhật trạng thái thất bại!",
+          icon: "error",
+        });
+      }
     } catch (error) {
       console.error("Lỗi đổi trạng thái:", error);
-      toast.error("Cập nhật trạng thái thất bại!");
+      Swal.fire({
+        title: "Lỗi",
+        text: "Cập nhật trạng thái thất bại!",
+        icon: "error",
+      });
     } finally {
       setLoadingStatusId(null);
     }
   };
 
   const handleDeleteBrand = async (brandId: number, brandName: string) => {
-  const result = await Swal.fire({
-    title: `Bạn có chắc muốn xóa nhãn hiệu "${brandName}" không?`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Có, xóa đi!",
-    cancelButtonText: "Hủy",
-  });
+    const result = await Swal.fire({
+      title: `Bạn có chắc muốn xóa nhãn hiệu "${brandName}" không?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Có, xóa đi!",
+      cancelButtonText: "Hủy",
+    });
 
-  if (result.isConfirmed) {
-    setLoadingDeleteId(brandId);
-    try {
-      await deleteBrand(brandId);
-      setBrands((prev) => prev.filter((b) => b.brand_id !== brandId));
+    if (result.isConfirmed) {
+      setLoadingDeleteId(brandId);
+      try {
+        await deleteBrand(brandId);
+        setBrands((prev) => prev.filter((b) => b.brand_id !== brandId));
 
-      Swal.fire("Đã xóa!", "Nhãn hiệu đã được xóa thành công.", "success");
+        Swal.fire("Đã xóa!", "Nhãn hiệu đã được xóa thành công.", "success");
 
-      if (brands.length === 1 && pagination.currentPage > 1) {
-        changePage(pagination.currentPage - 1);
+        if (brands.length === 1 && pagination.currentPage > 1) {
+          changePage(pagination.currentPage - 1);
+        }
+      } catch (error: any) {
+        console.error("Lỗi khi xóa nhãn hiệu:", error);
+        Swal.fire("Lỗi!", error.message || "Xóa nhãn hiệu thất bại!", "error");
+      } finally {
+        setLoadingDeleteId(null);
       }
-    } catch (error: any) {
-      console.error("Lỗi khi xóa nhãn hiệu:", error);
-      Swal.fire("Lỗi!", error.message || "Xóa nhãn hiệu thất bại!", "error");
-    } finally {
-      setLoadingDeleteId(null);
     }
-  }
-};
+  };
 
   return (
     <div className="brand-list">
@@ -267,6 +303,7 @@ export default function Brands() {
                       handleToggleStatus(brand.brand_id, brand.status)
                     }
                   />
+
                   <span className="slider round"></span>
                 </label>
               </td>
@@ -282,7 +319,13 @@ export default function Brands() {
                 <i
                   className="fa-solid fa-trash delete-icon"
                   title="Xóa nhãn hiệu"
-                  style={{ cursor: loadingDeleteId === brand.brand_id ? "not-allowed" : "pointer", opacity: loadingDeleteId === brand.brand_id ? 0.5 : 1 }}
+                  style={{
+                    cursor:
+                      loadingDeleteId === brand.brand_id
+                        ? "not-allowed"
+                        : "pointer",
+                    opacity: loadingDeleteId === brand.brand_id ? 0.5 : 1,
+                  }}
                   onClick={() => {
                     if (loadingDeleteId === brand.brand_id) return; // đang xóa thì không cho click
                     handleDeleteBrand(brand.brand_id, brand.name);

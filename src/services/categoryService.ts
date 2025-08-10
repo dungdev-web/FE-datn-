@@ -1,10 +1,15 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockCategories } from "@/mocks/mocksCategory";
-import { CategoryFilters, CategoryResponse, ICategory } from "@/types/ICategory";
+import {
+  CategoryFilters,
+  CategoryResponse,
+  ICategory,
+} from "@/types/ICategory";
 import { IProduct } from "@/types/product";
 
-
-export async function getCategories(filters: CategoryFilters = {}): Promise<CategoryResponse> {
+export async function getCategories(
+  filters: CategoryFilters = {}
+): Promise<CategoryResponse> {
   try {
     if (IS_MOCK) {
       return {
@@ -20,13 +25,16 @@ export async function getCategories(filters: CategoryFilters = {}): Promise<Cate
     if (filters.id) query.append("id", String(filters.id));
     if (filters.name) query.append("name", filters.name);
     if (filters.keyword) query.append("keyword", filters.keyword);
-    if (filters.status !== undefined) query.append("status", String(filters.status));
+    if (filters.status !== undefined)
+      query.append("status", String(filters.status));
     if (filters.page) query.append("page", String(filters.page));
     if (filters.limit) query.append("limit", String(filters.limit));
     if (filters.sortBy) query.append("sortBy", filters.sortBy);
     if (filters.sortOrder) query.append("sortOrder", filters.sortOrder);
 
-    const url = `${API_BASE_URL}/category${query.toString() ? `?${query.toString()}` : ""}`;
+    const url = `${API_BASE_URL}/category${
+      query.toString() ? `?${query.toString()}` : ""
+    }`;
 
     const response = await fetch(url, { cache: "no-store" });
 
@@ -48,29 +56,28 @@ export async function getCategories(filters: CategoryFilters = {}): Promise<Cate
     return { data: [], total: 0, totalPages: 0, page: 1 };
   }
 }
-export async function getProductsByCategorySlug(slug: string): Promise<IProduct[]> {
+export async function getProductsByCategorySlug(
+  slug: string
+): Promise<IProduct[]> {
   if (IS_MOCK) {
     return [];
   }
 
   try {
     const url = `${API_BASE_URL}/product/category?category=${slug}`;
-    
 
     const res = await fetch(url, {
       cache: "no-store",
     });
 
     if (!res.ok) {
-    
       throw new Error("Failed to fetch");
     }
 
     const json = await res.json();
-  
+
     return json.products || [];
   } catch (error) {
-  
     return [];
   }
 }
@@ -180,4 +187,57 @@ export async function getCategoryById(id: number): Promise<ICategory | null> {
     return null;
   }
 }
+export async function updateCategoryStatus(
+  id: number,
+  status: number
+): Promise<boolean> {
+  if (!id) return false;
 
+  try {
+    const res = await fetch(`${API_BASE_URL}/category/${id}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      console.error("Lỗi khi cập nhật trạng thái category:", res.statusText);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Lỗi khi gọi API updateCategoryStatus:", error);
+    return false;
+  }
+}
+export async function deleteCategory(id: number): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  if (!id) return { success: false, message: "ID không hợp lệ" };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/category/delete/${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      // Trả lại message lỗi từ API
+      return {
+        success: false,
+        message: data?.error || "Xóa danh mục thất bại",
+      };
+    }
+
+    return {
+      success: true,
+      message: data?.message || "Xóa danh mục thành công",
+    };
+  } catch (error) {
+    console.error("Lỗi khi gọi API deleteCategory:", error);
+    return { success: false, message: "Lỗi khi kết nối tới server" };
+  }
+}
