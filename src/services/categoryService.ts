@@ -77,15 +77,22 @@ export async function getProductsByCategorySlug(slug: string): Promise<IProduct[
 export async function addCategory(data: {
   name: string;
   parent_id?: number | null;
-  imageFile?: File | null; // file ảnh upload
+  status?: number; // 0 hoặc 1
+  imageFile?: File | null;
 }): Promise<{ message: string; data: ICategory }> {
   const formData = new FormData();
   formData.append("name", data.name);
+
   if (data.parent_id !== undefined && data.parent_id !== null) {
     formData.append("parent_id", String(data.parent_id));
   }
+
+  if (data.status !== undefined) {
+    formData.append("status", String(data.status)); // ✅ thêm status
+  }
+
   if (data.imageFile) {
-    formData.append("image", data.imageFile); // chú ý tên trường upload là "image" theo backend bạn
+    formData.append("image", data.imageFile);
   }
 
   try {
@@ -100,9 +107,77 @@ export async function addCategory(data: {
     }
 
     const json = await res.json();
-    return json; // { message, data }
+    return json;
   } catch (error: any) {
     console.error("Lỗi khi gọi API addCategory:", error);
     throw error;
   }
 }
+
+export async function updateCategory(
+  id: number,
+  data: {
+    name: string;
+    parent_id?: number | null;
+    status?: number; // 0 hoặc 1
+    imageFile?: File | null; // có thể null => giữ ảnh cũ
+  }
+): Promise<{ message: string; data: ICategory }> {
+  const formData = new FormData();
+  formData.append("name", data.name);
+
+  if (data.parent_id !== undefined && data.parent_id !== null) {
+    formData.append("parent_id", String(data.parent_id));
+  }
+
+  if (data.status !== undefined) {
+    formData.append("status", String(data.status));
+  }
+
+  if (data.imageFile) {
+    formData.append("image", data.imageFile); // nếu không gửi => backend lấy ảnh cũ
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/category/update/${id}`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => null);
+      throw new Error(errJson?.message || "Lỗi khi cập nhật danh mục");
+    }
+
+    const json = await res.json();
+    return json;
+  } catch (error: any) {
+    console.error("Lỗi khi gọi API updateCategory:", error);
+    throw error;
+  }
+}
+//
+export async function getCategoryById(id: number): Promise<ICategory | null> {
+  if (!id) return null;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/category/${id}`, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      console.error(
+        "Lỗi khi gọi API lấy category theo ID:",
+        response.statusText
+      );
+      return null;
+    }
+
+    const data = await response.json();
+    return data || null;
+  } catch (error) {
+    console.error("Lỗi khi gọi API lấy category theo ID:", error);
+    return null;
+  }
+}
+
