@@ -56,8 +56,9 @@ export default function Header() {
     }
   };
   useEffect(() => {
-    getCategories().then(setCategories);
-  }, []);
+  getCategories().then(res => setCategories(res.data || []));
+}, []);
+
  useEffect(() => {
   getBrands().then(res => setBrands(res.data || []));
 }, []);
