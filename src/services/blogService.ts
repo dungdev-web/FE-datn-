@@ -239,3 +239,23 @@ export async function addCategoryPost(data: {
     throw error;
   }
 }
+export async function getIdCategoryPost(category_post_id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/category/byCategoryId/${category_post_id}`);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const result = await res.json();
+
+    if (!result.success) {
+      throw new Error(result.message || 'Failed to fetch category');
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    throw error;
+  }
+}
+
