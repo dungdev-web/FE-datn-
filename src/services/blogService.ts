@@ -283,3 +283,23 @@ export async function updateCategoryPost(category_post_id:number,data: {
     throw error;
   }
 }
+export async function deleteCategoryPost(category_post_id:number) 
+{
+    try {
+    const response = await fetch(`${API_BASE_URL}/post/delete-category/${category_post_id}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Lỗi khi xóa danh mục");
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error("deleteCategoryPost error:", error);
+    throw error;
+  }
+}

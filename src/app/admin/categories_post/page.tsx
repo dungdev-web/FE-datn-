@@ -1,14 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import "../css/categories_admin.css";
 import Link from "next/link";
 import { Category } from "@/types/blog";
 import { getCategory } from "@/services/blogService";
 import { ArrowUpDown } from "lucide-react";
-
+import { deleteCategoryPost } from "@/services/blogService";
 export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const router = useRouter(); // khởi tạo router
 
   const [filterId, setFilterId] = useState("");
   const [filterName, setFilterName] = useState("");
@@ -58,7 +60,21 @@ export default function Categories() {
       setSortOrder("asc");
     }
   };
+  const handleDelete = async (id: number) => {
+    if (!id || isNaN(id)) {
+      alert("ID danh mục không hợp lệ");
+      return;
+    }
+    if (!confirm("Bạn có chắc muốn xóa danh mục này?")) return;
 
+    try {
+      await deleteCategoryPost(id);
+      alert("Xóa danh mục thành công");
+      fetchData(); // load lại danh sách sau khi xóa
+    } catch (err) {
+      alert((err as Error).message || "Lỗi khi xóa danh mục");
+    }
+  };
   return (
     <div className="category-list">
       <h2>Danh sách danh mục bài viết</h2>
@@ -192,8 +208,11 @@ export default function Categories() {
                   >
                     <i className="fa-solid fa-pen-to-square"></i> Sửa
                   </Link>
-                  <button className="btn btn-delete">
-                    <i className="fa-solid fa-trash"></i> Xóa
+                  <button
+                    className="btn btn-delete"
+                    onClick={() => handleDelete(cat.category_post_id)}
+                  >
+                    <i className="fa-solid fa-trash"></i> 
                   </button>
                 </td>
               </tr>
