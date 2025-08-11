@@ -5,13 +5,20 @@ import { ArrowUpDown } from "lucide-react";
 import { API_BASE_URL } from "@/config/env";
 import { getProductsDashboard } from "@/services/productService"; // import đúng đường dẫn service của bạn
 import "../css/product_admin.css";
+import { getAllBrands } from "@/services/brandService";
+import { getAllCategories } from "@/services/categoryService";
+import { IBrand } from "@/types/IBrand";
+import { ICategory } from "@/types/ICategory";
+import { IProduct } from "@/types/product";
 
 export default function Products() {
   // State dữ liệu
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<IProduct[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [brands, setBrands] = useState<IBrand[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
 
   // State filter + search
   const [filters, setFilters] = useState({
@@ -26,7 +33,10 @@ export default function Products() {
   });
 
   // Sort state
-  const [sortConfig, setSortConfig] = useState({
+  const [sortConfig, setSortConfig] = useState<{
+    sortBy: string;
+    sortOrder: "asc" | "desc";
+  }>({
     sortBy: "created_at",
     sortOrder: "desc",
   });
@@ -46,8 +56,12 @@ export default function Products() {
         categoryId: filters.categoryId ? Number(filters.categoryId) : undefined,
         minSalePrice: filters.minPrice ? Number(filters.minPrice) : undefined,
         maxSalePrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
-        minQuantity: filters.minQuantity ? Number(filters.minQuantity) : undefined,
-        maxQuantity: filters.maxQuantity ? Number(filters.maxQuantity) : undefined,
+        minQuantity: filters.minQuantity
+          ? Number(filters.minQuantity)
+          : undefined,
+        maxQuantity: filters.maxQuantity
+          ? Number(filters.maxQuantity)
+          : undefined,
       });
       setProducts(res.data);
       setTotalPages(res.totalPages);
@@ -57,13 +71,22 @@ export default function Products() {
     }
     setLoading(false);
   }
+  useEffect(() => {
+    async function fetchFilterData() {
+      const brandsData = await getAllBrands();
+      const categoriesData = await getAllCategories();
+      setBrands(brandsData);
+      setCategories(categoriesData);
+    }
+    fetchFilterData();
+  }, []);
 
   useEffect(() => {
     fetchProducts();
   }, [currentPage, filters, sortConfig]);
 
   // Handle sort click
-  function handleSort(field) {
+  function handleSort(field: string) {
     if (sortConfig.sortBy === field) {
       // toggle sort order
       setSortConfig({
@@ -80,14 +103,14 @@ export default function Products() {
   }
 
   // Handle filter input change
-  function handleFilterChange(e) {
+  function handleFilterChange(e: { target: { name: any; value: any; }; }) {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
     setCurrentPage(1); // reset trang khi filter thay đổi
   }
 
   // Component icon sort
-  const SortIcon = ({ field }) => {
+  const SortIcon: React.FC<{ field: string }> = ({ field }) => {
     const active = sortConfig.sortBy === field;
     const direction = active ? sortConfig.sortOrder : undefined;
     return (
@@ -102,8 +125,18 @@ export default function Products() {
 
   // Render product rows
   const renderRows = () => {
-    if (loading) return <tr><td colSpan={12}>Đang tải dữ liệu...</td></tr>;
-    if (products.length === 0) return <tr><td colSpan={12}>Không có dữ liệu</td></tr>;
+    if (loading)
+      return (
+        <tr>
+          <td colSpan={12}>Đang tải dữ liệu...</td>
+        </tr>
+      );
+    if (products.length === 0)
+      return (
+        <tr>
+          <td colSpan={12}>Không có dữ liệu</td>
+        </tr>
+      );
 
     return products.map((product) => {
       // Lấy variant đầu tiên để lấy sku và số lượng kho
@@ -111,7 +144,9 @@ export default function Products() {
       const sku = firstVariant.sku || "";
       const stockQuantity = firstVariant.stock_quantity || 0;
       // Lấy ảnh main đầu tiên
-      const mainImage = product.images?.find((img) => img.type === "main") || product.images?.[0];
+      const mainImage =
+        product.images?.find((img) => img.type === "main") ||
+        product.images?.[0];
       return (
         <tr key={product.products_id}>
           <td>{sku}</td>
@@ -228,10 +263,11 @@ export default function Products() {
                   onChange={handleFilterChange}
                 >
                   <option value="">Tất cả</option>
-                  <option value="1">Nike</option>
-                  <option value="2">Adidas</option>
-                  <option value="3">Puma</option>
-                  {/* Có thể lấy động từ API brand */}
+                  {brands.map((brand) => (
+                    <option key={brand.brand_id} value={brand.brand_id}>
+                      {brand.name}
+                    </option>
+                  ))}
                 </select>
               </th>
               <th>
@@ -241,10 +277,11 @@ export default function Products() {
                   onChange={handleFilterChange}
                 >
                   <option value="">Tất cả</option>
-                  <option value="3">Giày Chạy Bộ</option>
-                  <option value="7">Giày Sneaker</option>
-                  <option value="4">Giày Bóng Rổ</option>
-                  {/* Có thể lấy động từ API category */}
+                  {categories.map((cat) => (
+                    <option key={cat.categories_id} value={cat.categories_id}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </th>
               <th>
@@ -309,10 +346,7 @@ export default function Products() {
                 </button>
               );
             }
-            if (
-              page === currentPage - 2 ||
-              page === currentPage + 2
-            ) {
+            if (page === currentPage - 2 || page === currentPage + 2) {
               return <span key={page}>...</span>;
             }
             return null;
