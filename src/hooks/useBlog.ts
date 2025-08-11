@@ -2,7 +2,11 @@
 import { useEffect, useState } from "react";
 import { getCategory } from "@/services/blogService";
 import { Category, CategoryResponse, IBlog, AddCategory } from "@/types/blog";
-import { getPostsByCategory, addCategoryPost } from "@/services/blogService";
+import {
+  getPostsByCategory,
+  addCategoryPost,
+  updateCategoryPost,
+} from "@/services/blogService";
 
 export function useCategories() {
   const [categories, setCategories] = useState<CategoryResponse | null>(null);
@@ -69,3 +73,26 @@ export function useAddCategoryPost() {
 
   return { loading, error, category, addCategoriesPost };
 }
+export function useUpdateCategoryPost() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [category, setCategory] = useState<Category | null>(null);
+
+  async function updateCategoriesPost(categoryId: number, data: any) {
+    setLoading(true);
+    setError(null);
+    try {
+      const newCategory = await updateCategoryPost(categoryId, data);
+      setCategory(newCategory);
+      return newCategory;
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Unknown error"));
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return { loading, error, category, updateCategoriesPost };
+}
+

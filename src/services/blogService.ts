@@ -257,5 +257,29 @@ export async function getIdCategoryPost(category_post_id: number) {
     console.error('Error fetching category:', error);
     throw error;
   }
-}
 
+}
+export async function updateCategoryPost(category_post_id:number,data: {
+  name: string;
+  slug: string;
+  parent_id?: number | null;
+}): Promise<Category> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/post/update-category/${category_post_id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Lỗi khi cập nhật danh mục");
+    }
+
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error("updateCategoryPost error:", error);
+    throw error;
+  }
+}

@@ -187,7 +187,7 @@ export default function Categories() {
                 </td>
                 <td>
                   <Link
-                    href={`/admin/categories/edit/${cat.category_post_id}`}
+                    href={`/admin/categories_post/${cat.category_post_id}`}
                     className="btn btn-edit"
                   >
                     <i className="fa-solid fa-pen-to-square"></i> Sửa
