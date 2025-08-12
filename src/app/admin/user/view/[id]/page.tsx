@@ -24,8 +24,9 @@ export default function ViewUser() {
 
     setLoading(true);
     try {
-      const users = await getAllUsersV2({ user_id: parseInt(userId) });
-      setUser(users[0] || null);
+      const res = await getAllUsersV2({ user_id: parseInt(userId) });
+      setUser(res.data.users[0] || null);
+
       setError("");
     } catch (err: any) {
       console.error("Lỗi khi fetch user:", err);
@@ -63,9 +64,9 @@ export default function ViewUser() {
       </div>
     );
   }
-  
+
   console.log(user);
-  
+
   if (!user) {
     return (
       <div className="error-container">
@@ -80,9 +81,9 @@ export default function ViewUser() {
   return (
     <>
       <UserInfoCard user={user} totalOrders={totalOrders} />
-      <UserOrdersList 
-        user={user} 
-        userId={userId} 
+      <UserOrdersList
+        user={user}
+        userId={userId}
         onTotalOrdersChange={handleTotalOrdersChange}
       />
     </>
