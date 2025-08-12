@@ -5,10 +5,13 @@ import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { API_BASE_URL } from "@/config/env";
 import Select from "react-select";
+import { Plus, Trash2 } from "lucide-react";
+import { values } from "lodash";
+
 export default function Add_pro() {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
-  const [selectedSizes, setSelectedSizes] = useState([]);
+
   const defaultContent = `🔸 Chất lượng Rep 1:1 - Nên mang lên 1 size
 so với tiêu chuẩn - Vận chuyển toàn quốc | Kiểm Tra Hàng
 Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
@@ -31,13 +34,10 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
         },
       });
       quillRef.current.root.innerHTML = defaultContent;
-      quillRef.current.on("text-change", () => {
-        console.log("Nội dung mới:", quillRef.current?.root.innerHTML);
-      });
     }
   }, []);
 
-  /** Quản lý tabs + variant list + dropdown */
+  /** Quản lý tab & custom select */
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -56,30 +56,6 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
           (content as HTMLElement).style.display =
             i === index ? "block" : "none";
         });
-      }
-
-      // Add variant
-      if (target.classList.contains("btn-add-variant")) {
-        const variantList = document.getElementById("variant-list");
-        const row = target.closest(".variant-row");
-        if (variantList && row) {
-          const newRow = row.cloneNode(true) as HTMLElement;
-          newRow.querySelectorAll("input").forEach((input) => {
-            const el = input as HTMLInputElement;
-            el.value = el.type === "hidden" ? "black|Đen" : "";
-          });
-          const btn = newRow.querySelector(".btn-add-variant") as HTMLElement;
-          if (btn) {
-            btn.textContent = "-";
-            btn.classList.replace("btn-add-variant", "btn-remove-variant");
-          }
-          variantList.appendChild(newRow);
-        }
-      }
-
-      // Remove variant
-      if (target.classList.contains("btn-remove-variant")) {
-        target.closest(".variant-row")?.remove();
       }
 
       // Toggle custom select
@@ -101,13 +77,20 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
 
   /** Multi-select danh mục */
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-
   const toggleCategory = (value: string) => {
     setSelectedCategories((prev) =>
       prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
     );
   };
+
+  /** Options size */
   const sizeOptions = [
+    { value: "30", label: "30" },
+    { value: "31", label: "31" },
+    { value: "32", label: "32" },
+    { value: "33", label: "33" },
+    { value: "34", label: "34" },
+    { value: "35", label: "35" },
     { value: "36", label: "36" },
     { value: "37", label: "37" },
     { value: "38", label: "38" },
@@ -115,11 +98,49 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
     { value: "40", label: "40" },
     { value: "41", label: "41" },
     { value: "42", label: "42" },
+    { value: "43", label: "43" },
+    { value: "44", label: "44" },
+    { value: "45", label: "45" },
   ];
-  const handleChange = (selectedOptions: any) => {
-    setSelectedSizes(selectedOptions || []);
+
+  /** Kiểu dữ liệu biến thể */
+  type Variant = {
+    color: string;
+    image: File | null;
+    sizes: string[];
+    quantity: number | string;
   };
 
+  /** State biến thể */
+  const [variants, setVariants] = useState<Variant[]>([
+    { color: "black|Đen", image: null, sizes: [], quantity: "" },
+  ]);
+
+  /** Cập nhật biến thể */
+  const handleVariantChange = (
+    index: number,
+    field: keyof Variant,
+    value: any
+  ) => {
+    setVariants((prev) => {
+      const newVariants = [...prev];
+      newVariants[index] = { ...newVariants[index], [field]: value };
+      return newVariants;
+    });
+  };
+
+  /** Thêm biến thể mới */
+  const addVariant = () => {
+    setVariants((prev) => [
+      ...prev,
+      { color: "black|Đen", image: null, sizes: [], quantity: "" },
+    ]);
+  };
+
+  /** Xóa biến thể */
+  const removeVariant = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
   return (
     <>
       <div className="header-bar">
@@ -266,417 +287,462 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       >
         <div className="form-group">
           <label>Nhập biến thể sản phẩm (Màu - Size - Giá - Số lượng)</label>
+
           <div id="variant-list">
-            <div
-              className="variant-row"
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginBottom: "10px",
-                alignItems: "center",
-              }}
-            >
-              <div className="custom-select-wrapper" style={{ flex: "1" }}>
-                <div className="custom-select">
-                  <div className="selected-option">
-                    <span
-                      className="color-circle"
-                      style={{ backgroundColor: "black" }}
-                    ></span>
-                    <span className="color-name">Đen</span>
-                  </div>
-
-                  <div className="dropdown">
-                    <input
-                      type="text"
-                      className="color-search"
-                      placeholder="Tìm màu..."
-                    />
-
-                    {/* Nhóm màu cơ bản */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="black|Đen"
-                      style={{ "--color": "#000000" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
+            {variants.map((variant, index) => (
+              <div
+                key={index}
+                className="variant-row"
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginBottom: "10px",
+                  alignItems: "center",
+                }}
+              >
+                {/* Chọn màu */}
+                <div className="custom-select-wrapper" style={{ flex: "1" }}>
+                  <div className="custom-select">
+                    <div className="selected-option">
+                      <span
+                        className="color-circle"
+                        style={{ backgroundColor: "black" }}
+                      ></span>
                       <span className="color-name">Đen</span>
                     </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="white|Trắng"
-                      style={{ "--color": "#FFFFFF" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Trắng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="gray|Xám"
-                      style={{ "--color": "#808080" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xám</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="lightgray|Xám nhạt"
-                      style={{ "--color": "#D3D3D3" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xám nhạt</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="silver|Bạc"
-                      style={{ "--color": "#C0C0C0" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Bạc</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="dimgray|Xám đậm"
-                      style={{ "--color": "#696969" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xám đậm</span>
-                    </div>
 
-                    {/* Nhóm đỏ - hồng */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="red|Đỏ"
-                      style={{ "--color": "#FF0000" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Đỏ</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="darkred|Đỏ đậm"
-                      style={{ "--color": "#8B0000" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Đỏ đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="firebrick|Đỏ gạch"
-                      style={{ "--color": "#B22222" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Đỏ gạch</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="pink|Hồng"
-                      style={{ "--color": "#FFC0CB" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="deeppink|Hồng đậm"
-                      style={{ "--color": "#FF1493" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="hotpink|Hồng nóng"
-                      style={{ "--color": "#FF69B4" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng nóng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="lightpink|Hồng nhạt"
-                      style={{ "--color": "#FFB6C1" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng nhạt</span>
-                    </div>
+                    <div className="dropdown">
+                      <input
+                        type="text"
+                        className="color-search"
+                        placeholder="Tìm màu..."
+                      />
+                      {/* Nhóm màu cơ bản */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="black|Đen"
+                        style={{ "--color": "#000000" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Đen</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="white|Trắng"
+                        style={{ "--color": "#FFFFFF" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Trắng</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="gray|Xám"
+                        style={{ "--color": "#808080" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xám</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="lightgray|Xám nhạt"
+                        style={{ "--color": "#D3D3D3" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xám nhạt</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="silver|Bạc"
+                        style={{ "--color": "#C0C0C0" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Bạc</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="dimgray|Xám đậm"
+                        style={{ "--color": "#696969" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xám đậm</span>
+                      </div>
 
-                    {/* Nhóm cam - vàng */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="orange|Cam"
-                      style={{ "--color": "#FFA500" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Cam</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="darkorange|Cam đậm"
-                      style={{ "--color": "#FF8C00" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Cam đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="coral|San hô"
-                      style={{ "--color": "#FF7F50" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">San hô</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="tomato|Cà chua"
-                      style={{ "--color": "#FF6347" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Cà chua</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="yellow|Vàng"
-                      style={{ "--color": "#FFFF00" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Vàng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="gold|Vàng kim"
-                      style={{ "--color": "#FFD700" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Vàng kim</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="khaki|Vàng nhạt"
-                      style={{ "--color": "#F0E68C" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Vàng nhạt</span>
-                    </div>
+                      {/* Nhóm đỏ - hồng */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="red|Đỏ"
+                        style={{ "--color": "#FF0000" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Đỏ</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="darkred|Đỏ đậm"
+                        style={{ "--color": "#8B0000" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Đỏ đậm</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="firebrick|Đỏ gạch"
+                        style={{ "--color": "#B22222" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Đỏ gạch</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="pink|Hồng"
+                        style={{ "--color": "#FFC0CB" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Hồng</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="deeppink|Hồng đậm"
+                        style={{ "--color": "#FF1493" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Hồng đậm</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="hotpink|Hồng nóng"
+                        style={{ "--color": "#FF69B4" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Hồng nóng</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="lightpink|Hồng nhạt"
+                        style={{ "--color": "#FFB6C1" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Hồng nhạt</span>
+                      </div>
 
-                    {/* Nhóm xanh lá */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="green|Xanh lá"
-                      style={{ "--color": "#008000" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh lá</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="darkgreen|Xanh lá đậm"
-                      style={{ "--color": "#006400" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh lá đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="lime|Xanh neon"
-                      style={{ "--color": "#00FF00" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh neon</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="lightgreen|Xanh lá nhạt"
-                      style={{ "--color": "#90EE90" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh lá nhạt</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="springgreen|Xanh xuân"
-                      style={{ "--color": "#00FF7F" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh xuân</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="olive|Xanh oliu"
-                      style={{ "--color": "#808000" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh oliu</span>
-                    </div>
+                      {/* Nhóm cam - vàng */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="orange|Cam"
+                        style={{ "--color": "#FFA500" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Cam</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="darkorange|Cam đậm"
+                        style={{ "--color": "#FF8C00" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Cam đậm</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="coral|San hô"
+                        style={{ "--color": "#FF7F50" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">San hô</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="tomato|Cà chua"
+                        style={{ "--color": "#FF6347" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Cà chua</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="yellow|Vàng"
+                        style={{ "--color": "#FFFF00" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Vàng</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="gold|Vàng kim"
+                        style={{ "--color": "#FFD700" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Vàng kim</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="khaki|Vàng nhạt"
+                        style={{ "--color": "#F0E68C" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Vàng nhạt</span>
+                      </div>
 
-                    {/* Nhóm xanh dương */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="blue|Xanh dương"
-                      style={{ "--color": "#0000FF" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh dương</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="navy|Xanh navy"
-                      style={{ "--color": "#000080" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh navy</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="skyblue|Xanh da trời"
-                      style={{ "--color": "#87CEEB" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh da trời</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="deepskyblue|Xanh trời đậm"
-                      style={{ "--color": "#00BFFF" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh trời đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="royalblue|Xanh hoàng gia"
-                      style={{ "--color": "#4169E1" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh hoàng gia</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="teal|Xanh ngọc"
-                      style={{ "--color": "#008080" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh ngọc</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="turquoise|Ngọc lam"
-                      style={{ "--color": "#40E0D0" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Ngọc lam</span>
-                    </div>
+                      {/* Nhóm xanh lá */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="green|Xanh lá"
+                        style={{ "--color": "#008000" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh lá</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="darkgreen|Xanh lá đậm"
+                        style={{ "--color": "#006400" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh lá đậm</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="lime|Xanh neon"
+                        style={{ "--color": "#00FF00" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh neon</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="lightgreen|Xanh lá nhạt"
+                        style={{ "--color": "#90EE90" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh lá nhạt</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="springgreen|Xanh xuân"
+                        style={{ "--color": "#00FF7F" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh xuân</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="olive|Xanh oliu"
+                        style={{ "--color": "#808000" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh oliu</span>
+                      </div>
 
-                    {/* Nhóm tím */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="purple|Tím"
-                      style={{ "--color": "#800080" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Tím</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="indigo|Chàm"
-                      style={{ "--color": "#4B0082" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Chàm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="violet|Tím nhạt"
-                      style={{ "--color": "#EE82EE" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Tím nhạt</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="plum|Mận"
-                      style={{ "--color": "#DDA0DD" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Mận</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="orchid|Phong lan"
-                      style={{ "--color": "#DA70D6" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Phong lan</span>
-                    </div>
+                      {/* Nhóm xanh dương */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="blue|Xanh dương"
+                        style={{ "--color": "#0000FF" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh dương</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="navy|Xanh navy"
+                        style={{ "--color": "#000080" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh navy</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="skyblue|Xanh da trời"
+                        style={{ "--color": "#87CEEB" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh da trời</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="deepskyblue|Xanh trời đậm"
+                        style={{ "--color": "#00BFFF" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh trời đậm</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="royalblue|Xanh hoàng gia"
+                        style={{ "--color": "#4169E1" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh hoàng gia</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="teal|Xanh ngọc"
+                        style={{ "--color": "#008080" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Xanh ngọc</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="turquoise|Ngọc lam"
+                        style={{ "--color": "#40E0D0" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Ngọc lam</span>
+                      </div>
 
-                    {/* Nhóm nâu */}
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="brown|Nâu"
-                      style={{ "--color": "#A52A2A" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Nâu</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="saddlebrown|Nâu yên ngựa"
-                      style={{ "--color": "#8B4513" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Nâu yên ngựa</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="chocolate|Socola"
-                      style={{ "--color": "#D2691E" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Socola</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="tan|Nâu vàng"
-                      style={{ "--color": "#D2B48C" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Nâu vàng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="burlywood|Gỗ sồi"
-                      style={{ "--color": "#DEB887" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Gỗ sồi</span>
+                      {/* Nhóm tím */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="purple|Tím"
+                        style={{ "--color": "#800080" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Tím</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="indigo|Chàm"
+                        style={{ "--color": "#4B0082" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Chàm</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="violet|Tím nhạt"
+                        style={{ "--color": "#EE82EE" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Tím nhạt</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="plum|Mận"
+                        style={{ "--color": "#DDA0DD" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Mận</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="orchid|Phong lan"
+                        style={{ "--color": "#DA70D6" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Phong lan</span>
+                      </div>
+
+                      {/* Nhóm nâu */}
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="brown|Nâu"
+                        style={{ "--color": "#A52A2A" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Nâu</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="saddlebrown|Nâu yên ngựa"
+                        style={{ "--color": "#8B4513" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Nâu yên ngựa</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="chocolate|Socola"
+                        style={{ "--color": "#D2691E" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Socola</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="tan|Nâu vàng"
+                        style={{ "--color": "#D2B48C" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Nâu vàng</span>
+                      </div>
+                      <div
+                        className="dropdown-option"
+                        data-defaultvalue="burlywood|Gỗ sồi"
+                        style={{ "--color": "#DEB887" } as React.CSSProperties}
+                      >
+                        <span className="color-circle"></span>
+                        <span className="color-name">Gỗ sồi</span>
+                      </div>
                     </div>
                   </div>
+                  <input
+                    type="hidden"
+                    name="color[]"
+                    defaultValue={variant.color || "black|Đen"}
+                  />
                 </div>
-                <input type="hidden" name="color[]" defaultValue="black|Đen" />
+
+                {/* Upload ảnh */}
+                <input type="file" style={{ flex: "1" }} />
+
+                <Select<{ value: string; label: string }, true>
+                  options={sizeOptions}
+                  isMulti
+                  value={sizeOptions.filter((opt) =>
+                    Array.isArray(variant.sizes)
+                      ? variant.sizes.includes(opt.value)
+                      : false
+                  )}
+                  onChange={(selected) => {
+                    handleVariantChange(
+                      index,
+                      "sizes",
+                      selected.map((s) => s.value)
+                    );
+                  }}
+                  placeholder="Chọn size"
+                />
+
+                {/* Số lượng */}
+                <input
+                  type="number"
+                  name="số lượng[]"
+                  placeholder="nhập số lượng sản phẩm..."
+                  style={{ flex: "1" }}
+                  value={variant.quantity || ""}
+                  onChange={(e) => {
+                    const updated = [...variants];
+                    updated[index].quantity = Number(e.target.value);
+                    setVariants(updated);
+                  }}
+                />
+                {/* Thêm biến thể */}
+                <button
+                  type="button"
+                  onClick={addVariant}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Plus size={20} color="#021688" />
+                </button>
+                {/* Xóa biến thể */}
+                <button
+                  type="button"
+                  onClick={() => removeVariant(index)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Trash2 size={20} color="red" />
+                </button>
               </div>
-              <input type="file" style={{ flex: "1" }} />
-              <Select<
-                { value: string; label: string },
-                true
-              >
-                options={sizeOptions}
-                isMulti
-                value={selectedSizes}
-                onChange={handleChange}
-                placeholder="Chọn size"
-              />
-
-              <input
-                type="number"
-                name="số lượng[]"
-                placeholder="nhập số lượng sản phẩm..."
-                style={{ flex: "1" }}
-              />
-
-              <button type="button" className="btn btn-add-variant">
-                +
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </div>
