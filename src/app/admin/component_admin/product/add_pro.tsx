@@ -13,7 +13,7 @@ import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
 import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
-
+import Swal from "sweetalert2";
 export default function Add_pro() {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
@@ -37,9 +37,9 @@ export default function Add_pro() {
     if (e.target.files && e.target.files[0]) {
       const originalFile = e.target.files[0];
       const colorFull = variants[index].color; // ví dụ: "white|Trắng"
-      const colorCode = colorFull.split("|")[0];
+      const colorCode = colorFull.split("|")[0]; // ví dụ: "white"
 
-      // Tìm mã màu hex từ mảng colors (bỏ dấu # và viết hoa)
+      // Tìm mã màu hex trong mảng colors, bỏ dấu # và viết hoa
       const colorObj = colors.find((c) => c.value.startsWith(colorCode + "|"));
       const hex = colorObj
         ? colorObj.hex.replace("#", "").toUpperCase()
@@ -48,7 +48,7 @@ export default function Add_pro() {
       // Lấy đuôi file gốc
       const ext = originalFile.name.split(".").pop();
 
-      // Tạo tên file mới theo mẫu
+      // Tạo tên file mới theo chuẩn
       const newFileName = `${Date.now()}-variant_image_${hex}.${ext}`;
 
       // Tạo file mới với tên mới
@@ -56,13 +56,13 @@ export default function Add_pro() {
         type: originalFile.type,
       });
 
-      // Lưu file mới vào state
+      // Lưu file mới vào state với key là mã hex
       setVariantImages((prev) => ({
         ...prev,
-        [colorCode]: newFile,
+        [hex]: newFile,
       }));
 
-      // Gọi update biến thể (nếu bạn cần)
+      // Cập nhật biến thể nếu cần (cái này bạn đã có)
       handleVariantChange(index, "image", newFile);
     }
   };
@@ -70,17 +70,19 @@ export default function Add_pro() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const name = (document.getElementById("ten_sp") as HTMLInputElement).value;
+    const name = (
+      document.getElementById("ten_sp") as HTMLInputElement
+    ).value.trim();
     const short_desc = (
       document.getElementById("mo_ta_ngan") as HTMLTextAreaElement
-    ).value;
+    ).value.trim();
     const description = quillRef.current?.root.innerHTML || "";
-    const price = Number(
-      (document.getElementById("gia_goc") as HTMLInputElement).value
-    );
-    const sale_price = Number(
-      (document.getElementById("gia_ban") as HTMLInputElement).value
-    );
+    const priceInput = (
+      document.getElementById("gia_goc") as HTMLInputElement
+    ).value.trim();
+    const salePriceInput = (
+      document.getElementById("gia_ban") as HTMLInputElement
+    ).value.trim();
     const categories_id = Number(
       (document.getElementById("danh_muc") as HTMLSelectElement).value
     );
@@ -95,27 +97,91 @@ export default function Add_pro() {
     ).value;
     const status = statusText === "Mở bán" ? 1 : 0;
 
-    // format biến thể lấy mã hex màu thay cho tên code_color
-    const product_variants = variants.flatMap((v) => {
-      const [code_color, name_color] = v.color.split("|");
+    // Check required fields
+    if (!name) {
+      Swal.fire("Lỗi", "Tên sản phẩm không được để trống", "error");
+      return;
+    }
+    if (!short_desc) {
+      Swal.fire("Lỗi", "Mô tả ngắn không được để trống", "error");
+      return;
+    }
+    if (!priceInput || isNaN(Number(priceInput))) {
+      Swal.fire("Lỗi", "Giá gốc không hợp lệ", "error");
+      return;
+    }
+    if (!salePriceInput || isNaN(Number(salePriceInput))) {
+      Swal.fire("Lỗi", "Giá bán không hợp lệ", "error");
+      return;
+    }
+    const price = Number(priceInput);
+    const sale_price = Number(salePriceInput);
+    if (sale_price > price) {
+      Swal.fire("Lỗi", "Giá bán phải nhỏ hơn hoặc bằng giá gốc", "error");
+      return;
+    }
 
-      // Tìm mã màu hex từ mảng colors dựa trên code_color
-      const colorObj = colors.find((c) => c.value.startsWith(code_color + "|"));
+    if (!categories_id) {
+      Swal.fire("Lỗi", "Vui lòng chọn danh mục sản phẩm", "error");
+      return;
+    }
+    if (!brand_id) {
+      Swal.fire("Lỗi", "Vui lòng chọn nhãn hiệu", "error");
+      return;
+    }
+    if (!gender_id) {
+      Swal.fire("Lỗi", "Vui lòng chọn giới tính sản phẩm", "error");
+      return;
+    }
+    if (mainImages.length === 0) {
+      Swal.fire("Lỗi", "Phải có ít nhất 1 ảnh chính của sản phẩm", "error");
+      return;
+    }
+
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+
+      // Lấy code màu text (ví dụ "gold")
+      const colorCode = v.color.split("|")[0];
+
+      // Tìm mã hex tương ứng từ mảng colors
+      const colorObj = colors.find((c) => c.value.startsWith(colorCode + "|"));
+
+      // Nếu tìm thấy thì lấy mã hex (loại bỏ # và viết hoa), nếu không thì fallback colorCode
       const hexColor = colorObj
         ? colorObj.hex.replace("#", "").toUpperCase()
-        : code_color;
+        : colorCode;
 
-      return v.sizes.map((size_id) => ({
-        code_color: hexColor, // dùng mã hex
-        name_color,
-        size_id: Number(size_id),
-        stock_quantity: Number(v.quantity),
-      }));
-    });
-    console.log("product_variants trước khi gửi:", product_variants);
-    console.log("Kiểu product_variants:", typeof product_variants);
+      // Kiểm tra xem ảnh biến thể có tồn tại không với key là mã hex
+      if (!variantImages[hexColor]) {
+        Swal.fire(
+          "Lỗi",
+          `Biến thể màu ${colorCode}: Chưa chọn ảnh biến thể`,
+          "error"
+        );
+        return;
+      }
+    }
 
+    // Nếu qua hết kiểm tra, gọi API
     try {
+      const product_variants = variants.flatMap((v) => {
+        const [code_color, name_color] = v.color.split("|");
+        const colorObj = colors.find((c) =>
+          c.value.startsWith(code_color + "|")
+        );
+        const hexColor = colorObj
+          ? colorObj.hex.replace("#", "").toUpperCase()
+          : code_color;
+
+        return v.sizes.map((size_id) => ({
+          code_color: hexColor,
+          name_color,
+          size_id: Number(size_id),
+          stock_quantity: Number(v.quantity),
+        }));
+      });
+
       await addProduct({
         name,
         description,
@@ -131,10 +197,10 @@ export default function Add_pro() {
         variantImages,
       });
 
-      alert("Thêm sản phẩm thành công!");
+      Swal.fire("Thành công", "Thêm sản phẩm thành công!", "success");
     } catch (error) {
       console.error(error);
-      alert("Có lỗi khi thêm sản phẩm");
+      Swal.fire("Lỗi", "Có lỗi khi thêm sản phẩm", "error");
     }
   };
 
