@@ -5,19 +5,20 @@ import { useSearchParams, useParams } from "next/navigation";
 import { ChevronDown, ChevronRight, XCircle } from "lucide-react";
 
 import { getFilteredProducts } from "@/services/productService";
-import { getBrands } from "@/services/brandService";
-import { getCategories } from "@/services/categoryService";
+import { getAllBrands, getBrands } from "@/services/brandService";
+import { getAllCategories } from "@/services/categoryService";
 
 import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-import SidebarFilter from "./Products/SidebarFilter";
-import MobileSidebarFilter from "./Products/MobileSidebarFilter";
+
 import ProductIcons from "./Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
+import SidebarFilter from "./Products/SidebarFilter";
+import MobileSidebarFilter from "./Products/MobileSidebarFilter";
 
 export default function Product() {
   const params = useParams();
@@ -68,11 +69,11 @@ export default function Product() {
     const fetchInitialData = async () => {
       try {
         const [brands, categories] = await Promise.all([
-          getBrands(),
-          getCategories(),
+          getAllBrands(),
+          getAllCategories(),
         ]);
-        setBrandsList(brands?.data || []);
-        setCategories(categories.data || []);
+        setBrandsList(brands || []);
+        setCategories(categories || []);
       } catch (err) {
         console.error("❌ Lỗi khi lấy dữ liệu brand/category:", err);
       }
