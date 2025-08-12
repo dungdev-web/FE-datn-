@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import "../css/css.css";
 import "../css/dashboard.css";
 import Link from "next/link";
-import { getAllUsers, updateUser } from "@/services/authService";
+import { getAllUsers, getAllUsersV2, updateUser } from "@/services/authService";
 import { InterfaceUser } from "@/types/user";
 import Swal from "sweetalert2";
 import {
@@ -103,10 +103,10 @@ export default function ListUser() {
         ...(filters.email && { email: filters.email }),
         ...(filters.phone && { phone: filters.phone }),
         ...(filters.id && { user_id: parseInt(filters.id) }),
-        ...(searchText && { name: searchText }), // Use search text as name filter
+        ...(searchText && { search: searchText }), // Use search text as name filter
       };
 
-      const res: ApiResponse = await getAllUsers(params);
+      const res: ApiResponse = await getAllUsersV2(params);
 
       setUsers(res.data.users);
       setTotalUsers(res.data.total);
@@ -129,7 +129,7 @@ export default function ListUser() {
     debounce(() => {
       fetchUsers(1, true);
     }, 500),
-    [sortConfig, filters]
+    [sortConfig, filters, searchText]
   );
 
   // Handle sort
@@ -207,7 +207,7 @@ export default function ListUser() {
         ...(filters.email && { email: filters.email }),
         ...(filters.phone && { phone: filters.phone }),
         ...(filters.id && { user_id: parseInt(filters.id) }),
-        ...(searchText && { name: searchText }),
+        ...(searchText && { search: searchText }),
       });
 
       const headers = [
