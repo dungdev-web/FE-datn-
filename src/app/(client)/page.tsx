@@ -27,6 +27,8 @@ import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "src/app/(client)/component/Products/ProductIcons";
 import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
 import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
+import { getCategories } from "@/services/categoryService";
+import { ICategory } from "@/types/ICategory";
 
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
@@ -40,6 +42,8 @@ export default function Home() {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
 
