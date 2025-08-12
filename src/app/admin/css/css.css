@@ -23,7 +23,7 @@ body.dark,
 body.dark .category-tag,
 body.dark .dropdown-options,
 body.dark option,
-body.dark .menunote  {
+body.dark .menunote {
   background: #101828 !important;
   color: #f1f1f1;
 }
@@ -72,7 +72,7 @@ body.dark .ql-toolbar.ql-snow + .ql-container.ql-snow,
 body.dark textarea,
 body.dark .filepond--drop-label,
 body.dark .filepond--root :not(text),
-body.dark .dropdown{
+body.dark .dropdown {
   background: color-mix(in oklab, #ffffff 3%, transparent) !important;
 }
 
@@ -520,7 +520,12 @@ body.dark .header .header-right .header-icon i {
   font-size: 28px;
   color: #007bff;
 }
-
+.card .info {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+}
 .revenue-card .info .title {
   font-size: 14px;
   color: #888;
@@ -546,7 +551,8 @@ body.dark .header .header-right .header-icon i {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 15px;
+  /* gap: 15px; */
+  height: 104px;
 }
 
 .dashboard-cards .card .icon {
@@ -555,13 +561,14 @@ body.dark .header .header-right .header-icon i {
 }
 
 .dashboard-cards .card .info .title {
-  font-size: 14px;
+  font-size: 12px;
   color: #888;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
+  text-align: center;
 }
 
 .dashboard-cards .card .info .number {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
 }
 

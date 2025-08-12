@@ -99,6 +99,7 @@ export default function InfoUpdateUser({
               name="email"
               value={formData.email}
               onChange={handleChange}
+              disabled
               className="peer w-full !border !border-gray-300 !rounded !px-4 !pt-5 !pb-2 !text-sm !text-gray-800 focus:!outline-none focus:!ring-1 focus:!ring-blue-500 focus:!border-blue-500"
               placeholder=" "
             />
@@ -122,7 +123,7 @@ export default function InfoUpdateUser({
             />
           </div>
         ) : (
-          <span className="!ml-[10px]">+84{user.phone}</span>
+          <span className="!ml-[10px]">{user.phone}</span>
         )}
       </div>
 

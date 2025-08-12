@@ -1,24 +1,23 @@
 import { API_BASE_URL } from "@/config/env";
 
-
 export async function changePasswordService(data: {
   userId: number;
   oldPassword: string;
   newPassword: string;
 }) {
   const response = await fetch(`${API_BASE_URL}/change-pass`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-    credentials: 'include',
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.error || 'Đổi mật khẩu thất bại');
+    throw new Error(result.error || "Đổi mật khẩu thất bại");
   }
 
   return result;
@@ -32,7 +31,7 @@ export async function updateUserService(data: {
   const formData = new FormData();
 
   formData.append("userId", data.userId.toString());
-  if (data.fullName) formData.append("fullName", data.fullName);
+  if (data.fullName) formData.append("name", data.fullName);
   if (data.email) formData.append("email", data.email);
   if (data.phone) formData.append("phone", data.phone);
 
@@ -83,4 +82,3 @@ export async function getUserProfileService(userId: number) {
 
   return result;
 }
-

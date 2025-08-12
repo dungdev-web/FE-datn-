@@ -185,43 +185,43 @@ export default function Order_Account() {
     switch (status) {
       case "pending":
         return (
-          <span className="bg-gray-200 text-gray-800 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-gray-200 text-gray-800 text-sm !px-6 !py-2 rounded-4xl">
             Chờ xử lý
           </span>
         );
       case "processing":
         return (
-          <span className="bg-yellow-100 text-yellow-800 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-yellow-100 text-yellow-800 text-sm !px-6 !py-2 rounded-4xl">
             Đang xử lý
           </span>
         );
       case "shipping":
         return (
-          <span className="bg-blue-100 text-blue-800 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-blue-100 text-blue-800 text-sm !px-6 !py-2 rounded-4xl">
             Đang giao
           </span>
         );
       case "delivered":
         return (
-          <span className="bg-green-100 text-green-700 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-green-100 text-green-700 text-sm !px-6 !py-2 rounded-4xl">
             Đã giao
           </span>
         );
       case "cancelled":
         return (
-          <span className="bg-red-100 text-red-700 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-red-100 text-red-700 text-sm !px-6 !py-2 rounded-4xl">
             Đã hủy
           </span>
         );
       case "returned":
         return (
-          <span className="bg-purple-100 text-purple-700 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-purple-100 text-purple-700 text-sm !px-6 !py-2 rounded-4xl">
             Hoàn hàng
           </span>
         );
       default:
         return (
-          <span className="bg-gray-100 text-gray-700 text-sm !px-6 !py-2 rounded-full">
+          <span className="bg-gray-100 text-gray-700 text-sm !px-6 !py-2 rounded-4xl">
             Không rõ
           </span>
         );

@@ -10,7 +10,7 @@ import "swiper/css/pagination";
 import Image from "next/image";
 import { useEffect, useState, useRef, use } from "react";
 import Show1sanpham from "./component/product_home";
-import BlogHome from "./component/blog_home";
+import BlogHome from "./component/Home/BlogHome";
 import CouponApp from "./component/coupon";
 import FlashSale from "./component/flash_sale";
 import { IProduct } from "@/types/product";
@@ -21,12 +21,13 @@ import {
   getProductsByCategory,
 } from "@/services/productService";
 import Link from "next/link";
-import Show2sanpham from "./component/product-two-box";
-import Banner3D from "./component/Banner3D";
+import Show2sanpham from "src/app/(client)/component/product-two-box";
+import Banner3D from "src/app/(client)/component/Home/Banner3D";
 import { useAddToCart } from "@/hooks/useAddToCart";
-import ProductIcons from "./component/products/ProductIcons";
-import HotProductIcons from "./component/products/HotProductIcons";
-import HotspotLookbook from "./component/home/HotspotProduct";
+import ProductIcons from "src/app/(client)/component/Products/ProductIcons";
+import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
+import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
+
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -39,7 +40,7 @@ export default function Home() {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
- 
+
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
 
   const handlePlay = () => {
@@ -175,48 +176,8 @@ export default function Home() {
 
   return (
     <div>
-      {/* <div className="banner-home relative">
-        <Swiper
-          modules={[Autoplay]}
-          autoplay={{ delay: 3000 }}
-          loop={true}
-          spaceBetween={0}
-          slidesPerView={1}
-        >
-          <SwiperSlide>
-            <div className="banner-slider relative w-full h-[650px]">
-              <Image
-                src="/images/banner/slider_1.png"
-                alt="Banner 1"
-                fill
-                style={{ objectFit: "cover", objectPosition: "center" }}
-              />
-              <div className="button-banner-left absolute bottom-32 left-32">
-                <button className="border border-white text-white text-xl font-bold px-12 py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
-                  Mua ngay
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="banner-slider relative w-full h-[650px]">
-              <Image
-                src="/images/banner/slider_2.png"
-                alt="Banner 2"
-                fill
-                style={{ objectFit: "cover", objectPosition: "center" }}
-              />
-              <div className="button-banner-right absolute bottom-44 right-44">
-                <button className="border border-white text-white text-xl font-bold px-12 py-2 rounded-3xl hover:bg-[#0a0] hover:text-black transition">
-                  Mua ngay
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </div> */}
       <Banner3D />
-      <main>
+      <main className="!mt-16 sm:!mt-0">
         <div className="category-main">
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
           <h1>DANH MỤC SẢN PHẨM</h1>
@@ -282,17 +243,25 @@ export default function Home() {
               ở bất cứ nơi đâu bạn đến.
             </p>
             <div className="buttons">
-              <button ><Link  className="btn-lookbook"  href={`/product?gender=nam`}>GIÀY NAM</Link></button>  
-              <button ><Link  className="btn-lookbook"  href={`/product?gender=nữ`}>GIÀY NỮ</Link></button> 
+              <button>
+                <Link className="btn-lookbook" href={`/product?gender=nam`}>
+                  GIÀY NAM
+                </Link>
+              </button>
+              <button>
+                <Link className="btn-lookbook" href={`/product?gender=nữ`}>
+                  GIÀY NỮ
+                </Link>
+              </button>
             </div>
           </div>
 
           <HotspotLookbook
-        openIndex={openIndex}
-        setOpenIndex={setOpenIndex}
-        togglePopup={togglePopup}
-        containerRef={containerRef}
-      />
+            openIndex={openIndex}
+            setOpenIndex={setOpenIndex}
+            togglePopup={togglePopup}
+            containerRef={containerRef}
+          />
         </div>
         <div className="shipping-main">
           <div className="shipping1">
@@ -315,7 +284,7 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM MỚI NHẤT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
@@ -359,14 +328,20 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
-
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
+                          "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
+                    <HotProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants[0]?.product_variants_id
+                      }
+                      price={product.sale_price}
+                    />
 
                     <span className="tag-discount">-{discount}%</span>
                   </div>
@@ -421,11 +396,12 @@ export default function Home() {
             })}
           </div>
         </div>
+        {featureproducts.length > 0 && (
         <div className="hot-products">
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
             <h4>
-              <a href="">–– Xem tất cả</a>
+              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
             </h4>
           </div>
 
@@ -471,15 +447,20 @@ export default function Home() {
                     <Link href={`product/${product.slug}`}>
                       <img
                         src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` || "/images/placeholder.png"
-
+                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
+                          "/images/placeholder.png"
                         }
                         alt={product.name}
                       />
                     </Link>
 
-                    <HotProductIcons productId={productId} variant_id={product.product_variants[0]?.product_variants_id} price={product.sale_price} />
-
+                    <HotProductIcons
+                      productId={productId}
+                      variant_id={
+                        product.product_variants[0]?.product_variants_id
+                      }
+                      price={product.sale_price}
+                    />
 
                     {discount > 0 && (
                       <span className="tag-discount">-{discount}%</span>
@@ -540,6 +521,7 @@ export default function Home() {
             })}
           </div>
         </div>
+        )}
 
         <div className="product-two-box-main">
           <h1 className="h1">SẢN PHẨM THEO DANH MỤC</h1>

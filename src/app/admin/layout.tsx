@@ -3,6 +3,8 @@ import "./admin.css";
 import Header_admin from "./component_admin/Header_admin";
 import SideBar from "./component_admin/Sidebar";
 import { useState } from "react";
+import { Toaster } from "react-hot-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,6 +28,8 @@ export default function RootLayout({
 
             <main className="main-content">
               <Header_admin toggleSidebar={toggleSidebar}></Header_admin>
+              <Toaster position="top-right" />
+
               {children}
             </main>
           </div>

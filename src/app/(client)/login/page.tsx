@@ -19,7 +19,9 @@ export default function Login() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [rememberMe, setRememberMe] = useState(false);
   const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -82,12 +84,12 @@ export default function Login() {
       const timer = setTimeout(() => {
         setShowLoader(false);
         Swal.fire({
-  title: "Đăng nhập thành công!",
-  icon: "success",
-  showConfirmButton: false,
-  timer: 2000, 
-  timerProgressBar: true,
-});
+          title: "Đăng nhập thành công!",
+          icon: "success",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        });
         window.location.href = "/account";
       }, 2000);
       router.refresh();
@@ -115,6 +117,13 @@ export default function Login() {
               <div>
                 <input
                   value={usernameOrEmail}
+                  className={`input ${
+                    errors.email
+                      ? "error"
+                      : usernameOrEmail.trim() !== ""
+                      ? "success"
+                      : ""
+                  }`}
                   onChange={(e) => {
                     setIdentifier(e.target.value);
                     setErrors((prev) => ({ ...prev, email: "" }));
@@ -137,48 +146,61 @@ export default function Login() {
                 )}
               </div>
 
-              <div style={{ position: "relative" }}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mật Khẩu"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, password: "" }));
-                  }}
-                  onBlur={(e) =>
-                    setErrors((prev) => ({
-                      ...prev,
-                      password: validateField({
-                        name: "password",
-                        value: e.target.value,
-                        formType: "login",
-                      }),
-                    }))
-                  }
-                />
+              <div className="password-field-container">
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`input ${
+                      errors.password
+                        ? "error"
+                        : password.trim() !== ""
+                        ? "success"
+                        : ""
+                    }`}
+                    placeholder="Mật Khẩu"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: "" }));
+                    }}
+                    onBlur={(e) =>
+                      setErrors((prev) => ({
+                        ...prev,
+                        password: validateField({
+                          name: "password",
+                          value: e.target.value,
+                          formType: "login",
+                        }),
+                      }))
+                    }
+                    style={{ paddingRight: "40px" }}
+                  />
+                  <div
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      zIndex: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "24px",
+                      height: "24px",
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </div>
+                </div>
                 {errors.password && (
                   <p className="text-sm text-red-500 mt-1">{errors.password}</p>
                 )}
-                <div
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute",
-                    right: "10px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    cursor: "pointer",
-                  }}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </div>
               </div>
-
-              <div className="remember-me">
-                <input type="checkbox" />
-                Lưu tài khoản
-              </div>
-
+              <p className="foget-pw">
+                <Link href="/forgot-password">Quên mật khẩu?</Link>
+              </p>
               <button type="submit">Đăng nhập ngay</button>
             </form>
 
@@ -188,11 +210,7 @@ export default function Login() {
               </div>
             )}
 
-            <br />
-            <h5>
-              <Link href="/forgot-password">Quên mật khẩu?</Link>
-            </h5>
-
+            <h3>Hoặc</h3>
             <button className="google-login" onClick={googleLogin}>
               <i className="fab fa-google"></i> Đăng nhập bằng Google
             </button>

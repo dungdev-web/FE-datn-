@@ -41,7 +41,7 @@
 
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(4 , 1fr);
+  grid-template-columns: repeat(8 , 1fr) !important;
   gap: 20px;
 }
 
@@ -52,9 +52,9 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  padding: 16px;
+  padding: 0 !important;
   transition: transform 0.2s, box-shadow 0.2s;
-  height: 150px; /* Đặt chiều cao cố định cho card */
+  height: 73px; /* Đặt chiều cao cố định cho card */
 }
 
 .card:hover {
@@ -73,7 +73,7 @@
   justify-content: center;
   color: #fff;
   font-size: 36px; /* Tăng kích thước icon */
-  margin-right: 16px;
+  /* margin-right: 16px; */
 }
 
 /* Tùy màu cho từng loại icon */
@@ -115,6 +115,7 @@
   font-size: 0.8rem;
   color: #adb5bd;
   text-decoration: none;
+  display: none;
 }
 
 .card .info .details-link:hover {

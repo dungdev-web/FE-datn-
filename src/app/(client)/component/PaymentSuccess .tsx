@@ -20,8 +20,6 @@ export default function CheckoutSuccess() {
     if (orderId) {
       getOrderDetailService(orderId)
         .then((data) => {
-          const fee = localStorage.getItem("checkout_shipping_fee");
-          data.shipping_fee = fee ? Number(JSON.parse(fee)) : 0;
           setOrder(data);
         })
         .catch((err) => {

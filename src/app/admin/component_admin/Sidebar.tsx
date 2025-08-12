@@ -4,6 +4,7 @@ import "../css/dashboard.css";
 import "../css/css.css";
 import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
+import CategoryIcon from "@mui/icons-material/Category";
 import LabelIcon from "@mui/icons-material/Label";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import ArticleIcon from "@mui/icons-material/Article";
@@ -37,8 +38,8 @@ const pathname = usePathname();
     <nav className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <ul className="menu">
         <li>
-          <div className="logo bg-[#000]">
-            <img src="/images/logo/E.png" alt="" />
+          <div className="logo">
+            <img src="/images/logo/logo-xanh.png" alt="" />
              
           </div>
         </li>
@@ -91,6 +92,29 @@ const pathname = usePathname();
               </li>
               <li>
                 <Link href={'/admin/brands/add'}>Thêm mới nhãn hiệu</Link>
+              </li>
+            </ul>
+          )}
+        </li>
+        <li
+          className={`has-submenu ${openMenuKey === "danhmucbaiviet" ? "open" : ""}`}
+        >
+          <Link href={'/admin/categories_post'} className={`flex items-center ${pathname === '/admin/categories_post' ? 'tick' : ''}`} onClick={() => toggleMenu("danhmucbaiviet")}>
+            <CategoryIcon /> 
+            {!isCollapsed && (
+              <>
+                <span>Quản lý danh mục bài viết</span>
+                <i className="fa-solid fa-chevron-down submenu-icon"></i>
+              </>
+            )}
+          </Link>
+          {!isCollapsed && (
+            <ul className="submenu">
+              <li>
+                <Link href={'/admin/categories'}>Danh sách danh mục bài viết</Link>
+              </li>
+              <li>
+                <Link href={'/admin/categories/add'}>Thêm mới danh mục bài viết</Link>
               </li>
             </ul>
           )}
