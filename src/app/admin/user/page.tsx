@@ -54,19 +54,16 @@ export default function ListUser() {
   const [selectedStatus, setSelectedStatus] = useState<number>(1);
   const [selectedRole, setSelectedRole] = useState<string>("user");
 
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(6);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Sort states
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     field: "created_at",
     direction: "desc",
   });
 
-  // Filter states
   const [filters, setFilters] = useState({
     id: "",
     name: "",
@@ -103,7 +100,7 @@ export default function ListUser() {
         ...(filters.email && { email: filters.email }),
         ...(filters.phone && { phone: filters.phone }),
         ...(filters.id && { user_id: parseInt(filters.id) }),
-        ...(searchText && { search: searchText }), // Use search text as name filter
+        ...(searchText && { search: searchText }),
       };
 
       const res: ApiResponse = await getAllUsersV2(params);
@@ -124,7 +121,6 @@ export default function ListUser() {
     }
   };
 
-  // Debounced search function
   const debouncedSearch = useCallback(
     debounce(() => {
       fetchUsers(1, true);
@@ -132,7 +128,6 @@ export default function ListUser() {
     [sortConfig, filters, searchText]
   );
 
-  // Handle sort
   const handleSort = (field: SortField) => {
     const newDirection: SortDirection =
       sortConfig.field === field && sortConfig.direction === "asc"
@@ -142,7 +137,6 @@ export default function ListUser() {
     setSortConfig({ field, direction: newDirection });
   };
 
-  // Get sort icon
   const getSortIcon = (field: SortField) => {
     if (sortConfig.field !== field) {
       return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
@@ -155,7 +149,6 @@ export default function ListUser() {
     }
   };
 
-  // Handle filter change
   const handleFilterChange = (field: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
@@ -163,7 +156,6 @@ export default function ListUser() {
     }));
   };
 
-  // Handle search text change
   const handleSearchChange = (value: string) => {
     setSearchText(value);
   };
@@ -196,9 +188,8 @@ export default function ListUser() {
   const handleExport = async () => {
     try {
       setLoading(true);
-      // Fetch all users for export (without pagination)
       const res: ApiResponse = await getAllUsers({
-        limit: totalUsers, // Get all users
+        limit: totalUsers,
         sortField: sortConfig.field,
         sortDirection: sortConfig.direction,
         ...(filters.role && { role: filters.role }),
@@ -224,7 +215,7 @@ export default function ListUser() {
         ...res.data.users.map((user) =>
           [
             user.user_id,
-            `"${(user.name || "").replace(/"/g, '""')}"`, // Handle commas in names
+            `"${(user.name || "").replace(/"/g, '""')}"`,
             `"${(user.email || "").replace(/"/g, '""')}"`,
             user.phone || "",
             user.role === "admin" ? "Admin" : "Người dùng",
@@ -269,7 +260,6 @@ export default function ListUser() {
         status: selectedStatus,
       });
 
-      // Refresh current page data
       fetchUsers();
       closeModal();
 
@@ -303,7 +293,6 @@ export default function ListUser() {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    // First page
     if (startPage > 1) {
       pages.push(
         <button
@@ -319,7 +308,6 @@ export default function ListUser() {
       }
     }
 
-    // Visible pages
     for (let i = startPage; i <= endPage; i++) {
       pages.push(
         <button
@@ -332,7 +320,6 @@ export default function ListUser() {
       );
     }
 
-    // Last page
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
         pages.push(<span key="ellipsis2">...</span>);
@@ -373,21 +360,20 @@ export default function ListUser() {
     );
   };
 
-  // Effects
   useEffect(() => {
     fetchUsers(1, true);
-  }, []); // Initial load
+  }, []);
 
   useEffect(() => {
     fetchUsers(1, true);
-  }, [sortConfig]); // Reload when sort changes
+  }, [sortConfig]);
 
   useEffect(() => {
     debouncedSearch();
     return () => {
       debouncedSearch.cancel();
     };
-  }, [filters, searchText, debouncedSearch]); // Debounced search on filter/search changes
+  }, [filters, searchText, debouncedSearch]);
 
   if (loading && users.length === 0) {
     return <div className="loading">Đang tải...</div>;

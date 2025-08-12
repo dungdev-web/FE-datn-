@@ -90,7 +90,6 @@ export default function UserOrdersList({
     returned: { label: "Hoàn trả", class: "status-returned" },
   };
 
-  // Sortable columns configuration
   const sortableColumns = [
     { key: "orders_id", label: "Mã đơn hàng", field: "orders_id" },
     { key: "user_name", label: "Người nhận", field: "user.name" },
@@ -121,7 +120,7 @@ export default function UserOrdersList({
         : "asc";
 
     setSortConfig({ field, direction: newDirection });
-    setCurrentPage(1); // Reset to first page when sorting
+    setCurrentPage(1);
   };
 
   const getSortIcon = (field: string) => {
@@ -149,7 +148,6 @@ export default function UserOrdersList({
         sortDirection: sortConfig.direction,
       };
 
-      // Add filters to params
       if (filters.status) {
         params.status = filters.status;
       }
