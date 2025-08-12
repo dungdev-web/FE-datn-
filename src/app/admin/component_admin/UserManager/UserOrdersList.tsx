@@ -80,6 +80,7 @@ export default function UserOrdersList({
     date_from: "",
     date_to: "",
   });
+  console.log(user)
 
   const statusMap = {
     pending: { label: "Chờ xác nhận", class: "status-pending" },
