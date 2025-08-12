@@ -109,3 +109,53 @@ export interface GetProductsDashboardResponse {
   currentPage: number;
   totalPages: number;
 }
+
+// src/types/size.ts
+export interface ISize {
+  label: any;
+  name: any;
+  value: any;
+  size_id: any;
+  id: number;
+  number_size: string;
+}
+
+export interface GetSizesResponse {
+  data: ISize[];
+}
+ export interface IGender {
+  id: number;
+  name: string;
+  label?: string;
+  value?: string;
+}
+
+export interface GetGendersResponse {
+  data: IGender[];
+}
+export interface IProductVariantPayload {
+  code_color: string;
+  name_color: string;
+  size_id: number;
+  stock_quantity: number;
+}
+
+export interface AddProductPayload {
+  name: string;
+  description: string;
+  short_desc: string;
+  price: number;
+  sale_price: number;
+  categories_id: number;
+  brand_id: number;
+  gender_id: number;
+  status: number;
+  product_variants: IProductVariantPayload[];
+  images: File[]; // ảnh chính
+  variantImages: Record<string, File>; // key = code_color
+}
+
+export interface AddProductResponse {
+  message: string;
+  product: IProduct;
+}
