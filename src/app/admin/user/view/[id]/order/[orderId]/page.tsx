@@ -296,7 +296,7 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
                     
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900 !mb-1">
-                        Sản phẩm #{item.order_items_id}
+                        Sản phẩm {item.variant?.product?.name}
                       </h3>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span>Màu: <span className="font-medium">{item.variant?.color?.name_color || 'N/A'}</span></span>

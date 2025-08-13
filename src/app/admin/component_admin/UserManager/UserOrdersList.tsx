@@ -26,6 +26,7 @@ interface GetOrdersParams {
   limit?: number;
   status?: string;
   payment_method_id?: number;
+  payment_status?: string;
   date_from?: string;
   date_to?: string;
   sortField?: string;
@@ -77,25 +78,25 @@ export default function UserOrdersList({
     status: "",
     products: "",
     payment_method_id: "",
+    payment_status: "",
     date_from: "",
     date_to: "",
   });
-  console.log(user)
+  console.log(user);
 
   const statusMap = {
     pending: { label: "Chờ xác nhận", class: "status-pending" },
     confirmed: { label: "Đã xác nhận", class: "status-confirmed" },
     shipping: { label: "Đang giao hàng", class: "status-shipping" },
-    delivered: { label: "Đã giao", class: "status-delivered" },
+    completed: { label: "Hoàn thành", class: "status-completed" },
     cancelled: { label: "Đã hủy", class: "status-cancelled" },
-    returned: { label: "Hoàn trả", class: "status-returned" },
   };
 
   const sortableColumns = [
     { key: "orders_id", label: "Mã đơn hàng", field: "orders_id" },
     { key: "user_name", label: "Người nhận", field: "user.name" },
     { key: "user_phone", label: "Điện thoại", field: "user.phone" },
-    { key: "status", label: "Trạng thái", field: "payment_status" },
+    { key: "status", label: "Trạng thái", field: "status" },
     { key: "total_amount", label: "Tổng tiền", field: "total_amount" },
     { key: "created_at", label: "Ngày đặt", field: "created_at" },
   ];
@@ -146,6 +147,7 @@ export default function UserOrdersList({
         limit: itemsPerPage,
         sortField: sortConfig.field,
         sortDirection: sortConfig.direction,
+        payment_status: filters.payment_status || "",
       };
 
       if (filters.status) {
@@ -155,7 +157,9 @@ export default function UserOrdersList({
       if (filters.payment_method_id) {
         params.payment_method_id = parseInt(filters.payment_method_id);
       }
-
+      if (filters.payment_status) {
+        params.payment_status = filters.payment_status;
+      }
       if (filters.date_from) {
         params.date_from = filters.date_from;
       }
@@ -225,6 +229,7 @@ export default function UserOrdersList({
       status: "",
       products: "",
       payment_method_id: "",
+      payment_status: "",
       date_from: "",
       date_to: "",
     });
@@ -270,6 +275,7 @@ export default function UserOrdersList({
         limit: totalOrders || 1000,
         sortField: sortConfig.field,
         sortDirection: sortConfig.direction,
+        payment_status: filters.payment_status || "",
       };
 
       // Add all current filters for export
@@ -557,21 +563,96 @@ export default function UserOrdersList({
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 overflow-x-auto">
             <table className="w-full min-w-max">
               <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                  {sortableColumns.map((column) =>
-                    renderSortableHeader(column)
-                  )}
-                  <th className="!px-6 !py-4 text-left whitespace-nowrap">
-                    <span className="font-semibold text-gray-700">
-                      Sản phẩm
-                    </span>
-                  </th>
-                  <th className="!px-6 !py-4 text-left whitespace-nowrap">
-                    <span className="font-semibold text-gray-700">
-                      Thao tác
-                    </span>
-                  </th>
-                </tr>
+  <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+    {/* Mã đơn hàng - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("orders_id")}
+      >
+        <span>Mã đơn hàng</span>
+        {getSortIcon("orders_id")}
+      </button>
+    </th>
+    
+    {/* Người nhận - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("user.name")}
+      >
+        <span>Người nhận</span>
+        {getSortIcon("user.name")}
+      </button>
+    </th>
+    
+    {/* Điện thoại - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("user.phone")}
+      >
+        <span>Điện thoại</span>
+        {getSortIcon("user.phone")}
+      </button>
+    </th>
+    
+    {/* Trạng thái - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("status")}
+      >
+        <span>Trạng thái</span>
+        {getSortIcon("status")}
+      </button>
+    </th>
+    
+    {/* Tổng tiền - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("total_amount")}
+      >
+        <span>Tổng tiền</span>
+        {getSortIcon("total_amount")}
+      </button>
+    </th>
+    
+    {/* Ngày đặt - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("created_at")}
+      >
+        <span>Ngày đặt</span>
+        {getSortIcon("created_at")}
+      </button>
+    </th>
+    
+    {/* Trạng thái thanh toán - có sort */}
+    <th className="!px-6 !py-4 text-left">
+      <button
+        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+        onClick={() => handleSort("payment_status")}
+      >
+        <span>Trạng thái thanh toán</span>
+        {getSortIcon("payment_status")}
+      </button>
+    </th>
+    
+    {/* Sản phẩm - KHÔNG sort */}
+    <th className="!px-6 !py-4 text-left whitespace-nowrap">
+      <span className="font-semibold text-gray-700">Sản phẩm</span>
+    </th>
+    
+    {/* Thao tác - KHÔNG sort */}
+    <th className="!px-6 !py-4 text-left whitespace-nowrap">
+      <span className="font-semibold text-gray-700">Thao tác</span>
+    </th>
+  </tr>
+
+                {/* Filter row */}
                 <tr className="bg-white border-b-2 border-gray-100">
                   <th className="!px-6 !py-3">
                     <div className="relative">
@@ -588,23 +669,7 @@ export default function UserOrdersList({
                     </div>
                   </th>
                   <th className="!px-6 !py-3"></th>
-                  <th className="!px-6 !py-3">
-                    <div className="relative">
-                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Phương thức..."
-                        value={filters.payment_method_id}
-                        onChange={(e) =>
-                          handleFilterChange(
-                            "payment_method_id",
-                            e.target.value
-                          )
-                        }
-                        className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-400"
-                      />
-                    </div>
-                  </th>
+                  <th className="!px-6 !py-3"></th>
                   <th className="!px-6 !py-3">
                     <div className="relative">
                       <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -619,9 +684,8 @@ export default function UserOrdersList({
                         <option value="pending">Chờ xác nhận</option>
                         <option value="confirmed">Đã xác nhận</option>
                         <option value="shipping">Đang giao hàng</option>
-                        <option value="delivered">Đã giao</option>
+                        <option value="completed">Hoàn thành</option>
                         <option value="cancelled">Đã hủy</option>
-                        <option value="returned">Hoàn trả</option>
                       </select>
                     </div>
                   </th>
@@ -653,6 +717,21 @@ export default function UserOrdersList({
                       </div>
                     </div>
                   </th>
+                  <th className="!px-6 !py-3">
+      <div className="relative">
+        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <select
+          value={filters.payment_status || ''}
+          onChange={(e) => handleFilterChange("payment_status", e.target.value)}
+          className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm bg-white appearance-none"
+        >
+          <option value="">Tất cả trạng thái TT</option>
+          <option value="paid">Đã thanh toán</option>
+          <option value="unpaid">Chưa thanh toán</option>
+          <option value="refunded">Đã hoàn tiền</option>
+        </select>
+      </div>
+    </th>
                   <th className="!px-6 !py-3">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -725,12 +804,10 @@ export default function UserOrdersList({
                           return "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200";
                         case "shipping":
                           return "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200";
-                        case "delivered":
+                        case "completed":
                           return "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200";
                         case "cancelled":
                           return "bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200";
-                        case "returned":
-                          return "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200";
                         default:
                           return "bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200";
                       }
@@ -748,11 +825,12 @@ export default function UserOrdersList({
                             </span>
                           </div>
                         </td>
-                        <td className="!px-6 !py-4">
+                        
+<td className="!px-6 !py-4">
                           <div className="flex items-center !gap-3">
                             <div className="min-w-0">
                               <div className="font-semibold text-gray-900 truncate">
-                                {order.user?.name || "N/A"}
+                                {order.user?.name || user?.name || "N/A"}
                               </div>
                               <div className="text-sm text-gray-500 whitespace-nowrap">
                                 Khách hàng
@@ -762,7 +840,7 @@ export default function UserOrdersList({
                         </td>
                         <td className="!px-6 !py-4">
                           <span className="text-gray-900 font-medium whitespace-nowrap">
-                            {order.user?.phone || "N/A"}
+                            {order.user?.phone || user?.phone || "N/A"}
                           </span>
                         </td>
                         <td className="!px-6 !py-4">
@@ -774,7 +852,7 @@ export default function UserOrdersList({
                             >
                               <div
                                 className={`w-2 h-2 rounded-full !mr-2 flex-shrink-0 ${
-                                  order.status === "delivered"
+                                  order.status === "completed"
                                     ? "bg-green-500"
                                     : order.status === "cancelled"
                                     ? "bg-red-500"
@@ -801,9 +879,8 @@ export default function UserOrdersList({
                               <option value="pending">Chờ xác nhận</option>
                               <option value="confirmed">Đã xác nhận</option>
                               <option value="shipping">Đang giao hàng</option>
-                              <option value="delivered">Đã giao</option>
+                              <option value="completed">Hoàn thành</option>
                               <option value="cancelled">Đã hủy</option>
-                              <option value="returned">Hoàn trả</option>
                             </select>
                           </div>
                         </td>
@@ -824,6 +901,23 @@ export default function UserOrdersList({
                               ? formatDate(order.created_at)
                               : "N/A"}
                           </div>
+                        </td>
+                        <td className="!px-6 !py-4">
+                          <span
+                            className={`inline-flex items-center !px-3 !py-1 rounded-full text-sm font-medium whitespace-nowrap ${
+                              order.payment_status === "PAID"
+                                ? "bg-green-100 text-green-800 border border-green-200"
+                                : order.payment_status === "FAILED"
+                                ? "bg-gray-100 text-gray-800 border border-gray-200"
+                                : "bg-red-100 text-red-800 border border-red-200"
+                            }`}
+                          >
+                            {order.payment_status === "PAID"
+                              ? "Đã thanh toán"
+                              : order.payment_status === "FAILED"
+                              ? "Đã hoàn tiền"
+                              : "Chưa thanh toán"}
+                          </span>
                         </td>
                         <td className="!px-6 !py-4">
                           <div
