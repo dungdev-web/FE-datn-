@@ -34,12 +34,11 @@ export default function OrderPage() {
   const [categoryProducts, setCategoryProducts] = useState<ICategory[]>([]);
 
   const statusOrderFlow = [
-    "pending", // Chờ xử lý
-    "processing", // Đang xử lý
-    "shipping", // Đang giao hàng
-    "delivered", // Đã giao
-    "completed", // Hoàn thành
-    "cancelled", // Đã hủy
+    "pending",
+    "processing",
+    "shipping",
+    "completed",
+    "cancelled",
   ];
 
   const excelData = orders.map((order: any) => ({
@@ -276,7 +275,6 @@ export default function OrderPage() {
                   <option value="pending">Chờ xử lý</option>
                   <option value="processing">Đang xử lý</option>
                   <option value="shipping">Đang giao hàng</option>
-                  <option value="delivered">Đã giao</option>
                   <option value="completed">Hoàn thành</option>
                   <option value="cancelled">Đã hủy</option>
                   <option value="returned">Hoàn trả</option>

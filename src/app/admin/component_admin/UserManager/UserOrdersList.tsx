@@ -95,7 +95,7 @@ export default function UserOrdersList({
     { key: "orders_id", label: "Mã đơn hàng", field: "orders_id" },
     { key: "user_name", label: "Người nhận", field: "user.name" },
     { key: "user_phone", label: "Điện thoại", field: "user.phone" },
-    { key: "status", label: "Trạng thái", field: "status" },
+    { key: "status", label: "Trạng thái", field: "payment_status" },
     { key: "total_amount", label: "Tổng tiền", field: "total_amount" },
     { key: "created_at", label: "Ngày đặt", field: "created_at" },
   ];
@@ -123,7 +123,6 @@ export default function UserOrdersList({
     setSortConfig({ field, direction: newDirection });
     setCurrentPage(1);
   };
-
   const getSortIcon = (field: string) => {
     if (sortConfig.field !== field) {
       return <ArrowUpDown className="w-4 h-4 text-gray-400 opacity-50" />;

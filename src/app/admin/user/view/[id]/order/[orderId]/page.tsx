@@ -120,8 +120,8 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
         icon: Truck,
         dotColor: 'bg-purple-500'
       },
-      delivered: { 
-        label: 'Đã giao', 
+      completed: { 
+        label: 'Hoàn thành', 
         color: 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200',
         icon: Package,
         dotColor: 'bg-green-500'
@@ -131,12 +131,6 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
         color: 'bg-gradient-to-r from-red-100 to-pink-100 text-red-800 border border-red-200',
         icon: XCircle,
         dotColor: 'bg-red-500'
-      },
-      returned: { 
-        label: 'Hoàn trả', 
-        color: 'bg-gradient-to-r from-gray-100 to-slate-100 text-gray-800 border border-gray-200',
-        icon: RotateCcw,
-        dotColor: 'bg-gray-500'
       }
     };
     return statusMap[status as keyof typeof statusMap] || statusMap.pending;
@@ -342,7 +336,6 @@ export default function OrderDetailPage({ params }: OrderDetailProps) {
                       <option value="pending">Chờ xác nhận</option>
                       <option value="confirmed">Đã xác nhận</option>
                       <option value="shipping">Đang giao hàng</option>
-                      <option value="delivered">Đã giao</option>
                       <option value="cancelled">Đã hủy</option>
                       <option value="returned">Hoàn trả</option>
                     </select>
