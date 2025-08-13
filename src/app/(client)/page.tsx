@@ -27,7 +27,7 @@ import { useAddToCart } from "@/hooks/useAddToCart";
 import ProductIcons from "src/app/(client)/component/Products/ProductIcons";
 import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
 import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
-import { getCategories } from "@/services/categoryService";
+import { getAllCategories, getCategories } from "@/services/categoryService";
 import { ICategory } from "@/types/ICategory";
 
 export default function Home() {
@@ -177,33 +177,76 @@ export default function Home() {
 
     fetchData();
   }, []);
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        setLoading(true);
+        const data = await getAllCategories();
+        setCategories(data);
+      } catch (error) {
+        console.error("Lỗi khi lấy danh mục:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return <p>Đang tải danh mục...</p>;
+  }
+  
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4, // ✅ 4 item/lần
+    slidesToScroll: 1,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 3 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 480, settings: { slidesToShow: 1 } },
+    ],
+  };
   return (
     <div>
       <Banner3D />
       <main className="!mt-16 sm:!mt-0">
-        <div className="category-main">
-          <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
-          <h1>DANH MỤC SẢN PHẨM</h1>
-          <div className="category-main1">
-            <div className="category-main1-item">
-              <img src="/images/category/chaybo.webp" alt="" />
-              <h4>CHẠY BỘ</h4>
-            </div>
-            <div className="category-main1-item">
-              <img src="/images/category/leonui.webp" alt="" />
-              <h4>LEO NÚI</h4>
-            </div>
-            <div className="category-main1-item">
-              <img src="/images/category/quanvot.webp" alt="" />
-              <h4>QUẦN VỢT</h4>
-            </div>
-            <div className="category-main1-item">
-              <img src="/images/category/bongro.webp" alt="" />
-              <h4>GIÀY BÓNG RỔ</h4>
-            </div>
-          </div>
-        </div>
+      <div className="category-main">
+      <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
+      <h1>DANH MỤC SẢN PHẨM</h1>
+      {categories.length === 0 ? (
+        <p>Không có danh mục nào</p>
+      ) : (
+        <Swiper
+          modules={[Navigation, Pagination, Autoplay]}
+          spaceBetween={20}
+          slidesPerView={4}
+          navigation
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 2500 }}
+          breakpoints={{
+            1024: { slidesPerView: 4 },
+            768: { slidesPerView: 2 },
+            480: { slidesPerView: 1 },
+          }}
+        >
+          {categories.map((cat) => (
+            <SwiperSlide key={cat.id}>
+              <div className="category-main1-item">
+                <img
+                  src={cat.image || "/images/default.jpg"}
+                  alt={cat.name}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+                <h4>{cat.name}</h4>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
+    </div>
         <div className="marquee-wrapper">
           <div className="marquee" ref={marqueeRef}>
             <div className="marquee-content">
