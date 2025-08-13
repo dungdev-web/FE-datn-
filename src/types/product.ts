@@ -176,5 +176,6 @@ export interface GetProductByIdResponse {
   data: IProduct;
 }
 export interface UpdateProductResponse {
+  name: any;
   product: IProduct;
 }

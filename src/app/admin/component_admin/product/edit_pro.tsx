@@ -6,6 +6,9 @@ import "quill/dist/quill.snow.css";
 import { API_BASE_URL } from "@/config/env";
 import Select from "react-select";
 import { Plus, Trash2 } from "lucide-react";
+import Swal from "sweetalert2";
+import { useParams } from "next/navigation";
+
 import {
   addProduct,
   getGenders,
@@ -13,13 +16,12 @@ import {
   getSizes,
   updateAdminProduct,
 } from "@/services/productService";
+import { getAllBrands } from "@/services/brandService";
+import { getAllCategories } from "@/services/categoryService";
+
 import { AddProductPayload, IGender, IProduct, ISize } from "@/types/product";
 import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
-import { getAllBrands } from "@/services/brandService";
-import { getAllCategories } from "@/services/categoryService";
-import Swal from "sweetalert2";
-import { useParams } from "next/navigation";
 
 export default function Add_pro() {
   const { id } = useParams();
@@ -27,6 +29,7 @@ export default function Add_pro() {
 
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
+
   const [sizes, setSizes] = useState<ISize[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -68,7 +71,7 @@ export default function Add_pro() {
     },
   ]);
 
-  const colors = [
+ const colors = [
     { value: "black|Đen", hex: "#000000" },
     { value: "white|Trắng", hex: "#FFFFFF" },
     { value: "red|Đỏ", hex: "#FF0000" },
@@ -168,32 +171,30 @@ export default function Add_pro() {
     { value: "lightCoral|San hô nhạt", hex: "#F08080" },
     { value: "lightCyan|Xanh cyan nhạt", hex: "#E0FFFF" },
   ];
+
+
   const sizeOptions = sizes.map((s) => ({
     value: String(s.id),
     label: s.number_size,
   }));
-  /** Quản lý tab & custom select */
+
+  /** Tab & custom select */
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-
-      // Tab switching
       if (target.classList.contains("tab")) {
         document
           .querySelectorAll(".tab")
           .forEach((t) => t.classList.remove("active"));
         target.classList.add("active");
-
         const index = Array.from(document.querySelectorAll(".tab")).indexOf(
           target
         );
-        document.querySelectorAll(".tab-content").forEach((content, i) => {
-          (content as HTMLElement).style.display =
-            i === index ? "block" : "none";
+        document.querySelectorAll(".tab-content").forEach((c, i) => {
+          (c as HTMLElement).style.display = i === index ? "block" : "none";
         });
       }
 
-      // Toggle custom select
       if (target.closest(".custom-select")) {
         const dropdown = target
           .closest(".custom-select")
@@ -205,12 +206,11 @@ export default function Add_pro() {
           .forEach((dd) => dd.classList.remove("show"));
       }
     };
-
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
 
-  /** Quản lý màu cho biến thể */
+  /** Chọn màu biến thể */
   const handleColorSelect = (index: number, colorValue: string) => {
     const colorObj = colors.find((c) => c.value === colorValue);
     if (!colorObj) return;
@@ -225,8 +225,8 @@ export default function Add_pro() {
     });
   };
 
-  /** Thêm biến thể mới */
-  const addVariant = () => {
+  /** Thêm biến thể */
+  const addVariant = () =>
     setVariants((prev) => [
       ...prev,
       {
@@ -237,12 +237,10 @@ export default function Add_pro() {
         quantity: "",
       },
     ]);
-  };
 
   /** Xóa biến thể */
-  const removeVariant = (index: number) => {
+  const removeVariant = (index: number) =>
     setVariants((prev) => prev.filter((_, i) => i !== index));
-  };
 
   /** Cập nhật biến thể */
   const handleVariantChange = (
@@ -257,7 +255,7 @@ export default function Add_pro() {
     });
   };
 
-  /** Lấy dữ liệu sizes, brands, categories, genders */
+  /** Fetch brands, categories, genders, sizes */
   useEffect(() => {
     async function fetchData() {
       try {
@@ -279,7 +277,7 @@ export default function Add_pro() {
     fetchData();
   }, []);
 
-  /** Khởi tạo Quill editor */
+  /** Quill editor */
   useEffect(() => {
     if (editorRef.current && !quillRef.current) {
       quillRef.current = new Quill(editorRef.current, {
@@ -295,173 +293,151 @@ export default function Add_pro() {
           ],
         },
       });
+
+      quillRef.current.on("text-change", () => {
+        setDescription(quillRef.current?.root.innerHTML || "");
+      });
     }
   }, []);
 
-  /** Fetch product để edit */
-  useEffect(() => {
-    async function fetchProduct() {
-      if (!productId || sizes.length === 0) return;
+// Thêm state để lưu ảnh cũ
+const [variantImagesOld, setVariantImagesOld] = useState<Record<string, string>>({});
 
-      try {
-        const res = await getProductAdminById(productId);
-        const data = res.data;
-        setProduct(data);
-
-        // Quill
-        if (quillRef.current)
-          quillRef.current.root.innerHTML = data.description || "";
-
-        setSelectedBrand(data.brand_id || "");
-        setSelectedCategory(data.categories_id || "");
-        setSelectedGender(data.gender_id || "");
-        setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
-
-        // Map variants
-        const variantsMapped: Variant[] = data.product_variants.map(
-          (v: any) => {
-            const colorKey = `${v.color.code_color}|${v.color.name_color}`;
-            const sizeIds = sizes
-              .filter((s) => s.number_size === v.size.number_size)
-              .map((s) => String(s.id));
-            return {
-              color: colorKey,
-              colorHex: v.color.code_color,
-              sizes: sizeIds,
-              quantity: v.stock_quantity,
-              image: null,
-              imagePreview: v.color.images
-                ? `${API_BASE_URL}/uploads/${v.color.images}`
-                : undefined,
-            };
-          }
-        );
-
-        setVariants(variantsMapped);
-        const previewMap: Record<string, string> = {};
-        variantsMapped.forEach((v) => {
-          if (v.imagePreview) previewMap[v.color] = v.imagePreview;
-        });
-        setVariantImagesPreview(previewMap);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    fetchProduct();
-  }, [productId, sizes]);
-
-  /** Handle main image upload */
-  const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setMainImages(Array.from(e.target.files));
-  };
-
-  /** Handle variant image upload */
-  const handleVariantImagesChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    colorKey: string
-  ) => {
-    if (!e.target.files) return;
-    const file = e.target.files[0];
-    setVariantImages((prev) => ({ ...prev, [colorKey]: file }));
-    setVariantImagesPreview((prev) => ({
-      ...prev,
-      [colorKey]: URL.createObjectURL(file),
-    }));
-  };
-  const handleUpdate = async () => {
-    if (!productId) return;
-
-    // Hàm đổi tên file an toàn
-    const sanitizeFilename = (filename: string) =>
-      filename.replace(/[\\/:*?"<>|#]/g, "_");
-
+// Fetch product khi edit
+useEffect(() => {
+  async function fetchProduct() {
+    if (!productId || sizes.length === 0) return;
     try {
-      const payload: AddProductPayload = {
-        name,
-        short_desc: shortDesc,
-        description: quillRef.current?.root.innerHTML || "",
-        price: Number(price),
-        sale_price: Number(salePrice),
-        categories_id: Number(selectedCategory),
-        brand_id: Number(selectedBrand),
-        gender_id: Number(selectedGender),
-        status: status === "Mở bán" ? 1 : 0,
-        images: mainImages,
-        variantImages: variantImages,
-        product_variants: variants.flatMap((v) =>
-          v.sizes.map((sizeId) => ({
-            code_color: v.color.split("|")[0],
-            name_color: v.color.split("|")[1] || "",
-            size_id: Number(sizeId),
-            stock_quantity: Number(v.quantity),
-          }))
-        ),
-      };
+      const res = await getProductAdminById(productId);
+      const data = res.data;
+      setProduct(data);
 
-      // Tạo FormData
-      const formData = new FormData();
-      formData.append("name", payload.name);
-      formData.append("short_desc", payload.short_desc);
-      formData.append("description", payload.description);
-      formData.append("price", payload.price.toString());
-      formData.append("sale_price", payload.sale_price.toString());
-      formData.append("categories_id", payload.categories_id.toString());
-      formData.append("brand_id", payload.brand_id.toString());
-      formData.append("gender_id", payload.gender_id.toString());
-      formData.append("status", payload.status.toString());
+      if (quillRef.current)
+        quillRef.current.root.innerHTML = data.description || "";
+      setDescription(data.description || "");
+      setName(data.name || "");
+      setShortDesc(data.short_desc || "");
+      setPrice(data.price || "");
+      setSalePrice(data.sale_price || "");
+      setSelectedBrand(data.brand_id || "");
+      setSelectedCategory(data.categories_id || "");
+      setSelectedGender(data.gender_id || "");
+      setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
 
-      // Thêm ảnh chính (sanitize tên)
-      payload.images.forEach((file) => {
-        formData.append(
-          "images",
-          new File([file], sanitizeFilename(file.name), { type: file.type })
-        );
+      const variantsMapped: Variant[] = data.product_variants.map((v: any) => {
+        const colorKey = `${v.color.code_color}|${v.color.name_color}`;
+        const sizeIds = sizes
+          .filter((s) => s.number_size === v.size.number_size)
+          .map((s) => String(s.id));
+        return {
+          color: colorKey,
+          colorHex: v.color.code_color,
+          sizes: sizeIds,
+          quantity: v.stock_quantity,
+          image: null,
+          imagePreview: v.color.images
+            ? `${API_BASE_URL}/uploads/${v.color.images}`
+            : undefined,
+        };
       });
 
-      // Thêm ảnh variant (sanitize tên)
-      Object.entries(payload.variantImages).forEach(([code, file]) => {
-        formData.append(
-          `variant_image_${code}`,
-          new File([file], sanitizeFilename(file.name), { type: file.type })
-        );
-      });
+      setVariants(variantsMapped);
 
-      // Thêm product_variants JSON
-      formData.append(
-        "product_variants",
-        JSON.stringify(payload.product_variants)
-      );
-
-      // Gửi request
-      const res = await fetch(
-        `${API_BASE_URL}/product/update-product/${productId}`,
-        {
-          method: "PUT",
-          body: formData,
+      // Map preview và ảnh cũ
+      const previewMap: Record<string, string> = {};
+      const oldMap: Record<string, string> = {};
+      variantsMapped.forEach((v) => {
+        const key = getColorKey(v.color);
+        if (v.imagePreview) {
+          previewMap[key] = v.imagePreview;
+          // Lưu filename ảnh cũ (lấy từ DB)
+          oldMap[key] = v.imagePreview.split("/").pop() || "";
         }
-      );
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Cập nhật sản phẩm thất bại");
-      }
-
-      const json = await res.json();
-
-      Swal.fire({
-        icon: "success",
-        title: "Cập nhật thành công",
-        text: `Sản phẩm "${json.name}" đã được cập nhật.`,
       });
-    } catch (err: any) {
-      Swal.fire({
-        icon: "error",
-        title: "Cập nhật thất bại",
-        text: err.message || "Có lỗi xảy ra",
-      });
+      setVariantImagesPreview(previewMap);
+      setVariantImagesOld(oldMap);
+    } catch (err) {
+      console.error(err);
     }
-  };
+  }
+  fetchProduct();
+}, [productId, sizes]);
+
+const getColorKey = (colorString: string) =>
+  colorString.split("|")[0].replace("#", "").toLowerCase();
+
+const handleVariantImagesChange = (
+  e: React.ChangeEvent<HTMLInputElement>,
+  colorValue: string
+) => {
+  if (!e.target.files) return;
+  const file = e.target.files[0];
+  const colorKey = getColorKey(colorValue);
+  setVariantImages((prev) => ({ ...prev, [colorKey]: file }));
+  setVariantImagesPreview((prev) => ({
+    ...prev,
+    [colorKey]: URL.createObjectURL(file),
+  }));
+};
+
+const handleUpdate = async () => {
+  if (!productId) return;
+  try {
+    const sanitizedVariantImages: Record<string, File | string> = {};
+
+    // Dùng ảnh mới nếu có, nếu không thì ảnh cũ
+    variants.forEach((v) => {
+      const key = getColorKey(v.color);
+      if (variantImages[key]) {
+        sanitizedVariantImages[key] = variantImages[key]; // file mới
+      } else if (variantImagesOld[key]) {
+        sanitizedVariantImages[key] = variantImagesOld[key]; // filename ảnh cũ
+      }
+    });
+
+    const payload: AddProductPayload = {
+      name,
+      short_desc: shortDesc,
+      description,
+      price: Number(price),
+      sale_price: Number(salePrice),
+      categories_id: Number(selectedCategory),
+      brand_id: Number(selectedBrand),
+      gender_id: Number(selectedGender),
+      status: status === "Mở bán" ? 1 : 0,
+      images: mainImages,
+      variantImages: sanitizedVariantImages,
+      product_variants: variants.flatMap((v) =>
+        v.sizes.map((sizeId) => ({
+          code_color: v.colorHex.replace("#", "").toLowerCase(),
+          name_color: v.color.split("|")[1] || "",
+          size_id: Number(sizeId),
+          stock_quantity: Number(v.quantity),
+        }))
+      ),
+    };
+
+    const updatedProduct = await updateAdminProduct(productId, payload);
+
+    Swal.fire({
+      icon: "success",
+      title: "Cập nhật thành công",
+      text: `Sản phẩm "${updatedProduct.name}" đã được cập nhật.`,
+    });
+  } catch (err: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Cập nhật thất bại",
+      text: err.message || "Có lỗi xảy ra",
+    });
+  }
+};
+// Handle upload ảnh chính
+const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!e.target.files) return;
+  setMainImages(Array.from(e.target.files));
+};
+
 
   return (
     <>
@@ -473,7 +449,7 @@ export default function Add_pro() {
           <button
             className="btn-add"
             type="submit"
-            form="add-product-form"
+            form="edit-product-form"
             onClick={handleUpdate}
           >
             <i className="fa fa-plus"></i> Cập nhật sản phẩm
@@ -488,7 +464,7 @@ export default function Add_pro() {
 
       <div className="tab-content" style={{ display: "block" }}>
         <form id="edit-product-form" className="edit-product-form">
-          <div className="form-grid" id="edit-product-form">
+          <div className="form-grid">
             <div>
               <div className="form-group">
                 <label htmlFor="ten_sp">Tên sản phẩm *</label>
@@ -496,10 +472,12 @@ export default function Add_pro() {
                   type="text"
                   id="ten_sp"
                   name="ten_sp"
-                  defaultValue={product?.name || ""}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Nhập tên sản phẩm..."
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="mo_ta">Mô tả *</label>
                 <div
@@ -507,11 +485,13 @@ export default function Add_pro() {
                   style={{ height: "300px", backgroundColor: "#fff" }}
                 />
               </div>
-              <label htmlFor=""> Mô tả ngắn</label>
+
+              <label htmlFor="">Mô tả ngắn</label>
               <textarea
                 id="mo_ta_ngan"
                 name="mo_ta_ngan"
-                defaultValue={product?.short_desc || ""}
+                value={shortDesc}
+                onChange={(e) => setShortDesc(e.target.value)}
                 rows={3}
                 placeholder="Nhập mô tả ngắn cho sản phẩm..."
               ></textarea>
@@ -553,7 +533,7 @@ export default function Add_pro() {
               <div className="form-group">
                 <select
                   id="danh_muc"
-                  value={selectedCategory} // number | ""
+                  value={selectedCategory}
                   onChange={(e) =>
                     setSelectedCategory(
                       e.target.value === "" ? "" : Number(e.target.value)
@@ -604,7 +584,8 @@ export default function Add_pro() {
                   type="number"
                   id="gia_goc"
                   name="gia_goc"
-                  defaultValue={product?.price || ""}
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
                   placeholder="nhập giá sản phẩm..."
                 />
               </div>
@@ -615,7 +596,8 @@ export default function Add_pro() {
                   type="number"
                   id="gia_ban"
                   name="gia_ban"
-                  defaultValue={product?.sale_price || ""}
+                  value={salePrice}
+                  onChange={(e) => setSalePrice(e.target.value)}
                   placeholder="nhập giá giảm..."
                 />
               </div>
@@ -623,45 +605,34 @@ export default function Add_pro() {
           </div>
         </form>
 
+        {/* Ảnh sản phẩm */}
         <div className="form-group">
           <label>
             Ảnh sản phẩm <small>(Lưu ý: Nền đế nền trắng)</small>
           </label>
           <div className="product-images">
-            {product?.images?.length > 0
-              ? product.images.map(
-                  (img: {
-                    images_id: React.Key | null | undefined;
-                    url: any;
-                    alt_text: any;
-                  }) => (
-                    <div className="image-thumb" key={img?.images_id}>
-                      <img
-                        src={`${API_BASE_URL}/uploads/${img?.url || ""}`}
-                        alt={img?.alt_text || "Ảnh sản phẩm"}
-                      />
-                    </div>
-                  )
-                )
-              : null}
-
-            {mainImages?.length > 0 &&
-              mainImages.map((file, index) => {
-                const url = URL.createObjectURL(file);
-                return (
-                  <div className="image-thumb" key={index}>
-                    <img src={url} alt={`Ảnh mới ${index + 1}`} />
-                  </div>
-                );
-              })}
-
+            {product?.images?.map((img) => (
+              <div className="image-thumb" key={img.images_id}>
+                <img
+                  src={`${API_BASE_URL}/uploads/${img.url}`}
+                  alt={img.alt_text || "Ảnh sản phẩm"}
+                />
+              </div>
+            ))}
+            {mainImages?.map((file, index) => (
+              <div className="image-thumb" key={index}>
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt={`Ảnh mới ${index + 1}`}
+                />
+              </div>
+            ))}
             {!product?.images?.length && !mainImages?.length && (
               <p className="w-full text-gray-500 italic select-none py-10">
                 Chưa có ảnh sản phẩm
               </p>
             )}
           </div>
-
           <label htmlFor="fileInput" className="choose-image-btn">
             Chọn ảnh
           </label>
@@ -676,6 +647,7 @@ export default function Add_pro() {
         </div>
       </div>
 
+      {/* Biến thể */}
       <div
         className="tab-content"
         id="so-luong-tab"
@@ -684,82 +656,63 @@ export default function Add_pro() {
         <div className="form-group">
           <label>Nhập biến thể sản phẩm (Màu - Size - Giá - Số lượng)</label>
           <div id="variant-list">
-            {Array.from(
-              variants.reduce((map, v, idx) => {
-                if (!map.has(v.color)) map.set(v.color, []);
-                map.get(v.color)!.push(idx);
-                return map;
-              }, new Map<string, number[]>())
-            ).map(([color, indices], displayIndex) => {
-              const firstIndex = indices[0];
-              const variant = variants[firstIndex];
-
-              // Gộp tất cả size của các biến thể cùng màu để hiển thị
-              const mergedSizes = Array.from(
-                new Set(indices.flatMap((i) => variants[i].sizes))
-              );
-
-              return (
-                <div
-                  key={displayIndex}
-                  className="variant-row"
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginBottom: "10px",
-                    alignItems: "center",
-                  }}
-                >
-                  {/* Color select */}
-                  <div className="custom-select-wrapper" style={{ flex: 1 }}>
-                    <div className="custom-select">
-                      <div className="selected-option">
-                        <span
-                          className="color-circle"
-                          style={{
-                            backgroundColor: variant.colorHex || "#000",
-                          }}
-                        ></span>
-                        <span className="color-name">
-                          {variant.color.split("|")[1]}
-                        </span>
-                      </div>
-                      <div className="dropdown">
-                        {colors.map((c, i) => (
-                          <div
-                            key={i}
-                            className="dropdown-option"
-                            onClick={() =>
-                              handleColorSelect(firstIndex, c.value)
-                            }
-                          >
-                            <span
-                              className="color-circle"
-                              style={{ backgroundColor: c.hex }}
-                            ></span>
-                            <span className="color-name">
-                              {c.value.split("|")[1]}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+            {variants.map((variant, index) => (
+              <div
+                key={index}
+                className="variant-row"
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginBottom: "10px",
+                  alignItems: "center",
+                }}
+              >
+                {/* Color select */}
+                <div className="custom-select-wrapper" style={{ flex: 1 }}>
+                  <div className="custom-select">
+                    <div className="selected-option">
+                      <span
+                        className="color-circle"
+                        style={{ backgroundColor: variant.colorHex || "#000" }}
+                      ></span>
+                      <span className="color-name">
+                        {variant.color.split("|")[1]}
+                      </span>
+                    </div>
+                    <div className="dropdown">
+                      {colors.map((c, i) => (
+                        <div
+                          key={i}
+                          className="dropdown-option"
+                          onClick={() => handleColorSelect(index, c.value)}
+                        >
+                          <span
+                            className="color-circle"
+                            style={{ backgroundColor: c.hex }}
+                          ></span>
+                          <span className="color-name">
+                            {c.value.split("|")[1]}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
+                </div>
 
-                  {/* Image upload */}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    style={{ flex: 1 }}
-                    onChange={(e) =>
-                      handleVariantImagesChange(e, variant.color)
-                    }
-                  />
+                {/* Image upload */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ flex: 1 }}
+                  onChange={(e) => handleVariantImagesChange(e, variant.color)}
+                />
 
-                  {/* Preview image */}
-                  {variantImagesPreview[variant.color] && (
+                {(() => {
+                  const colorKey = getColorKey(variant.color);
+                  const imageUrl = variantImagesPreview[colorKey];
+                  return imageUrl ? (
                     <img
-                      src={variantImagesPreview[variant.color]}
+                      src={imageUrl}
                       alt="Preview"
                       style={{
                         width: 50,
@@ -769,54 +722,51 @@ export default function Add_pro() {
                         marginBottom: 4,
                       }}
                     />
+                  ) : null;
+                })()}
+
+                {/* Size select */}
+                <Select
+                  options={sizeOptions}
+                  isMulti
+                  value={sizeOptions.filter((opt) =>
+                    variant.sizes.includes(opt.value)
                   )}
+                  onChange={(selected) =>
+                    handleVariantChange(
+                      index,
+                      "sizes",
+                      selected.map((s) => s.value)
+                    )
+                  }
+                  placeholder="Chọn size"
+                  styles={{ container: (base) => ({ ...base, flex: 1 }) }}
+                />
 
-                  {/* Size select */}
-                  <Select<{ value: string; label: string }, true>
-                    options={sizeOptions}
-                    isMulti
-                    value={sizeOptions.filter((opt) =>
-                      mergedSizes.includes(opt.value)
-                    )}
-                    onChange={(selected) =>
-                      handleVariantChange(
-                        firstIndex,
-                        "sizes",
-                        selected.map((s) => s.value)
-                      )
-                    }
-                    placeholder="Chọn size"
-                    styles={{ container: (base) => ({ ...base, flex: 1 }) }}
-                  />
+                {/* Quantity */}
+                <input
+                  type="number"
+                  placeholder="Nhập số lượng..."
+                  style={{ flex: 1 }}
+                  value={variant.quantity || ""}
+                  onChange={(e) =>
+                    handleVariantChange(
+                      index,
+                      "quantity",
+                      Number(e.target.value)
+                    )
+                  }
+                />
 
-                  {/* Quantity */}
-                  <input
-                    type="number"
-                    placeholder="Nhập số lượng..."
-                    style={{ flex: 1 }}
-                    value={variant.quantity || ""}
-                    onChange={(e) =>
-                      handleVariantChange(
-                        firstIndex,
-                        "quantity",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-
-                  {/* Add / Remove */}
-                  <button type="button" onClick={addVariant}>
-                    <Plus size={20} color="#021688" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeVariant(firstIndex)}
-                  >
-                    <Trash2 size={20} color="red" />
-                  </button>
-                </div>
-              );
-            })}
+                {/* Add / Remove */}
+                <button type="button" onClick={addVariant}>
+                  <Plus size={20} color="#021688" />
+                </button>
+                <button type="button" onClick={() => removeVariant(index)}>
+                  <Trash2 size={20} color="red" />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </div>
