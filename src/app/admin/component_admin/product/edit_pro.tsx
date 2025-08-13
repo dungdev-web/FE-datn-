@@ -11,8 +11,9 @@ import {
   getGenders,
   getProductAdminById,
   getSizes,
+  updateAdminProduct,
 } from "@/services/productService";
-import { IGender, IProduct, ISize } from "@/types/product";
+import { AddProductPayload, IGender, IProduct, ISize } from "@/types/product";
 import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
 import { getAllBrands } from "@/services/brandService";
@@ -368,6 +369,99 @@ export default function Add_pro() {
       [colorKey]: URL.createObjectURL(file),
     }));
   };
+  const handleUpdate = async () => {
+    if (!productId) return;
+
+    // Hàm đổi tên file an toàn
+    const sanitizeFilename = (filename: string) =>
+      filename.replace(/[\\/:*?"<>|#]/g, "_");
+
+    try {
+      const payload: AddProductPayload = {
+        name,
+        short_desc: shortDesc,
+        description: quillRef.current?.root.innerHTML || "",
+        price: Number(price),
+        sale_price: Number(salePrice),
+        categories_id: Number(selectedCategory),
+        brand_id: Number(selectedBrand),
+        gender_id: Number(selectedGender),
+        status: status === "Mở bán" ? 1 : 0,
+        images: mainImages,
+        variantImages: variantImages,
+        product_variants: variants.flatMap((v) =>
+          v.sizes.map((sizeId) => ({
+            code_color: v.color.split("|")[0],
+            name_color: v.color.split("|")[1] || "",
+            size_id: Number(sizeId),
+            stock_quantity: Number(v.quantity),
+          }))
+        ),
+      };
+
+      // Tạo FormData
+      const formData = new FormData();
+      formData.append("name", payload.name);
+      formData.append("short_desc", payload.short_desc);
+      formData.append("description", payload.description);
+      formData.append("price", payload.price.toString());
+      formData.append("sale_price", payload.sale_price.toString());
+      formData.append("categories_id", payload.categories_id.toString());
+      formData.append("brand_id", payload.brand_id.toString());
+      formData.append("gender_id", payload.gender_id.toString());
+      formData.append("status", payload.status.toString());
+
+      // Thêm ảnh chính (sanitize tên)
+      payload.images.forEach((file) => {
+        formData.append(
+          "images",
+          new File([file], sanitizeFilename(file.name), { type: file.type })
+        );
+      });
+
+      // Thêm ảnh variant (sanitize tên)
+      Object.entries(payload.variantImages).forEach(([code, file]) => {
+        formData.append(
+          `variant_image_${code}`,
+          new File([file], sanitizeFilename(file.name), { type: file.type })
+        );
+      });
+
+      // Thêm product_variants JSON
+      formData.append(
+        "product_variants",
+        JSON.stringify(payload.product_variants)
+      );
+
+      // Gửi request
+      const res = await fetch(
+        `${API_BASE_URL}/product/update-product/${productId}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Cập nhật sản phẩm thất bại");
+      }
+
+      const json = await res.json();
+
+      Swal.fire({
+        icon: "success",
+        title: "Cập nhật thành công",
+        text: `Sản phẩm "${json.name}" đã được cập nhật.`,
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Cập nhật thất bại",
+        text: err.message || "Có lỗi xảy ra",
+      });
+    }
+  };
 
   return (
     <>
@@ -376,8 +470,13 @@ export default function Add_pro() {
           <button className="btn btn-back">
             <i className="fa-solid fa-arrow-left"></i> Trở về
           </button>
-          <button className="btn-add" type="submit" form="add-product-form">
-            <i className="fa fa-plus"></i> Sửa sản phẩm
+          <button
+            className="btn-add"
+            type="submit"
+            form="add-product-form"
+            onClick={handleUpdate}
+          >
+            <i className="fa fa-plus"></i> Cập nhật sản phẩm
           </button>
         </div>
       </div>
