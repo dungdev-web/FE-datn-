@@ -1,5 +1,10 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
-import { IProduct, IReview, IReviewPayload } from "@/types/product";
+import {
+  GetAllProductReviewParams,
+  IProduct,
+  IReview,
+  IReviewPayload,
+} from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
 type ProductIdentifier = { id: number } | { slug: string };
@@ -214,7 +219,7 @@ export async function getFeaturedProducts(): Promise<IProduct[]> {
   return products;
 }
 
-//Lấy sản phẩm theo giới tính 
+//Lấy sản phẩm theo giới tính
 export async function getGenderShoes(
   name: string,
   limit: number,
@@ -260,7 +265,6 @@ export async function getGenderShoes(
     total: data.total,
   };
 }
-
 
 //Lấy sản phẩm theo catename
 export async function getProductsByCategory(
@@ -642,4 +646,63 @@ export async function deleteCompareProduct(userId: number, productID: number) {
   }
 
   return await res.json();
+}
+//get all reviews admin
+export async function getAllProductReview({
+  page,
+  limit,
+  product_reviews_id,
+  user_name,
+  product_name,
+  rating,
+  search,
+  sortBy,
+  sortOrder,
+}: GetAllProductReviewParams = {}) {
+  try {
+    const query = new URLSearchParams({
+      page: String(page || 1), // mặc định 1
+      limit: String(limit || 10), // mặc định 10
+      sortBy: sortBy || "created_at",
+      sortOrder: sortOrder || "desc",
+    });
+
+    if (product_reviews_id)
+      query.append("product_reviews_id", product_reviews_id?.toString() ?? "");
+
+    if (user_name) query.append("user_name", user_name);
+
+    if (product_name) query.append("product_name", product_name);
+
+    if (rating) query.append("rating", rating?.toString() ?? "");
+
+    if (search) query.append("search", search);
+
+    const res = await fetch(
+      `${API_BASE_URL}/product/all/reviews?${query.toString()}`
+    );
+
+    if (!res.ok) {
+      throw new Error(`Lỗi API: ${res.status}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API getAllProductReview:", error);
+    throw error;
+  }
+}
+export async function getByIdReview(product_reviews_id:number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/all/reviews/${product_reviews_id}`);
+    if (!res.ok) {
+      throw new Error(`Lỗi API: ${res.status}`);
+      }
+      return await res.json();
+      } catch (error) {
+        console.error("Lỗi khi gọi API getByIdReview:", error);
+        throw error;
+        }
+
+  
 }

@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import "../../css/comment_admin.css";
 import {
@@ -11,41 +11,38 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import { API_BASE_URL } from "@/config/env";
-
-const mockComment = {
-  id: 101,
-  user: {
-    name: "Lê Chí Bảo",
-    email: "lechibao@gmail.com",
-    address: "76 duognd dos sdhdskdsdsds",
-    phone: "0775895943",
-    avatar: "/images/logo/anhdep.jpg",
-  },
-  product: {
-    name: "Giày nike",
-    image: "AirJordanDMP1Retro(xanhduong).webp",
-    description: "Giày ngon bổ rẻ",
-    variant: {
-      color_name: "Xanh",
-      number_size: 33,
-    },
-  },
-  rating: 4,
-  content:
-    "Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.Rất hài lòng với sản phẩm! Giao hàng cực kỳ nhanh, đóng gói cẩn thận. Sẽ tiếp tục ủng hộ shop trong những lần sau.",
-  status: "pending",
-  createdAt: "2025-07-05 14:32",
-};
+import { getByIdReview } from "@/services/productService";
 
 export default function CommentDetailPage() {
   const router = useRouter();
   const [comment, setComment] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const params = useParams();
+
+  const reviewId = Number(params.id); // Lấy id từ URL ?id=123
+  console.log(reviewId);
 
   useEffect(() => {
-    setComment(mockComment);
-  }, []);
+    if (!reviewId) return;
 
-  if (!comment) return <p>Đang tải dữ liệu...</p>;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const data = await getByIdReview(Number(reviewId));
+        setComment(data);
+        console.log(data);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu bình luận:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [reviewId]);
+
+  if (loading) return <p>Đang tải dữ liệu...</p>;
+  if (!comment) return <p>Không tìm thấy bình luận.</p>;
 
   return (
     <div className="review-container">
@@ -62,7 +59,7 @@ export default function CommentDetailPage() {
             <div className="flex items-center  gap-4 !p-4 ">
               <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600">
                 <img
-                  src={comment.user.avatar}
+                  src={`${API_BASE_URL}/uploads/${comment.user.avatar}`}
                   alt="avatar"
                   className="w-full h-full object-cover"
                 />
@@ -74,15 +71,11 @@ export default function CommentDetailPage() {
                 </div>
                 <div className="flex items-center gap-2 ">
                   <strong>Số điện thoại: </strong>
-                  <p>
-                    {comment.user.phone}
-                  </p>
+                  <p>{comment.user.phone}</p>
                 </div>
                 <div className="flex items-center gap-2 ">
-                  <strong>Địa chỉ: </strong>
-                  <p >
-                    {comment.user.address}
-                  </p>
+                  <strong className="w-[20%]">Địa chỉ: </strong>
+                  <p className="!mt-[20px]" >{comment.user.ship_addresses[0]?.address_line}</p>
                 </div>
               </div>
             </div>
@@ -96,39 +89,44 @@ export default function CommentDetailPage() {
 
             <div className="flex items-center gap-4 mb-4">
               <img
-                src={`${API_BASE_URL}/uploads/${comment.product.image}`}
+                src={`${API_BASE_URL}/uploads/${comment.product.product_variants?.[0]?.color?.images}`}
                 alt={comment.product.name}
                 className="w-24 h-24 rounded object-cover border"
               />
               <div className="text-sm">
                 <div className="flex gap-2 items-center">
                   <strong>Màu:</strong>
-                  <p> {comment.product.variant.color_name}</p>
+                  <p>
+                    {comment.product.product_variants?.[0]?.color?.name_color}
+                  </p>
                 </div>
                 <div className="flex gap-2 items-center">
                   <strong>Size:</strong>{" "}
-                  <p>{comment.product.variant.number_size}</p>
+                  <p>
+                    {comment.product.product_variants?.[0]?.size?.number_size}
+                  </p>
                 </div>
                 <div className="flex  gap-2 items-center">
                   <strong>Mô tả:</strong>
-                  <p> {comment.product.description}</p>
+                  <p> {comment.product.short_desc}</p>
                 </div>
                 <div className="flex gap-2 items-center">
                   <strong>Đánh giá:</strong>
-              <p>
-                {"★".repeat(comment.rating)} {"☆".repeat(5 - comment.rating)}
-              </p>
+                  <p>
+                    {"★".repeat(comment.rating)}{" "}
+                    {"☆".repeat(5 - comment.rating)}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="comment-box col-span-4">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <FaRegClock />
               <strong>Thời gian:</strong>
-              <p>{comment.createdAt}</p>
-              </div>
+              <p>{new Date(comment.created_at).toLocaleString('vi-VN')}</p>
+            </div>
             <strong>Nội dung:</strong>
             <p>{comment.content}</p>
           </div>
