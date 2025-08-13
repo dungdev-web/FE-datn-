@@ -196,19 +196,6 @@ export default function Home() {
   if (loading) {
     return <p>Đang tải danh mục...</p>;
   }
-  
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 4, // ✅ 4 item/lần
-    slidesToScroll: 1,
-    responsive: [
-      { breakpoint: 1024, settings: { slidesToShow: 3 } },
-      { breakpoint: 768, settings: { slidesToShow: 2 } },
-      { breakpoint: 480, settings: { slidesToShow: 1 } },
-    ],
-  };
   return (
     <div>
       <Banner3D />
@@ -236,7 +223,7 @@ export default function Home() {
           <SwiperSlide key={cat.id}>
             <div className="category-main1-item" style={{ textAlign: "center" }}>
               <img
-                src={"https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_500,h_500/global/780088/01/mod01/fnd/VNM/fmt/png/Borussia-Dortmund-25/26-Home-Jersey-Men" || "/images/default.jpg"}
+                src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
                 alt={cat.name}
                 style={{
                   width: "400px",
