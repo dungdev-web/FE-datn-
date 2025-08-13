@@ -163,7 +163,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-boxes-stacked"></i>
           </div>
           <div className="info">
-            <p className="title">Số lượng sản phẩm</p>
+            <p className="title">Sản phẩm</p>
             <p className="number">{data.products?.totalProducts}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -175,7 +175,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-tags"></i>
           </div>
           <div className="info">
-            <p className="title">Tổng số nhãn hiệu</p>
+            <p className="title">Nhãn hiệu</p>
             <p className="number">{data.brands?.totalBrands}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -187,7 +187,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-layer-group"></i>
           </div>
           <div className="info">
-            <p className="title">Tổng số danh mục</p>
+            <p className="title">Danh mục</p>
             <p className="number">{data.categories?.totalCategories}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -199,7 +199,7 @@ export default function Home_admin() {
             <i className="fa fa-shopping-bag position-relative"></i>{" "}
           </div>
           <div className="info">
-            <p className="title">Tổng số đơn hàng</p>
+            <p className="title">Đơn hàng</p>
             <p className="number">{data.orders?.totalOrders}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -212,7 +212,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-users"></i>
           </div>
           <div className="info">
-            <p className="title">Tổng số user</p>
+            <p className="title">Người dùng</p>
             <p className="number">{data.users?.totalUsers}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -224,7 +224,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-star-half-stroke"></i>
           </div>
           <div className="info">
-            <p className="title">Tổng số đánh giá</p>
+            <p className="title">Đánh giá</p>
             <p className="number">{data.reviews?.totalReviews}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -236,7 +236,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-folder-open"></i>
           </div>
           <div className="info">
-            <p className="title">Tổng số danh mục bài viết</p>
+            <p className="title">Danh mục bài viết</p>
             <p className="number">{data.postCategories?.totalPostCategories}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)
@@ -248,7 +248,7 @@ export default function Home_admin() {
             <i className="fa-solid fa-newspaper"></i>
           </div>
           <div className="info">
-            <p className="title">Tổng số bài viết</p>
+            <p className="title">Bài viết</p>
             <p className="number">{data.posts?.totalPosts}</p>
             <a href="#" className="details-link">
               (Xem chi tiết)

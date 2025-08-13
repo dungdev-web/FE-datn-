@@ -1,11 +1,18 @@
 "use client";
-import { getRecentOrders, getStatusText } from "@/services/dashboard";
+import {
+  getRecentOrders,
+  getStatusText,
+  getAllCategoryProduct,
+} from "@/services/dashboard";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
 import exportStyledExcel from "../component_admin/excel";
 import { IOrder } from "@/types/Order";
 import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
+import { ArrowUpDown } from "lucide-react";
+import { ICategory } from "@/types/ICategory";
+
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
@@ -20,7 +27,11 @@ export default function OrderPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [sortField, setSortField] = useState<"name" | "phone" | "created_at">(
+    "created_at"
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [categoryProducts, setCategoryProducts] = useState<ICategory[]>([]);
 
   const statusOrderFlow = [
     "pending", // Chờ xử lý
@@ -28,7 +39,7 @@ export default function OrderPage() {
     "shipping", // Đang giao hàng
     "delivered", // Đã giao
     "completed", // Hoàn thành
-    "cancelled", // Đã hủy (cho phép chọn mọi lúc nếu muốn)
+    "cancelled", // Đã hủy
   ];
 
   const excelData = orders.map((order: any) => ({
@@ -125,7 +136,8 @@ export default function OrderPage() {
         search,
         status: statusFilter,
         categoryId: categoryFilter,
-        sort: sortOrder, // Thêm dòng này
+        sortField: sortField || "created_at",
+        sortOrder: sortOrder || "desc",
       });
 
       const data = await getRecentOrders(params.toString());
@@ -141,7 +153,29 @@ export default function OrderPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, [page, limit, search, statusFilter, categoryFilter,sortOrder]);
+  }, [page, limit, search, statusFilter, categoryFilter, sortOrder]);
+  const handleSort = (field: "name" | "phone" | "created_at") => {
+    if (sortField === field) {
+      // Nếu click lại cùng 1 field -> đảo chiều asc/desc
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // Nếu click field khác -> set field mới và reset asc
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await getAllCategoryProduct();
+        // res có dạng { message: string, data: CategoryProduct[] }
+        setCategoryProducts(res.data);
+      } catch (error) {
+        console.error("Lỗi lấy danh mục sản phẩm:", error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <div>
@@ -190,22 +224,31 @@ export default function OrderPage() {
           <thead>
             <tr>
               <th>Mã đơn hàng</th>
-              <th>Người nhận</th>
-              <th>Điện thoại</th>
+              <th>
+                Người nhận{" "}
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                  onClick={() => handleSort("name")}
+                  style={{ cursor: "pointer" }}
+                />{" "}
+              </th>
+              <th>
+                Điện thoại{" "}
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                  onClick={() => handleSort("phone")}
+                  style={{ cursor: "pointer" }}
+                />
+              </th>
               <th>Trạng thái</th>
               <th>Sản phẩm</th>
-              <th
-                onClick={() =>
-                  setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                }
-                style={{ cursor: "pointer" }}
-              >
+              <th>
                 Ngày đặt{" "}
-                <i
-                  className={`fa-solid ${
-                    sortOrder === "asc" ? "fa-arrow-up" : "fa-arrow-down"
-                  }`}
-                ></i>
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                  onClick={() => handleSort("created_at")}
+                  style={{ cursor: "pointer" }}
+                />
               </th>
               <th>Thao tác</th>
             </tr>
@@ -240,11 +283,19 @@ export default function OrderPage() {
                 </select>
               </th>
               <th>
-                <select onChange={(e) => setCategoryFilter(e.target.value)}>
+                <select
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  value={categoryFilter}
+                >
                   <option value="">Tất cả</option>
-                  <option value="1">Nike</option>
-                  <option value="2">Adidas</option>
-                  <option value="3">Puma</option>
+                  {categoryProducts.map((cat) => (
+                    <option
+                      key={cat.categories_id}
+                      value={String(cat.categories_id)}
+                    >
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </th>
               <th></th>

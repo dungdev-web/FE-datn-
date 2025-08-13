@@ -828,12 +828,12 @@ export default function Detail() {
                                       src={
                                         review.user?.picture
                                           ? review.user?.picture
-                                          : review.user.avatar?.startsWith(
+                                          : review.user?.avatar?.startsWith(
                                               "http"
                                             )
-                                          ? review.user.avatar
-                                          : review.user.avatar
-                                          ? `${API_BASE_URL}/uploads/${review.user.avatar}`
+                                          ? review.user?.avatar
+                                          : review.user?.avatar
+                                          ? `${API_BASE_URL}/uploads/${review.user?.avatar}`
                                           : "/images/default.png"
                                       }
                                       alt=""

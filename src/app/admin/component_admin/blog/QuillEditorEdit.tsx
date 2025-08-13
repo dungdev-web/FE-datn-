@@ -6,56 +6,50 @@ import "quill/dist/quill.snow.css";
 import "quill-image-uploader/dist/quill.imageUploader.min.css";
 import "filepond/dist/filepond.min.css";
 import "@yaireo/tagify/dist/tagify.css";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import "../../css/blog_add.css";
 import { useUpdatePost } from "@/hooks/useAddBlog";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCategories } from "@/hooks/useBlog";
-import { ICategory } from "@/types/ICategory";
 import { API_BASE_URL } from "@/config/env";
 import { getPostById } from "@/services/blogService";
-import { usePostsByCategory } from "@/hooks/useBlog";
 import { IBlog } from "@/types/blog";
+
+import { FilePond, registerPlugin } from "react-filepond";
+import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+
 Quill.register("modules/imageUploader", ImageUploader);
+registerPlugin(FilePondPluginImagePreview);
 
 export default function Blog_View() {
-  const quillRef = useRef<any>(null);
+  const quillRef = useRef<Quill | null>(null);
   const isInitializedRef = useRef(false);
-  const filePondRef = useRef<any>(null);
   const params = useParams();
+  const router = useRouter();
   const idParam = params.id;
+
   const [post, setPost] = useState<IBlog | null>(null);
-  const [strongTexts, setStrongTexts] = useState<string[]>([]);
-  const [modifiedContent, setModifiedContent] = useState("");
-  const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [status, setStatus] = useState<string>(""); // lưu dưới dạng chuỗi để khớp với option value
- 
 
-  const {
-    updatePost,
-    loading: loadingAddPost,
-    error: errorAddPost,
-    success,
-  } = useUpdatePost();
+  // State quản lý form
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [categoryId, setCategoryId] = useState<number | "">("");
+  const [status, setStatus] = useState("1"); // mặc định công khai
 
-  const {
-    categories,
-    loading: loadingCategories,
-    error: errorCategories,
-  } = useCategories();
-
+  const { updatePost, loading: loadingUpdate } = useUpdatePost();
+  const { categories, loading: loadingCategories, error: errorCategories } = useCategories();
   const { user } = useAuthUser();
+
+  // FilePond quản lý files (có preload file cũ)
+  const [files, setFiles] = useState<any[]>([]);
 
   useEffect(() => {
     const init = async () => {
-      if (isInitializedRef.current || quillRef.current) return; // ⛔️ CHẶN LẠI nếu đã có Quill
+      if (isInitializedRef.current || quillRef.current) return;
 
-      const { create } = await import("filepond");
-      const Tagify = (await import("@yaireo/tagify")).default;
-
-      const editorElement = document.querySelector(
-        "#editor"
-      ) as HTMLElement | null;
+      // Khởi tạo Quill
+      const editorElement = document.querySelector("#editor") as HTMLElement | null;
       if (editorElement && !quillRef.current) {
         quillRef.current = new Quill(editorElement, {
           theme: "snow",
@@ -82,41 +76,17 @@ export default function Blog_View() {
         });
       }
 
-      // ✅ Các phần khởi tạo khác
-      if (filePondRef.current) {
-        filePondRef.current.pond = create(filePondRef.current);
-      }
+      // Khởi tạo Tagify (nếu cần)
+      const tagInput = document.querySelector("#tags") as HTMLInputElement | null;
+      if (tagInput) new (await import("@yaireo/tagify")).default(tagInput);
 
-      const tagInput = document.querySelector(
-        "#tags"
-      ) as HTMLInputElement | null;
-      if (tagInput) new Tagify(tagInput);
-
-      const titleInput = document.getElementById(
-        "title"
-      ) as HTMLInputElement | null;
-      const slugInput = document.getElementById(
-        "slug"
-      ) as HTMLInputElement | null;
-
-      const handleTitleInput = () => {
-        if (titleInput && slugInput) {
-          const slug = titleInput.value
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/--+/g, "-");
-          slugInput.value = slug;
-        }
-      };
-
-      titleInput?.addEventListener("input", handleTitleInput);
       isInitializedRef.current = true;
     };
 
     init();
   }, []);
 
+  // Lấy dữ liệu bài viết khi có idParam
   useEffect(() => {
     const fetchPost = async () => {
       if (typeof idParam !== "string") return;
@@ -126,19 +96,32 @@ export default function Blog_View() {
       try {
         const data = await getPostById(id);
         setPost(data);
-        if (data?.category_post?.category_post_id) {
-          setCategoryId(data.category_post.category_post_id);
-        }
-        if (data?.status !== undefined && data?.status !== null) {
-          setStatus(String(data.status)); // gán giá trị status cho select
-        }
-        // Chờ Quill đã khởi tạo
+
+        // Set state form từ dữ liệu lấy về
+        setTitle(data?.title || "");
+        setSlug(data?.slug || "");
+        setCategoryId(data?.category_post?.category_post_id ?? "");
+        setStatus(data?.status !== undefined && data.status !== null ? String(data.status) : "1");
+
+        // Set nội dung cho Quill sau khi nó đã khởi tạo
         const interval = setInterval(() => {
           if (quillRef.current) {
             quillRef.current.root.innerHTML = data?.content || "";
             clearInterval(interval);
           }
-        }, 100); // đợi tối đa vài lần
+        }, 100);
+
+        // Preload ảnh cũ vào FilePond
+        if (data?.thumbnail) {
+          setFiles([
+            {
+              source: `${API_BASE_URL}/uploads/blog/${data.thumbnail}`,
+              options: {
+                type: "local",
+              },
+            },
+          ]);
+        }
       } catch (error) {
         console.error("Lỗi khi lấy bài viết:", error);
       }
@@ -147,104 +130,86 @@ export default function Blog_View() {
     fetchPost();
   }, [idParam]);
 
+  // Tự động tạo slug khi title thay đổi
   useEffect(() => {
-    if (post?.content) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(post.content, "text/html");
-
-      const strongElements = doc.querySelectorAll("strong");
-      strongElements.forEach((el, index) => {
-        el.setAttribute("id", `section-${index}`);
-      });
-
-      setModifiedContent(doc.body.innerHTML);
+    if (!title) {
+      setSlug("");
+      return;
     }
-  }, [post]);
-  useEffect(() => {
-    if (post?.content && quillRef.current) {
-      // Set nội dung vào trình soạn thảo Quill
-      quillRef.current.root.innerHTML = post.content;
-    }
-  }, [post]);
-const numericId = typeof idParam === "string" ? parseInt(idParam) : NaN;
-if (isNaN(numericId)) {
-  console.error("❌ ID không hợp lệ");
-  return;
-}
+    const newSlug = title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-");
+    setSlug(newSlug);
+  }, [title]);
 
-  // Dùng hook sau khi có categoryId
-  const { posts, loading, error } = usePostsByCategory(
-    categoryId ? categoryId : 0
-  );
+  const numericId = typeof idParam === "string" ? parseInt(idParam) : NaN;
+  if (isNaN(numericId)) {
+    console.error("❌ ID không hợp lệ");
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const title = (document.getElementById("title") as HTMLInputElement)?.value;
-    const slug = (document.getElementById("slug") as HTMLInputElement)?.value;
-    const category_post_id = (
-      document.getElementById("category") as HTMLSelectElement
-    )?.value;
-    const status = (
-      document.querySelector("select:nth-of-type(2)") as HTMLSelectElement
-    )?.value;
-    const contentHtml = quillRef.current?.root.innerHTML;
-
-    const thumbnailFile = filePondRef.current?.pond?.getFiles?.()[0]?.file;
-
-    if (
-      !title ||
-      !slug ||
-      !category_post_id ||
-      !contentHtml ||
-      !thumbnailFile
-    ) {
-      console.error("❌ Thiếu dữ liệu, chi tiết:");
-      console.log("🔸 title:", title);
-      console.log("🔸 slug:", slug);
-      console.log("🔸 category_post_id:", category_post_id);
-      console.log("🔸 contentHtml:", contentHtml ? "[có nội dung]" : "[trống]");
-      console.log(
-        "🔸 thumbnailFile:",
-        thumbnailFile ? "[đã chọn ảnh]" : "[chưa có ảnh]"
-      );
+    if (!title || !slug || !categoryId || !quillRef.current?.root.innerHTML) {
+      console.error("❌ Thiếu dữ liệu bắt buộc");
       return;
     }
+
+    const contentHtml = quillRef.current.root.innerHTML;
+
+    // Lấy file ảnh thumbnail nếu có
+    const thumbnailFile = files.length > 0 && files[0].file ? files[0].file : null;
 
     const formData = new FormData();
     formData.append("title", title);
     formData.append("slug", slug);
-    formData.append("category_post_id", category_post_id);
+    formData.append("category_post_id", String(categoryId));
     formData.append("status", status);
-
     formData.append("content", contentHtml);
     formData.append("author_id", String(user?.id));
-if (thumbnailFile) {
-  formData.append("thumbnail", thumbnailFile);
-}
+
+    if (thumbnailFile) {
+      formData.append("thumbnail", thumbnailFile);
+    }
+
+    console.log("🔸 title:", title);
+    console.log("🔸 slug:", slug);
+    console.log("🔸 category_post_id:", categoryId);
+    console.log("🔸 contentHtml:", contentHtml ? "[có nội dung]" : "[trống]");
+    console.log("🔸 thumbnailFile:", thumbnailFile ? "[đã chọn ảnh]" : "[chưa có ảnh]");
 
     const result = await updatePost(numericId, formData);
 
     if (result) {
-      console.log("✅ Thêm bài viết thành công:", result);
+      console.log("✅ Cập nhật bài viết thành công:", result);
+      router.push("/admin/blog");
     } else {
-      console.error("❌ Thêm bài viết thất bại");
+      console.error("❌ Cập nhật bài viết thất bại");
     }
   };
 
   return (
     <form className="form-add-post" onSubmit={handleSubmit}>
-      {/* -- giữ nguyên phần HTML form như bạn đã có -- */}
       {loadingCategories && <p>Đang tải danh mục...</p>}
       {errorCategories && <p>{errorCategories}</p>}
+
       <div className="form-header flex justify-between items-center !mb-[24px]">
         <h2 className="form-title">Sửa bài viết</h2>
         <div className="action-buttons flex !gap-[8px]">
-          <button type="button" className="btn btn-back cursor-pointer">
+          <button
+            type="button"
+            className="btn btn-back cursor-pointer"
+            onClick={() => router.back()}
+          >
             <i className="fa-solid fa-arrow-left"></i> Trở về
           </button>
           <button
             type="submit"
             className="btn bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
+            disabled={loadingUpdate}
           >
             <i className="fa-solid fa-plus"></i> Sửa bài viết
           </button>
@@ -262,7 +227,8 @@ if (thumbnailFile) {
               id="title"
               className="form-controls !w-full !px-4 !py-2 border border-gray-300 rounded-md"
               placeholder="Nhập tiêu đề bài viết"
-              defaultValue={post?.title || ""}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
           <div className="!mb-[12px]">
@@ -274,7 +240,8 @@ if (thumbnailFile) {
               id="slug"
               className="form-controls !w-full !px-4 !py-2 border border-gray-300 rounded-md"
               placeholder="Slug tự sinh hoặc chỉnh sửa"
-              defaultValue={post?.slug || ""}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
             />
           </div>
           <div className="!mb-[12px]">
@@ -283,12 +250,14 @@ if (thumbnailFile) {
             </label>
             <select
               id="category"
-              value={categoryId ?? ""}
-              onChange={(e) => setCategoryId(Number(e.target.value))}
-              className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
+              value={categoryId}
+              onChange={(e) =>
+                setCategoryId(e.target.value ? Number(e.target.value) : "")
+              }
+              className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-700"
             >
               <option value="">-- Chọn danh mục --</option>
-              {categories.map((cat) => (
+              {categories?.data.map((cat) => (
                 <option key={cat.category_post_id} value={cat.category_post_id}>
                   {cat.name}
                 </option>
@@ -303,37 +272,41 @@ if (thumbnailFile) {
               Trạng thái
             </label>
             <select
-              className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
+              id="status"
+              className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-700"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
             >
               <option value="1">Công khai</option>
-              <option value="0">Nháp</option>
-              <option value="2">Chờ duyệt</option>
+              <option value="0">Riêng tư</option>
             </select>
           </div>
+
           <div className="!mb-[12px]">
             <label className="block text-lg/6 font-medium text-gray-900">
               Ảnh đại diện
             </label>
 
-            {post?.thumbnail && (
-              <div className="mb-2">
-                <p className="text-gray-600 text-sm">Ảnh hiện tại:</p>
+            {/* Ảnh hiện tại bên dưới (không dùng FilePond để hiển thị ảnh cũ nữa) */}
+            {/* Bạn có thể bỏ phần này nếu preload vào FilePond */}
+
+            {/* <div className="mb-2">
+              <p className="text-gray-600 text-sm">Ảnh hiện tại:</p>
+              {post?.thumbnail && (
                 <img
                   src={`${API_BASE_URL}/uploads/blog/${post.thumbnail}`}
                   alt="Ảnh đại diện cũ"
                   className="w-[150px] h-auto border rounded-md mt-1"
                 />
-              </div>
-            )}
+              )}
+            </div> */}
 
-            <input
-              type="file"
-              className="filepond"
-              id="thumbnail"
+            <FilePond
+              files={files}
+              allowMultiple={false}
+              onupdatefiles={setFiles}
               name="thumbnail"
-              ref={filePondRef}
+              labelIdle='Kéo thả file hoặc <span class="filepond--label-action"> Chọn file </span>'
             />
           </div>
         </div>

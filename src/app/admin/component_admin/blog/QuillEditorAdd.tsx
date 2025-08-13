@@ -15,12 +15,13 @@ import { useAuthUser } from "@/hooks/useAuthUser";
 import { useCategories } from "@/hooks/useBlog";
 import { ICategory } from "@/types/ICategory";
 import { API_BASE_URL } from "@/config/env";
+import { log } from "console";
 Quill.register("modules/imageUploader", ImageUploader);
 
 export default function Blog_View() {
   const quillRef = useRef<any>(null);
   const isInitializedRef = useRef(false);
-  const filePondRef = useRef<any>(null); // ref FilePond
+  const filePondRef = useRef<any>(null); 
 
   const {
     addPost,
@@ -117,9 +118,9 @@ export default function Blog_View() {
     const category_post_id = (
       document.getElementById("category") as HTMLSelectElement
     )?.value;
-    const status = (
-      document.querySelector("select:nth-of-type(2)") as HTMLSelectElement
-    )?.value;
+    const status = (document.getElementById("status") as HTMLSelectElement)
+      ?.value;
+
     const contentHtml = quillRef.current?.root.innerHTML;
 
     const thumbnailFile = filePondRef.current?.pond?.getFiles?.()[0]?.file;
@@ -140,6 +141,7 @@ export default function Blog_View() {
         "🔸 thumbnailFile:",
         thumbnailFile ? "[đã chọn ảnh]" : "[chưa có ảnh]"
       );
+      console.log("🔸 status:", status);
       return;
     }
 
@@ -147,10 +149,8 @@ export default function Blog_View() {
     formData.append("title", title);
     formData.append("slug", slug);
     formData.append("category_post_id", category_post_id);
-    formData.append(
-      "status",
-      status === "public" ? "1" : status === "draft" ? "0" : "2"
-    ); 
+    formData.append("status", status);
+
     formData.append("content", contentHtml);
     formData.append("author_id", String(user?.id));
     formData.append("thumbnail", thumbnailFile);
@@ -217,7 +217,7 @@ export default function Blog_View() {
               className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
             >
               <option value="">-- Chọn danh mục --</option>
-              {categories.map((cat) => (
+              {categories?.data.map((cat) => (
                 <option key={cat.category_post_id} value={cat.category_post_id}>
                   {cat.name}
                 </option>
@@ -231,10 +231,9 @@ export default function Blog_View() {
             <label className="text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">
               Trạng thái
             </label>
-            <select className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500">
-              <option value="public">Công khai</option>
-              <option value="draft">Nháp</option>
-              <option value="pending">Chờ duyệt</option>
+            <select id="status" className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500">
+              <option value="1">Công khai</option>
+              <option value="0">Riêng tư</option>
             </select>
           </div>
           <div className="!mb-[12px]">

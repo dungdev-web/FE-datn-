@@ -56,3 +56,4 @@ export const getCountPosts = () => fetchDashboardData("posts");
 export const getCountPostCategories = () => fetchDashboardData("post-categories");
 export const getCountOrders = () => fetchDashboardData("orders");
 export const getRecentOrders = (query = "") => fetchDashboardData("recent-orders?" + query);
+export const getAllCategoryProduct = ()=> fetchDashboardData("category_product");

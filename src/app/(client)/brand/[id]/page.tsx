@@ -128,7 +128,9 @@ export default function CategoryPage() {
         setTotal(fetched.length);
         setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
 
-        const matchedBrand = fetchedBrands.find((b) => b.brand_id === brandId);
+        const matchedBrand = Array.isArray(fetchedBrands.data)
+          ? fetchedBrands.data.find((b) => b.brand_id === brandId)
+          : null;
         setBrand(matchedBrand || null);
       } catch (err) {
         console.error("Lỗi khi load sản phẩm theo brand:", err);

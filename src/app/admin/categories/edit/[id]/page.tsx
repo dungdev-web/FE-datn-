@@ -3,100 +3,114 @@
 import "@/app/admin/css/categories_add_admin.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { addCategory, getCategories } from "@/services/categoryService"; // nhớ import đúng service
+import { useRouter, useParams } from "next/navigation";
+import {
+  updateCategory,
+  getCategories,
+  getCategoryById,
+} from "@/services/categoryService";
 import Swal from "sweetalert2";
 import { ICategory } from "@/types/ICategory";
 
-export default function CategoryAdd() {
+export default function CategoryEdit() {
   const router = useRouter();
-
+  const params = useParams();
+  const categoryId = Number(params?.id);
+  const [updatedAt, setUpdatedAt] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
   const [name, setName] = useState("");
-  const [status, setStatus] = useState<number>(1); // 1: hiển thị, 0: ẩn
-  const [parentId, setParentId] = useState<number>(0); // mặc định 0
+  const [status, setStatus] = useState<number>(1);
+  const [parentId, setParentId] = useState<number>(0);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<ICategory[]>([]);
 
   useEffect(() => {
-    async function fetchCategories() {
+    async function fetchData() {
       try {
-        const res = await getCategories({ limit: 1000 }); // lấy hết category để chọn cha
+        const res = await getCategories({ limit: 1000 });
         setCategories(res.data);
+
+        if (categoryId) {
+          const category = await getCategoryById(categoryId);
+          if (category) {
+            setName(category.name);
+            setStatus(Number(category.status));
+            setCreatedAt(category.created_at || "");
+            setUpdatedAt(category.updated_at || "");
+            setParentId(category.parent_id || 0);
+            if (category.image) {
+              setImagePreview(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/uploads/${category.image}`
+              );
+            }
+          }
+        }
       } catch (error) {
-        console.error("Lỗi khi lấy danh mục:", error);
+        console.error("Lỗi khi load dữ liệu:", error);
       }
     }
-    fetchCategories();
-  }, []);
+    fetchData();
+  }, [categoryId]);
 
   function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] || null;
     setImageFile(file);
-    if (file) setImagePreview(URL.createObjectURL(file));
-    else setImagePreview(null);
+    if (file) {
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setImagePreview(null);
+    }
   }
 
- async function handleSubmit(e: React.FormEvent) {
-  e.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-  if (!name.trim()) {
-    Swal.fire({
-      icon: "warning",
-      title: "Thiếu thông tin",
-      text: "Vui lòng nhập tên danh mục",
-    });
-    return;
+    if (!name.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu thông tin",
+        text: "Vui lòng nhập tên danh mục",
+      });
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await updateCategory(categoryId, {
+        name,
+        parent_id: parentId === 0 ? null : parentId,
+        imageFile,
+        status,
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Cập nhật danh mục thành công!",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      setTimeout(() => {
+        router.push("/admin/categories");
+      }, 1500);
+    } catch (error: any) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: error.message || "Lỗi khi cập nhật danh mục",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
-
-  if (!imageFile) { // ✅ Bắt buộc chọn ảnh
-    Swal.fire({
-      icon: "warning",
-      title: "Thiếu ảnh",
-      text: "Vui lòng chọn ảnh danh mục",
-    });
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const payload = {
-      name,
-      parent_id: parentId === 0 ? null : parentId,
-      imageFile,
-      status,
-    };
-
-    await addCategory(payload);
-
-    Swal.fire({
-      icon: "success",
-      title: "Thành công",
-      text: "Thêm danh mục thành công!",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-
-    setTimeout(() => {
-      router.push("/admin/categories");
-    }, 1500);
-  } catch (error: any) {
-    Swal.fire({
-      icon: "error",
-      title: "Lỗi",
-      text: error.message || "Lỗi khi thêm danh mục",
-    });
-  } finally {
-    setLoading(false);
-  }
-}
-
 
   return (
     <div className="category-container">
-      <h2>Thêm danh mục mới</h2>
+      <h2>Cập nhật danh mục</h2>
 
       <form className="category-form" onSubmit={handleSubmit}>
         <div className="form-row">
@@ -111,7 +125,6 @@ export default function CategoryAdd() {
               placeholder="Nhập tên danh mục"
               value={name}
               onChange={(e) => setName(e.target.value)}
-            
             />
           </div>
 
@@ -137,11 +150,13 @@ export default function CategoryAdd() {
               onChange={(e) => setParentId(Number(e.target.value))}
             >
               <option value={0}>-- Không có --</option>
-              {categories.map((cate) => (
-                <option key={cate.categories_id} value={cate.categories_id}>
-                  {cate.name}
-                </option>
-              ))}
+              {categories
+                .filter((cate) => cate.categories_id !== categoryId) // tránh chọn chính nó
+                .map((cate) => (
+                  <option key={cate.categories_id} value={cate.categories_id}>
+                    {cate.name}
+                  </option>
+                ))}
             </select>
           </div>
         </div>
@@ -166,13 +181,12 @@ export default function CategoryAdd() {
               </div>
             )}
           </div>
-
           <div className="form-group readonly">
             <label>Ngày tạo</label>
             <input
               type="text"
               className="input-field"
-              value="Tự động tạo"
+              value={createdAt || "Tự động tạo"}
               readOnly
             />
           </div>
@@ -182,7 +196,7 @@ export default function CategoryAdd() {
             <input
               type="text"
               className="input-field"
-              value="Tự động cập nhật"
+              value={updatedAt || "Tự động cập nhật"}
               readOnly
             />
           </div>
@@ -190,7 +204,7 @@ export default function CategoryAdd() {
 
         <div className="form-actions">
           <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? "Đang thêm..." : "Thêm"}
+            {loading ? "Đang cập nhật..." : "Cập nhật"}
           </button>
           <Link
             href={"/admin/categories"}

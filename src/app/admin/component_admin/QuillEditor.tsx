@@ -214,7 +214,7 @@ export default function Blog_View() {
               className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
             >
               <option value="">-- Chọn danh mục --</option>
-              {categories.map((cat) => (
+              {categories?.data.map((cat) => (
                 <option key={cat.category_post_id} value={cat.category_post_id}>
                   {cat.name}
                 </option>

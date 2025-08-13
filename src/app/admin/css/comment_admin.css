@@ -164,8 +164,8 @@
 }
 .status.pending,
 .status.pending-add {
-  background-color: #ffc107;
-  color: #000;
+  background-color: #c51515;
+  color: #fff !important;
 }
 .status.hidden {
   background-color: #6c757d;
@@ -265,7 +265,7 @@ body.dark .comment-box {
 }
 
 .status.approved-add {
-  color: #28a745;
+  /* color: #28a745; */
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -278,7 +278,7 @@ body.dark .comment-box {
   display: flex;
   align-items: center;
   gap: 6px;
-  width: 14%;
+  /* width: 14%; */
 }
 .switch {
   position: relative;
