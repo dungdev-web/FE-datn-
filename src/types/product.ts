@@ -1,4 +1,7 @@
 export interface IProduct {
+  brand_id: any;
+  gender_id: any;
+  categories_id: any;
   products_id: number;
   name: string;
   slug: string;
@@ -6,13 +9,18 @@ export interface IProduct {
   short_desc: string;
   price: number;
   sale_price: number;
-  status: string;
+  status: number;
   created_at: string;
   updated_at: string;
   category: {
     categories_id: number;
     name: string;
     slug: string;
+    parent_id: number;
+    image: string;
+    status: number;
+    created_at: string;
+    updated_at: string;
   };
 
   brand: {
@@ -20,6 +28,9 @@ export interface IProduct {
     name: string;
     slug: string;
     logo_url: string;
+    status: number;
+    created_at: string;
+    updated_at: string;
   };
 
   gender: {
@@ -43,6 +54,7 @@ export interface IProduct {
     };
   }[];
   product_variants: {
+    image_url: string;
     product_variants_id: number;
     sku: string;
     stock_quantity: number;
@@ -53,6 +65,7 @@ export interface IProduct {
       images: string;
     };
     size: {
+      map(arg0: (s: any) => any): any;
       id: number;
       number_size: string;
     };
@@ -157,5 +170,11 @@ export interface AddProductPayload {
 
 export interface AddProductResponse {
   message: string;
+  product: IProduct;
+}
+export interface GetProductByIdResponse {
+  data: IProduct;
+}
+export interface UpdateProductResponse {
   product: IProduct;
 }

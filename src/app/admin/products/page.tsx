@@ -103,7 +103,7 @@ export default function Products() {
   }
 
   // Handle filter input change
-  function handleFilterChange(e: { target: { name: any; value: any; }; }) {
+  function handleFilterChange(e: { target: { name: any; value: any } }) {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
     setCurrentPage(1); // reset trang khi filter thay đổi
@@ -172,8 +172,23 @@ export default function Products() {
           <td>{new Date(product.updated_at).toLocaleDateString()}</td>
           <td>{stockQuantity}</td>
           <td>
-            <i className="fa-solid fa-pen edit-icon" title="Sửa SP" />
-            <i className="fa-solid fa-trash delete-icon" title="Xóa SP" />
+            {/* Sửa sản phẩm */}
+            <a
+              href={`/admin/products/edit/${product.products_id}`}
+              title="Sửa SP"
+            >
+              <i className="fa-solid fa-pen edit-icon" />
+            </a>
+
+            {/* Xóa sản phẩm */}
+            <button
+              type="button"
+              title="Xóa SP"
+              className="delete-icon"
+
+            >
+              <i className="fa-solid fa-trash" />
+            </button>
           </td>
         </tr>
       );

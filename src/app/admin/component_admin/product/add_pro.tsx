@@ -23,6 +23,9 @@ export default function Add_pro() {
   const [genders, setGenders] = useState<IGender[]>([]);
   const [mainImages, setMainImages] = useState<File[]>([]);
   const [variantImages, setVariantImages] = useState<Record<string, File>>({});
+  const [variantImagesPreview, setVariantImagesPreview] = useState<{
+    [key: string]: string;
+  }>({});
 
   // chọn ảnh chính
   const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,7 +42,7 @@ export default function Add_pro() {
       const colorFull = variants[index].color; // ví dụ: "white|Trắng"
       const colorCode = colorFull.split("|")[0]; // ví dụ: "white"
 
-      // Tìm mã màu hex trong mảng colors, bỏ dấu # và viết hoa
+      // Tìm mã màu hex trong mảng colors
       const colorObj = colors.find((c) => c.value.startsWith(colorCode + "|"));
       const hex = colorObj
         ? colorObj.hex.replace("#", "").toUpperCase()
@@ -48,7 +51,7 @@ export default function Add_pro() {
       // Lấy đuôi file gốc
       const ext = originalFile.name.split(".").pop();
 
-      // Tạo tên file mới theo chuẩn
+      // Tạo tên file mới
       const newFileName = `${Date.now()}-variant_image_${hex}.${ext}`;
 
       // Tạo file mới với tên mới
@@ -56,13 +59,22 @@ export default function Add_pro() {
         type: originalFile.type,
       });
 
-      // Lưu file mới vào state với key là mã hex
+      // Lưu file mới vào state
       setVariantImages((prev) => ({
         ...prev,
         [hex]: newFile,
       }));
 
-      // Cập nhật biến thể nếu cần (cái này bạn đã có)
+      // Lưu đường dẫn preview ảnh
+      const files = Array.from(e.target.files);
+      const previews = files.map((file) => URL.createObjectURL(file));
+
+      setVariantImagesPreview((prev: any) => ({
+        ...prev,
+        [hex]: previews,
+      }));
+
+      // Cập nhật biến thể
       handleVariantChange(index, "image", newFile);
     }
   };
@@ -97,67 +109,91 @@ export default function Add_pro() {
     ).value;
     const status = statusText === "Mở bán" ? 1 : 0;
 
-    // Check required fields
+    // Kiểm tra các trường bắt buộc
     if (!name) {
-      Swal.fire("Lỗi", "Tên sản phẩm không được để trống", "error");
+      Swal.fire("Thiếu thông tin", "Vui lòng nhập tên sản phẩm.", "warning");
       return;
     }
+
     if (!short_desc) {
-      Swal.fire("Lỗi", "Mô tả ngắn không được để trống", "error");
+      Swal.fire(
+        "Thiếu thông tin",
+        "Vui lòng nhập mô tả ngắn cho sản phẩm.",
+        "warning"
+      );
       return;
     }
+
     if (!priceInput || isNaN(Number(priceInput))) {
-      Swal.fire("Lỗi", "Giá gốc không hợp lệ", "error");
+      Swal.fire(
+        "Giá không hợp lệ",
+        "Vui lòng nhập giá gốc của sản phẩm.",
+        "warning"
+      );
       return;
     }
-    if (!salePriceInput || isNaN(Number(salePriceInput))) {
-      Swal.fire("Lỗi", "Giá bán không hợp lệ", "error");
-      return;
-    }
+
     const price = Number(priceInput);
     const sale_price = Number(salePriceInput);
     if (sale_price > price) {
-      Swal.fire("Lỗi", "Giá bán phải nhỏ hơn hoặc bằng giá gốc", "error");
+      Swal.fire(
+        "Sai giá",
+        "Giá bán phải nhỏ hơn hoặc bằng giá gốc.",
+        "warning"
+      );
       return;
     }
 
     if (!categories_id) {
-      Swal.fire("Lỗi", "Vui lòng chọn danh mục sản phẩm", "error");
-      return;
-    }
-    if (!brand_id) {
-      Swal.fire("Lỗi", "Vui lòng chọn nhãn hiệu", "error");
-      return;
-    }
-    if (!gender_id) {
-      Swal.fire("Lỗi", "Vui lòng chọn giới tính sản phẩm", "error");
-      return;
-    }
-    if (mainImages.length === 0) {
-      Swal.fire("Lỗi", "Phải có ít nhất 1 ảnh chính của sản phẩm", "error");
+      Swal.fire(
+        "Thiếu danh mục",
+        "Vui lòng chọn danh mục sản phẩm.",
+        "warning"
+      );
       return;
     }
 
+    if (!brand_id) {
+      Swal.fire(
+        "Thiếu nhãn hiệu",
+        "Vui lòng chọn nhãn hiệu cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!gender_id) {
+      Swal.fire(
+        "Thiếu thông tin",
+        "Vui lòng chọn giới tính áp dụng cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    if (mainImages.length === 0) {
+      Swal.fire(
+        "Thiếu hình ảnh",
+        "Cần ít nhất 1 ảnh chính cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    // Kiểm tra ảnh biến thể
     for (let i = 0; i < variants.length; i++) {
       const v = variants[i];
-
-      // Lấy code màu text (ví dụ "gold")
       const colorCode = v.color.split("|")[0];
-
-      // Tìm mã hex tương ứng từ mảng colors
       const colorObj = colors.find((c) => c.value.startsWith(colorCode + "|"));
-
-      // Nếu tìm thấy thì lấy mã hex (loại bỏ # và viết hoa), nếu không thì fallback colorCode
       const hexColor = colorObj
         ? colorObj.hex.replace("#", "").toUpperCase()
         : colorCode;
 
-      // Kiểm tra xem ảnh biến thể có tồn tại không với key là mã hex
       if (!variantImages[hexColor]) {
         Swal.fire(
-          "Lỗi",
-          `Biến thể màu ${colorCode}: Chưa chọn ảnh biến thể`,
-          "error"
+          "Thiếu ảnh biến thể",
+          `Vui lòng chọn ảnh cho biến thể màu "${v.color.split("|")[1]}".`,
+          "warning"
         );
         return;
       }
@@ -286,6 +322,7 @@ export default function Add_pro() {
 
   /** Kiểu dữ liệu biến thể */
   type Variant = {
+    imagePreview?: string;
     color: string;
     image: File | null;
     sizes: string[];
@@ -654,28 +691,6 @@ export default function Add_pro() {
 
                     {/* Dropdown danh sách màu */}
                     <div className="dropdown">
-                      <input
-                        type="text"
-                        className="color-search"
-                        placeholder="Tìm màu..."
-                        onChange={(e) => {
-                          const search = e.target.value.toLowerCase();
-                          document
-                            .querySelectorAll(
-                              `.dropdown-option[data-variant="${index}"]`
-                            )
-                            .forEach((el) => {
-                              const name =
-                                el.getAttribute("data-name")?.toLowerCase() ||
-                                "";
-                              (el as HTMLElement).style.display = name.includes(
-                                search
-                              )
-                                ? "flex"
-                                : "none";
-                            });
-                        }}
-                      />
                       {colors.map((c, i) => (
                         <div
                           key={i}
@@ -699,9 +714,40 @@ export default function Add_pro() {
                 </div>
                 <input
                   type="file"
+                  accept="image/*"
                   onChange={(e) => handleVariantImageChange(index, e)}
                   style={{ flex: "1" }}
                 />
+
+                {(() => {
+                  const colorCode = variant.color.split("|")[0];
+                  const colorObj = colors.find((c) =>
+                    c.value.startsWith(colorCode + "|")
+                  );
+                  const hex =
+                    colorObj?.hex.replace("#", "").toUpperCase() || colorCode;
+
+                  const previews = Array.isArray(variantImagesPreview[hex])
+                    ? variantImagesPreview[hex]
+                    : variantImagesPreview[hex]
+                    ? [variantImagesPreview[hex]]
+                    : [];
+                  return previews.map((preview, idx) => (
+                    <img
+                      key={idx}
+                      src={preview}
+                      alt={`Preview ${idx}`}
+                      style={{
+                        width: 50,
+                        height: 50,
+                        objectFit: "cover",
+                        marginTop: 8,
+                        marginRight: 4,
+                      }}
+                    />
+                  ));
+                })()}
+
                 <Select<{ value: string; label: string }, true>
                   options={sizeOptions}
                   isMulti

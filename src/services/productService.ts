@@ -11,6 +11,8 @@ import {
   IGender,
   AddProductPayload,
   AddProductResponse,
+  GetProductByIdResponse,
+  UpdateProductResponse,
 } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
@@ -821,4 +823,63 @@ export async function getGenders(): Promise<GetGendersResponse> {
   return {
     data: json as IGender[],
   };
+}
+export async function getProductAdminById(id: number): Promise<GetProductByIdResponse> {
+  if (IS_MOCK) {
+ 
+  }
+
+  const url = `${API_BASE_URL}/product/proadmin/${id}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Không thể lấy sản phẩm với id ${id} từ server.`);
+  }
+
+  const json = await res.json();
+  return {
+    data: json as IProduct,
+  };
+}
+export async function updateAdminProduct(
+  productId: number,
+  payload: AddProductPayload
+): Promise<UpdateProductResponse> {
+  const formData = new FormData();
+
+  formData.append("name", payload.name);
+  formData.append("description", payload.description);
+  formData.append("short_desc", payload.short_desc);
+  formData.append("price", payload.price.toString());
+  formData.append("sale_price", payload.sale_price.toString());
+  formData.append("categories_id", payload.categories_id.toString());
+  formData.append("brand_id", payload.brand_id.toString());
+  formData.append("gender_id", payload.gender_id.toString());
+  formData.append("status", payload.status.toString());
+
+  // Thêm ảnh chính nếu có
+  payload.images.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  // Thêm ảnh variant
+  Object.entries(payload.variantImages).forEach(([code, file]) => {
+    formData.append(`variant_image_${code}`, file);
+  });
+
+  // Thêm product_variants JSON
+  formData.append("product_variants", JSON.stringify(payload.product_variants));
+
+  const res = await fetch(`${API_BASE_URL}/product/update-product/${productId}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Cập nhật sản phẩm thất bại");
+  }
+
+  const json = await res.json();
+  return json as UpdateProductResponse;
 }
