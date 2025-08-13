@@ -221,7 +221,7 @@ export default function Home() {
       ) : (
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
-          spaceBetween={20}
+          spaceBetween={10}
           slidesPerView={4}
           navigation
           pagination={{ clickable: true }}
@@ -233,16 +233,21 @@ export default function Home() {
           }}
         >
           {categories.map((cat) => (
-            <SwiperSlide key={cat.id}>
-              <div className="category-main1-item">
-                <img
-                  src={cat.image || "/images/default.jpg"}
-                  alt={cat.name}
-                  style={{ width: "100%", borderRadius: "8px" }}
-                />
-                <h4>{cat.name}</h4>
-              </div>
-            </SwiperSlide>
+          <SwiperSlide key={cat.id}>
+            <div className="category-main1-item" style={{ textAlign: "center" }}>
+              <img
+                src={"https://images.puma.com/image/upload/f_auto,q_auto,b_rgb:fafafa,w_500,h_500/global/780088/01/mod01/fnd/VNM/fmt/png/Borussia-Dortmund-25/26-Home-Jersey-Men" || "/images/default.jpg"}
+                alt={cat.name}
+                style={{
+                  width: "400px",
+                  height: "400px",
+                  objectFit: "cover",
+                  margin: "0 auto",
+                }}
+              />
+              <h4 style={{ marginTop: "8px", fontSize: "16px" }}>{cat.name}</h4>
+            </div>
+          </SwiperSlide>
           ))}
         </Swiper>
       )}
