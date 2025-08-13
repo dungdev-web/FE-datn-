@@ -706,3 +706,24 @@ export async function getByIdReview(product_reviews_id:number) {
 
   
 }
+export async function setStatusReview(product_reviews_id: number, status: string) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/reviews/status/${product_reviews_id}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Lỗi khi cập nhật trạng thái đánh giá");
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("[Frontend] Lỗi setStatusReview:", err);
+    throw err;
+  }
+}

@@ -2,7 +2,10 @@
 import "../css/comment_admin.css";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getAllProductReview } from "@/services/productService"; // import hàm service
+import {
+  getAllProductReview,
+  setStatusReview,
+} from "@/services/productService";
 
 export default function CommentPage() {
   const [isSearching, setIsSearching] = useState(false);
@@ -21,13 +24,12 @@ export default function CommentPage() {
   });
 
   useEffect(() => {
-  const delay = setTimeout(() => {
-    fetchReviews();
-  }, 500); 
+    const delay = setTimeout(() => {
+      fetchReviews();
+    }, 500);
 
-  return () => clearTimeout(delay);
-}, [filters, page]);
-
+    return () => clearTimeout(delay);
+  }, [filters, page]);
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -38,8 +40,8 @@ export default function CommentPage() {
         product_reviews_id: filters.product_reviews_id
           ? Number(filters.product_reviews_id)
           : undefined,
-        user_name: filters.user_name ||searchText || undefined,
-        product_name: filters.product_name ||searchText || undefined,
+        user_name: filters.user_name || searchText || undefined,
+        product_name: filters.product_name || searchText || undefined,
         rating: filters.rating ? Number(filters.rating) : undefined,
         search: filters.content || searchText || undefined,
       });
@@ -60,7 +62,15 @@ export default function CommentPage() {
     }));
     setPage(1);
   };
-
+  const handleToggleStatus = async (id: number, currentStatus: string) => {
+    const newStatus = currentStatus === "approved" ? "pending" : "approved";
+    try {
+      await setStatusReview(id, newStatus); // truyền đủ 2 tham số
+      fetchReviews(); // load lại danh sách sau khi đổi
+    } catch (err) {
+      console.error("Lỗi khi đổi trạng thái:", err);
+    }
+  };
   return (
     <div className="review-container">
       <h2>Quản lý bình luận sản phẩm</h2>
@@ -189,22 +199,41 @@ export default function CommentPage() {
                           item.status === "approved" ? "approved" : "pending"
                         }`}
                       >
-                        {item.status === "approved" ? "Đã duyệt" : "Chờ duyệt"}
+                        {item.status === "approved" ? "Đã duyệt" : "Đã ẩn"}
                       </span>
                     </td>
                     <td>
-                      <i
-                        className="fa-solid fa-eye view-icon"
-                        title="Xem chi tiết"
-                      ></i>
-                      <i
-                        className="fa-solid fa-pen edit-icon"
-                        title="Sửa bình luận"
-                      ></i>
-                      <i
-                        className="fa-solid fa-trash delete-icon"
-                        title="Xóa bình luận"
-                      ></i>
+                      <Link href={`/admin/comment/${item.product_reviews_id}`}>
+                        <i
+                          className="fa-solid fa-pen view-icon"
+                          title="Xem chi tiết"
+                        ></i>
+                      </Link>
+                      {item.status === "approved" ? (
+                        <i
+                          className="fa-solid fa-eye-slash delete-icon"
+                          title="Ẩn bình luận"
+                          onClick={() =>
+                            handleToggleStatus(
+                              item.product_reviews_id,
+                              item.status
+                            )
+                          }
+                          style={{ cursor: "pointer" }}
+                        ></i>
+                      ) : (
+                        <i
+                          className="fa-solid fa-eye approve-icon"
+                          title="Hiện bình luận"
+                          onClick={() =>
+                            handleToggleStatus(
+                              item.product_reviews_id,
+                              item.status
+                            )
+                          }
+                          style={{ cursor: "pointer" }}
+                        ></i>
+                      )}
                     </td>
                   </tr>
                 ))
