@@ -226,10 +226,9 @@ export default function Home() {
                 src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
                 alt={cat.name}
                 style={{
-                  width: "400px",
+                  width: "100%",
                   height: "400px",
                   objectFit: "cover",
-                  margin: "0 auto",
                 }}
               />
               <h4 style={{ marginTop: "8px", fontSize: "16px" }}>{cat.name}</h4>
