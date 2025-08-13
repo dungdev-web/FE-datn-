@@ -5,7 +5,11 @@ import { addAddressService, updateAddress } from "@/services/addressService";
 import { toast } from "react-toastify";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { useAddressFormValidation } from "@/hooks/useAddressFormValidation";
-import { getDistricts, getProvinces, getWards } from "@/services/locationService";
+import {
+  getDistricts,
+  getProvinces,
+  getWards,
+} from "@/services/locationService";
 
 type AddressFormData = {
   id?: number;
@@ -14,7 +18,7 @@ type AddressFormData = {
   address_line_part: string;
   country: string;
   province_code: string;
-  province_name: string; 
+  province_name: string;
   district_code: string;
   district_name: string;
   ward_code: string;
@@ -52,62 +56,69 @@ export default function EditAddressForm({
     useAddressFormValidation(initialData);
 
   // Helper function để tìm kiếm tên gần giống nhất
-  const findBestMatch = (searchName: string, items: { name: string; code: string }[]) => {
+  const findBestMatch = (
+    searchName: string,
+    items: { name: string; code: string }[]
+  ) => {
     if (!searchName || !items.length) return null;
-    
+
     console.log("🔍 Searching for:", searchName, "in", items.length, "items");
-    
+
     // Chuẩn hóa tên để so sánh
-    const normalize = (str: string) => str.toLowerCase()
-      .replace(/tỉnh|thành phố|tp\.|tp /gi, '')
-      .replace(/quận|huyện|thị xã|tx\./gi, '')
-      .replace(/phường|xã|thị trấn|tt\./gi, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-    
+    const normalize = (str: string) =>
+      str
+        .toLowerCase()
+        .replace(/tỉnh|thành phố|tp\.|tp /gi, "")
+        .replace(/quận|huyện|thị xã|tx\./gi, "")
+        .replace(/phường|xã|thị trấn|tt\./gi, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
     const normalizedSearch = normalize(searchName);
     console.log("🔍 Normalized search:", normalizedSearch);
-    
+
     // Tìm exact match trước
-    let match = items.find(item => {
+    let match = items.find((item) => {
       const normalizedItem = normalize(item.name);
       console.log("🔍 Comparing with:", normalizedItem);
       return normalizedItem === normalizedSearch;
     });
-    
+
     if (match) {
       console.log("✅ Found exact match:", match);
       return match;
     }
-    
+
     // Tìm contains match
-    match = items.find(item => {
+    match = items.find((item) => {
       const normalizedItem = normalize(item.name);
-      return normalizedItem.includes(normalizedSearch) || 
-             normalizedSearch.includes(normalizedItem);
+      return (
+        normalizedItem.includes(normalizedSearch) ||
+        normalizedSearch.includes(normalizedItem)
+      );
     });
-    
+
     if (match) {
       console.log("✅ Found partial match:", match);
     } else {
       console.warn("❌ No match found for:", searchName);
     }
-    
+
     return match;
   };
-    
+
   useEffect(() => {
     console.log("🛠 initialData vào EditForm:", initialData);
     console.log("🛠 Mode:", mode);
     console.log("🛠 ID exists:", initialData?.id);
-    
+
     // Đảm bảo formData được cập nhật đúng cách
     setFormData({
       ...initialData,
       // Đảm bảo ID được giữ lại trong edit mode
-      ...(mode === "edit" && initialData?.id && { id: initialData.id })
+      ...(mode === "edit" && initialData?.id && { id: initialData.id }),
     });
-    
+
     // Reset trạng thái initialization cho edit mode
     if (mode === "edit") {
       setIsInitializing(true);
@@ -121,20 +132,35 @@ export default function EditAddressForm({
       .then((provinceList) => {
         console.log("🏢 Loaded provinces:", provinceList.length);
         setProvinces(provinceList);
-        
+
         // Nếu đang edit và có tên tỉnh, tìm code tương ứng
-        if (mode === "edit" && initialData.province_name && !initialData.province_code) {
-          const matchedProvince = findBestMatch(initialData.province_name, provinceList);
-          
+        if (
+          mode === "edit" &&
+          initialData.province_name &&
+          !initialData.province_code
+        ) {
+          const matchedProvince = findBestMatch(
+            initialData.province_name,
+            provinceList
+          );
+
           if (matchedProvince) {
-            console.log("🔍 Found matching province:", matchedProvince.name, "->", matchedProvince.code);
-            setFormData(prev => ({
+            console.log(
+              "🔍 Found matching province:",
+              matchedProvince.name,
+              "->",
+              matchedProvince.code
+            );
+            setFormData((prev) => ({
               ...prev,
               province_code: matchedProvince.code,
-              province_name: matchedProvince.name
+              province_name: matchedProvince.name,
             }));
           } else {
-            console.warn("❌ Could not find province:", initialData.province_name);
+            console.warn(
+              "❌ Could not find province:",
+              initialData.province_name
+            );
           }
         }
       })
@@ -149,31 +175,49 @@ export default function EditAddressForm({
         .then((districtList) => {
           console.log("🏛️ Loaded districts:", districtList.length);
           setDistricts(districtList);
-          
+
           // Luôn thử match district nếu có initialData.district_name (không phụ thuộc vào isInitializing)
-          if (mode === "edit" && initialData.district_name && !formData.district_code) {
-            console.log("🏛️ Trying to match district:", initialData.district_name);
-            const matchedDistrict = findBestMatch(initialData.district_name, districtList);
-            
+          if (
+            mode === "edit" &&
+            initialData.district_name &&
+            !formData.district_code
+          ) {
+            console.log(
+              "🏛️ Trying to match district:",
+              initialData.district_name
+            );
+            const matchedDistrict = findBestMatch(
+              initialData.district_name,
+              districtList
+            );
+
             if (matchedDistrict) {
-              console.log("🔍 Found matching district:", matchedDistrict.name, "->", matchedDistrict.code);
-              setFormData(prev => ({
+              console.log(
+                "🔍 Found matching district:",
+                matchedDistrict.name,
+                "->",
+                matchedDistrict.code
+              );
+              setFormData((prev) => ({
                 ...prev,
                 district_code: matchedDistrict.code,
-                district_name: matchedDistrict.name
+                district_name: matchedDistrict.name,
               }));
             } else {
-              console.warn("❌ Could not find district:", initialData.district_name);
+              console.warn(
+                "❌ Could not find district:",
+                initialData.district_name
+              );
             }
           } else if (!isInitializing && mode !== "edit") {
             // Reset ward khi user thay đổi tỉnh manually (chỉ cho add mode)
             setWards([]);
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               district_code: "",
               district_name: "",
               ward_code: "",
-              ward_name: ""
+              ward_name: "",
             }));
           }
         })
@@ -194,32 +238,37 @@ export default function EditAddressForm({
         .then((wardList) => {
           console.log("🏘️ Loaded wards:", wardList.length);
           setWards(wardList);
-          
+
           // Luôn thử match ward nếu có initialData.ward_name và chưa có formData.ward_code
           if (mode === "edit" && initialData.ward_name && !formData.ward_code) {
             console.log("🏘️ Trying to match ward:", initialData.ward_name);
             const matchedWard = findBestMatch(initialData.ward_name, wardList);
-            
+
             if (matchedWard) {
-              console.log("🔍 Found matching ward:", matchedWard.name, "->", matchedWard.code);
-              setFormData(prev => ({
+              console.log(
+                "🔍 Found matching ward:",
+                matchedWard.name,
+                "->",
+                matchedWard.code
+              );
+              setFormData((prev) => ({
                 ...prev,
                 ward_code: matchedWard.code,
-                ward_name: matchedWard.name
+                ward_name: matchedWard.name,
               }));
             } else {
               console.warn("❌ Could not find ward:", initialData.ward_name);
             }
-            
+
             // Kết thúc quá trình khởi tạo sau khi thử match ward
             console.log("✅ Initialization completed");
             setIsInitializing(false);
           } else if (mode !== "edit") {
             // Reset ward khi user thay đổi huyện manually (chỉ cho add mode)
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               ward_code: "",
-              ward_name: ""
+              ward_name: "",
             }));
           }
         })
@@ -245,7 +294,7 @@ export default function EditAddressForm({
     // Handle checkbox specifically to convert to boolean
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: checked, // This will be a boolean: true or false
       }));
@@ -254,8 +303,8 @@ export default function EditAddressForm({
     }
 
     if (name === "province_code") {
-      const selected = provinces.find(p => p.code.toString() === value);
-      setFormData(prev => ({
+      const selected = provinces.find((p) => p.code.toString() === value);
+      setFormData((prev) => ({
         ...prev,
         province_code: value,
         province_name: selected?.name || "",
@@ -266,8 +315,8 @@ export default function EditAddressForm({
       }));
       validateField("province_code", value);
     } else if (name === "district_code") {
-      const selected = districts.find(d => d.code.toString() === value);
-      setFormData(prev => ({
+      const selected = districts.find((d) => d.code.toString() === value);
+      setFormData((prev) => ({
         ...prev,
         district_code: value,
         district_name: selected?.name || "",
@@ -276,8 +325,8 @@ export default function EditAddressForm({
       }));
       validateField("district_code", value);
     } else if (name === "ward_code") {
-      const selected = wards.find(w => w.code.toString() === value);
-      setFormData(prev => ({
+      const selected = wards.find((w) => w.code.toString() === value);
+      setFormData((prev) => ({
         ...prev,
         ward_code: value,
         ward_name: selected?.name || "",
@@ -285,7 +334,7 @@ export default function EditAddressForm({
       validateField("ward_code", value);
     } else {
       validateField(name, value);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
@@ -294,7 +343,7 @@ export default function EditAddressForm({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast.error("Bạn cần đăng nhập để thực hiện thao tác này.");
       return;
@@ -317,7 +366,7 @@ export default function EditAddressForm({
     console.log("🧾 Submit ID:", formData.id);
 
     setLoading(true);
-    
+
     try {
       onSubmit({
         ...formData,
@@ -345,44 +394,11 @@ export default function EditAddressForm({
         {mode === "add" ? "Thêm địa chỉ mới" : "Chỉnh sửa địa chỉ"}
         {mode === "edit" && (
           <small className="block text-sm text-gray-500 mt-1">
-            ID: {formData.id || "Không có ID"} | Initializing: {isInitializing ? "Yes" : "No"}
+            ID: {formData.id || "Không có ID"} | Initializing:{" "}
+            {isInitializing ? "Yes" : "No"}
           </small>
         )}
       </h2>
-
-      {/* Debug info - chỉ hiện khi dev */}
-      {mode === "edit" && (
-        <div className="mb-4 p-3 bg-gray-100 text-xs">
-          <p><strong>Debug Info:</strong></p>
-          <p>Initial Data:</p>
-          <ul className="ml-4">
-            <li>Province: {initialData.province_name}</li>
-            <li>District: {initialData.district_name}</li>
-            <li>Ward: {initialData.ward_name}</li>
-          </ul>
-          <p>Current Form Data:</p>
-          <ul className="ml-4">
-            <li>Province: {formData.province_name} ({formData.province_code})</li>
-            <li>District: {formData.district_name} ({formData.district_code})</li>
-            <li>Ward: {formData.ward_name} ({formData.ward_code})</li>
-          </ul>
-          <p>Loaded Options:</p>
-          <ul className="ml-4">
-            <li>Provinces: {provinces.length}</li>
-            <li>Districts: {districts.length}</li>
-            <li>Wards: {wards.length}</li>
-          </ul>
-          <p>Is Initializing: {isInitializing.toString()}</p>
-          {districts.length > 0 && (
-            <details className="mt-2">
-              <summary>Available Districts:</summary>
-              <ul className="ml-4">
-                {districts.map(d => <li key={d.code}>{d.name} ({d.code})</li>)}
-              </ul>
-            </details>
-          )}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
@@ -444,7 +460,9 @@ export default function EditAddressForm({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Tỉnh / Thành</label>
+            <label className="block text-sm font-medium mb-1">
+              Tỉnh / Thành
+            </label>
             <select
               name="province_code"
               className="w-full border border-gray-300 rounded !px-3 !py-2 outline-none"
@@ -459,12 +477,16 @@ export default function EditAddressForm({
               ))}
             </select>
             {errors.province_code && (
-              <p className="text-sm text-red-500 mt-1">{errors.province_code}</p>
+              <p className="text-sm text-red-500 mt-1">
+                {errors.province_code}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Quận / Huyện</label>
+            <label className="block text-sm font-medium mb-1">
+              Quận / Huyện
+            </label>
             <select
               name="district_code"
               className="w-full border border-gray-300 rounded !px-3 !py-2"
@@ -480,12 +502,16 @@ export default function EditAddressForm({
               ))}
             </select>
             {errors.district_code && (
-              <p className="text-sm text-red-500 mt-1">{errors.district_code}</p>
+              <p className="text-sm text-red-500 mt-1">
+                {errors.district_code}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Phường / Xã</label>
+            <label className="block text-sm font-medium mb-1">
+              Phường / Xã
+            </label>
             <select
               name="ward_code"
               className="w-full border border-gray-300 rounded !px-3 !py-2"
