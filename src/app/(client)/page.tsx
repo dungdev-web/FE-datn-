@@ -200,40 +200,47 @@ export default function Home() {
       <Banner3D />
       <main className="!mt-16 sm:!mt-0">
       <div className="category-main">
-      <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
-      <h1>DANH MỤC SẢN PHẨM</h1>
-      {categories.length === 0 ? (
-        <p>Không có danh mục nào</p>
-      ) : (
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            spaceBetween={5} // giảm khoảng cách
-            slidesPerView={4}
-            navigation
-            pagination={{ clickable: true }}
-            autoplay={{ delay: 2500 }}
-            breakpoints={{
-              1024: { slidesPerView: 4 },
-              768: { slidesPerView: 2 },
-              480: { slidesPerView: 1 },
-            }}
-          >
-            {categories.map((cat) => (
-              <SwiperSlide key={cat.id}>
-                <div className="category-main1">
-                  <div className="category-main1-item">
-                    <img
-                      src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
-                      alt={cat.name}
-                    />
-                    <h4>{cat.name}</h4>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-      )}
-    </div>
+  <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
+  <h1>DANH MỤC SẢN PHẨM</h1>
+
+  {categories.length === 0 ? (
+    <p>Không có danh mục nào</p>
+  ) : (
+    <Swiper
+      modules={[Navigation, Pagination, Autoplay]}
+      spaceBetween={0}
+      slidesPerView={4}
+      navigation
+      pagination={{ clickable: true }}
+      autoplay={{ delay: 2500 }}
+      breakpoints={{
+        1024: { slidesPerView: 4 },
+        768: { slidesPerView: 2 },
+        480: { slidesPerView: 1 },
+      }}
+    >
+      {categories.map((cat) => (
+        <SwiperSlide key={cat.id}>
+          <div className="category-main1">
+            <div className="category-main1-item">
+              <img
+                src={
+                  cat.image
+                    ? `${API_BASE_URL}/uploads/${cat.image}`
+                    : "/images/default.jpg"
+                }
+                alt={cat.name}
+                style={{ height: "500px", width: "400px", objectFit: "cover" }}
+              />
+              <h4 style={{ marginTop: "4px", fontSize: "16px" }}>{cat.name}</h4>
+            </div>
+          </div>
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  )}
+</div>
+
         <div className="marquee-wrapper">
           <div className="marquee" ref={marqueeRef}>
             <div className="marquee-content">
