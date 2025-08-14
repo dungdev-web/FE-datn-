@@ -220,12 +220,14 @@ export default function Home() {
         >
           {categories.map((cat) => (
           <SwiperSlide key={cat.id}>
+            <div className="category-main1">
             <div className="category-main1-item">
               <img
                 src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
                 alt={cat.name}
               />
               <h4 style={{ marginTop: "8px", fontSize: "16px" }}>{cat.name}</h4>
+            </div>
             </div>
           </SwiperSlide>
           ))}
