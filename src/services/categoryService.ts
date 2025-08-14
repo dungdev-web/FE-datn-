@@ -56,6 +56,28 @@ export async function getCategories(
     return { data: [], total: 0, totalPages: 0, page: 1 };
   }
 }
+export async function getAllCategories(): Promise<ICategory[]> {
+  try {
+    if (IS_MOCK) {
+      return getMockCategories();
+    }
+
+    const url = `${API_BASE_URL}/category/all`;
+
+    const response = await fetch(url, { cache: "no-store" });
+
+    if (!response.ok) {
+      console.error("Lỗi API category:", response.statusText);
+      return [];
+    }
+
+    const result = await response.json();
+    return result as ICategory[];
+  } catch (error) {
+    console.error("Lỗi khi gọi API category:", error);
+    return [];
+  }
+}
 export async function getProductsByCategorySlug(
   slug: string
 ): Promise<IProduct[]> {
