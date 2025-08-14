@@ -81,9 +81,9 @@ export default function Compare_product() {
     };
     fetchCompare();
   }, [refresh]);
-  console.log("Compare:", compare);
-  console.log("Product:", compare[0]?.product);
-  console.log("Variants:", compare[0]?.product?.product_variants);
+  // console.log("Compare:", compare);
+  // console.log("Product:", compare[0]?.product);
+  // console.log("Variants:", compare[0]?.product?.product_variants);
   return (
     <>
       <section
