@@ -180,3 +180,14 @@ export interface UpdateProductResponse {
   name: any;
   product: IProduct;
 }
+export interface GetAllProductReviewParams {
+  page?: number;
+  limit?: number;
+  product_reviews_id?: number;
+  user_name?: string;
+  product_name?: string;
+  rating?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}

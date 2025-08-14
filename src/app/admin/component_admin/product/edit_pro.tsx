@@ -71,7 +71,7 @@ export default function Add_pro() {
     },
   ]);
 
- const colors = [
+  const colors = [
     { value: "black|Đen", hex: "#000000" },
     { value: "white|Trắng", hex: "#FFFFFF" },
     { value: "red|Đỏ", hex: "#FF0000" },
@@ -171,7 +171,6 @@ export default function Add_pro() {
     { value: "lightCoral|San hô nhạt", hex: "#F08080" },
     { value: "lightCyan|Xanh cyan nhạt", hex: "#E0FFFF" },
   ];
-
 
   const sizeOptions = sizes.map((s) => ({
     value: String(s.id),
@@ -300,100 +299,110 @@ export default function Add_pro() {
     }
   }, []);
 
-// Thêm state để lưu ảnh cũ
-const [variantImagesOld, setVariantImagesOld] = useState<Record<string, string>>({});
+  // Thêm state để lưu ảnh cũ
+  const [variantImagesOld, setVariantImagesOld] = useState<
+    Record<string, string>
+  >({});
 
-// Fetch product khi edit
-useEffect(() => {
-  async function fetchProduct() {
-    if (!productId || sizes.length === 0) return;
-    try {
-      const res = await getProductAdminById(productId);
-      const data = res.data;
-      setProduct(data);
+  // Fetch product khi edit
+  useEffect(() => {
+    async function fetchProduct() {
+      if (!productId || sizes.length === 0) return;
+      try {
+        const res = await getProductAdminById(productId);
+        const data = res.data;
+        setProduct(data);
 
-      if (quillRef.current)
-        quillRef.current.root.innerHTML = data.description || "";
-      setDescription(data.description || "");
-      setName(data.name || "");
-      setShortDesc(data.short_desc || "");
-      setPrice(data.price || "");
-      setSalePrice(data.sale_price || "");
-      setSelectedBrand(data.brand_id || "");
-      setSelectedCategory(data.categories_id || "");
-      setSelectedGender(data.gender_id || "");
-      setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
+        if (quillRef.current)
+          quillRef.current.root.innerHTML = data.description || "";
+        setDescription(data.description || "");
+        setName(data.name || "");
+        setShortDesc(data.short_desc || "");
+        setPrice(data.price || "");
+        setSalePrice(data.sale_price || "");
+        setSelectedBrand(data.brand_id || "");
+        setSelectedCategory(data.categories_id || "");
+        setSelectedGender(data.gender_id || "");
+        setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
 
-      const variantsMapped: Variant[] = data.product_variants.map((v: any) => {
-        const colorKey = `${v.color.code_color}|${v.color.name_color}`;
-        const sizeIds = sizes
-          .filter((s) => s.number_size === v.size.number_size)
-          .map((s) => String(s.id));
-        return {
-          color: colorKey,
-          colorHex: v.color.code_color,
-          sizes: sizeIds,
-          quantity: v.stock_quantity,
-          image: null,
-          imagePreview: v.color.images
-            ? `${API_BASE_URL}/uploads/${v.color.images}`
-            : undefined,
-        };
-      });
+        const variantsMapped: Variant[] = data.product_variants.map(
+          (v: any) => {
+            const colorKey = `${v.color.code_color}|${v.color.name_color}`;
+            const sizeIds = sizes
+              .filter((s) => s.number_size === v.size.number_size)
+              .map((s) => String(s.id));
+            return {
+              color: colorKey,
+              colorHex: v.color.code_color,
+              sizes: sizeIds,
+              quantity: v.stock_quantity,
+              product_variants_id: v.product_variants_id || null,
+              image: null,
+              imagePreview: v.color.images
+                ? `${API_BASE_URL}/uploads/${v.color.images}`
+                : undefined,
+            };
+          }
+        );
 
-      setVariants(variantsMapped);
+        setVariants(variantsMapped);
 
-      // Map preview và ảnh cũ
-      const previewMap: Record<string, string> = {};
-      const oldMap: Record<string, string> = {};
-      variantsMapped.forEach((v) => {
-        const key = getColorKey(v.color);
-        if (v.imagePreview) {
-          previewMap[key] = v.imagePreview;
-          // Lưu filename ảnh cũ (lấy từ DB)
-          oldMap[key] = v.imagePreview.split("/").pop() || "";
-        }
-      });
-      setVariantImagesPreview(previewMap);
-      setVariantImagesOld(oldMap);
-    } catch (err) {
-      console.error(err);
+        // Map preview và ảnh cũ
+        const previewMap: Record<string, string> = {};
+        const oldMap: Record<string, string> = {};
+        variantsMapped.forEach((v) => {
+          const key = getColorKey(v.color);
+          if (v.imagePreview) {
+            previewMap[key] = v.imagePreview;
+            // Lưu filename ảnh cũ (lấy từ DB)
+            oldMap[key] = v.imagePreview.split("/").pop() || "";
+          }
+        });
+        setVariantImagesPreview(previewMap);
+        setVariantImagesOld(oldMap);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
-  fetchProduct();
-}, [productId, sizes]);
+    fetchProduct();
+  }, [productId, sizes]);
 
-const getColorKey = (colorString: string) =>
-  colorString.split("|")[0].replace("#", "").toLowerCase();
+  const getColorKey = (colorString: string) =>
+    colorString.split("|")[0].replace("#", "").toLowerCase();
 
-const handleVariantImagesChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  colorValue: string
-) => {
-  if (!e.target.files) return;
-  const file = e.target.files[0];
-  const colorKey = getColorKey(colorValue);
-  setVariantImages((prev) => ({ ...prev, [colorKey]: file }));
-  setVariantImagesPreview((prev) => ({
-    ...prev,
-    [colorKey]: URL.createObjectURL(file),
-  }));
-};
+  const handleVariantImagesChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    colorValue: string
+  ) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+    const colorKey = getColorKey(colorValue);
+    setVariantImages((prev) => ({ ...prev, [colorKey]: file }));
+    setVariantImagesPreview((prev) => ({
+      ...prev,
+      [colorKey]: URL.createObjectURL(file),
+    }));
+  };
 
-const handleUpdate = async () => {
+  const handleUpdate = async () => {
   if (!productId) return;
+
   try {
     const sanitizedVariantImages: Record<string, File | string> = {};
 
-    // Dùng ảnh mới nếu có, nếu không thì ảnh cũ
     variants.forEach((v) => {
       const key = getColorKey(v.color);
-      if (variantImages[key]) {
-        sanitizedVariantImages[key] = variantImages[key]; // file mới
-      } else if (variantImagesOld[key]) {
-        sanitizedVariantImages[key] = variantImagesOld[key]; // filename ảnh cũ
+
+      if (variantImages[key] instanceof File) {
+        sanitizedVariantImages[key] = variantImages[key] as File; // ảnh mới
+      } else if (variantImagesOld[key] && typeof variantImagesOld[key] === "string") {
+        sanitizedVariantImages[key] = variantImagesOld[key]; // ảnh cũ
       }
     });
+
+    const sanitizedMainImages = mainImages.map((img) =>
+      img instanceof File ? img : (typeof img === "string" ? img : null)
+    ).filter(Boolean) as (File | string)[];
 
     const payload: AddProductPayload = {
       name,
@@ -405,10 +414,11 @@ const handleUpdate = async () => {
       brand_id: Number(selectedBrand),
       gender_id: Number(selectedGender),
       status: status === "Mở bán" ? 1 : 0,
-      images: mainImages,
+      images: sanitizedMainImages,
       variantImages: sanitizedVariantImages,
       product_variants: variants.flatMap((v) =>
         v.sizes.map((sizeId) => ({
+          product_variants_id: v.product_variants_id || undefined,
           code_color: v.colorHex.replace("#", "").toLowerCase(),
           name_color: v.color.split("|")[1] || "",
           size_id: Number(sizeId),
@@ -432,12 +442,12 @@ const handleUpdate = async () => {
     });
   }
 };
-// Handle upload ảnh chính
-const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files) return;
-  setMainImages(Array.from(e.target.files));
-};
 
+  // Handle upload ảnh chính
+  const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setMainImages(Array.from(e.target.files));
+  };
 
   return (
     <>
