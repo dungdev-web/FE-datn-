@@ -177,7 +177,6 @@ export default function Home() {
 
     fetchData();
   }, []);
-<<<<<<< Updated upstream
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -190,10 +189,6 @@ export default function Home() {
         setLoading(false);
       }
     }
-=======
-  
->>>>>>> Stashed changes
-
     fetchCategories();
   }, []);
 
@@ -225,15 +220,10 @@ export default function Home() {
         >
           {categories.map((cat) => (
           <SwiperSlide key={cat.id}>
-            <div className="category-main1-item" style={{ textAlign: "center" }}>
+            <div className="category-main1-item">
               <img
                 src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
                 alt={cat.name}
-                style={{
-                  width: "100%",
-                  height: "400px",
-                  objectFit: "cover",
-                }}
               />
               <h4 style={{ marginTop: "8px", fontSize: "16px" }}>{cat.name}</h4>
             </div>
