@@ -177,6 +177,7 @@ export default function Home() {
 
     fetchData();
   }, []);
+<<<<<<< Updated upstream
   useEffect(() => {
     async function fetchCategories() {
       try {
@@ -189,6 +190,9 @@ export default function Home() {
         setLoading(false);
       }
     }
+=======
+  
+>>>>>>> Stashed changes
 
     fetchCategories();
   }, []);
