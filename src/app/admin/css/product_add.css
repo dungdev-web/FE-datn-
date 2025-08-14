@@ -80,6 +80,7 @@ label {
 
 input[type="text"],
 input[type="number"],
+input[type="file"],
 select,
 textarea {
   width: 100%;
@@ -163,6 +164,8 @@ textarea {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  width: 10%;
+  text-align: center;
 }
 
 .choose-image-btn:hover {

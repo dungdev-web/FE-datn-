@@ -6,6 +6,14 @@ import {
   GetProductsDashboardParams,
   GetProductsDashboardResponse,
   GetAllProductReviewParams,
+  GetSizesResponse,
+  ISize,
+  GetGendersResponse,
+  IGender,
+  AddProductPayload,
+  AddProductResponse,
+  GetProductByIdResponse,
+  UpdateProductResponse,
 } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
@@ -378,26 +386,47 @@ export async function getReviewProduct(productId: number): Promise<IReview[]> {
   }
 }
 
-// Thêm sản phẩm mới
-export async function addProduct(newProduct: IProduct): Promise<IProduct> {
-  if (IS_MOCK) {
-    const current = getMockProducts();
-    const updated = [...current, newProduct];
-    saveMockProducts(updated);
-    return newProduct;
-  }
+export async function addProduct(
+  payload: AddProductPayload
+): Promise<AddProductResponse> {
+  
+  const url = `${API_BASE_URL}/product/add-product`;
 
-  const res = await fetch(`${API_BASE_URL}/products`, {
+  const formData = new FormData();
+
+  formData.append("name", payload.name);
+  formData.append("description", payload.description);
+  formData.append("short_desc", payload.short_desc);
+  formData.append("price", payload.price.toString());
+  formData.append("sale_price", payload.sale_price.toString());
+  formData.append("categories_id", payload.categories_id.toString());
+  formData.append("brand_id", payload.brand_id.toString());
+  formData.append("gender_id", payload.gender_id.toString());
+  formData.append("status", payload.status.toString());
+
+  // stringify variants
+  formData.append("product_variants", JSON.stringify(payload.product_variants));
+
+  // ảnh chính
+  payload.images.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  // ảnh cho từng mã màu
+  Object.entries(payload.variantImages).forEach(([codeColor, file]) => {
+    formData.append(`variant_image_${codeColor}`, file);
+  });
+
+  const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(newProduct),
+    body: formData,
   });
 
   if (!res.ok) {
-    throw new Error("Không thể thêm sản phẩm.");
+    throw new Error("Không thể tạo sản phẩm mới.");
   }
 
-  return await res.json();
+  return res.json() as Promise<AddProductResponse>;
 }
 
 // Lấy 1 sản phẩm theo ID
@@ -737,6 +766,7 @@ export async function setStatusReview(
     throw err;
   }
 }
+
 export async function getProductsDashboard(
   params: GetProductsDashboardParams = {}
 ): Promise<GetProductsDashboardResponse> {
@@ -808,4 +838,153 @@ export async function getProductsDashboard(
     currentPage: json.currentPage,
     totalPages: json.totalPages,
   };
+}
+
+export async function getSizes(): Promise<GetSizesResponse> {
+  if (IS_MOCK) {
+    // Mock dữ liệu khi chạy ở chế độ mock
+    return {
+      data: [
+        {
+          id: 1,
+          number_size: "35",
+          label: undefined,
+          name: undefined,
+          value: undefined,
+          size_id: undefined,
+        },
+        {
+          id: 2,
+          number_size: "36",
+          label: undefined,
+          name: undefined,
+          value: undefined,
+          size_id: undefined,
+        },
+        {
+          id: 3,
+          number_size: "37",
+          label: undefined,
+          name: undefined,
+          value: undefined,
+          size_id: undefined,
+        },
+      ],
+    };
+  }
+
+  const url = `${API_BASE_URL}/product/size`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách size từ server.");
+  }
+
+  const json = await res.json();
+
+  return {
+    data: json as ISize[],
+  };
+}
+
+export async function getGenders(): Promise<GetGendersResponse> {
+  if (IS_MOCK) {
+    // Mock dữ liệu khi chạy ở chế độ mock
+    return {
+      data: [
+        { id: 1, name: "Nam", label: undefined, value: undefined },
+        { id: 2, name: "Nữ", label: undefined, value: undefined },
+        { id: 3, name: "Khác", label: undefined, value: undefined },
+      ],
+    };
+  }
+
+  const url = `${API_BASE_URL}/product/genderadmin`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách gender từ server.");
+  }
+
+  const json = await res.json();
+
+  return {
+    data: json as IGender[],
+  };
+}
+export async function getProductAdminById(id: number): Promise<GetProductByIdResponse> {
+  if (IS_MOCK) {
+ 
+  }
+
+  const url = `${API_BASE_URL}/product/proadmin/${id}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Không thể lấy sản phẩm với id ${id} từ server.`);
+  }
+
+  const json = await res.json();
+  return {
+    data: json as IProduct,
+  };
+}
+export async function updateAdminProduct(
+  productId: number,
+  payload: AddProductPayload
+): Promise<UpdateProductResponse> {
+  const formData = new FormData();
+
+  formData.append("name", payload.name);
+  formData.append("description", payload.description);
+  formData.append("short_desc", payload.short_desc);
+  formData.append("price", payload.price.toString());
+  formData.append("sale_price", payload.sale_price.toString());
+  formData.append("categories_id", payload.categories_id.toString());
+  formData.append("brand_id", payload.brand_id.toString());
+  formData.append("gender_id", payload.gender_id.toString());
+  formData.append("status", payload.status.toString());
+
+  // Thêm ảnh chính nếu có
+  payload.images.forEach((file) => {
+    formData.append("images", file);
+  });
+
+  // Thêm ảnh variant
+  Object.entries(payload.variantImages).forEach(([code, file]) => {
+    formData.append(`variant_image_${code}`, file);
+  });
+
+  // Thêm product_variants JSON
+  formData.append("product_variants", JSON.stringify(payload.product_variants));
+
+  const res = await fetch(`${API_BASE_URL}/product/update-product/${productId}`, {
+    method: "PUT",
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Cập nhật sản phẩm thất bại");
+  }
+
+  const json = await res.json();
+  return json as UpdateProductResponse;
+}
+export async function deleteAdminProduct(
+  productId: number
+): Promise<IProduct> {
+  const res = await fetch(`${API_BASE_URL}/product/delete/${productId}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Xóa sản phẩm thất bại");
+  }
+
+  const json = await res.json();
+  return json as IProduct;
 }

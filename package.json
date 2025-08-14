@@ -39,6 +39,7 @@
     "react-inner-image-zoom": "^4.0.1",
     "react-medium-image-zoom": "^5.2.14",
     "react-phone-input-2": "^2.15.1",
+    "react-select": "^5.10.2",
     "react-toastify": "^11.0.5",
     "sweetalert2": "^11.6.13",
     "swiper": "^11.2.10",

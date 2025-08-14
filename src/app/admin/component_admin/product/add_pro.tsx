@@ -1,21 +1,250 @@
 "use client";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../../css/product_add.css";
-import { useEffect, useState, useRef } from "react";
-import dynamic from "next/dynamic";
-import { API_BASE_URL } from "@/config/env";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import { API_BASE_URL } from "@/config/env";
+import Select from "react-select";
+import { Plus, Trash2 } from "lucide-react";
+import { values } from "lodash";
+import { addProduct, getGenders, getSizes } from "@/services/productService";
+import { IGender, ISize } from "@/types/product";
+import { IBrand } from "@/types/IBrand";
+import { ICategory } from "@/types/ICategory";
+import { getAllBrands } from "@/services/brandService";
+import { getAllCategories } from "@/services/categoryService";
+import Swal from "sweetalert2";
 export default function Add_pro() {
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
+  const [sizes, setSizes] = useState<ISize[]>([]);
+  const [brands, setBrands] = useState<IBrand[]>([]);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [genders, setGenders] = useState<IGender[]>([]);
+  const [mainImages, setMainImages] = useState<File[]>([]);
+  const [variantImages, setVariantImages] = useState<Record<string, File>>({});
+  const [variantImagesPreview, setVariantImagesPreview] = useState<{
+    [key: string]: string;
+  }>({});
 
-  const defaultContent = `🔸 Chất lượng Rep 1:1 - Nên mang lên 1 size
-so với tiêu chuẩn - Vận chuyển toàn quốc | Kiểm Tra Hàng
-Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
-- Bảo Hành Trọn Đời Sản Phẩm - Đổi Trả 7 Ngày Không Kể Lý Do`;
+  // chọn ảnh chính
+  const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setMainImages(Array.from(e.target.files));
+    }
+  };
+  const handleVariantImageChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      const originalFile = e.target.files[0];
+      const colorFull = variants[index].color; // ví dụ: "white|Trắng"
+      const colorCode = colorFull.split("|")[0]; // ví dụ: "white"
+
+      // Tìm mã màu hex trong mảng colors
+      const colorObj = colors.find((c) => c.value.startsWith(colorCode + "|"));
+      const hex = colorObj
+        ? colorObj.hex.replace("#", "").toUpperCase()
+        : "000000";
+
+      // Lấy đuôi file gốc
+      const ext = originalFile.name.split(".").pop();
+
+      // Tạo tên file mới
+      const newFileName = `${Date.now()}-variant_image_${hex}.${ext}`;
+
+      // Tạo file mới với tên mới
+      const newFile = new File([originalFile], newFileName, {
+        type: originalFile.type,
+      });
+
+      // Lưu file mới vào state
+      setVariantImages((prev) => ({
+        ...prev,
+        [hex]: newFile,
+      }));
+
+      // Lưu đường dẫn preview ảnh
+      const files = Array.from(e.target.files);
+      const previews = files.map((file) => URL.createObjectURL(file));
+
+      setVariantImagesPreview((prev: any) => ({
+        ...prev,
+        [hex]: previews,
+      }));
+
+      // Cập nhật biến thể
+      handleVariantChange(index, "image", newFile);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const name = (
+      document.getElementById("ten_sp") as HTMLInputElement
+    ).value.trim();
+    const short_desc = (
+      document.getElementById("mo_ta_ngan") as HTMLTextAreaElement
+    ).value.trim();
+    const description = quillRef.current?.root.innerHTML || "";
+    const priceInput = (
+      document.getElementById("gia_goc") as HTMLInputElement
+    ).value.trim();
+    const salePriceInput = (
+      document.getElementById("gia_ban") as HTMLInputElement
+    ).value.trim();
+    const categories_id = Number(
+      (document.getElementById("danh_muc") as HTMLSelectElement).value
+    );
+    const brand_id = Number(
+      (document.getElementById("nhan_hieu") as HTMLSelectElement).value
+    );
+    const gender_id = Number(
+      (document.getElementById("gender") as HTMLSelectElement).value
+    );
+    const statusText = (
+      document.getElementById("trang_thai") as HTMLSelectElement
+    ).value;
+    const status = statusText === "Mở bán" ? 1 : 0;
+
+    // Kiểm tra các trường bắt buộc
+    if (!name) {
+      Swal.fire("Thiếu thông tin", "Vui lòng nhập tên sản phẩm.", "warning");
+      return;
+    }
+
+    if (!short_desc) {
+      Swal.fire(
+        "Thiếu thông tin",
+        "Vui lòng nhập mô tả ngắn cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!priceInput || isNaN(Number(priceInput))) {
+      Swal.fire(
+        "Giá không hợp lệ",
+        "Vui lòng nhập giá gốc của sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    const price = Number(priceInput);
+    const sale_price = Number(salePriceInput);
+    if (sale_price > price) {
+      Swal.fire(
+        "Sai giá",
+        "Giá bán phải nhỏ hơn hoặc bằng giá gốc.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!categories_id) {
+      Swal.fire(
+        "Thiếu danh mục",
+        "Vui lòng chọn danh mục sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!brand_id) {
+      Swal.fire(
+        "Thiếu nhãn hiệu",
+        "Vui lòng chọn nhãn hiệu cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!gender_id) {
+      Swal.fire(
+        "Thiếu thông tin",
+        "Vui lòng chọn giới tính áp dụng cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    if (mainImages.length === 0) {
+      Swal.fire(
+        "Thiếu hình ảnh",
+        "Cần ít nhất 1 ảnh chính cho sản phẩm.",
+        "warning"
+      );
+      return;
+    }
+
+    // Kiểm tra ảnh biến thể
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+      const colorCode = v.color.split("|")[0];
+      const colorObj = colors.find((c) => c.value.startsWith(colorCode + "|"));
+      const hexColor = colorObj
+        ? colorObj.hex.replace("#", "").toUpperCase()
+        : colorCode;
+
+      if (!variantImages[hexColor]) {
+        Swal.fire(
+          "Thiếu ảnh biến thể",
+          `Vui lòng chọn ảnh cho biến thể màu "${v.color.split("|")[1]}".`,
+          "warning"
+        );
+        return;
+      }
+    }
+
+    // Nếu qua hết kiểm tra, gọi API
+    try {
+      const product_variants = variants.flatMap((v) => {
+        const [code_color, name_color] = v.color.split("|");
+        const colorObj = colors.find((c) =>
+          c.value.startsWith(code_color + "|")
+        );
+        const hexColor = colorObj
+          ? colorObj.hex.replace("#", "").toUpperCase()
+          : code_color;
+
+        return v.sizes.map((size_id) => ({
+          code_color: hexColor,
+          name_color,
+          size_id: Number(size_id),
+          stock_quantity: Number(v.quantity),
+        }));
+      });
+
+      await addProduct({
+        name,
+        description,
+        short_desc,
+        price,
+        sale_price,
+        categories_id,
+        brand_id,
+        gender_id,
+        status,
+        product_variants,
+        images: mainImages,
+        variantImages,
+      });
+
+      Swal.fire("Thành công", "Thêm sản phẩm thành công!", "success");
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Lỗi", "Có lỗi khi thêm sản phẩm", "error");
+    }
+  };
+
+  const defaultContent = ``;
+
+  /** Khởi tạo Quill editor */
   useEffect(() => {
-    if (editorRef.current) {
+    if (editorRef.current && !quillRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
         placeholder: "Nhập nội dung...",
@@ -29,290 +258,229 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
           ],
         },
       });
-
       quillRef.current.root.innerHTML = defaultContent;
-
-      quillRef.current.on("text-change", () => {
-        const html = quillRef.current?.root.innerHTML;
-        console.log("Nội dung mới:", html);
-      });
     }
   }, []);
+
+  /** Quản lý tab & custom select */
   useEffect(() => {
-    // ===== Hàm gắn lại sự kiện cho dòng biến thể mới =====
-    const attachEventsToRow = (row: HTMLElement) => {
-      // Dropdown option chọn màu
-      row.querySelectorAll(".dropdown-option").forEach((option) => {
-        option.addEventListener("click", (e) => {
-          const opt = e.currentTarget as HTMLElement;
-          const wrapper = opt.closest(".custom-select-wrapper")!;
-          const selected = wrapper.querySelector(".selected-option")!;
-          const input = wrapper.querySelector(
-            "input[type=hidden]"
-          ) as HTMLInputElement;
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
 
-          const colorCircle = selected.querySelector(
-            ".color-circle"
-          ) as HTMLElement;
-          const colorName = selected.querySelector(
-            ".color-name"
-          ) as HTMLElement;
-          const chosenName = opt.querySelector(".color-name")?.textContent;
+      // Tab switching
+      if (target.classList.contains("tab")) {
+        document
+          .querySelectorAll(".tab")
+          .forEach((t) => t.classList.remove("active"));
+        target.classList.add("active");
 
-          colorCircle.style.backgroundColor =
-            opt.style.getPropertyValue("--color");
-          colorName.textContent = chosenName || "";
-          input.value = opt.getAttribute("data-defaultvalue") || "";
-
-          wrapper.querySelector(".dropdown")?.classList.remove("show");
-        });
-      });
-
-      // Toggle dropdown
-      row.querySelectorAll(".custom-select").forEach((select) => {
-        select.addEventListener("click", (e) => {
-          e.stopPropagation();
-          document
-            .querySelectorAll(".dropdown")
-            .forEach((dropdown) => dropdown.classList.remove("show"));
-          const dropdown = select.querySelector(".dropdown");
-          dropdown?.classList.toggle("show");
-        });
-      });
-
-      // Ngăn dropdown đóng khi click bên trong
-      row.querySelectorAll(".dropdown").forEach((dropdown) => {
-        dropdown.addEventListener("click", (e) => {
-          e.stopPropagation();
-        });
-      });
-    };
-
-    // ===== Tabs =====
-    const tabs = document.querySelectorAll(".tab");
-    const tabContents = document.querySelectorAll(".tab-content");
-
-    tabs.forEach((tab, index) => {
-      tab.addEventListener("click", () => {
-        tabs.forEach((t) => t.classList.remove("active"));
-        tab.classList.add("active");
-
-        tabContents.forEach((content, i) => {
+        const index = Array.from(document.querySelectorAll(".tab")).indexOf(
+          target
+        );
+        document.querySelectorAll(".tab-content").forEach((content, i) => {
           (content as HTMLElement).style.display =
             i === index ? "block" : "none";
         });
-      });
-    });
+      }
 
-    // ===== Variant Add/Remove =====
-    const variantList = document.getElementById("variant-list");
-    if (variantList) {
-      variantList.addEventListener("click", (e: Event) => {
-        const target = e.target as HTMLElement;
-        if (target.classList.contains("btn-add-variant")) {
-          const row = target.closest(".variant-row");
-          const newRow = row?.cloneNode(true) as HTMLElement;
-
-          newRow?.querySelectorAll("input").forEach((input) => {
-            const el = input as HTMLInputElement;
-            el.value = el.type === "hidden" ? "black|Đen" : "";
-          });
-
-          const btn = newRow.querySelector(".btn-add-variant") as HTMLElement;
-          if (btn) {
-            btn.textContent = "-";
-            btn.classList.remove("btn-add-variant");
-            btn.classList.add("btn-remove-variant");
-          }
-
-          variantList.appendChild(newRow);
-          attachEventsToRow(newRow); // 🔁 Gắn lại sự kiện dropdown màu
-        }
-
-        if (target.classList.contains("btn-remove-variant")) {
-          const row = target.closest(".variant-row");
-          if (row) variantList.removeChild(row);
-        }
-      });
-    }
-
-    // ===== Dropdown chọn màu ban đầu =====
-    document.querySelectorAll(".dropdown-option").forEach((option) => {
-      option.addEventListener("click", (e) => {
-        const opt = e.currentTarget as HTMLElement;
-        const wrapper = opt.closest(".custom-select-wrapper")!;
-        const selected = wrapper.querySelector(".selected-option")!;
-        const input = wrapper.querySelector(
-          "input[type=hidden]"
-        ) as HTMLInputElement;
-
-        const colorCircle = selected.querySelector(
-          ".color-circle"
-        ) as HTMLElement;
-        const colorName = selected.querySelector(".color-name") as HTMLElement;
-        const chosenName = opt.querySelector(".color-name")?.textContent;
-
-        colorCircle.style.backgroundColor =
-          opt.style.getPropertyValue("--color");
-        colorName.textContent = chosenName || "";
-        input.value = opt.getAttribute("data-defaultvalue") || "";
-
-        wrapper.querySelector(".dropdown")?.classList.remove("show");
-      });
-    });
-
-    // ===== Custom dropdown toggle ban đầu =====
-    document.querySelectorAll(".custom-select").forEach((select) => {
-      select.addEventListener("click", (e) => {
-        e.stopPropagation();
+      // Toggle custom select
+      if (target.closest(".custom-select")) {
+        const dropdown = target
+          .closest(".custom-select")
+          ?.querySelector(".dropdown");
+        if (dropdown) dropdown.classList.toggle("show");
+      } else {
         document
           .querySelectorAll(".dropdown")
-          .forEach((dropdown) => dropdown.classList.remove("show"));
-        const dropdown = select.querySelector(".dropdown");
-        dropdown?.classList.toggle("show");
-      });
-    });
-
-    document.querySelectorAll(".dropdown").forEach((dropdown) => {
-      dropdown.addEventListener("click", (e) => {
-        e.stopPropagation();
-      });
-    });
-
-    // ===== Multi-select Danh Mục (nếu dùng) =====
-    const danhMucWrapper = document.getElementById("danh-muc-wrapper");
-    const dropdownSelected = document.getElementById("dropdown-selected");
-    const dropdownOptions = document.getElementById("dropdown-options");
-    const selectedTags = document.getElementById("selected-tags");
-
-    if (danhMucWrapper && dropdownSelected && dropdownOptions && selectedTags) {
-      dropdownSelected.addEventListener("click", (e) => {
-        e.stopPropagation();
-        dropdownOptions.classList.toggle("show");
-      });
-
-      const checkboxes = dropdownOptions.querySelectorAll(
-        "input[type=checkbox]"
-      ) as NodeListOf<HTMLInputElement>;
-
-      checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-          const value = checkbox.value;
-
-          if (checkbox.checked) {
-            const tag = document.createElement("span");
-            tag.className = "tag";
-            tag.textContent = value;
-
-            const removeBtn = document.createElement("button");
-            removeBtn.innerHTML = "&times;";
-            removeBtn.style.marginLeft = "5px";
-            removeBtn.addEventListener("click", () => {
-              checkbox.checked = false;
-              selectedTags.removeChild(tag);
-            });
-
-            tag.appendChild(removeBtn);
-            selectedTags.appendChild(tag);
-          } else {
-            const tags = selectedTags.querySelectorAll(".tag");
-            tags.forEach((tag) => {
-              if (tag.textContent?.includes(value)) {
-                selectedTags.removeChild(tag);
-              }
-            });
-          }
-        });
-      });
-    }
-
-    // ===== Close dropdowns on outside click =====
-    const handleClickOutside = () => {
-      document.querySelectorAll(".dropdown").forEach((dropdown) => {
-        dropdown.classList.remove("show");
-      });
-
-      dropdownOptions?.classList.remove("show");
-    };
-
-    document.addEventListener("click", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
-  useEffect(() => {
-    const dropdownWrapper = document.getElementById("danh-muc-wrapper");
-    const dropdownSelected = document.getElementById("dropdown-selected");
-    const dropdownOptions = document.getElementById("dropdown-options");
-    const selectedTagsContainer = document.getElementById("selected-tags");
-
-    if (
-      !dropdownWrapper ||
-      !dropdownSelected ||
-      !dropdownOptions ||
-      !selectedTagsContainer
-    )
-      return;
-
-    const checkboxes = dropdownOptions.querySelectorAll<HTMLInputElement>(
-      'input[type="checkbox"]'
-    );
-
-    const renderTags = () => {
-      selectedTagsContainer.innerHTML = "";
-      const selected: string[] = [];
-
-      checkboxes.forEach((checkbox) => {
-        if (checkbox.checked) {
-          selected.push(checkbox.value);
-
-          const tag = document.createElement("span");
-          tag.className = "tag";
-          tag.textContent = checkbox.value;
-
-          const removeBtn = document.createElement("span");
-          removeBtn.textContent = " ×";
-          removeBtn.style.marginLeft = "5px";
-          removeBtn.style.cursor = "pointer";
-          removeBtn.onclick = () => {
-            checkbox.checked = false;
-            renderTags();
-          };
-
-          tag.appendChild(removeBtn);
-          selectedTagsContainer.appendChild(tag);
-        }
-      });
-
-      dropdownSelected.textContent =
-        selected.length > 0 ? selected.join(", ") : "Chọn danh mục";
-    };
-
-    dropdownWrapper.addEventListener("click", () => {
-      dropdownWrapper.classList.toggle("open");
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!dropdownWrapper.contains(e.target as Node)) {
-        dropdownWrapper.classList.remove("open");
+          .forEach((dd) => dd.classList.remove("show"));
       }
-    });
-
-    checkboxes.forEach((checkbox) => {
-      checkbox.addEventListener("change", renderTags);
-    });
-
-    renderTags();
-
-    return () => {
-      checkboxes.forEach((checkbox) => {
-        checkbox.removeEventListener("change", renderTags);
-      });
     };
+
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
   }, []);
 
+  /** Multi-select danh mục */
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const toggleCategory = (value: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
+    );
+  };
+  useEffect(() => {
+    getSizes()
+      .then((res) => {
+        setSizes(Array.isArray(res) ? res : res.data || []);
+      })
+      .catch(console.error);
+  }, []);
+
+  const sizeOptions = sizes.map((s) => ({
+    value: String(s.id),
+    label: s.number_size,
+  }));
+
+  /** Kiểu dữ liệu biến thể */
+  type Variant = {
+    imagePreview?: string;
+    color: string;
+    image: File | null;
+    sizes: string[];
+    quantity: number | string;
+  };
+
+  /** State biến thể */
+  const [variants, setVariants] = useState<Variant[]>([
+    { color: "black|Đen", image: null, sizes: [], quantity: "" },
+  ]);
+
+  /** Cập nhật biến thể */
+  const handleVariantChange = (
+    index: number,
+    field: keyof Variant,
+    value: any
+  ) => {
+    setVariants((prev) => {
+      const newVariants = [...prev];
+      newVariants[index] = { ...newVariants[index], [field]: value };
+      return newVariants;
+    });
+  };
+
+  /** Thêm biến thể mới */
+  const addVariant = () => {
+    setVariants((prev) => [
+      ...prev,
+      { color: "black|Đen", image: null, sizes: [], quantity: "" },
+    ]);
+  };
+
+  /** Xóa biến thể */
+  const removeVariant = (index: number) => {
+    setVariants((prev) => prev.filter((_, i) => i !== index));
+  };
+  const colors = [
+    { value: "black|Đen", hex: "#000000" },
+    { value: "white|Trắng", hex: "#FFFFFF" },
+    { value: "red|Đỏ", hex: "#FF0000" },
+    { value: "blue|Xanh dương", hex: "#0000FF" },
+    { value: "green|Xanh lá", hex: "#008000" },
+    { value: "yellow|Vàng", hex: "#FFFF00" },
+    { value: "purple|Tím", hex: "#800080" },
+    { value: "pink|Hồng", hex: "#FFC0CB" },
+    { value: "orange|Cam", hex: "#FFA500" },
+    { value: "brown|Nâu", hex: "#8B4513" },
+    { value: "gray|Xám", hex: "#808080" },
+    { value: "silver|Bạc", hex: "#C0C0C0" },
+    { value: "gold|Vàng ánh kim", hex: "#FFD700" },
+    { value: "beige|Be", hex: "#F5F5DC" },
+    { value: "navy|Xanh navy", hex: "#000080" },
+    { value: "teal|Xanh teal", hex: "#008080" },
+    { value: "cyan|Xanh cyan", hex: "#00FFFF" },
+    { value: "magenta|Hồng magenta", hex: "#FF00FF" },
+    { value: "lime|Xanh chanh", hex: "#00FF00" },
+    { value: "maroon|Nâu đỏ", hex: "#800000" },
+    { value: "olive|Xanh olive", hex: "#808000" },
+    { value: "coral|San hô", hex: "#FF7F50" },
+    { value: "turquoise|Ngọc lam", hex: "#40E0D0" },
+    { value: "indigo|Chàm", hex: "#4B0082" },
+    { value: "violet|Tím violet", hex: "#EE82EE" },
+    { value: "khaki|Kaki", hex: "#F0E68C" },
+    { value: "plum|Mận", hex: "#DDA0DD" },
+    { value: "orchid|Lan tím", hex: "#DA70D6" },
+    { value: "salmon|Cá hồi", hex: "#FA8072" },
+    { value: "chocolate|Sô-cô-la", hex: "#D2691E" },
+    { value: "tan|Da bò", hex: "#D2B48C" },
+    { value: "skyblue|Xanh da trời", hex: "#87CEEB" },
+    { value: "royalblue|Xanh hoàng gia", hex: "#4169E1" },
+    { value: "seagreen|Xanh lá biển", hex: "#2E8B57" },
+    { value: "forestgreen|Xanh rừng", hex: "#228B22" },
+    { value: "lightgreen|Xanh lá nhạt", hex: "#90EE90" },
+    { value: "lightblue|Xanh nhạt", hex: "#ADD8E6" },
+    { value: "darkblue|Xanh đậm", hex: "#00008B" },
+    { value: "darkred|Đỏ đậm", hex: "#8B0000" },
+    { value: "darkgreen|Xanh đậm", hex: "#006400" },
+    { value: "darkorange|Cam đậm", hex: "#FF8C00" },
+    { value: "crimson|Đỏ thẫm", hex: "#DC143C" },
+    { value: "firebrick|Gạch đỏ", hex: "#B22222" },
+    { value: "lavender|Oải hương", hex: "#E6E6FA" },
+    { value: "mint|Bạc hà", hex: "#98FF98" },
+    { value: "peach|Đào", hex: "#FFE5B4" },
+    { value: "apricot|Mơ", hex: "#FBCEB1" },
+    { value: "amber|Hổ phách", hex: "#FFBF00" },
+    { value: "aqua|Xanh nước", hex: "#00FFFF" },
+    { value: "azure|Xanh da trời nhạt", hex: "#F0FFFF" },
+    { value: "burgundy|Rượu vang", hex: "#800020" },
+    { value: "charcoal|Xám than", hex: "#36454F" },
+    { value: "copper|Đồng", hex: "#B87333" },
+    { value: "cream|Kem", hex: "#FFFDD0" },
+    { value: "fuchsia|Hồng fuchsia", hex: "#FF00FF" },
+    { value: "honeydew|Sương mật", hex: "#F0FFF0" },
+    { value: "ivory|Ngà", hex: "#FFFFF0" },
+    { value: "jade|Ngọc bích", hex: "#00A86B" },
+    { value: "lemon|Vàng chanh", hex: "#FFF44F" },
+    { value: "mustard|Vàng mù tạt", hex: "#FFDB58" },
+    { value: "pearl|Ngọc trai", hex: "#EAE0C8" },
+    { value: "rose|Hồng rose", hex: "#FF007F" },
+    { value: "ruby|Hồng ngọc", hex: "#E0115F" },
+    { value: "sapphire|Lam ngọc", hex: "#0F52BA" },
+    { value: "scarlet|Đỏ tươi", hex: "#FF2400" },
+    { value: "seafoam|Bọt biển", hex: "#9FE2BF" },
+    { value: "slate|Đá phiến", hex: "#708090" },
+    { value: "snow|Tuyết", hex: "#FFFAFA" },
+    { value: "steelblue|Xanh thép", hex: "#4682B4" },
+    { value: "sunset|Hoàng hôn", hex: "#FD5E53" },
+    { value: "tomato|Cà chua", hex: "#FF6347" },
+    { value: "wheat|Lúa mì", hex: "#F5DEB3" },
+    { value: "amethyst|Thạch anh tím", hex: "#9966CC" },
+    { value: "antiqueWhite|Trắng cổ", hex: "#FAEBD7" },
+    { value: "bisque|Màu sứ", hex: "#FFE4C4" },
+    { value: "blanchedAlmond|Hạnh nhân", hex: "#FFEBCD" },
+    { value: "cadetBlue|Xanh cadet", hex: "#5F9EA0" },
+    { value: "chartreuse|Vàng lục", hex: "#7FFF00" },
+    { value: "darkCyan|Xanh cyan đậm", hex: "#008B8B" },
+    { value: "darkGoldenRod|Vàng gỗ đậm", hex: "#B8860B" },
+    { value: "darkKhaki|Kaki đậm", hex: "#BDB76B" },
+    { value: "darkMagenta|Tím đậm", hex: "#8B008B" },
+    { value: "darkOliveGreen|Xanh olive đậm", hex: "#556B2F" },
+    { value: "darkOrchid|Lan tím đậm", hex: "#9932CC" },
+    { value: "darkSalmon|Cá hồi đậm", hex: "#E9967A" },
+    { value: "darkSeaGreen|Xanh biển đậm", hex: "#8FBC8F" },
+    { value: "darkSlateBlue|Xanh đá phiến đậm", hex: "#483D8B" },
+    { value: "darkSlateGray|Xám đá đậm", hex: "#2F4F4F" },
+    { value: "deepPink|Hồng đậm", hex: "#FF1493" },
+    { value: "deepSkyBlue|Xanh trời đậm", hex: "#00BFFF" },
+    { value: "dodgerBlue|Xanh dodger", hex: "#1E90FF" },
+    { value: "floralWhite|Trắng hoa", hex: "#FFFAF0" },
+    { value: "gainsboro|Xám gainsboro", hex: "#DCDCDC" },
+    { value: "ghostWhite|Trắng ma", hex: "#F8F8FF" },
+    { value: "greenYellow|Xanh vàng", hex: "#ADFF2F" },
+    { value: "hotPink|Hồng nóng", hex: "#FF69B4" },
+    { value: "lightCoral|San hô nhạt", hex: "#F08080" },
+    { value: "lightCyan|Xanh cyan nhạt", hex: "#E0FFFF" },
+  ];
+
+  // Hàm chọn màu
+  const handleColorSelect = (index: number, colorValue: string) => {
+    handleVariantChange(index, "color", colorValue);
+  };
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [brandData, categoryData, genderData] = await Promise.all([
+          getAllBrands(),
+          getAllCategories(),
+          getGenders(),
+        ]);
+        setBrands(brandData);
+        setCategories(categoryData);
+        setGenders(genderData.data); // gender trả về { data: IGender[] }
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu:", error);
+      }
+    }
+    fetchData();
+  }, []);
   return (
     <>
       <div className="header-bar">
@@ -329,11 +497,14 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       <div className="tabs">
         <div className="tab active">Thông tin sản phẩm</div>
         <div className="tab">Nhập số lượng sản phẩm</div>
-        <div className="tab">Thêm ảnh feedback cho sản phẩm</div>
       </div>
 
       <div className="tab-content" style={{ display: "block" }}>
-        <form id="add-product-form" className="add-product-form">
+        <form
+          id="add-product-form"
+          onSubmit={handleSubmit}
+          className="add-product-form"
+        >
           <div className="form-grid">
             <div>
               <div className="form-group">
@@ -342,8 +513,8 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
                   type="text"
                   id="ten_sp"
                   name="ten_sp"
-                  defaultValue="VANS VAULT STYLE 36 BLACK"
-                  required
+                  defaultValue=""
+                  placeholder="Nhập tên sản phẩm..."
                 />
               </div>
               <div className="form-group">
@@ -353,6 +524,13 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
                   style={{ height: "300px", backgroundColor: "#fff" }}
                 />
               </div>
+              <label htmlFor=""> Mô tả ngắn</label>
+              <textarea
+                id="mo_ta_ngan"
+                name="mo_ta_ngan"
+                rows={3}
+                placeholder="Nhập mô tả ngắn cho sản phẩm..."
+              ></textarea>
             </div>
 
             <div>
@@ -366,68 +544,70 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
 
               <div className="form-group">
                 <label htmlFor="nhan_hieu">Nhãn hiệu sản phẩm *</label>
-                <select id="nhan_hieu" defaultValue="VANZ">
-                  <option value="VANZ">VANZ</option>
-                  <option value="Nike">Nike</option>
-                  <option value="Adidas">Adidas</option>
+                <select id="nhan_hieu" defaultValue="">
+                  <option value="" disabled>
+                    -- Chọn nhãn hiệu --
+                  </option>
+                  {brands.map((b) => (
+                    <option key={b.brand_id} value={b.brand_id}>
+                      {b.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label>Danh mục sản phẩm *</label>
-                <div className="dropdown-multiselect" id="danh-muc-wrapper">
-                  <div className="dropdown-selected" id="dropdown-selected">
-                    Chọn danh mục
-                  </div>
-                  <div className="dropdown-options" id="dropdown-options">
-                    <label>
-                      <input type="checkbox" defaultValue="Giày Nam" /> Giày Nam
-                    </label>
-                    <label>
-                      <input type="checkbox" defaultValue="Giày Nữ" /> Giày Nữ
-                    </label>
-                    <label>
-                      <input type="checkbox" defaultValue="Giày Trẻ em" /> Giày
-                      Trẻ em
-                    </label>
-                    <label>
-                      <input type="checkbox" defaultValue="Sneaker" /> Sneaker
-                    </label>
-                    <label>
-                      <input type="checkbox" defaultValue="Chạy bộ" /> Chạy bộ
-                    </label>
-                    <label>
-                      <input type="checkbox" defaultValue="Thể thao" /> Thể thao
-                    </label>
-                  </div>
-                </div>
-                <div
-                  id="selected-tags"
-                  className="tags-input"
-                  style={{ marginTop: "10px" }}
-                ></div>
+                <label htmlFor="danh_muc">Danh mục sản phẩm *</label>
+                <select id="danh_muc" defaultValue="">
+                  <option value="" disabled>
+                    -- Chọn danh mục --
+                  </option>
+                  {categories.map((c) => (
+                    <option key={c.categories_id} value={c.categories_id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="gender">Giới tính *</label>
+                <select id="gender" defaultValue="3">
+                  <option value="" disabled>
+                    -- Chọn giới tính --
+                  </option>
+                  {genders.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="form-group">
                 <label htmlFor="gia_goc">
-                  Giá gốc tham khảo (VND)
+                  Giá bán (VND)
                   <small>
-                    (Giá này sẽ được dùng mặc định nếu không nhập giá riêng
-                    trong tab 2)
+                    (Giá này sẽ được dùng mặc định nếu không nhập giá khuyến
+                    mãi)
                   </small>
                 </label>
-                <input type="number" id="gia_goc" name="gia_goc" />
+                <input
+                  type="number"
+                  id="gia_goc"
+                  name="gia_goc"
+                  placeholder="nhập giá sản phẩm..."
+                />
               </div>
 
               <div className="form-group">
-                <label htmlFor="gia_ban">
-                  Giá bán tham khảo (VND)
-                  <small>
-                    (Giá này sẽ được dùng mặc định nếu không nhập giá riêng
-                    trong tab 2)
-                  </small>
-                </label>
-                <input type="number" id="gia_ban" name="gia_ban" />
+                <label htmlFor="gia_ban">Giá khuyên mãi (VND)</label>
+                <input
+                  type="number"
+                  id="gia_ban"
+                  name="gia_ban"
+                  placeholder="nhập giá giảm..."
+                />
               </div>
             </div>
           </div>
@@ -438,34 +618,35 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
             Ảnh sản phẩm <small>(Lưu ý: Nền đế nền trắng)</small>
           </label>
           <div className="product-images">
-            <div className="image-thumb">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion(1).webp`}
-                alt="Ảnh 1"
-              />
-            </div>
-            <div className="image-thumb">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion(2).webp`}
-                alt="Ảnh 2"
-              />
-            </div>
-            <div className="image-thumb">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion(3).webp`}
-                alt="Ảnh 3"
-              />
-            </div>
-            <div className="image-thumb">
-              <img
-                src={`${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`}
-                alt="Ảnh 4"
-              />
-            </div>
+            {/* Hiển thị ảnh preview từ mainImages */}
+            {mainImages.length > 0 ? (
+              mainImages.map((file, index) => {
+                const url = URL.createObjectURL(file);
+                return (
+                  <div className="image-thumb" key={index}>
+                    <img src={url} alt={`Ảnh ${index + 1}`} />
+                  </div>
+                );
+              })
+            ) : (
+              <>
+                <p className="w-full text-gray-500 italic select-none py-10">
+                  Chưa có ảnh sản phẩm
+                </p>
+              </>
+            )}
           </div>
-          <button type="button" className="choose-image-btn">
+          <label htmlFor="fileInput" className="choose-image-btn">
             Chọn ảnh
-          </button>
+          </label>
+          <input
+            type="file"
+            id="fileInput"
+            style={{ display: "none" }}
+            multiple
+            accept="image/*"
+            onChange={handleMainImagesChange}
+          />
         </div>
       </div>
 
@@ -476,329 +657,155 @@ Trước Khi Thanh Toán - 100% Ảnh chụp trực tiếp tại Tu Shoes
       >
         <div className="form-group">
           <label>Nhập biến thể sản phẩm (Màu - Size - Giá - Số lượng)</label>
-          <div id="variant-list">
-            <div
-              className="variant-row"
-              style={{
-                display: "flex",
-                gap: "10px",
-                marginBottom: "10px",
-                alignItems: "center",
-              }}
-            >
-              <div className="custom-select-wrapper" style={{ flex: "1" }}>
-                <div className="custom-select">
-                  <div className="selected-option">
-                    <span
-                      className="color-circle"
-                      style={{ backgroundColor: "black" }}
-                    ></span>
-                    <span className="color-name">Đen</span>
-                  </div>
 
-                  <div className="dropdown">
-                    <input
-                      type="text"
-                      className="color-search"
-                      placeholder="Tìm màu..."
-                    />
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="black|Đen"
-                      style={{ "--color": "black" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Đen</span>
+          <div id="variant-list">
+            {variants.map((variant, index) => (
+              <div
+                key={index}
+                className="variant-row"
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  marginBottom: "10px",
+                  alignItems: "center",
+                }}
+              >
+                <div className="custom-select-wrapper" style={{ flex: "1" }}>
+                  <div className="custom-select">
+                    {/* Màu đang chọn */}
+                    <div className="selected-option">
+                      <span
+                        className="color-circle"
+                        style={{
+                          backgroundColor: variant.color
+                            ? variant.color.split("|")[0]
+                            : colors[0].hex,
+                        }}
+                      ></span>
+                      <span className="color-name">
+                        {variant.color
+                          ? variant.color.split("|")[1]
+                          : colors[0].value.split("|")[1]}
+                      </span>
                     </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="white|Trắng"
-                      style={{ "--color": "white" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Trắng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="gray|Xám"
-                      style={{ "--color": "gray" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xám</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="lightgray|Xám nhạt"
-                      style={{ "--color": "lightgray" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xám nhạt</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="red|Đỏ"
-                      style={{ "--color": "red" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Đỏ</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="darkred|Đỏ đậm"
-                      style={{ "--color": "darkred" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Đỏ đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="maroon|Nâu đỏ"
-                      style={{ "--color": "maroon" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Nâu đỏ</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="pink|Hồng"
-                      style={{ "--color": "pink" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="hotpink|Hồng đậm"
-                      style={{ "--color": "hotpink" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="blue|Xanh dương"
-                      style={{ "--color": "blue" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh dương</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="navy|Xanh navy"
-                      style={{ "--color": "navy" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh navy</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="skyblue|Xanh da trời"
-                      style={{ "--color": "skyblue;" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh da trời</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="teal|Xanh ngọc"
-                      style={{ "--color": "teal" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh ngọc</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="green|Xanh lá"
-                      style={{ "--color": "green" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh lá</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="lime|Xanh neon"
-                      style={{ "--color": "lime" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh neon</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="olive|Xanh oliu"
-                      style={{ "--color": "olive" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh oliu</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="orange|Cam"
-                      style={{ "--color": "orange" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Cam</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="darkorange|Cam đậm"
-                      style={{ "--color": "darkorange" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Cam đậm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="yellow|Vàng"
-                      style={{ "--color": "yellow" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Vàng</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="gold|Vàng kim"
-                      style={{ "--color": "gold" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Vàng kim</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="beige|Be"
-                      style={{ "--color": "beige" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Be</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="ivory|Trắng ngà"
-                      style={{ "--color": "ivory" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Trắng ngà</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="purple|Tím"
-                      style={{ "--color": "purple" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Tím</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="violet|Tím nhạt"
-                      style={{ "--color": "violet" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Tím nhạt</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="indigo|Chàm"
-                      style={{ "--color": "indigo" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Chàm</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="brown|Nâu"
-                      style={{ "--color": "brown" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Nâu</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="saddlebrown|Nâu yên ngựa"
-                      style={
-                        { "--color": "saddlebrown" } as React.CSSProperties
-                      }
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Nâu yên ngựa</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="chocolate|Socola"
-                      style={{ "--color": "chocolate" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Socola</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="silver|Bạc"
-                      style={{ "--color": "silver" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Bạc</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="cyan|Xanh cyan"
-                      style={{ "--color": "cyan" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Xanh cyan</span>
-                    </div>
-                    <div
-                      className="dropdown-option"
-                      data-defaultvalue="magenta|Hồng tím"
-                      style={{ "--color": "magenta" } as React.CSSProperties}
-                    >
-                      <span className="color-circle"></span>
-                      <span className="color-name">Hồng tím</span>
+
+                    {/* Dropdown danh sách màu */}
+                    <div className="dropdown">
+                      {colors.map((c, i) => (
+                        <div
+                          key={i}
+                          className="dropdown-option"
+                          data-variant={index}
+                          data-name={c.value.split("|")[1]}
+                          style={{ "--color": c.hex } as React.CSSProperties}
+                          onClick={() => handleColorSelect(index, c.value)}
+                        >
+                          <span
+                            className="color-circle"
+                            style={{ backgroundColor: c.hex }}
+                          ></span>
+                          <span className="color-name">
+                            {c.value.split("|")[1]}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
-                <input type="hidden" name="color[]" defaultValue="black|Đen" />
-              </div>
-              <input
-                type="text"
-                name="size[]"
-                placeholder="Size (VD: 39)"
-                style={{ flex: "1" }}
-              />
-              <input
-                type="number"
-                name="price[]"
-                placeholder="Giá bán (VND)"
-                style={{ flex: "1" }}
-              />
-              <input
-                type="number"
-                name="price[]"
-                placeholder="Giá khuyến mãi (VND)"
-                style={{ flex: "1" }}
-              />
-              <input
-                type="number"
-                name="quantity[]"
-                placeholder="Số lượng"
-                style={{ flex: "1" }}
-              />
-              <button type="button" className="btn btn-add-variant">
-                +
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleVariantImageChange(index, e)}
+                  style={{ flex: "1" }}
+                />
 
-      <div
-        className="tab-content"
-        id="feedback-tab"
-        style={{ display: "none" }}
-      >
-        <div className="form-group">
-          <label>Thêm ảnh feedback từ khách hàng</label>
-          <div className="product-images"></div>
-          <button type="button" className="choose-image-btn">
-            Tải ảnh lên
-          </button>
+                {(() => {
+                  const colorCode = variant.color.split("|")[0];
+                  const colorObj = colors.find((c) =>
+                    c.value.startsWith(colorCode + "|")
+                  );
+                  const hex =
+                    colorObj?.hex.replace("#", "").toUpperCase() || colorCode;
+
+                  const previews = Array.isArray(variantImagesPreview[hex])
+                    ? variantImagesPreview[hex]
+                    : variantImagesPreview[hex]
+                    ? [variantImagesPreview[hex]]
+                    : [];
+                  return previews.map((preview, idx) => (
+                    <img
+                      key={idx}
+                      src={preview}
+                      alt={`Preview ${idx}`}
+                      style={{
+                        width: 50,
+                        height: 50,
+                        objectFit: "cover",
+                        marginTop: 8,
+                        marginRight: 4,
+                      }}
+                    />
+                  ));
+                })()}
+
+                <Select<{ value: string; label: string }, true>
+                  options={sizeOptions}
+                  isMulti
+                  value={sizeOptions.filter((opt) =>
+                    Array.isArray(variant.sizes)
+                      ? variant.sizes.includes(opt.value)
+                      : false
+                  )}
+                  onChange={(selected) => {
+                    handleVariantChange(
+                      index,
+                      "sizes",
+                      selected.map((s) => s.value)
+                    );
+                  }}
+                  placeholder="Chọn size"
+                />
+
+                {/* Số lượng */}
+                <input
+                  type="number"
+                  name="số lượng[]"
+                  placeholder="nhập số lượng sản phẩm..."
+                  style={{ flex: "1" }}
+                  value={variant.quantity || ""}
+                  onChange={(e) => {
+                    const updated = [...variants];
+                    updated[index].quantity = Number(e.target.value);
+                    setVariants(updated);
+                  }}
+                />
+                {/* Thêm biến thể */}
+                <button
+                  type="button"
+                  onClick={addVariant}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Plus size={20} color="#021688" />
+                </button>
+                {/* Xóa biến thể */}
+                <button
+                  type="button"
+                  onClick={() => removeVariant(index)}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Trash2 size={20} color="red" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </>
