@@ -7,7 +7,8 @@ export interface IProduct {
   price: number;
   sale_price: number;
   status: string;
-
+  created_at: string;
+  updated_at: string;
   category: {
     categories_id: number;
     name: string;
@@ -93,4 +94,35 @@ export interface GetAllProductReviewParams {
   search?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+}
+export interface ICompareProduct{
+  product_compare_id:number;
+  user_id:number;
+  created_at:Date;
+  product:IProduct;
+  
+}
+
+export interface GetProductsDashboardParams {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortOrder?: "asc" | "desc";
+  productCode?: string;
+  productName?: string;
+  brandId?: number;
+  categoryId?: number;
+  minImportPrice?: number;
+  maxImportPrice?: number;
+  minSalePrice?: number;
+  maxSalePrice?: number;
+  minQuantity?: number;
+  maxQuantity?: number;
+}
+
+export interface GetProductsDashboardResponse {
+  data: IProduct[];
+  total: number;
+  currentPage: number;
+  totalPages: number;
 }

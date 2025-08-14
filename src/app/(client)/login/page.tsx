@@ -10,6 +10,7 @@ import { validateField } from "@/hooks/validate_login_register";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -21,7 +22,7 @@ export default function Login() {
   const router = useRouter();
   const [rememberMe, setRememberMe] = useState(false);
   const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
-
+  const { user } = useAuthUser();
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -53,7 +54,6 @@ export default function Login() {
       const res = await loginUser({ usernameOrEmail, password });
 
       saveUserToCookies(res);
-
       setShowLoader(true);
       setLoginSuccess(true);
     } catch (err: any) {
@@ -80,7 +80,7 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (showLoader && loginSuccess) {
+    if (showLoader && loginSuccess && user) {
       const timer = setTimeout(() => {
         setShowLoader(false);
         Swal.fire({
@@ -90,13 +90,18 @@ export default function Login() {
           timer: 2000,
           timerProgressBar: true,
         });
-        window.location.href = "/account";
-      }, 2000);
-      router.refresh();
 
+        if (user?.role === "admin") {
+          window.location.href = "/admin";
+        } else {
+          window.location.href = "/account";
+        }
+      }, 2000);
+
+      router.refresh();
       return () => clearTimeout(timer);
     }
-  }, [showLoader, loginSuccess]);
+  }, [showLoader, loginSuccess, user]);
 
   return (
     <>

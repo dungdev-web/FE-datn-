@@ -1,9 +1,11 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import {
-  GetAllProductReviewParams,
   IProduct,
   IReview,
   IReviewPayload,
+  GetProductsDashboardParams,
+  GetProductsDashboardResponse,
+  GetAllProductReviewParams,
 } from "@/types/product";
 import { getMockProducts, saveMockProducts } from "@/mocks/mockProduct";
 import { FilterParams, ProductFilterResponse } from "@/types/productFilter";
@@ -692,33 +694,41 @@ export async function getAllProductReview({
     throw error;
   }
 }
-export async function getByIdReview(product_reviews_id:number) {
+export async function getByIdReview(product_reviews_id: number) {
   try {
-    const res = await fetch(`${API_BASE_URL}/product/all/reviews/${product_reviews_id}`);
+    const res = await fetch(
+      `${API_BASE_URL}/product/all/reviews/${product_reviews_id}`
+    );
     if (!res.ok) {
       throw new Error(`Lỗi API: ${res.status}`);
-      }
-      return await res.json();
-      } catch (error) {
-        console.error("Lỗi khi gọi API getByIdReview:", error);
-        throw error;
-        }
-
-  
+    }
+    return await res.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API getByIdReview:", error);
+    throw error;
+  }
 }
-export async function setStatusReview(product_reviews_id: number, status: string) {
+export async function setStatusReview(
+  product_reviews_id: number,
+  status: string
+) {
   try {
-    const res = await fetch(`${API_BASE_URL}/product/reviews/status/${product_reviews_id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    });
+    const res = await fetch(
+      `${API_BASE_URL}/product/reviews/status/${product_reviews_id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
 
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.error || "Lỗi khi cập nhật trạng thái đánh giá");
+      throw new Error(
+        errorData.error || "Lỗi khi cập nhật trạng thái đánh giá"
+      );
     }
 
     return await res.json();
@@ -726,4 +736,76 @@ export async function setStatusReview(product_reviews_id: number, status: string
     console.error("[Frontend] Lỗi setStatusReview:", err);
     throw err;
   }
+}
+export async function getProductsDashboard(
+  params: GetProductsDashboardParams = {}
+): Promise<GetProductsDashboardResponse> {
+  if (IS_MOCK) {
+    // Xử lý mock nếu có
+    return {
+      data: [],
+      total: 0,
+      currentPage: 1,
+      totalPages: 0,
+    };
+  }
+
+  const {
+    page = 1,
+    limit = 5,
+    sortField = "created_at",
+    sortOrder = "desc",
+    productCode,
+    productName,
+    brandId,
+    categoryId,
+    minImportPrice,
+    maxImportPrice,
+    minSalePrice,
+    maxSalePrice,
+    minQuantity,
+    maxQuantity,
+  } = params;
+
+  const queryParams = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    sortField,
+    sortOrder,
+  });
+
+  if (productCode) queryParams.append("productCode", productCode);
+  if (productName) queryParams.append("productName", productName);
+  if (brandId !== undefined) queryParams.append("brandId", String(brandId));
+  if (categoryId !== undefined)
+    queryParams.append("categoryId", String(categoryId));
+  if (minImportPrice !== undefined)
+    queryParams.append("minImportPrice", String(minImportPrice));
+  if (maxImportPrice !== undefined)
+    queryParams.append("maxImportPrice", String(maxImportPrice));
+  if (minSalePrice !== undefined)
+    queryParams.append("minSalePrice", String(minSalePrice));
+  if (maxSalePrice !== undefined)
+    queryParams.append("maxSalePrice", String(maxSalePrice));
+  if (minQuantity !== undefined)
+    queryParams.append("minQuantity", String(minQuantity));
+  if (maxQuantity !== undefined)
+    queryParams.append("maxQuantity", String(maxQuantity));
+
+  const url = `${API_BASE_URL}/product/prodashboard?${queryParams.toString()}`;
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("Không thể lấy danh sách sản phẩm từ server.");
+  }
+
+  const json = await res.json();
+
+  return {
+    data: json.products as IProduct[],
+    total: json.total,
+    currentPage: json.currentPage,
+    totalPages: json.totalPages,
+  };
 }
