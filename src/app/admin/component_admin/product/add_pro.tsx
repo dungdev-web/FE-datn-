@@ -234,6 +234,8 @@ export default function Add_pro() {
       });
 
       Swal.fire("Thành công", "Thêm sản phẩm thành công!", "success");
+      //
+     
     } catch (error) {
       console.error(error);
       Swal.fire("Lỗi", "Có lỗi khi thêm sản phẩm", "error");
