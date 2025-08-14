@@ -1,10 +1,7 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getAllCategories,
-} from "@/services/categoryService";
+import { getAllCategories } from "@/services/categoryService";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
@@ -94,7 +91,7 @@ export default function CategoryPage() {
     min: number;
     max: number;
   } | null>(null);
- const handleBrandCheckboxChange = (id: number) => {
+  const handleBrandCheckboxChange = (id: number) => {
     setSelectedBrandIds((prev) =>
       prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]
     );
@@ -123,69 +120,77 @@ export default function CategoryPage() {
     page * productsPerPage
   );
 
-useEffect(() => {
-  async function fetchFiltered() {
-    try {
-      if (!slug) return;
+  useEffect(() => {
+    async function fetchFiltered() {
+      try {
+        if (!slug) return;
 
-      // Chuẩn bị params cho getFilteredProducts
-      const params: any = {
-        keyword: keyword || undefined,
-        gender: selectedGender || undefined,
-        brand: selectedBrandIds.length > 0 ? selectedBrandIds.map(String) : undefined,
-        minPrice: selectedPriceRange?.min,
-        maxPrice: selectedPriceRange?.max,
-        status: 1,
-        limit: productsPerPage,
-        page,
-        sortBy,
-        sortOrder,
-      };
+        // Chuẩn bị params cho getFilteredProducts
+        const params: any = {
+          keyword: keyword || undefined,
+          gender: selectedGender || undefined,
+          brand:
+            selectedBrandIds.length > 0
+              ? selectedBrandIds.map(String)
+              : undefined,
+          minPrice: selectedPriceRange?.min,
+          maxPrice: selectedPriceRange?.max,
+          status: 1,
+          limit: productsPerPage,
+          page,
+          sortBy,
+          sortOrder,
+        };
 
-      // Nếu đã chọn brand thì bỏ filter theo category
-      if (selectedBrandIds.length === 0) {
-        (params as any).categorySlug = slug; // hoặc categoryId nếu có
+        // Nếu đã chọn brand thì bỏ filter theo category
+        if (selectedBrandIds.length === 0) {
+          (params as any).categorySlug = slug; // hoặc categoryId nếu có
+        }
+
+        const result = await getFilteredProducts(params);
+
+        setProducts(result.products);
+        setTotal(result.total);
+        setTotalPages(result.totalPages);
+
+        // Lấy categories và brands như cũ
+        const fetchedCategories = await getAllCategories();
+        setCategories(
+          Array.isArray(fetchedCategories) ? fetchedCategories : []
+        );
+
+        const fetchedBrands = await getAllBrands();
+        setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
+
+        // Tìm category, brand tương ứng
+        const matchedCategory = fetchedCategories.find(
+          (cat) => cat.slug === slug
+        );
+        setCategory(matchedCategory || null);
+
+        const matchedBrand = fetchedBrands.find((b) =>
+          selectedBrandIds.includes(b.brand_id)
+        );
+        setBrand(matchedBrand || null);
+      } catch (error) {
+        console.error("Lỗi khi fetch sản phẩm lọc:", error);
+        setProducts([]);
+        setTotal(0);
+        setTotalPages(1);
       }
-
-      const result = await getFilteredProducts(params);
-
-      setProducts(result.products);
-      setTotal(result.total);
-      setTotalPages(result.totalPages);
-
-      // Lấy categories và brands như cũ
-      const fetchedCategories = await getAllCategories();
-      setCategories(Array.isArray(fetchedCategories) ? fetchedCategories : []);
-
-      const fetchedBrands = await getAllBrands();
-      setBrandsList(Array.isArray(fetchedBrands) ? fetchedBrands : []);
-
-      // Tìm category, brand tương ứng
-      const matchedCategory = fetchedCategories.find((cat) => cat.slug === slug);
-      setCategory(matchedCategory || null);
-
-      const matchedBrand = fetchedBrands.find((b) => selectedBrandIds.includes(b.brand_id));
-      setBrand(matchedBrand || null);
-    } catch (error) {
-      console.error("Lỗi khi fetch sản phẩm lọc:", error);
-      setProducts([]);
-      setTotal(0);
-      setTotalPages(1);
     }
-  }
-  fetchFiltered();
-}, [
-  slug,
-  keyword,
-  selectedBrandIds,
-  selectedGender,
-  selectedPriceRange,
-  page,
-  sortBy,
-  sortOrder,
-  productsPerPage,
-]);
-
+    fetchFiltered();
+  }, [
+    slug,
+    keyword,
+    selectedBrandIds,
+    selectedGender,
+    selectedPriceRange,
+    page,
+    sortBy,
+    sortOrder,
+    productsPerPage,
+  ]);
 
   const handlePriceChange = (range: { min: number; max: number } | null) => {
     setSelectedPriceRange(range);
@@ -383,10 +388,9 @@ useEffect(() => {
                                 {Array.isArray(sp.product_variants) &&
                                   [
                                     ...new Map(
-                                      sp.product_variants.map((v) => [
-                                        v.color.id,
-                                        v.color,
-                                      ])
+                                      sp.product_variants
+                                        .filter((v) => v.color) // chỉ lấy những variant có color
+                                        .map((v) => [v.color.id, v.color])
                                     ).values(),
                                   ].map((color) => (
                                     <span
@@ -601,10 +605,9 @@ useEffect(() => {
                                   {Array.isArray(sp.product_variants) &&
                                     [
                                       ...new Map(
-                                        sp.product_variants.map((v) => [
-                                          v.color.id,
-                                          v.color,
-                                        ])
+                                        sp.product_variants
+                                          .filter((v) => v.color) // chỉ lấy những variant có color hợp lệ
+                                          .map((v) => [v.color.id, v.color])
                                       ).values(),
                                     ].map((color) => (
                                       <span
@@ -759,4 +762,3 @@ useEffect(() => {
 function getProductsByCategorySlug(arg0: string) {
   throw new Error("Function not implemented.");
 }
-
