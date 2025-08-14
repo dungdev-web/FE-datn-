@@ -19,13 +19,7 @@ import {
 import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
 
-import {
-  AddProductPayload,
-  IGender,
-  IProduct,
-  ISize,
-  VariantUI,
-} from "@/types/product";
+import { AddProductPayload, IGender, IProduct, ISize } from "@/types/product";
 import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
 
@@ -58,7 +52,6 @@ export default function Add_pro() {
 
   /** Kiểu dữ liệu biến thể */
   type Variant = {
-    product_variants_id: number;
     colorHex: string;
     imagePreview?: string;
     color: string;
@@ -332,29 +325,25 @@ export default function Add_pro() {
         setSelectedGender(data.gender_id || "");
         setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
 
-        const variantsMapped: VariantUI[] = [];
-        data.product_variants.forEach((v: any) => {
-          const colorKey = `${v.color.code_color}|${v.color.name_color}`;
-          let variant = variantsMapped.find((x) => x.color === colorKey);
-          if (!variant) {
-            variant = {
+        const variantsMapped: Variant[] = data.product_variants.map(
+          (v: any) => {
+            const colorKey = `${v.color.code_color}|${v.color.name_color}`;
+            const sizeIds = sizes
+              .filter((s) => s.number_size === v.size.number_size)
+              .map((s) => String(s.id));
+            return {
               color: colorKey,
               colorHex: v.color.code_color,
-              sizes: [],
+              sizes: sizeIds,
+              quantity: v.stock_quantity,
+              product_variants_id: v.product_variants_id || null,
               image: null,
               imagePreview: v.color.images
                 ? `${API_BASE_URL}/uploads/${v.color.images}`
                 : undefined,
             };
-            variantsMapped.push(variant);
           }
-          variant.sizes.push({
-            size_id: v.size.id,
-            product_variants_id: v.product_variants_id,
-            stock_quantity: v.stock_quantity,
-          });
-        });
-        setVariants(variantsMapped);
+        );
 
         setVariants(variantsMapped);
 
@@ -365,6 +354,7 @@ export default function Add_pro() {
           const key = getColorKey(v.color);
           if (v.imagePreview) {
             previewMap[key] = v.imagePreview;
+            // Lưu filename ảnh cũ (lấy từ DB)
             oldMap[key] = v.imagePreview.split("/").pop() || "";
           }
         });
@@ -394,33 +384,26 @@ export default function Add_pro() {
     }));
   };
 
-const handleUpdate = async () => {
+  const handleUpdate = async () => {
   if (!productId) return;
 
   try {
-    // --- Chuẩn bị ảnh variant ---
     const sanitizedVariantImages: Record<string, File | string> = {};
+
     variants.forEach((v) => {
       const key = getColorKey(v.color);
-      if (variantImages[key]) {
-        sanitizedVariantImages[key] = variantImages[key]; // ảnh mới
-      } else if (variantImagesOld[key]) {
+
+      if (variantImages[key] instanceof File) {
+        sanitizedVariantImages[key] = variantImages[key] as File; // ảnh mới
+      } else if (variantImagesOld[key] && typeof variantImagesOld[key] === "string") {
         sanitizedVariantImages[key] = variantImagesOld[key]; // ảnh cũ
       }
     });
 
-    // --- Chuẩn bị product_variants payload ---
-    const productVariantsPayload = variants.flatMap((v) =>
-      v.sizes.map((s) => ({
-        product_variants_id: s.product_variants_id ?? undefined, // giữ đúng ID cũ hoặc undefined nếu mới
-        code_color: v.colorHex.replace("#", "").toUpperCase(),
-        name_color: v.color.split("|")[1] || "",
-        size_id: s.size_id,
-        stock_quantity: Number(s.stock_quantity), // có thể update từ input nếu muốn
-      }))
-    );
+    const sanitizedMainImages = mainImages.map((img) =>
+      img instanceof File ? img : (typeof img === "string" ? img : null)
+    ).filter(Boolean) as (File | string)[];
 
-    // --- Build payload chính ---
     const payload: AddProductPayload = {
       name,
       short_desc: shortDesc,
@@ -431,12 +414,18 @@ const handleUpdate = async () => {
       brand_id: Number(selectedBrand),
       gender_id: Number(selectedGender),
       status: status === "Mở bán" ? 1 : 0,
-      images: mainImages,
+      images: sanitizedMainImages,
       variantImages: sanitizedVariantImages,
-      product_variants: productVariantsPayload,
+      product_variants: variants.flatMap((v) =>
+        v.sizes.map((sizeId) => ({
+          product_variants_id: v.product_variants_id || undefined,
+          code_color: v.colorHex.replace("#", "").toLowerCase(),
+          name_color: v.color.split("|")[1] || "",
+          size_id: Number(sizeId),
+          stock_quantity: Number(v.quantity),
+        }))
+      ),
     };
-
-    console.log("=== Payload gửi BE ===", payload);
 
     const updatedProduct = await updateAdminProduct(productId, payload);
 
@@ -446,7 +435,6 @@ const handleUpdate = async () => {
       text: `Sản phẩm "${updatedProduct.name}" đã được cập nhật.`,
     });
   } catch (err: any) {
-    console.error("=== Lỗi handleUpdate ===", err);
     Swal.fire({
       icon: "error",
       title: "Cập nhật thất bại",
@@ -454,7 +442,6 @@ const handleUpdate = async () => {
     });
   }
 };
-
 
   // Handle upload ảnh chính
   const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
