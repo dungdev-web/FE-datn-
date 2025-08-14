@@ -205,33 +205,33 @@ export default function Home() {
       {categories.length === 0 ? (
         <p>Không có danh mục nào</p>
       ) : (
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
-          spaceBetween={10}
-          slidesPerView={4}
-          navigation
-          pagination={{ clickable: true }}
-          autoplay={{ delay: 2500 }}
-          breakpoints={{
-            1024: { slidesPerView: 4 },
-            768: { slidesPerView: 2 },
-            480: { slidesPerView: 1 },
-          }}
-        >
-          {categories.map((cat) => (
-          <SwiperSlide key={cat.id}>
-            <div className="category-main1">
-            <div className="category-main1-item">
-              <img
-                src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
-                alt={cat.name}
-              />
-              <h4 style={{ marginTop: "8px", fontSize: "16px" }}>{cat.name}</h4>
-            </div>
-            </div>
-          </SwiperSlide>
-          ))}
-        </Swiper>
+          <Swiper
+            modules={[Navigation, Pagination, Autoplay]}
+            spaceBetween={5} // giảm khoảng cách
+            slidesPerView={4}
+            navigation
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 2500 }}
+            breakpoints={{
+              1024: { slidesPerView: 4 },
+              768: { slidesPerView: 2 },
+              480: { slidesPerView: 1 },
+            }}
+          >
+            {categories.map((cat) => (
+              <SwiperSlide key={cat.id}>
+                <div className="category-main1">
+                  <div className="category-main1-item">
+                    <img
+                      src={`${API_BASE_URL}/uploads/${cat.image}` || "/images/default.jpg"}
+                      alt={cat.name}
+                    />
+                    <h4>{cat.name}</h4>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
       )}
     </div>
         <div className="marquee-wrapper">
