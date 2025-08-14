@@ -12,6 +12,7 @@ export interface IProduct {
   status: number;
   created_at: string;
   updated_at: string;
+  view: number;
   category: {
     categories_id: number;
     name: string;

@@ -883,3 +883,18 @@ export async function updateAdminProduct(
   const json = await res.json();
   return json as UpdateProductResponse;
 }
+export async function deleteAdminProduct(
+  productId: number
+): Promise<IProduct> {
+  const res = await fetch(`${API_BASE_URL}/product/delete/${productId}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Xóa sản phẩm thất bại");
+  }
+
+  const json = await res.json();
+  return json as IProduct;
+}
