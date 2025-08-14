@@ -36,13 +36,9 @@ export default function Add_pro() {
   const [genders, setGenders] = useState<IGender[]>([]);
   const [mainImages, setMainImages] = useState<File[]>([]);
   const [variantImages, setVariantImages] = useState<Record<string, File>>({});
-  const [variantImagesOld, setVariantImagesOld] = useState<
-    Record<string, string>
-  >({});
   const [variantImagesPreview, setVariantImagesPreview] = useState<
     Record<string, string>
   >({});
-
   const [product, setProduct] = useState<any>({});
   const [selectedBrand, setSelectedBrand] = useState<number | "">("");
   const [selectedCategory, setSelectedCategory] = useState<number | "">("");
@@ -244,186 +240,169 @@ export default function Add_pro() {
   /** Xóa biến thể */
   const removeVariant = (index: number) =>
     setVariants((prev) => prev.filter((_, i) => i !== index));
-/** Cập nhật biến thể */
-const handleVariantChange = (
-  index: number,
-  field: keyof Variant,
-  value: any
-) => {
-  setVariants((prev) => {
-    const newVariants = [...prev];
-    newVariants[index] = { ...newVariants[index], [field]: value };
-    return newVariants;
-  });
-};
 
-/** Fetch brands, categories, genders, sizes */
-useEffect(() => {
-  async function fetchData() {
-    try {
-      const [brandData, categoryData, genderData, sizeData] =
-        await Promise.all([
-          getAllBrands(),
-          getAllCategories(),
-          getGenders(),
-          getSizes(),
-        ]);
-      setBrands(brandData);
-      setCategories(categoryData);
-      setGenders(genderData.data);
-      setSizes(Array.isArray(sizeData) ? sizeData : sizeData.data || []);
-    } catch (err) {
-      console.error(err);
+  /** Cập nhật biến thể */
+  const handleVariantChange = (
+    index: number,
+    field: keyof Variant,
+    value: any
+  ) => {
+    setVariants((prev) => {
+      const newVariants = [...prev];
+      newVariants[index] = { ...newVariants[index], [field]: value };
+      return newVariants;
+    });
+  };
+
+  /** Fetch brands, categories, genders, sizes */
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [brandData, categoryData, genderData, sizeData] =
+          await Promise.all([
+            getAllBrands(),
+            getAllCategories(),
+            getGenders(),
+            getSizes(),
+          ]);
+        setBrands(brandData);
+        setCategories(categoryData);
+        setGenders(genderData.data);
+        setSizes(Array.isArray(sizeData) ? sizeData : sizeData.data || []);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
-/** Quill editor */
-useEffect(() => {
-  if (editorRef.current && !quillRef.current) {
-    quillRef.current = new Quill(editorRef.current, {
-      theme: "snow",
-      placeholder: "Nhập nội dung...",
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, false] }],
-          ["bold", "italic", "underline"],
-          ["link", "image"],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["clean"],
-        ],
-      },
-    });
-
-    quillRef.current.on("text-change", () => {
-      setDescription(quillRef.current?.root.innerHTML || "");
-    });
-  }
-}, []);
-
-/** Fetch product khi edit */
-useEffect(() => {
-  async function fetchProduct() {
-    if (!productId || sizes.length === 0) return;
-    try {
-      const res = await getProductAdminById(productId);
-      const data = res.data;
-      setProduct(data);
-
-      if (quillRef.current)
-        quillRef.current.root.innerHTML = data.description || "";
-      setDescription(data.description || "");
-      setName(data.name || "");
-      setShortDesc(data.short_desc || "");
-      setPrice(data.price || "");
-      setSalePrice(data.sale_price || "");
-      setSelectedBrand(data.brand_id || "");
-      setSelectedCategory(data.categories_id || "");
-      setSelectedGender(data.gender_id || "");
-      setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
-
-      // Map product_variants
-      const variantsMapped: Variant[] = data.product_variants.map(
-        (v: any) => {
-          const colorKey = `${v.color.code_color}|${v.color.name_color}`;
-          const sizeIds = sizes
-            .filter((s) => s.number_size === v.size.number_size)
-            .map((s) => String(s.id));
-          return {
-            color: colorKey,
-            colorHex: v.color.code_color,
-            sizes: sizeIds,
-            quantity: v.stock_quantity,
-            image: null,
-            imagePreview: v.color.images
-              ? `${API_BASE_URL}/uploads/${v.color.images}`
-              : undefined,
-          };
-        }
-      );
-
-      setVariants(variantsMapped);
-
-      // Map preview và ảnh cũ
-      const previewMap: Record<string, string> = {};
-      const oldMap: Record<string, string> = {};
-      variantsMapped.forEach((v) => {
-        const key = getBackendColorKey(v.colorHex);
-        if (v.imagePreview) {
-          previewMap[key] = v.imagePreview;
-          oldMap[key] = v.imagePreview.split("/").pop() || "";
-        }
+  /** Quill editor */
+  useEffect(() => {
+    if (editorRef.current && !quillRef.current) {
+      quillRef.current = new Quill(editorRef.current, {
+        theme: "snow",
+        placeholder: "Nhập nội dung...",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            ["link", "image"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["clean"],
+          ],
+        },
       });
-      setVariantImagesPreview(previewMap);
-      setVariantImagesOld(oldMap);
-    } catch (err) {
-      console.error(err);
+
+      quillRef.current.on("text-change", () => {
+        setDescription(quillRef.current?.root.innerHTML || "");
+      });
     }
-  }
-  fetchProduct();
-}, [productId, sizes]);
+  }, []);
 
-// --- Lấy key cho FE preview ---
-const getColorKey = (colorString: string) =>
-  colorString.split("|")[0].replace("#", "").toLowerCase();
+  // Thêm state để lưu ảnh cũ
+  const [variantImagesOld, setVariantImagesOld] = useState<
+    Record<string, string>
+  >({});
 
-// --- Lấy key dùng để gửi backend ---
-const getBackendColorKey = (color: string) => color.replace("#", "").toUpperCase();
+  // Fetch product khi edit
+  useEffect(() => {
+    async function fetchProduct() {
+      if (!productId || sizes.length === 0) return;
+      try {
+        const res = await getProductAdminById(productId);
+        const data = res.data;
+        setProduct(data);
 
-// --- Upload ảnh mới cho variant ---
-const handleVariantImagesChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  colorValue: string
-) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+        if (quillRef.current)
+          quillRef.current.root.innerHTML = data.description || "";
+        setDescription(data.description || "");
+        setName(data.name || "");
+        setShortDesc(data.short_desc || "");
+        setPrice(data.price || "");
+        setSalePrice(data.sale_price || "");
+        setSelectedBrand(data.brand_id || "");
+        setSelectedCategory(data.categories_id || "");
+        setSelectedGender(data.gender_id || "");
+        setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
 
-  const key = getBackendColorKey(colorValue);
+        const variantsMapped: Variant[] = data.product_variants.map(
+          (v: any) => {
+            const colorKey = `${v.color.code_color}|${v.color.name_color}`;
+            const sizeIds = sizes
+              .filter((s) => s.number_size === v.size.number_size)
+              .map((s) => String(s.id));
+            return {
+              color: colorKey,
+              colorHex: v.color.code_color,
+              sizes: sizeIds,
+              quantity: v.stock_quantity,
+              product_variants_id: v.product_variants_id || null,
+              image: null,
+              imagePreview: v.color.images
+                ? `${API_BASE_URL}/uploads/${v.color.images}`
+                : undefined,
+            };
+          }
+        );
 
-  setVariantImages((prev) => ({ ...prev, [key]: file }));
-  setVariantImagesPreview((prev) => ({
-    ...prev,
-    [key]: URL.createObjectURL(file),
-  }));
+        setVariants(variantsMapped);
 
-  setVariantImagesOld((prev) => {
-    const newOld = { ...prev };
-    delete newOld[key]; // xóa ảnh cũ nếu có
-    return newOld;
-  });
-};
+        // Map preview và ảnh cũ
+        const previewMap: Record<string, string> = {};
+        const oldMap: Record<string, string> = {};
+        variantsMapped.forEach((v) => {
+          const key = getColorKey(v.color);
+          if (v.imagePreview) {
+            previewMap[key] = v.imagePreview;
+            // Lưu filename ảnh cũ (lấy từ DB)
+            oldMap[key] = v.imagePreview.split("/").pop() || "";
+          }
+        });
+        setVariantImagesPreview(previewMap);
+        setVariantImagesOld(oldMap);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchProduct();
+  }, [productId, sizes]);
 
-// --- Chuẩn hóa key màu ---
-const normalizeColorKey = (color: string) =>
-  color.startsWith("#") ? color.toLowerCase() : `#${color.toLowerCase()}`;
+  const getColorKey = (colorString: string) =>
+    colorString.split("|")[0].replace("#", "").toLowerCase();
 
-// --- Cập nhật sản phẩm ---
-const handleUpdate = async () => {
+  const handleVariantImagesChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    colorValue: string
+  ) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+    const colorKey = getColorKey(colorValue);
+    setVariantImages((prev) => ({ ...prev, [colorKey]: file }));
+    setVariantImagesPreview((prev) => ({
+      ...prev,
+      [colorKey]: URL.createObjectURL(file),
+    }));
+  };
+
+  const handleUpdate = async () => {
   if (!productId) return;
 
   try {
-    // Build variantImages payload
     const sanitizedVariantImages: Record<string, File | string> = {};
+
     variants.forEach((v) => {
-      const key = getBackendColorKey(v.colorHex); // luôn uppercase, không #
-      if (variantImages[key]) {
-        sanitizedVariantImages[key] = variantImages[key]; // file mới
-      } else if (variantImagesOld[key]) {
+      const key = getColorKey(v.color);
+
+      if (variantImages[key] instanceof File) {
+        sanitizedVariantImages[key] = variantImages[key] as File; // ảnh mới
+      } else if (variantImagesOld[key] && typeof variantImagesOld[key] === "string") {
         sanitizedVariantImages[key] = variantImagesOld[key]; // ảnh cũ
       }
     });
 
-    // Build product_variants payload
-    const productVariantsPayload = variants.flatMap((v) => {
-      const code_color = getBackendColorKey(v.colorHex);
-      return v.sizes.map((sizeId) => ({
-        code_color,
-        name_color: v.color.split("|")[1] || "",
-        size_id: Number(sizeId),
-        stock_quantity: Number(v.quantity),
-      }));
-    });
+    const sanitizedMainImages = mainImages.map((img) =>
+      img instanceof File ? img : (typeof img === "string" ? img : null)
+    ).filter(Boolean) as (File | string)[];
 
     const payload: AddProductPayload = {
       name,
@@ -435,9 +414,17 @@ const handleUpdate = async () => {
       brand_id: Number(selectedBrand),
       gender_id: Number(selectedGender),
       status: status === "Mở bán" ? 1 : 0,
-      images: mainImages,
+      images: sanitizedMainImages,
       variantImages: sanitizedVariantImages,
-      product_variants: productVariantsPayload,
+      product_variants: variants.flatMap((v) =>
+        v.sizes.map((sizeId) => ({
+          product_variants_id: v.product_variants_id || undefined,
+          code_color: v.colorHex.replace("#", "").toLowerCase(),
+          name_color: v.color.split("|")[1] || "",
+          size_id: Number(sizeId),
+          stock_quantity: Number(v.quantity),
+        }))
+      ),
     };
 
     const updatedProduct = await updateAdminProduct(productId, payload);
@@ -456,11 +443,11 @@ const handleUpdate = async () => {
   }
 };
 
-// --- Upload ảnh chính ---
-const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files) return;
-  setMainImages(Array.from(e.target.files));
-};
+  // Handle upload ảnh chính
+  const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setMainImages(Array.from(e.target.files));
+  };
 
   return (
     <>

@@ -77,7 +77,9 @@ export default function Show2sanpham({ products }: { products: IProduct[] }) {
               const uniqueColors = Array.isArray(sp.product_variants)
                 ? [
                     ...new Map(
-                      sp.product_variants.map((v) => [v.color.id, v.color])
+                      sp.product_variants
+                        .filter((v) => v.color) // chỉ lấy những variant có color
+                        .map((v) => [v.color.id, v.color])
                     ).values(),
                   ]
                 : [];
