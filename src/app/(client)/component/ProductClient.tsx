@@ -12,7 +12,6 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-
 import ProductIcons from "./Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
@@ -375,10 +374,9 @@ export default function Product() {
                                 {Array.isArray(sp.product_variants) &&
                                   [
                                     ...new Map(
-                                      sp.product_variants.map((v) => [
-                                        v.color.id,
-                                        v.color,
-                                      ])
+                                      sp.product_variants
+                                        .filter((v) => v.color) // chỉ lấy những variant có color
+                                        .map((v) => [v.color.id, v.color])
                                     ).values(),
                                   ].map((color) => (
                                     <span
