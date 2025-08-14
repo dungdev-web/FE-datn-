@@ -8,7 +8,6 @@ export interface ICategory {
   children?: ICategory[];
   created_at: string;
   updated_at: string;
-
 }
 export interface CategoryFilters {
   id?: number;
