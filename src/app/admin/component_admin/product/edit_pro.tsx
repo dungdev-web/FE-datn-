@@ -19,7 +19,13 @@ import {
 import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
 
-import { AddProductPayload, IGender, IProduct, ISize } from "@/types/product";
+import {
+  AddProductPayload,
+  IGender,
+  IProduct,
+  ISize,
+  VariantUI,
+} from "@/types/product";
 import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
 
@@ -36,13 +42,9 @@ export default function Add_pro() {
   const [genders, setGenders] = useState<IGender[]>([]);
   const [mainImages, setMainImages] = useState<File[]>([]);
   const [variantImages, setVariantImages] = useState<Record<string, File>>({});
-  const [variantImagesOld, setVariantImagesOld] = useState<
-    Record<string, string>
-  >({});
   const [variantImagesPreview, setVariantImagesPreview] = useState<
     Record<string, string>
   >({});
-
   const [product, setProduct] = useState<any>({});
   const [selectedBrand, setSelectedBrand] = useState<number | "">("");
   const [selectedCategory, setSelectedCategory] = useState<number | "">("");
@@ -56,6 +58,7 @@ export default function Add_pro() {
 
   /** Kiểu dữ liệu biến thể */
   type Variant = {
+    product_variants_id: number;
     colorHex: string;
     imagePreview?: string;
     color: string;
@@ -244,187 +247,180 @@ export default function Add_pro() {
   /** Xóa biến thể */
   const removeVariant = (index: number) =>
     setVariants((prev) => prev.filter((_, i) => i !== index));
-/** Cập nhật biến thể */
-const handleVariantChange = (
-  index: number,
-  field: keyof Variant,
-  value: any
-) => {
-  setVariants((prev) => {
-    const newVariants = [...prev];
-    newVariants[index] = { ...newVariants[index], [field]: value };
-    return newVariants;
-  });
-};
 
-/** Fetch brands, categories, genders, sizes */
-useEffect(() => {
-  async function fetchData() {
-    try {
-      const [brandData, categoryData, genderData, sizeData] =
-        await Promise.all([
-          getAllBrands(),
-          getAllCategories(),
-          getGenders(),
-          getSizes(),
-        ]);
-      setBrands(brandData);
-      setCategories(categoryData);
-      setGenders(genderData.data);
-      setSizes(Array.isArray(sizeData) ? sizeData : sizeData.data || []);
-    } catch (err) {
-      console.error(err);
+  /** Cập nhật biến thể */
+  const handleVariantChange = (
+    index: number,
+    field: keyof Variant,
+    value: any
+  ) => {
+    setVariants((prev) => {
+      const newVariants = [...prev];
+      newVariants[index] = { ...newVariants[index], [field]: value };
+      return newVariants;
+    });
+  };
+
+  /** Fetch brands, categories, genders, sizes */
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [brandData, categoryData, genderData, sizeData] =
+          await Promise.all([
+            getAllBrands(),
+            getAllCategories(),
+            getGenders(),
+            getSizes(),
+          ]);
+        setBrands(brandData);
+        setCategories(categoryData);
+        setGenders(genderData.data);
+        setSizes(Array.isArray(sizeData) ? sizeData : sizeData.data || []);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
-/** Quill editor */
-useEffect(() => {
-  if (editorRef.current && !quillRef.current) {
-    quillRef.current = new Quill(editorRef.current, {
-      theme: "snow",
-      placeholder: "Nhập nội dung...",
-      modules: {
-        toolbar: [
-          [{ header: [1, 2, false] }],
-          ["bold", "italic", "underline"],
-          ["link", "image"],
-          [{ list: "ordered" }, { list: "bullet" }],
-          ["clean"],
-        ],
-      },
-    });
-
-    quillRef.current.on("text-change", () => {
-      setDescription(quillRef.current?.root.innerHTML || "");
-    });
-  }
-}, []);
-
-/** Fetch product khi edit */
-useEffect(() => {
-  async function fetchProduct() {
-    if (!productId || sizes.length === 0) return;
-    try {
-      const res = await getProductAdminById(productId);
-      const data = res.data;
-      setProduct(data);
-
-      if (quillRef.current)
-        quillRef.current.root.innerHTML = data.description || "";
-      setDescription(data.description || "");
-      setName(data.name || "");
-      setShortDesc(data.short_desc || "");
-      setPrice(data.price || "");
-      setSalePrice(data.sale_price || "");
-      setSelectedBrand(data.brand_id || "");
-      setSelectedCategory(data.categories_id || "");
-      setSelectedGender(data.gender_id || "");
-      setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
-
-      // Map product_variants
-      const variantsMapped: Variant[] = data.product_variants.map(
-        (v: any) => {
-          const colorKey = `${v.color.code_color}|${v.color.name_color}`;
-          const sizeIds = sizes
-            .filter((s) => s.number_size === v.size.number_size)
-            .map((s) => String(s.id));
-          return {
-            color: colorKey,
-            colorHex: v.color.code_color,
-            sizes: sizeIds,
-            quantity: v.stock_quantity,
-            image: null,
-            imagePreview: v.color.images
-              ? `${API_BASE_URL}/uploads/${v.color.images}`
-              : undefined,
-          };
-        }
-      );
-
-      setVariants(variantsMapped);
-
-      // Map preview và ảnh cũ
-      const previewMap: Record<string, string> = {};
-      const oldMap: Record<string, string> = {};
-      variantsMapped.forEach((v) => {
-        const key = getBackendColorKey(v.colorHex);
-        if (v.imagePreview) {
-          previewMap[key] = v.imagePreview;
-          oldMap[key] = v.imagePreview.split("/").pop() || "";
-        }
+  /** Quill editor */
+  useEffect(() => {
+    if (editorRef.current && !quillRef.current) {
+      quillRef.current = new Quill(editorRef.current, {
+        theme: "snow",
+        placeholder: "Nhập nội dung...",
+        modules: {
+          toolbar: [
+            [{ header: [1, 2, false] }],
+            ["bold", "italic", "underline"],
+            ["link", "image"],
+            [{ list: "ordered" }, { list: "bullet" }],
+            ["clean"],
+          ],
+        },
       });
-      setVariantImagesPreview(previewMap);
-      setVariantImagesOld(oldMap);
-    } catch (err) {
-      console.error(err);
+
+      quillRef.current.on("text-change", () => {
+        setDescription(quillRef.current?.root.innerHTML || "");
+      });
     }
-  }
-  fetchProduct();
-}, [productId, sizes]);
+  }, []);
 
-// --- Lấy key cho FE preview ---
-const getColorKey = (colorString: string) =>
-  colorString.split("|")[0].replace("#", "").toLowerCase();
+  // Thêm state để lưu ảnh cũ
+  const [variantImagesOld, setVariantImagesOld] = useState<
+    Record<string, string>
+  >({});
 
-// --- Lấy key dùng để gửi backend ---
-const getBackendColorKey = (color: string) => color.replace("#", "").toUpperCase();
+  // Fetch product khi edit
+  useEffect(() => {
+    async function fetchProduct() {
+      if (!productId || sizes.length === 0) return;
+      try {
+        const res = await getProductAdminById(productId);
+        const data = res.data;
+        setProduct(data);
 
-// --- Upload ảnh mới cho variant ---
-const handleVariantImagesChange = (
-  e: React.ChangeEvent<HTMLInputElement>,
-  colorValue: string
-) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
+        if (quillRef.current)
+          quillRef.current.root.innerHTML = data.description || "";
+        setDescription(data.description || "");
+        setName(data.name || "");
+        setShortDesc(data.short_desc || "");
+        setPrice(data.price || "");
+        setSalePrice(data.sale_price || "");
+        setSelectedBrand(data.brand_id || "");
+        setSelectedCategory(data.categories_id || "");
+        setSelectedGender(data.gender_id || "");
+        setStatus(data.status === 1 ? "Mở bán" : "Ngưng bán");
 
-  const key = getBackendColorKey(colorValue);
+        const variantsMapped: VariantUI[] = [];
+        data.product_variants.forEach((v: any) => {
+          const colorKey = `${v.color.code_color}|${v.color.name_color}`;
+          let variant = variantsMapped.find((x) => x.color === colorKey);
+          if (!variant) {
+            variant = {
+              color: colorKey,
+              colorHex: v.color.code_color,
+              sizes: [],
+              image: null,
+              imagePreview: v.color.images
+                ? `${API_BASE_URL}/uploads/${v.color.images}`
+                : undefined,
+            };
+            variantsMapped.push(variant);
+          }
+          variant.sizes.push({
+            size_id: v.size.id,
+            product_variants_id: v.product_variants_id,
+            stock_quantity: v.stock_quantity,
+          });
+        });
+        setVariants(variantsMapped);
 
-  setVariantImages((prev) => ({ ...prev, [key]: file }));
-  setVariantImagesPreview((prev) => ({
-    ...prev,
-    [key]: URL.createObjectURL(file),
-  }));
+        setVariants(variantsMapped);
 
-  setVariantImagesOld((prev) => {
-    const newOld = { ...prev };
-    delete newOld[key]; // xóa ảnh cũ nếu có
-    return newOld;
-  });
-};
+        // Map preview và ảnh cũ
+        const previewMap: Record<string, string> = {};
+        const oldMap: Record<string, string> = {};
+        variantsMapped.forEach((v) => {
+          const key = getColorKey(v.color);
+          if (v.imagePreview) {
+            previewMap[key] = v.imagePreview;
+            oldMap[key] = v.imagePreview.split("/").pop() || "";
+          }
+        });
+        setVariantImagesPreview(previewMap);
+        setVariantImagesOld(oldMap);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    fetchProduct();
+  }, [productId, sizes]);
 
-// --- Chuẩn hóa key màu ---
-const normalizeColorKey = (color: string) =>
-  color.startsWith("#") ? color.toLowerCase() : `#${color.toLowerCase()}`;
+  const getColorKey = (colorString: string) =>
+    colorString.split("|")[0].replace("#", "").toLowerCase();
 
-// --- Cập nhật sản phẩm ---
+  const handleVariantImagesChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    colorValue: string
+  ) => {
+    if (!e.target.files) return;
+    const file = e.target.files[0];
+    const colorKey = getColorKey(colorValue);
+    setVariantImages((prev) => ({ ...prev, [colorKey]: file }));
+    setVariantImagesPreview((prev) => ({
+      ...prev,
+      [colorKey]: URL.createObjectURL(file),
+    }));
+  };
+
 const handleUpdate = async () => {
   if (!productId) return;
 
   try {
-    // Build variantImages payload
+    // --- Chuẩn bị ảnh variant ---
     const sanitizedVariantImages: Record<string, File | string> = {};
     variants.forEach((v) => {
-      const key = getBackendColorKey(v.colorHex); // luôn uppercase, không #
+      const key = getColorKey(v.color);
       if (variantImages[key]) {
-        sanitizedVariantImages[key] = variantImages[key]; // file mới
+        sanitizedVariantImages[key] = variantImages[key]; // ảnh mới
       } else if (variantImagesOld[key]) {
         sanitizedVariantImages[key] = variantImagesOld[key]; // ảnh cũ
       }
     });
 
-    // Build product_variants payload
-    const productVariantsPayload = variants.flatMap((v) => {
-      const code_color = getBackendColorKey(v.colorHex);
-      return v.sizes.map((sizeId) => ({
-        code_color,
+    // --- Chuẩn bị product_variants payload ---
+    const productVariantsPayload = variants.flatMap((v) =>
+      v.sizes.map((s) => ({
+        product_variants_id: s.product_variants_id ?? undefined, // giữ đúng ID cũ hoặc undefined nếu mới
+        code_color: v.colorHex.replace("#", "").toUpperCase(),
         name_color: v.color.split("|")[1] || "",
-        size_id: Number(sizeId),
-        stock_quantity: Number(v.quantity),
-      }));
-    });
+        size_id: s.size_id,
+        stock_quantity: Number(s.stock_quantity), // có thể update từ input nếu muốn
+      }))
+    );
 
+    // --- Build payload chính ---
     const payload: AddProductPayload = {
       name,
       short_desc: shortDesc,
@@ -440,6 +436,8 @@ const handleUpdate = async () => {
       product_variants: productVariantsPayload,
     };
 
+    console.log("=== Payload gửi BE ===", payload);
+
     const updatedProduct = await updateAdminProduct(productId, payload);
 
     Swal.fire({
@@ -448,6 +446,7 @@ const handleUpdate = async () => {
       text: `Sản phẩm "${updatedProduct.name}" đã được cập nhật.`,
     });
   } catch (err: any) {
+    console.error("=== Lỗi handleUpdate ===", err);
     Swal.fire({
       icon: "error",
       title: "Cập nhật thất bại",
@@ -456,11 +455,12 @@ const handleUpdate = async () => {
   }
 };
 
-// --- Upload ảnh chính ---
-const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!e.target.files) return;
-  setMainImages(Array.from(e.target.files));
-};
+
+  // Handle upload ảnh chính
+  const handleMainImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setMainImages(Array.from(e.target.files));
+  };
 
   return (
     <>
