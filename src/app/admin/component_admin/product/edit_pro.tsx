@@ -380,19 +380,80 @@ export default function Add_pro() {
   const handleUpdate = async () => {
     if (!productId) return;
 
+    // ==== Validate giống handleSubmit ====
+    if (!name) {
+      Swal.fire("Thiếu thông tin", "Vui lòng nhập tên sản phẩm.", "warning");
+      return;
+    }
+
+    if (!shortDesc) {
+      Swal.fire("Thiếu thông tin", "Vui lòng nhập mô tả ngắn.", "warning");
+      return;
+    }
+
+    if (!price || isNaN(Number(price))) {
+      Swal.fire("Giá không hợp lệ", "Vui lòng nhập giá gốc.", "warning");
+      return;
+    }
+
+    if (Number(salePrice) > Number(price)) {
+      Swal.fire(
+        "Sai giá",
+        "Giá bán phải nhỏ hơn hoặc bằng giá gốc.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!selectedCategory) {
+      Swal.fire("Thiếu danh mục", "Vui lòng chọn danh mục.", "warning");
+      return;
+    }
+
+    if (!selectedBrand) {
+      Swal.fire("Thiếu nhãn hiệu", "Vui lòng chọn nhãn hiệu.", "warning");
+      return;
+    }
+
+    if (!selectedGender) {
+      Swal.fire("Thiếu thông tin", "Vui lòng chọn giới tính.", "warning");
+      return;
+    }
+
+    if (mainImages.length === 0) {
+      Swal.fire("Thiếu hình ảnh", "Cần ít nhất 1 ảnh chính.", "warning");
+      return;
+    }
+
+    // Kiểm tra ảnh biến thể
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+      const colorName = v.color.split("|")[1] || "";
+      const colorKey = getColorKey(v.colorHex); // rrggbb
+
+      if (!variantImages[colorKey] && !variantImagesOld[colorKey]) {
+        Swal.fire(
+          "Thiếu ảnh biến thể",
+          `Vui lòng chọn ảnh cho biến thể màu "${colorName}".`,
+          "warning"
+        );
+        return;
+      }
+    }
+
+    // ==== Nếu qua hết thì update ====
     try {
       const sanitizedVariantImages: Record<string, File | string> = {};
 
       variants.forEach((v) => {
-        const key = getColorKey(v.colorHex); // luôn ra rrggbb
-
+        const key = getColorKey(v.colorHex); // rrggbb
         if (variantImages[key] instanceof File) {
-          sanitizedVariantImages[key] = variantImages[key] as File; // ảnh mới
+          sanitizedVariantImages[key] = variantImages[key] as File;
         } else if (
           variantImagesOld[key] &&
           typeof variantImagesOld[key] === "string"
         ) {
-          sanitizedVariantImages[key] = variantImagesOld[key]; // ảnh cũ
+          sanitizedVariantImages[key] = variantImagesOld[key];
         }
       });
 
