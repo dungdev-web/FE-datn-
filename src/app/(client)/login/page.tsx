@@ -23,6 +23,7 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
   const { user } = useAuthUser();
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -51,12 +52,30 @@ export default function Login() {
     if (!validateForm()) return;
 
     try {
-      const res = await loginUser({ usernameOrEmail, password });
-
-      saveUserToCookies(res);
       setShowLoader(true);
+      const res = await loginUser({ usernameOrEmail, password });
+      
+      // Lưu user vào cookies và state
+      saveUserToCookies(res);
       setLoginSuccess(true);
+      
+      // Hiển thị thông báo thành công
+      await Swal.fire({
+        title: "Đăng nhập thành công!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      if (res?.user?.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/account";
+      }
+      
     } catch (err: any) {
+      setShowLoader(false);
       Swal.fire({
         title: "Đăng nhập thất bại",
         text: err.message || "Có lỗi xảy ra",
@@ -78,30 +97,6 @@ export default function Login() {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
     window.location.href = url;
   };
-
-  useEffect(() => {
-    if (showLoader && loginSuccess && user) {
-      const timer = setTimeout(() => {
-        setShowLoader(false);
-        Swal.fire({
-          title: "Đăng nhập thành công!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-        });
-
-        if (user?.role === "admin") {
-          window.location.href = "/admin";
-        } else {
-          window.location.href = "/account";
-        }
-      }, 2000);
-
-      router.refresh();
-      return () => clearTimeout(timer);
-    }
-  }, [showLoader, loginSuccess, user]);
 
   return (
     <>
@@ -206,7 +201,9 @@ export default function Login() {
               <p className="foget-pw">
                 <Link href="/forgot-password">Quên mật khẩu?</Link>
               </p>
-              <button type="submit">Đăng nhập ngay</button>
+              <button type="submit" disabled={showLoader}>
+                {showLoader ? "Đang đăng nhập..." : "Đăng nhập ngay"}
+              </button>
             </form>
 
             {showLoader && (
