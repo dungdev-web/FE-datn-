@@ -7,7 +7,7 @@ import { API_BASE_URL } from "@/config/env";
 import Select from "react-select";
 import { Plus, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import {
   addProduct,
@@ -26,7 +26,7 @@ import { ICategory } from "@/types/ICategory";
 export default function Add_pro() {
   const { id } = useParams();
   const productId = id ? Number(id) : null;
-
+  const router = useRouter();
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
 
@@ -420,11 +420,18 @@ export default function Add_pro() {
       return;
     }
 
-    if (mainImages.length === 0) {
-      Swal.fire("Thiếu hình ảnh", "Cần ít nhất 1 ảnh chính.", "warning");
+    if (!description) {
+      Swal.fire("Thiếu mô tả", "Vui lòng nhập mô tả sản phẩm.", "warning");
       return;
     }
-
+    if (mainImages.length === 0 && !product.images?.length) {
+      Swal.fire(
+        "Thiếu ảnh",
+        "Vui lòng chọn ít nhất một ảnh sản phẩm.",
+        "warning"
+      );
+      return;
+    }
     // Kiểm tra ảnh biến thể
     for (let i = 0; i < variants.length; i++) {
       const v = variants[i];
@@ -492,6 +499,9 @@ export default function Add_pro() {
         icon: "success",
         title: "Cập nhật thành công",
         text: `Sản phẩm "${updatedProduct.name}" đã được cập nhật.`,
+        confirmButtonText: "OK",
+      }).then(() => {
+        router.push("/admin/products");
       });
     } catch (err: any) {
       Swal.fire({

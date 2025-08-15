@@ -14,7 +14,10 @@ import { ICategory } from "@/types/ICategory";
 import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+
 export default function Add_pro() {
+  const router = useRouter();
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
   const [sizes, setSizes] = useState<ISize[]>([]);
@@ -234,8 +237,9 @@ export default function Add_pro() {
       });
 
       Swal.fire("Thành công", "Thêm sản phẩm thành công!", "success");
-      //
-     
+      setTimeout(() => {
+        router.push("/admin/products");
+      }, 1000);
     } catch (error) {
       console.error(error);
       Swal.fire("Lỗi", "Có lỗi khi thêm sản phẩm", "error");
