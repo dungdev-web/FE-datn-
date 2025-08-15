@@ -4,6 +4,7 @@ import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { Group } from "three";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 type GLTFResult = {
   scene: Group;
@@ -152,9 +153,9 @@ export default function Banner3D() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row !gap-3 !pt-2">
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <Link href={"/product"} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                       MUA NGAY
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>

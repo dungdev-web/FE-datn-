@@ -262,19 +262,6 @@ export default function VoucherEdit() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="used_count">Số lần đã dùng</label>
-            <input
-              type="number"
-              id="used_count"
-              name="used_count"
-              className="input-field"
-              placeholder="Nhập số lần đã dùng"
-              min={0}
-              value={form.used_count}
-              onChange={handleChange}
-            />
-          </div>
         </div>
       </form>
     </div>

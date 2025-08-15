@@ -92,23 +92,6 @@ export interface IReviewPayload {
   rating: number;
   content: string;
 }
-export interface ICompareProduct {
-  product_compare_id: number;
-  user_id: number;
-  created_at: Date;
-  product: IProduct;
-}
-export interface GetAllProductReviewParams {
-  page?: number;
-  limit?: number;
-  product_reviews_id?: number;
-  user_name?: string;
-  product_name?: string;
-  rating?: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-}
 export interface ICompareProduct{
   product_compare_id:number;
   user_id:number;
@@ -205,7 +188,6 @@ export interface UpdateProductResponse {
   name: any;
   product: IProduct;
 }
-
 interface Variant {
   color: string;        // "#FF0003|Xanh lá"
   colorHex: string;     // "#FF0003"
@@ -224,3 +206,14 @@ interface ProductVariantsPayload {
   product_variants_id?: number;
 }
 
+export interface GetAllProductReviewParams {
+  page?: number;
+  limit?: number;
+  product_reviews_id?: number;
+  user_name?: string;
+  product_name?: string;
+  rating?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+}
