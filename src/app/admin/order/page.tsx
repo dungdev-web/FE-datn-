@@ -209,7 +209,7 @@ export default function OrderPage() {
             )}
           </div>
           <button className="btn btn-refresh">
-            <i className="fa-solid fa-rotate-right"></i> Refresh
+            <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
           <button
             className="btn btn-export"

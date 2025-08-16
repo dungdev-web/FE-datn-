@@ -15,6 +15,7 @@ import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Add_pro() {
   const router = useRouter();
@@ -492,7 +493,9 @@ export default function Add_pro() {
       <div className="header-bar">
         <div className="header-left">
           <button className="btn btn-back">
-            <i className="fa-solid fa-arrow-left"></i> Trở về
+            <Link href="/admin/products" className="flex items-center">
+              <i className="fa-solid fa-arrow-left !mr-2" /> Trở về
+            </Link>
           </button>
           <button className="btn-add" type="submit" form="add-product-form">
             <i className="fa fa-plus"></i> Thêm sản phẩm

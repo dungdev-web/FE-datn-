@@ -137,7 +137,7 @@ export default function CategoryAdd() {
             {loading ? "Đang tạo..." : "Thêm"}
           </button>
           <Link
-            href={"/admin/categories"}
+            href={"/admin/categories_post"}
             className="btn btn-back"
             type="button"
           >

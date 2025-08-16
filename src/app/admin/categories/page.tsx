@@ -144,7 +144,7 @@ export default function Categories() {
             setPage(1);
           }}
         >
-          <i className="fa-solid fa-rotate-right"></i> Refresh
+          <i className="fa-solid fa-rotate-right"></i> Làm mới
         </button>
 
         <div className={`search-toggle ${isSearching ? "active" : ""}`}>

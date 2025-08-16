@@ -229,6 +229,25 @@ export default function Products() {
       );
     });
   };
+  const handleRefresh = () => {
+    // reset filter và sort nếu muốn
+    setFilters({
+      productCode: "",
+      productName: "",
+      brandId: "",
+      categoryId: "",
+      minPrice: "",
+      maxPrice: "",
+      minQuantity: "",
+      maxQuantity: "",
+    });
+
+    setSortConfig({ sortBy: "created_at", sortOrder: "desc" });
+    setCurrentPage(1);
+
+    // gọi lại fetchProducts (useEffect sẽ tự chạy sau khi state thay đổi)
+    fetchProducts();
+  };
 
   return (
     <>
@@ -242,11 +261,12 @@ export default function Products() {
 
           <button
             className="btn btn-refresh"
-            onClick={() => fetchProducts()}
+            onClick={handleRefresh}
             disabled={loading}
           >
-            <i className="fa-solid fa-rotate-right"></i> Refresh
+            <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
+
           <button className="btn btn-export">
             <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
           </button>

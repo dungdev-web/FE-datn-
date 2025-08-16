@@ -22,6 +22,7 @@ import { getAllCategories } from "@/services/categoryService";
 import { AddProductPayload, IGender, IProduct, ISize } from "@/types/product";
 import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
+import Link from "next/link";
 
 export default function Add_pro() {
   const { id } = useParams();
@@ -523,7 +524,9 @@ export default function Add_pro() {
       <div className="header-bar">
         <div className="header-left">
           <button className="btn btn-back">
-            <i className="fa-solid fa-arrow-left"></i> Trở về
+            <Link href="/admin/products" className="flex items-center">
+              <i className="fa-solid fa-arrow-left !mr-2"></i> Trở về
+            </Link>
           </button>
           <button
             className="btn-add"

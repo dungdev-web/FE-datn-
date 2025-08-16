@@ -81,7 +81,7 @@ export default function Blog() {
             className="btn btn-refresh"
             onClick={() => window.location.reload()}
           >
-            <i className="fa-solid fa-rotate-right"></i> Refresh
+            <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
 
           <div className={`search-toggle ${isSearching ? "active" : ""}`}>

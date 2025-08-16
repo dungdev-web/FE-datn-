@@ -16,12 +16,13 @@ import { useCategories } from "@/hooks/useBlog";
 import { ICategory } from "@/types/ICategory";
 import { API_BASE_URL } from "@/config/env";
 import { log } from "console";
+import Link from "next/link";
 Quill.register("modules/imageUploader", ImageUploader);
 
 export default function Blog_View() {
   const quillRef = useRef<any>(null);
   const isInitializedRef = useRef(false);
-  const filePondRef = useRef<any>(null); 
+  const filePondRef = useRef<any>(null);
 
   const {
     addPost,
@@ -172,9 +173,12 @@ export default function Blog_View() {
       <div className="form-header flex justify-between items-center !mb-[24px]">
         <h2 className="form-title">Thêm bài viết mới</h2>
         <div className="action-buttons flex !gap-[8px]">
-          <button type="button" className="btn btn-back cursor-pointer">
-            <i className="fa-solid fa-arrow-left"></i> Trở về
-          </button>
+          <Link
+            href="/admin/blog"
+            className="btn btn-back flex items-center cursor-pointer"
+          >
+            <i className="fa-solid fa-arrow-left mr-2"></i> Trở về
+          </Link>
           <button
             type="submit"
             className="btn bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded"
@@ -231,7 +235,10 @@ export default function Blog_View() {
             <label className="text-lg/6 font-medium text-gray-600 !mb-[8px] !inline-block">
               Trạng thái
             </label>
-            <select id="status" className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500">
+            <select
+              id="status"
+              className="!w-full !px-4 !py-2 border border-gray-300 rounded-md bg-white text-gray-500"
+            >
               <option value="1">Công khai</option>
               <option value="0">Riêng tư</option>
             </select>
