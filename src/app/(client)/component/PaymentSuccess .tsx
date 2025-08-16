@@ -134,10 +134,6 @@ export default function CheckoutSuccess() {
           <Link href="/account/order" className="continue-link">
             Xem đơn hàng
           </Link>
-          <button className="print-button" onClick={() => window.print()}>
-            <Printer size={18} className="print-icon" />
-            In hóa đơn
-          </button>
         </div>
       </div>
     </div>

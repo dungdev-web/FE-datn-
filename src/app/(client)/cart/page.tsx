@@ -3,14 +3,20 @@ import "../css/style.css";
 import "../css/cart.css";
 import "../css/product.css";
 import Link from "next/link";
-import { ICartItem } from "@/types/cart";
-import { useCart } from "@/hooks/useCart";
-import { API_BASE_URL } from "@/config/env";
 import { useEffect, useState } from "react";
+import { useCart } from "@/hooks/useCart";
 import { useCoupon } from "@/hooks/useCoupon";
+import { API_BASE_URL } from "@/config/env";
 import { ICoupon } from "@/types/coupon";
 import { checkToken } from "@/services/authService";
-import { getSavedUserCoupons } from "@/services/couponService";
+import {
+  getSavedUserCoupons,
+  getCouponList,
+  saveUserCoupon,
+} from "@/services/couponService";
+import { ICartItem } from "@/types/cart";
+import { toast } from "react-toastify";
+
 export default function Cart() {
   const {
     cart,
@@ -23,56 +29,74 @@ export default function Cart() {
     handlePlus,
     handleChangeQuantity,
     handleRemoveItem,
-  } = useCart(); // 👉 Gọi trước để lấy subtotal
+  } = useCart();
 
   const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
     useCoupon(subtotal, cart?.carts_id || "default");
-  const [savedCoupons, setSavedCoupons] = useState<ICoupon[]>([]);
-  const [userId, setUserId] = useState<number | null>(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [couponInput, setCouponInput] = useState("");
+
   const discountAmount = getDiscountAmount();
+
+  const [savedCoupons, setSavedCoupons] = useState<ICoupon[]>([]);
+  const [allCoupons, setAllCoupons] = useState<ICoupon[]>([]);
+  const [userId, setUserId] = useState<number | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+
+  // Click outside để đóng dropdown
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (!event.target.closest(".coupon-dropdown")) {
         setIsOpen(false);
       }
     };
-
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
-  useEffect(() => {
-    console.log("🛒 Cart items:", cart?.cart_items);
-  }, [cart]);
-  useEffect(() => {
-    if (appliedCoupon && appliedCoupon.length > 0) {
-      setCouponInput(appliedCoupon.code); // Hiện lại trong input
-    }
-  }, [appliedCoupon]);
+  // Load coupon khi mount
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
+        // Lấy userId
         const tokenData = await checkToken();
         if (tokenData?.user?.id) {
           const uid = tokenData.user.id;
           setUserId(uid);
 
-          const coupons = await getSavedUserCoupons(uid);
-          setSavedCoupons(coupons);
+          // Lấy coupon đã lưu
+          const saved = await getSavedUserCoupons(uid);
+          setSavedCoupons(saved);
+
+          // Lấy tất cả coupon gợi ý
+          const all = await getCouponList();
+          setAllCoupons(all);
         }
       } catch (err) {
-        console.error("Không thể lấy mã giảm giá đã lưu:", err);
+        console.error("Không thể lấy mã giảm giá:", err);
       }
     };
-
     fetchCoupons();
   }, []);
 
+  // Hiển thị coupon đã áp dụng
+  useEffect(() => {
+    if (appliedCoupon) {
+      setCouponInput(appliedCoupon.code);
+    }
+  }, [appliedCoupon]);
+
+  const handleSaveCoupon = async (couponCode: string) => {
+    if (!userId) return;
+    try {
+      await saveUserCoupon(userId, couponCode);
+      const updatedSaved = await getSavedUserCoupons(userId);
+      setSavedCoupons(updatedSaved);
+    } catch (err) {
+      console.error("Lỗi lưu coupon:", err);
+    }
+  };
   if (!cart) {
     return (
       <>
@@ -308,22 +332,26 @@ export default function Cart() {
             <div className="discount-section">
               <h3 className="text-lg font-semibold mb-2">Áp Dụng Khuyến Mãi</h3>
 
-              {savedCoupons.length > 0 && (
-                <div
-                  className={`relative w-full mb-4 coupon-dropdown ${
-                    isOpen ? "open" : ""
-                  }`}
+              <div
+                className={`relative w-full mb-4 coupon-dropdown ${
+                  isOpen ? "open" : ""
+                }`}
+              >
+                <button
+                  className="select-coupon w-full p-2 border border-gray-300 rounded-lg text-left"
+                  onClick={() => setIsOpen(!isOpen)}
                 >
-                  <button onClick={() => setIsOpen(!isOpen)}>
-                    {couponInput
-                      ? `Đã chọn: ${couponInput}`
-                      : "-- Chọn mã giảm giá đã lưu --"}
-                  </button>
+                  {couponInput
+                    ? `Đã chọn: ${couponInput}`
+                    : "-- Chọn mã giảm giá --"}
+                </button>
 
-                  {isOpen && (
-                    <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg max-h-80 overflow-auto">
-                      <div className="coupon-section">
-                        {savedCoupons.map((coupon) => (
+                {isOpen && (
+                  <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg max-h-80 overflow-auto">
+                    <div className="coupon-section">
+                      {/* --- Mã đã lưu --- */}
+                      {savedCoupons.length > 0 &&
+                        savedCoupons.map((coupon) => (
                           <div
                             key={coupon.code}
                             onClick={() => {
@@ -331,18 +359,22 @@ export default function Cart() {
                               applyCoupon(coupon.code);
                               setIsOpen(false);
                             }}
-                            className="coupon cursor-pointer"
+                            className={`coupon cursor-pointer flex gap-2 p-2 hover:bg-gray-100 transition ${
+                              couponInput === coupon.code ? "bg-green-100" : ""
+                            }`}
                           >
-                            {/* PHIẾU GIẢM GIÁ - label dọc */}
-                            <div className="right-part">PHIẾU GIẢM GIÁ</div>
-
-                            {/* Nội dung chính của voucher */}
-                            <div className="left-part">
-                              <p className="code">Mã: {coupon.code}</p>
-
-                              <div className="discount-box">
-                                <span className="title">MÃ GIẢM</span>
-                                <div className="percent">
+                            <div className="right-part font-bold text-xs text-gray-500">
+                              PHIẾU GIẢM GIÁ
+                            </div>
+                            <div className="left-part flex-1">
+                              <p className="code font-semibold">
+                                Mã: {coupon.code}
+                              </p>
+                              <div className="discount-box flex items-center gap-2 mt-1">
+                                <span className="title text-xs text-gray-500">
+                                  MÃ GIẢM
+                                </span>
+                                <div className="percent font-bold text-green-600">
                                   {coupon.discount_type === "percentage"
                                     ? `Giảm ${coupon.discount_value}%`
                                     : `Giảm ${parseInt(
@@ -350,8 +382,7 @@ export default function Cart() {
                                       ).toLocaleString("vi")}đ`}
                                 </div>
                               </div>
-
-                              <p className="desc">
+                              <p className="desc text-xs text-gray-400 mt-1">
                                 Áp dụng từ{" "}
                                 {new Date(coupon.start_date).toLocaleDateString(
                                   "vi-VN"
@@ -364,29 +395,102 @@ export default function Cart() {
                             </div>
                           </div>
                         ))}
-                      </div>
+
+                      {/* --- Ngăn cách --- */}
+                      {savedCoupons.length > 0 &&
+                        allCoupons.some(
+                          (c) => !savedCoupons.find((s) => s.code === c.code)
+                        ) && (
+                          <div className="my-2 border-t border-gray-300 text-center text-gray-500 text-xs uppercase">
+                            Mã gợi ý từ hệ thống
+                          </div>
+                        )}
+
+                      {/* --- Mã gợi ý --- */}
+                      {allCoupons
+                        .filter(
+                          (coupon) =>
+                            !savedCoupons.find((c) => c.code === coupon.code)
+                        )
+                        .map((coupon) => (
+                          <div
+                            key={coupon.code}
+                            className="coupon flex gap-2 p-2 bg-gray-100 text-gray-400 cursor-not-allowed"
+                          >
+                            <div className="right-part font-bold text-xs text-gray-500">
+                              PHIẾU GỢI Ý
+                            </div>
+                            <div className="left-part flex-1">
+                              <p className="code font-semibold">
+                                Mã: {coupon.code}
+                              </p>
+                              <div className="discount-box flex items-center gap-2 mt-1">
+                                <span className="title text-xs text-gray-500">
+                                  MÃ GIẢM
+                                </span>
+                                <div className="percent font-bold text-gray-400">
+                                  {coupon.discount_type === "percentage"
+                                    ? `Giảm ${coupon.discount_value}%`
+                                    : `Giảm ${parseInt(
+                                        coupon.discount_value
+                                      ).toLocaleString("vi")}đ`}
+                                </div>
+                              </div>
+                              <p className="desc text-xs text-gray-400 mt-1">
+                                Áp dụng từ{" "}
+                                {new Date(coupon.start_date).toLocaleDateString(
+                                  "vi-VN"
+                                )}{" "}
+                                đến{" "}
+                                {new Date(coupon.end_date).toLocaleDateString(
+                                  "vi-VN"
+                                )}
+                              </p>
+                              <button
+                                className="mt-1 text-sm text-blue-600 underline"
+                                onClick={async () => {
+                                  if (!userId) {
+                                    toast.error(
+                                      "Bạn cần đăng nhập để lưu mã này!"
+                                    );
+                                    return;
+                                  }
+                                  try {
+                                    await saveUserCoupon(userId, coupon.code);
+                                    const updated = await getSavedUserCoupons(
+                                      userId
+                                    );
+                                    setSavedCoupons(updated);
+                                    toast.success(
+                                      `Đã lưu mã ${coupon.code} vào ví voucher của bạn`
+                                    );
+                                  } catch (error) {
+                                    console.error(error);
+                                    toast.error(
+                                      "Có lỗi xảy ra khi lưu mã. Vui lòng thử lại!"
+                                    );
+                                  }
+                                }}
+                              >
+                                Lưu mã này
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+
+                      {/* --- Khi không có mã nào cả --- */}
+                      {savedCoupons.length === 0 && allCoupons.length === 0 && (
+                        <p className="text-gray-500 text-sm p-2">
+                          Bạn chưa có mã giảm giá nào trong giỏ hàng.
+                        </p>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
-              {/* Nhập tay */}
-              <div className="discount flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Nhập mã giảm giá..."
-                  className="flex-1 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                  value={couponInput}
-                  onChange={(e) => setCouponInput(e.target.value)}
-                />
-                <button
-                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
-                  onClick={() => applyCoupon(couponInput)}
-                >
-                  Áp Dụng
-                </button>
+                  </div>
+                )}
               </div>
 
               {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+
               {appliedCoupon && (
                 <p className="text-green-600 mt-2 text-sm">
                   Đã áp dụng mã <strong>{appliedCoupon.code}</strong>{" "}
