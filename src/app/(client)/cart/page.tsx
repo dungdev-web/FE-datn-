@@ -202,27 +202,30 @@ export default function Cart() {
 
               return (
                 <div className="cart-item" key={item.cart_items_id}>
-                  <div className="product-info">
-                    <img
-                      alt={item.variant?.product.name}
-                      src={
-                        item.variant?.color.images
-                          ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
-                          : "/images/placeholder.png"
-                      }
-                      width="80"
-                    />
-                    <div className="product-name">
-                      {item.variant?.product.name}
-                    </div>
-                    <div className="product-details">
-                      <div className="product-desc">
-                        Màu sắc: {item.variant?.color.name_color} | Kích thước:{" "}
-                        {item.variant?.size.number_size}
+                  <Link href={`/product/${item.variant?.product?.products_id}`}>
+                    <div className="product-info">
+                      <img
+                        alt={item.variant?.product?.name || "Sản phẩm"}
+                        src={
+                          item.variant?.color?.images
+                            ? `${API_BASE_URL}/uploads/${item.variant.color.images}`
+                            : "/images/placeholder.png"
+                        }
+                        width={80}
+                      />
+
+                      <div className="product-name">
+                        {item.variant?.product.name}
+                      </div>
+
+                      <div className="product-details">
+                        <div className="product-desc">
+                          Màu sắc: {item.variant?.color.name_color} | Kích
+                          thước: {item.variant?.size.number_size}
+                        </div>
                       </div>
                     </div>
-                  </div>
-
+                  </Link>
                   <div className="cart-item-price">
                     {Number(price).toLocaleString("vi")}₫
                   </div>
