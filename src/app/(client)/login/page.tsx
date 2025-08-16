@@ -4,9 +4,9 @@ import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Loader from "../component/loader";
+import Loader from "../component/Loader";
 import { Eye, EyeOff } from "lucide-react";
-import { validateField } from "@/hooks/validate_login_register";
+import { validateField } from "@/hooks/useValidateLoginRegister";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
@@ -54,11 +54,11 @@ export default function Login() {
     try {
       setShowLoader(true);
       const res = await loginUser({ usernameOrEmail, password });
-      
+
       // Lưu user vào cookies và state
       saveUserToCookies(res);
       setLoginSuccess(true);
-      
+
       // Hiển thị thông báo thành công
       await Swal.fire({
         title: "Đăng nhập thành công!",
@@ -73,7 +73,6 @@ export default function Login() {
       } else {
         window.location.href = "/account";
       }
-      
     } catch (err: any) {
       setShowLoader(false);
       Swal.fire({

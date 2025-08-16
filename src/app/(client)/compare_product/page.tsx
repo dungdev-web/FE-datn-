@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { getCompareProduct } from "@/services/productService";
 import { ICompareProduct } from "@/types/product";
 import { checkToken } from "@/services/authService";
-import { useCompare } from "../component/product_compare/compare_context";
+import { useCompare } from "../component/ProductCompare/CompareContext";
 import { deleteCompareProduct } from "@/services/productService";
 import { useRemoveCompare } from "@/hooks/useAddToCompare";
 import Swal from "sweetalert2";
@@ -141,7 +141,8 @@ export default function Compare_product() {
                           <img
                             className="img-fluid"
                             src={
-                              `${API_BASE_URL}/uploads/${item.product.images?.[0]?.url}` || "/default.jpg"
+                              `${API_BASE_URL}/uploads/${item.product.images?.[0]?.url}` ||
+                              "/default.jpg"
                             }
                             alt={
                               item.product.images?.[0]?.alt_text ||

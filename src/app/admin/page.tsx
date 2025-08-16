@@ -25,7 +25,7 @@ import {
   getRecentOrders,
   getStatusText,
   formatDate,
-} from "@/services/dashboard";
+} from "@/services/dashboardService";
 
 export default function Home_admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);

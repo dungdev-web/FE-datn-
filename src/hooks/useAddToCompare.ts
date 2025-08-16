@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addCompareProduct } from "@/services/productService";
-import { useCompare } from "@/app/(client)/component/product_compare/compare_context";
+import { useCompare } from "@/app/(client)/component/ProductCompare/CompareContext";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import { deleteCompareProduct } from "@/services/productService";
 export const useAddToCompare = (productId: number) => {

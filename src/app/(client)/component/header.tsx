@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 
 import TopCart from "./TopCart";
-import MenuRight from "./menu_right";
+import MenuRight from "./MenuRight";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
 import { useRouter } from "next/navigation";

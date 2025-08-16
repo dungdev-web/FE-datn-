@@ -1,18 +1,14 @@
 // pages/index.tsx hoặc Home.tsx
 "use client";
-import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/autoplay";
-import { Autoplay } from "swiper/modules";
-import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import Image from "next/image";
 import { useEffect, useState, useRef, use } from "react";
-import Show1sanpham from "./component/product_home";
+import Show1sanpham from "./component/ProductHome";
 import BlogHome from "./component/Home/BlogHome";
-import CouponApp from "./component/coupon";
-import FlashSale from "./component/flash_sale";
+import CouponApp from "./component/Coupon";
+import FlashSale from "./component/FlashSale";
 import { IProduct } from "@/types/product";
 import { API_BASE_URL } from "@/config/env";
 import {
@@ -21,10 +17,8 @@ import {
   getProductsByCategory,
 } from "@/services/productService";
 import Link from "next/link";
-import Show2sanpham from "src/app/(client)/component/product-two-box";
+import Show2sanpham from "@/app/(client)/component/ProductTwoBox";
 import Banner3D from "src/app/(client)/component/Home/Banner3D";
-import { useAddToCart } from "@/hooks/useAddToCart";
-import ProductIcons from "src/app/(client)/component/Products/ProductIcons";
 import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
 import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
 
@@ -284,7 +278,9 @@ export default function Home() {
           <div className="hot-products-header">
             <h1 className="hot-products-title">SẢN PHẨM MỚI NHẤT</h1>
             <h4>
-              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
+              <Link href="/product">
+                Xem tất cả <i className="fa-solid fa-angles-right"></i>
+              </Link>
             </h4>
           </div>
 
@@ -397,130 +393,135 @@ export default function Home() {
           </div>
         </div>
         {featureproducts.length > 0 && (
-        <div className="hot-products">
-          <div className="hot-products-header">
-            <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
-            <h4>
-              <Link href="/product">Xem tất cả <i className="fa-solid fa-angles-right"></i></Link>
-            </h4>
-          </div>
+          <div className="hot-products">
+            <div className="hot-products-header">
+              <h1 className="hot-products-title">SẢN PHẨM NỔI BẬT</h1>
+              <h4>
+                <Link href="/product">
+                  Xem tất cả <i className="fa-solid fa-angles-right"></i>
+                </Link>
+              </h4>
+            </div>
 
-          <div className="hot-products-list">
-            {featureproducts.map((product) => {
-              const productId = product.products_id ?? product.products_id;
+            <div className="hot-products-list">
+              {featureproducts.map((product) => {
+                const productId = product.products_id ?? product.products_id;
 
-              const averageRating = product.product_reviews?.length
-                ? Math.round(
-                    product.product_reviews.reduce(
-                      (sum, r) => sum + Number(r.rating),
-                      0
-                    ) / product.product_reviews.length
-                  )
-                : 0;
-
-              const sold =
-                product.product_variants?.reduce(
-                  (sum, v) => sum + v.stock_quantity,
-                  0
-                ) ?? 0;
-
-              const discount =
-                product.price > product.sale_price
+                const averageRating = product.product_reviews?.length
                   ? Math.round(
-                      ((product.price - product.sale_price) / product.price) *
-                        100
+                      product.product_reviews.reduce(
+                        (sum, r) => sum + Number(r.rating),
+                        0
+                      ) / product.product_reviews.length
                     )
                   : 0;
 
-              const uniqueColors = [
-                ...new Map(
-                  (product.product_variants || []).map((v) => [
-                    v.color.id,
-                    v.color,
-                  ])
-                ).values(),
-              ];
+                const sold =
+                  product.product_variants?.reduce(
+                    (sum, v) => sum + v.stock_quantity,
+                    0
+                  ) ?? 0;
 
-              return (
-                <div className="hot-product-card" key={product.products_id}>
-                  <div className="hot-product-image">
-                    <Link href={`product/${product.slug}`}>
-                      <img
-                        src={
-                          `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
-                          "/images/placeholder.png"
+                const discount =
+                  product.price > product.sale_price
+                    ? Math.round(
+                        ((product.price - product.sale_price) / product.price) *
+                          100
+                      )
+                    : 0;
+
+                const uniqueColors = [
+                  ...new Map(
+                    (product.product_variants || []).map((v) => [
+                      v.color.id,
+                      v.color,
+                    ])
+                  ).values(),
+                ];
+
+                return (
+                  <div className="hot-product-card" key={product.products_id}>
+                    <div className="hot-product-image">
+                      <Link href={`product/${product.slug}`}>
+                        <img
+                          src={
+                            `${API_BASE_URL}/uploads/${product.images?.[0]?.url}` ||
+                            "/images/placeholder.png"
+                          }
+                          alt={product.name}
+                        />
+                      </Link>
+
+                      <HotProductIcons
+                        productId={productId}
+                        variant_id={
+                          product.product_variants[0]?.product_variants_id
                         }
-                        alt={product.name}
+                        price={product.sale_price}
                       />
-                    </Link>
 
-                    <HotProductIcons
-                      productId={productId}
-                      variant_id={
-                        product.product_variants[0]?.product_variants_id
-                      }
-                      price={product.sale_price}
-                    />
-
-                    {discount > 0 && (
-                      <span className="tag-discount">-{discount}%</span>
-                    )}
-                  </div>
-
-                  <div className="hot-product-content">
-                    <div className="hot-product-colors">
-                      {uniqueColors.map((color) => (
-                        <span
-                          key={color.id}
-                          className="color"
-                          data-color={color.name_color}
-                          style={{ backgroundColor: color.code_color }}
-                        ></span>
-                      ))}
-                    </div>
-
-                    <h4 className="hot-product-title">{product.name}</h4>
-
-                    <div className="hot-product-price">
-                      {product.sale_price > 0 && (
-                        <span className="price-old">
-                          <del>{product.price.toLocaleString("vi")}đ</del>
-                        </span>
+                      {discount > 0 && (
+                        <span className="tag-discount">-{discount}%</span>
                       )}
-                      <span className="price-new">
-                        {(product.sale_price > 0
-                          ? product.sale_price
-                          : product.price
-                        ).toLocaleString("vi")}
-                        đ
-                      </span>
                     </div>
 
-                    <div className="hot-product-progress">
-                      <div className="progress-bar">
-                        <div className="progress-fill" style={{ width: "87%" }}>
-                          <span className="sold-info">
-                            Đã bán {sold} sản phẩm
+                    <div className="hot-product-content">
+                      <div className="hot-product-colors">
+                        {uniqueColors.map((color) => (
+                          <span
+                            key={color.id}
+                            className="color"
+                            data-color={color.name_color}
+                            style={{ backgroundColor: color.code_color }}
+                          ></span>
+                        ))}
+                      </div>
+
+                      <h4 className="hot-product-title">{product.name}</h4>
+
+                      <div className="hot-product-price">
+                        {product.sale_price > 0 && (
+                          <span className="price-old">
+                            <del>{product.price.toLocaleString("vi")}đ</del>
                           </span>
+                        )}
+                        <span className="price-new">
+                          {(product.sale_price > 0
+                            ? product.sale_price
+                            : product.price
+                          ).toLocaleString("vi")}
+                          đ
+                        </span>
+                      </div>
+
+                      <div className="hot-product-progress">
+                        <div className="progress-bar">
+                          <div
+                            className="progress-fill"
+                            style={{ width: "87%" }}
+                          >
+                            <span className="sold-info">
+                              Đã bán {sold} sản phẩm
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="hot-product-rating">
-                      {Array.from({ length: 5 }, (_, i) =>
-                        i < averageRating ? (
-                          <i key={i} className="fa-solid fa-star"></i>
-                        ) : (
-                          <i key={i} className="fa-regular fa-star"></i>
-                        )
-                      )}
+                      <div className="hot-product-rating">
+                        {Array.from({ length: 5 }, (_, i) =>
+                          i < averageRating ? (
+                            <i key={i} className="fa-solid fa-star"></i>
+                          ) : (
+                            <i key={i} className="fa-regular fa-star"></i>
+                          )
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
         )}
 
         <div className="product-two-box-main">

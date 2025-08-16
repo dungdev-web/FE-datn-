@@ -13,7 +13,10 @@ import {
   TooltipItem,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
-import { getRevernueWeekly, getRevernueYearly } from "@/services/dashboard";
+import {
+  getRevernueWeekly,
+  getRevernueYearly,
+} from "@/services/dashboardService";
 
 ChartJS.register(
   CategoryScale,
