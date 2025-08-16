@@ -18,13 +18,12 @@ export const useCart = () => {
   const SHIPPING_COST = 30000;
   const FREE_SHIPPING_THRESHOLD = 3000000;
 
-  const subtotal =
-    cart?.cart_items.reduce((sum, item) => {
-      const price =
-        item.variant?.product?.sale_price ?? item.variant?.product?.price ?? 0;
+  const subtotal = (cart?.cart_items ?? []).reduce((sum, item) => {
+    const price =
+      item.variant?.product?.sale_price ?? item.variant?.product?.price ?? 0;
 
-      return sum + price * item.quantity;
-    }, 0) || 0;
+    return sum + price * item.quantity;
+  }, 0);
 
   const isFreeShipping = subtotal >= FREE_SHIPPING_THRESHOLD;
   const shipprice = isFreeShipping ? 0 : SHIPPING_COST;

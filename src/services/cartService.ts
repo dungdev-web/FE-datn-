@@ -174,7 +174,7 @@ export const getCartByUserId = async (
   try {
     const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
-      credentials: "include", // nếu backend dùng cookie-auth
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
@@ -185,11 +185,13 @@ export const getCartByUserId = async (
       throw new Error(`Fetch failed: ${res.status} - ${errorText}`);
     }
 
-    const data: ICart = await res.json();
+    const data: ICart | null = await res.json();
+
+    if (!data) return { items: [] } as unknown as ICart & { items: ICartItem[] };
 
     const cartWithItems = {
       ...data,
-      items: data.cart_items.map((item) => ({
+      items: (data.cart_items || []).map((item) => ({
         ...item,
         price: Number(item.price),
       })),
@@ -198,7 +200,7 @@ export const getCartByUserId = async (
     return cartWithItems;
   } catch (error) {
     console.error("Lỗi lấy giỏ hàng:", error);
-    return null;
+    return { items: [] } as unknown as ICart & { items: ICartItem[] };
   }
 };
 

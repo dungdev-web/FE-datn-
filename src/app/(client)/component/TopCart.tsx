@@ -11,7 +11,7 @@ const TopCart = forwardRef<HTMLDivElement>((_props, ref) => {
     <div className="top-cart-content hidden-sm hidden-xs" ref={ref}>
       <ul id="cart-sidebar" className="mini-products-list count_li">
         <ul className="list-item-cart">
-          {cart?.cart_items.map((item) => {
+          {(cart?.cart_items ?? []).map((item) => {
             const price =
               item.variant?.product?.sale_price ??
               item.variant?.product?.price ??
