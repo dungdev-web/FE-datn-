@@ -3,7 +3,10 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowUpDown } from "lucide-react";
 import { API_BASE_URL } from "@/config/env";
-import { deleteAdminProduct, getProductsDashboard } from "@/services/productService"; // import đúng đường dẫn service của bạn
+import {
+  deleteAdminProduct,
+  getProductsDashboard,
+} from "@/services/productService"; // import đúng đường dẫn service của bạn
 import "../css/product_admin.css";
 import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
@@ -181,46 +184,46 @@ export default function Products() {
               <i className="fa-solid fa-pen edit-icon" />
             </a>
 
-         <button
-    type="button"
-    title="Xóa SP"
-    className="delete-icon"
-    onClick={async () => {
-      Swal.fire({
-        title: "Bạn chắc chắn muốn xóa?",
-        text: "Hành động này không thể hoàn tác!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Xóa",
-        cancelButtonText: "Hủy",
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            await deleteAdminProduct(product.products_id);
-            Swal.fire({
-              icon: "success",
-              title: "Đã xóa!",
-              text: "Sản phẩm đã bị xóa.",
-              timer: 1500,
-              showConfirmButton: false,
-            });
-            // reload lại danh sách
-            window.location.reload();
-          } catch (error: any) {
-            Swal.fire({
-              icon: "error",
-              title: "Xóa thất bại",
-              text: error.message || "Có lỗi xảy ra",
-            });
-          }
-        }
-      });
-    }}
-  >
-    <i className="fa-solid fa-trash" />
-  </button>
+            <button
+              type="button"
+              title="Xóa SP"
+              className="delete-icon"
+              onClick={async () => {
+                Swal.fire({
+                  title: "Bạn chắc chắn muốn xóa?",
+                  text: "Hành động này không thể hoàn tác!",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#d33",
+                  cancelButtonColor: "#3085d6",
+                  confirmButtonText: "Xóa",
+                  cancelButtonText: "Hủy",
+                }).then(async (result) => {
+                  if (result.isConfirmed) {
+                    try {
+                      await deleteAdminProduct(product.products_id);
+                      Swal.fire({
+                        icon: "success",
+                        title: "Đã xóa!",
+                        text: "Sản phẩm đã bị xóa.",
+                        timer: 1500,
+                        showConfirmButton: false,
+                      });
+                      // reload lại danh sách
+                      window.location.reload();
+                    } catch (error: any) {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Xóa thất bại",
+                        text: error.message || "Có lỗi xảy ra",
+                      });
+                    }
+                  }
+                });
+              }}
+            >
+              <i className="fa-solid fa-trash" />
+            </button>
           </td>
         </tr>
       );
@@ -266,10 +269,10 @@ export default function Products() {
                 Danh mục <SortIcon field="category_id" />
               </th>
               <th>
-                Giá nhập <SortIcon field="price" />
+                Giá bán <SortIcon field="price" />
               </th>
               <th>
-                Giá bán <SortIcon field="sale_price" />
+                Giá Khuyến mãi <SortIcon field="sale_price" />
               </th>
               <th>
                 Ngày tạo <SortIcon field="created_at" />
@@ -343,7 +346,7 @@ export default function Products() {
               <th>
                 <input
                   type="number"
-                  placeholder="Giá bán đến..."
+                  placeholder="Giá nhập từ..."
                   name="maxPrice"
                   value={filters.maxPrice}
                   onChange={handleFilterChange}
