@@ -85,8 +85,8 @@ export default function UserOrdersList({
   console.log(user);
 
   const statusMap = {
-    pending: { label: "Chờ xác nhận", class: "status-pending" },
-    confirmed: { label: "Đã xác nhận", class: "status-confirmed" },
+    pending: { label: "Chờ xử lý", class: "status-pending" },
+    processing: { label: "Đang xử lý", class: "status-processing" },
     shipping: { label: "Đang giao hàng", class: "status-shipping" },
     completed: { label: "Hoàn thành", class: "status-completed" },
     cancelled: { label: "Đã hủy", class: "status-cancelled" },
@@ -249,21 +249,6 @@ export default function UserOrdersList({
     fetchOrders(page);
   };
 
-  const handleStatusUpdate = async (orderId: number, newStatus: string) => {
-    try {
-      setOrdersLoading(true);
-      await updateOrderStatus(orderId, newStatus);
-      // Refresh the orders list after status update
-      await fetchOrders(currentPage);
-      alert("Cập nhật trạng thái thành công!");
-    } catch (error: any) {
-      console.error("Error updating status:", error);
-      alert(error.message || "Lỗi khi cập nhật trạng thái");
-    } finally {
-      setOrdersLoading(false);
-    }
-  };
-
   const handleExport = async () => {
     if (!userId) return;
 
@@ -278,7 +263,6 @@ export default function UserOrdersList({
         payment_status: filters.payment_status || "",
       };
 
-      // Add all current filters for export
       if (filters.status) params.status = filters.status;
       if (filters.payment_method_id)
         params.payment_method_id = parseInt(filters.payment_method_id);
@@ -470,7 +454,6 @@ export default function UserOrdersList({
     );
   };
 
-  // Effects
   useEffect(() => {
     if (userId) {
       fetchOrders(1, true);
@@ -563,96 +546,89 @@ export default function UserOrdersList({
           <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 overflow-x-auto">
             <table className="w-full min-w-max">
               <thead>
-  <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-    {/* Mã đơn hàng - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("orders_id")}
-      >
-        <span>Mã đơn hàng</span>
-        {getSortIcon("orders_id")}
-      </button>
-    </th>
-    
-    {/* Người nhận - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("user.name")}
-      >
-        <span>Người nhận</span>
-        {getSortIcon("user.name")}
-      </button>
-    </th>
-    
-    {/* Điện thoại - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("user.phone")}
-      >
-        <span>Điện thoại</span>
-        {getSortIcon("user.phone")}
-      </button>
-    </th>
-    
-    {/* Trạng thái - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("status")}
-      >
-        <span>Trạng thái</span>
-        {getSortIcon("status")}
-      </button>
-    </th>
-    
-    {/* Tổng tiền - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("total_amount")}
-      >
-        <span>Tổng tiền</span>
-        {getSortIcon("total_amount")}
-      </button>
-    </th>
-    
-    {/* Ngày đặt - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("created_at")}
-      >
-        <span>Ngày đặt</span>
-        {getSortIcon("created_at")}
-      </button>
-    </th>
-    
-    {/* Trạng thái thanh toán - có sort */}
-    <th className="!px-6 !py-4 text-left">
-      <button
-        className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
-        onClick={() => handleSort("payment_status")}
-      >
-        <span>Trạng thái thanh toán</span>
-        {getSortIcon("payment_status")}
-      </button>
-    </th>
-    
-    {/* Sản phẩm - KHÔNG sort */}
-    <th className="!px-6 !py-4 text-left whitespace-nowrap">
-      <span className="font-semibold text-gray-700">Sản phẩm</span>
-    </th>
-    
-    {/* Thao tác - KHÔNG sort */}
-    <th className="!px-6 !py-4 text-left whitespace-nowrap">
-      <span className="font-semibold text-gray-700">Thao tác</span>
-    </th>
-  </tr>
+                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("orders_id")}
+                    >
+                      <span>Mã đơn hàng</span>
+                      {getSortIcon("orders_id")}
+                    </button>
+                  </th>
 
-                {/* Filter row */}
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("user.name")}
+                    >
+                      <span>Người nhận</span>
+                      {getSortIcon("user.name")}
+                    </button>
+                  </th>
+
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("user.phone")}
+                    >
+                      <span>Điện thoại</span>
+                      {getSortIcon("user.phone")}
+                    </button>
+                  </th>
+
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("status")}
+                    >
+                      <span>Trạng thái</span>
+                      {getSortIcon("status")}
+                    </button>
+                  </th>
+
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("total_amount")}
+                    >
+                      <span>Tổng tiền</span>
+                      {getSortIcon("total_amount")}
+                    </button>
+                  </th>
+
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("created_at")}
+                    >
+                      <span>Ngày đặt</span>
+                      {getSortIcon("created_at")}
+                    </button>
+                  </th>
+
+                  <th className="!px-6 !py-4 text-left">
+                    <button
+                      className="flex items-center !gap-2 font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-200 focus:outline-none focus:text-blue-600"
+                      onClick={() => handleSort("payment_status")}
+                    >
+                      <span>Trạng thái thanh toán</span>
+                      {getSortIcon("payment_status")}
+                    </button>
+                  </th>
+                  <th className="!px-6 !py-4 text-left whitespace-nowrap">
+                    <span className="font-semibold text-gray-700">
+                      Sản phẩm
+                    </span>
+                  </th>
+
+                  <th className="!px-6 !py-4 text-left whitespace-nowrap">
+                    <span className="font-semibold text-gray-700">
+                      Thao tác
+                    </span>
+                  </th>
+                </tr>
+
                 <tr className="bg-white border-b-2 border-gray-100">
                   <th className="!px-6 !py-3">
                     <div className="relative">
@@ -681,8 +657,8 @@ export default function UserOrdersList({
                         className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm bg-white appearance-none"
                       >
                         <option value="">Tất cả trạng thái</option>
-                        <option value="pending">Chờ xác nhận</option>
-                        <option value="confirmed">Đã xác nhận</option>
+                        <option value="pending">Chờ xử lý</option>
+                        <option value="processing">Đang xử lý</option>
                         <option value="shipping">Đang giao hàng</option>
                         <option value="completed">Hoàn thành</option>
                         <option value="cancelled">Đã hủy</option>
@@ -718,20 +694,22 @@ export default function UserOrdersList({
                     </div>
                   </th>
                   <th className="!px-6 !py-3">
-      <div className="relative">
-        <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <select
-          value={filters.payment_status || ''}
-          onChange={(e) => handleFilterChange("payment_status", e.target.value)}
-          className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm bg-white appearance-none"
-        >
-          <option value="">Tất cả trạng thái TT</option>
-          <option value="paid">Đã thanh toán</option>
-          <option value="unpaid">Chưa thanh toán</option>
-          <option value="refunded">Đã hoàn tiền</option>
-        </select>
-      </div>
-    </th>
+                    <div className="relative">
+                      <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <select
+                        value={filters.payment_status || ""}
+                        onChange={(e) =>
+                          handleFilterChange("payment_status", e.target.value)
+                        }
+                        className="w-full !pl-10 !pr-4 !py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm bg-white appearance-none"
+                      >
+                        <option value="">Tất cả trạng thái TT</option>
+                        <option value="paid">Đã thanh toán</option>
+                        <option value="unpaid">Chưa thanh toán</option>
+                        <option value="refunded">Đã hoàn tiền</option>
+                      </select>
+                    </div>
+                  </th>
                   <th className="!px-6 !py-3">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -800,7 +778,7 @@ export default function UserOrdersList({
                       switch (status) {
                         case "pending":
                           return "bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200";
-                        case "confirmed":
+                        case "processing":
                           return "bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200";
                         case "shipping":
                           return "bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 border border-purple-200";
@@ -825,8 +803,8 @@ export default function UserOrdersList({
                             </span>
                           </div>
                         </td>
-                        
-<td className="!px-6 !py-4">
+
+                        <td className="!px-6 !py-4">
                           <div className="flex items-center !gap-3">
                             <div className="min-w-0">
                               <div className="font-semibold text-gray-900 truncate">
@@ -858,30 +836,13 @@ export default function UserOrdersList({
                                     ? "bg-red-500"
                                     : order.status === "shipping"
                                     ? "bg-purple-500"
-                                    : order.status === "confirmed"
+                                    : order.status === "processing"
                                     ? "bg-blue-500"
                                     : "bg-yellow-500"
                                 }`}
                               ></div>
                               {statusInfo.label}
                             </span>
-                            <select
-                              value={order.status}
-                              onChange={(e) =>
-                                handleStatusUpdate(
-                                  order.orders_id,
-                                  e.target.value
-                                )
-                              }
-                              className="ml-2 text-xs border border-gray-300 rounded px-2 py-1 bg-white flex-shrink-0"
-                              disabled={ordersLoading}
-                            >
-                              <option value="pending">Chờ xác nhận</option>
-                              <option value="confirmed">Đã xác nhận</option>
-                              <option value="shipping">Đang giao hàng</option>
-                              <option value="completed">Hoàn thành</option>
-                              <option value="cancelled">Đã hủy</option>
-                            </select>
                           </div>
                         </td>
                         <td className="!px-6 !py-4">
