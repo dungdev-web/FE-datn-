@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { resetPassword } from "@/services/authService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { validateField } from "@/hooks/validate_login_register";
+import { validateField } from "@/hooks/useValidateLoginRegister";
 import "../css/login.css";
 export default function OTP() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(""));

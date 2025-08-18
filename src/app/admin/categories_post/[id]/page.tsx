@@ -189,7 +189,7 @@ export default function CategoryEdit() {
 
         <div className="form-actions">
           <button type="submit" className="submit-btn" disabled={loading}>
-            {loading ? "Đang tạo..." : "Sửa"}
+            {loading ? "Đang tạo..." : "Cập nhật"}
           </button>
           <Link
             href={"/admin/categories_post"}

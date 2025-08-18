@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getInfoUser, checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
-import LogoutLink from "../component/log_out";
+import LogoutLink from "../component/LogOut";
 import CheckTokenGuard from "@/store/CheckTokenGuard";
 import AccountSidebar from "../component/Account/AccountSidebar";
 import { updateUserService, uploadAvatarService } from "@/services/userService";
@@ -33,10 +33,10 @@ export default function Account() {
         if (!tokenData?.user?.id) return;
 
         const [orders, addresses] = await Promise.all([
-          getOrdersByUserService({ 
-            userId: tokenData.user.id, 
-            page: 1, 
-            limit: 1
+          getOrdersByUserService({
+            userId: tokenData.user.id,
+            page: 1,
+            limit: 1,
           }),
           getAddressByUserId(tokenData.user.id),
         ]);

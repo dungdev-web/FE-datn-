@@ -181,6 +181,17 @@ export default function Brands() {
       }
     }
   };
+  const handleRefresh = () => {
+    // reset trang và filter nếu muốn
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    setFilterId("");
+    setFilterName("");
+    setFilterStatus("");
+    setSearchText("");
+
+    // fetch lại danh sách
+    fetchBrands();
+  };
 
   return (
     <div className="brand-list">
@@ -190,9 +201,10 @@ export default function Brands() {
         <Link href="/admin/brands/add" className="btn btn-add">
           <i className="fa-solid fa-plus"></i> Thêm mới nhãn hiệu
         </Link>
-        <button className="btn btn-refresh" onClick={fetchBrands}>
-          <i className="fa-solid fa-rotate-right"></i> Refresh
+        <button className="btn btn-refresh" onClick={handleRefresh}>
+          <i className="fa-solid fa-rotate-right"></i> Làm mới
         </button>
+
         <div className={`search-toggle ${isSearching ? "active" : ""}`}>
           {isSearching ? (
             <input

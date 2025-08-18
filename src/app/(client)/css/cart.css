@@ -462,7 +462,7 @@
 }
 
 /* Optional: Add a dropdown arrow icon */
-.coupon-dropdown button::after {
+.coupon-dropdown .select-coupon::after {
   content: "▼";
   font-size: 12px;
   margin-left: auto;

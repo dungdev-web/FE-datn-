@@ -14,7 +14,11 @@ import { ICategory } from "@/types/ICategory";
 import { getAllBrands } from "@/services/brandService";
 import { getAllCategories } from "@/services/categoryService";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 export default function Add_pro() {
+  const router = useRouter();
   const editorRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
   const [sizes, setSizes] = useState<ISize[]>([]);
@@ -234,8 +238,9 @@ export default function Add_pro() {
       });
 
       Swal.fire("Thành công", "Thêm sản phẩm thành công!", "success");
-      //
-     
+      setTimeout(() => {
+        router.push("/admin/products");
+      }, 1000);
     } catch (error) {
       console.error(error);
       Swal.fire("Lỗi", "Có lỗi khi thêm sản phẩm", "error");
@@ -488,7 +493,9 @@ export default function Add_pro() {
       <div className="header-bar">
         <div className="header-left">
           <button className="btn btn-back">
-            <i className="fa-solid fa-arrow-left"></i> Trở về
+            <Link href="/admin/products" className="flex items-center">
+              <i className="fa-solid fa-arrow-left !mr-2" /> Trở về
+            </Link>
           </button>
           <button className="btn-add" type="submit" form="add-product-form">
             <i className="fa fa-plus"></i> Thêm sản phẩm

@@ -3,10 +3,10 @@ import {
   getRecentOrders,
   getStatusText,
   getAllCategoryProduct,
-} from "@/services/dashboard";
+} from "@/services/dashboardService";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
-import exportStyledExcel from "../component_admin/excel";
+import exportStyledExcel from "../component_admin/Excel";
 import { IOrder } from "@/types/Order";
 import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
@@ -210,7 +210,7 @@ export default function OrderPage() {
             )}
           </div>
           <button className="btn btn-refresh">
-            <i className="fa-solid fa-rotate-right"></i> Refresh
+            <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
           <button
             className="btn btn-export"
