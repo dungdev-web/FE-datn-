@@ -360,7 +360,7 @@ export default function OrderDetail() {
 
   const handleBuyAgain = () => {
     // Logic để thêm lại tất cả sản phẩm vào giỏ hàng
-    router.push("/cart");
+    window.location.href = "/cart"; // reload cứng
   };
 
   const handleContactStore = () => {
@@ -906,7 +906,7 @@ export default function OrderDetail() {
             </div>
 
             {/* Gợi ý sản phẩm tương tự cho trạng thái completed */}
-            {(order.status === "completed") && (
+            {order.status === "completed" && (
               <div className="mt-6 bg-white rounded shadow !p-6">
                 <h3 className="text-lg font-semibold !mb-4 text-gray-800">
                   💡 Sản phẩm bạn có thể quan tâm

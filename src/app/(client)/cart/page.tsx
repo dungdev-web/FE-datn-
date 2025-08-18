@@ -97,9 +97,10 @@ export default function Cart() {
       console.error("Lỗi lưu coupon:", err);
     }
   };
-  if (!cart) {
+  if (!cart || !cart.cart_items || cart.cart_items.length === 0) {
     return (
       <>
+        {/* Banner */}
         <section
           className="bread-crumb background-cover relative"
           style={{
@@ -129,6 +130,7 @@ export default function Cart() {
           </div>
         </section>
 
+        {/* Empty Cart */}
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -217,8 +219,7 @@ export default function Cart() {
                 <p>Thành tiền</p>
               </div>
             </div>
-
-            {(cart?.cart_items ?? []).map((item: ICartItem) => {
+            {cart.cart_items.map((item: ICartItem) => {
               const price =
                 item.variant?.product?.sale_price ??
                 item.variant?.product?.price ??
