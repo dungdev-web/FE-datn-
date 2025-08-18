@@ -5,7 +5,7 @@ import Image from "next/image";
 import { API_BASE_URL } from "@/config/env";
 
 export default function AsideBlog() {
-  const { categories, loading: catLoading } = useCategories();
+  const { categories, loading: catLoading } = useCategories({ page: 1, limit: 1000 });
   const [selectedCategoryId, setSelectedCategory] = useState<number | null>(null);
   const [openParentId, setOpenParentId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -42,8 +42,9 @@ export default function AsideBlog() {
     // Lấy danh mục cha
     const parentCategories = categories.data
       .filter((cat) => cat.parent_id === null)
-      .slice(0, 10); // Giới hạn hiển thị 10 cha
-
+      .slice(0, 1000); // Giới hạn hiển thị 10 cha
+    console.log(parentCategories);
+    
     return (
       <ul className={isMobile ? "" : "space-y-1"}>
         {parentCategories.map((parent) => {
