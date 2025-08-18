@@ -40,8 +40,8 @@ export default function CommentPage() {
         product_reviews_id: filters.product_reviews_id
           ? Number(filters.product_reviews_id)
           : undefined,
-        user_name: filters.user_name || searchText || undefined,
-        product_name: filters.product_name || searchText || undefined,
+        user_name: filters.user_name  || undefined,
+        product_name: filters.product_name || undefined,
         rating: filters.rating ? Number(filters.rating) : undefined,
         search: filters.content || searchText || undefined,
       });
@@ -65,8 +65,8 @@ export default function CommentPage() {
   const handleToggleStatus = async (id: number, currentStatus: string) => {
     const newStatus = currentStatus === "approved" ? "pending" : "approved";
     try {
-      await setStatusReview(id, newStatus); // truyền đủ 2 tham số
-      fetchReviews(); // load lại danh sách sau khi đổi
+      await setStatusReview(id, newStatus); 
+      fetchReviews(); 
     } catch (err) {
       console.error("Lỗi khi đổi trạng thái:", err);
     }
@@ -74,7 +74,6 @@ export default function CommentPage() {
   return (
     <div className="review-container">
       <h2>Quản lý bình luận sản phẩm</h2>
-
       <div className="review-actions">
         <button className="btn btn-refresh" onClick={fetchReviews}>
           <i className="fa-solid fa-rotate-right"></i> Làm mới
@@ -90,7 +89,8 @@ export default function CommentPage() {
               onChange={(e) => setSearchText(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  fetchReviews();
+                  setSearchText(e.currentTarget.value); 
+                  fetchReviews(); 
                 }
               }}
               onBlur={() => {
@@ -105,176 +105,203 @@ export default function CommentPage() {
               <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
             </button>
           )}
-
         </div>
-        <button className="btn btn-export">
-          <i className="fa-solid fa-file-export"></i> Xuất Excel
-        </button>
-        <button className="btn btn-statistics">
-          <i className="fa-solid fa-chart-bar"></i> Thống kê
-        </button>
-      </div>
-      {loading ? (
-        <p>Đang tải...</p>
-      ) : (
-        <>
-          <table className="review-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Người dùng</th>
-                <th>Sản phẩm</th>
-                <th>Đánh giá</th>
-                <th>Nội dung</th>
-                <th>Trạng thái</th>
-                <th>Thao tác</th>
-              </tr>
-              <tr className="filter-row">
-                <th>
-                  <input
-                    type="text"
-                    placeholder="Lọc ID..."
-                    value={filters.product_reviews_id}
-                    onChange={(e) =>
-                      updateFilter("product_reviews_id", e.target.value)
-                    }
-                  />
-                </th>
-                <th>
-                  <input
-                    type="text"
-                    placeholder="Lọc người dùng..."
-                    value={filters.user_name}
-                    onChange={(e) => updateFilter("user_name", e.target.value)}
-                  />
-                </th>
-                <th>
-                  <input
-                    type="text"
-                    placeholder="Lọc sản phẩm..."
-                    value={filters.product_name}
-                    onChange={(e) =>
-                      updateFilter("product_name", e.target.value)
-                    }
-                  />
-                </th>
-                <th>
-                  <select
-                    value={filters.rating}
-                    onChange={(e) => updateFilter("rating", e.target.value)}
-                  >
-                    <option value="">Tất cả</option>
-                    <option value="1">★☆☆☆☆</option>
-                    <option value="2">★★☆☆☆</option>
-                    <option value="3">★★★☆☆</option>
-                    <option value="4">★★★★☆</option>
-                    <option value="5">★★★★★</option>
-                  </select>
-                </th>
-                <th>
-                  <input
-                    type="text"
-                    placeholder="Tìm nội dung..."
-                    value={filters.content}
-                    onChange={(e) => updateFilter("content", e.target.value)}
-                  />
-                </th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {reviews.length > 0 ? (
-                reviews.map((item) => (
-                  <tr key={item.product_reviews_id}>
-                    <td>{item.product_reviews_id}</td>
-                    <td>{item.user?.name}</td>
-                    <td>{item.product?.name}</td>
-                    <td>
-                      {"★".repeat(item.rating) + "☆".repeat(5 - item.rating)}
-                    </td>
-                    <td>{item.content}</td>
-                    <td>
-                      <span
-                        className={`status ${
-                          item.status === "approved" ? "approved" : "pending"
-                        }`}
-                      >
-                        {item.status === "approved" ? "Đã duyệt" : "Đã ẩn"}
-                      </span>
-                    </td>
-                    <td>
-                      <Link href={`/admin/comment/${item.product_reviews_id}`}>
-                        <i
-                          className="fa-solid fa-pen view-icon"
-                          title="Xem chi tiết"
-                        ></i>
-                      </Link>
-                      {item.status === "approved" ? (
-                        <i
-                          className="fa-solid fa-eye-slash delete-icon"
-                          title="Ẩn bình luận"
-                          onClick={() =>
-                            handleToggleStatus(
-                              item.product_reviews_id,
-                              item.status
-                            )
-                          }
-                          style={{ cursor: "pointer" }}
-                        ></i>
-                      ) : (
-                        <i
-                          className="fa-solid fa-eye approve-icon"
-                          title="Hiện bình luận"
-                          onClick={() =>
-                            handleToggleStatus(
-                              item.product_reviews_id,
-                              item.status
-                            )
-                          }
-                          style={{ cursor: "pointer" }}
-                        ></i>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
+        
+        {loading ? (
+          <p>Đang tải...</p>
+        ) : (
+          <>
+            <table className="review-table">
+              <thead>
                 <tr>
-                  <td colSpan={7}>Không có bình luận nào</td>
+                  <th>ID</th>
+                  <th>Người dùng</th>
+                  <th>Sản phẩm</th>
+                  <th>Đánh giá</th>
+                  <th>Nội dung</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-          {/* Pagination */}
-          <div className="pagination">
-            <button
-              className="page-btn"
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page === 1}
-            >
-              <i className="fa-solid fa-angle-left"></i>
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => (
+                <tr className="filter-row">
+                  <th>
+                    <input
+                      type="text"
+                      placeholder="Lọc ID..."
+                      value={filters.product_reviews_id}
+                      onChange={(e) =>
+                        updateFilter("product_reviews_id", e.target.value)
+                      }
+                    />
+                  </th>
+                  <th>
+                    <input
+                      type="text"
+                      placeholder="Lọc người dùng..."
+                      value={filters.user_name}
+                      onChange={(e) =>
+                        updateFilter("user_name", e.target.value)
+                      }
+                    />
+                  </th>
+                  <th>
+                    <input
+                      type="text"
+                      placeholder="Lọc sản phẩm..."
+                      value={filters.product_name}
+                      onChange={(e) =>
+                        updateFilter("product_name", e.target.value)
+                      }
+                    />
+                  </th>
+                  <th>
+                    <select
+                      value={filters.rating}
+                      onChange={(e) => updateFilter("rating", e.target.value)}
+                    >
+                      <option value="">Tất cả</option>
+                      <option value="1">★☆☆☆☆</option>
+                      <option value="2">★★☆☆☆</option>
+                      <option value="3">★★★☆☆</option>
+                      <option value="4">★★★★☆</option>
+                      <option value="5">★★★★★</option>
+                    </select>
+                  </th>
+                  <th>
+                    <input
+                      type="text"
+                      placeholder="Tìm nội dung..."
+                      value={filters.content}
+                      onChange={(e) => updateFilter("content", e.target.value)}
+                    />
+                  </th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {reviews.length > 0 ? (
+                  reviews.map((item) => (
+                    <tr key={item.product_reviews_id}>
+                      <td>{item.product_reviews_id}</td>
+                      <td>{item.user?.name}</td>
+                      <td>{item.product?.name}</td>
+                      <td>
+                        {"★".repeat(item.rating) + "☆".repeat(5 - item.rating)}
+                      </td>
+                      <td>{item.content}</td>
+                      <td>
+                        <span
+                          className={`status ${
+                            item.status === "approved" ? "approved" : "pending"
+                          }`}
+                        >
+                          {item.status === "approved" ? "Đã duyệt" : "Đã ẩn"}
+                        </span>
+                      </td>
+                      <td>
+                        <Link
+                          href={`/admin/comment/${item.product_reviews_id}`}
+                        >
+                          <i
+                            className="fa-solid fa-pen view-icon"
+                            title="Xem chi tiết"
+                          ></i>
+                        </Link>
+                        {item.status === "approved" ? (
+                          <i
+                            className="fa-solid fa-eye-slash delete-icon"
+                            title="Ẩn bình luận"
+                            onClick={() =>
+                              handleToggleStatus(
+                                item.product_reviews_id,
+                                item.status
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          ></i>
+                        ) : (
+                          <i
+                            className="fa-solid fa-eye approve-icon"
+                            title="Hiện bình luận"
+                            onClick={() =>
+                              handleToggleStatus(
+                                item.product_reviews_id,
+                                item.status
+                              )
+                            }
+                            style={{ cursor: "pointer" }}
+                          ></i>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7}>Không có bình luận nào</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            {/* Pagination */}
+            <div className="paginations flex justify-center items-center w-full gap-2">
               <button
-                key={i}
-                className={`page-btn ${page === i + 1 ? "active" : ""}`}
-                onClick={() => setPage(i + 1)}
+                className="page-btn"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
               >
-                {i + 1}
+                <i className="fa-solid fa-angle-left"></i>
               </button>
-            ))}
 
-            <button
-              className="page-btn"
-              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={page === totalPages}
-            >
-              <i className="fa-solid fa-angle-right"></i>
-            </button>
-          </div>
-        </>
-      )}
+              {/* Trang đầu tiên */}
+              <button
+                className={`page-btn ${page === 1 ? "active" : ""}`}
+                onClick={() => setPage(1)}
+              >
+                1
+              </button>
+
+              {/* Ellipsis trước */}
+              {page > 3 && <span className="ellipsis">...</span>}
+
+              {/* Các trang ở giữa (trước, hiện tại, sau) */}
+              {Array.from({ length: 3 }, (_, i) => page - 1 + i)
+                .filter((p) => p > 1 && p < totalPages)
+                .map((p) => (
+                  <button
+                    key={p}
+                    className={`page-btn ${page === p ? "active" : ""}`}
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                ))}
+
+              {/* Ellipsis sau */}
+              {page < totalPages - 2 && <span className="ellipsis">...</span>}
+
+              {/* Trang cuối cùng */}
+              {totalPages > 1 && (
+                <button
+                  className={`page-btn ${page === totalPages ? "active" : ""}`}
+                  onClick={() => setPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              )}
+
+              <button
+                className="page-btn"
+                onClick={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={page === totalPages}
+              >
+                <i className="fa-solid fa-angle-right"></i>
+              </button>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

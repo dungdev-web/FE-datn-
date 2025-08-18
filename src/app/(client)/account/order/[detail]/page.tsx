@@ -220,14 +220,6 @@ export default function OrderDetail() {
           bgColor: "bg-purple-100",
           description: "Đơn hàng đang trên đường giao đến bạn",
         };
-      case "delivered":
-        return {
-          label: "Đã giao hàng",
-          icon: "✅",
-          color: "text-green-600",
-          bgColor: "bg-green-100",
-          description: "Đơn hàng đã được giao thành công",
-        };
       case "completed":
         return {
           label: "Hoàn thành",
@@ -332,10 +324,10 @@ export default function OrderDetail() {
     try {
       setActionLoading(true);
 
-      await updateOrderStatus(orderId, "delivered");
+      await updateOrderStatus(orderId, "completed");
 
       if (order) {
-        setOrder({ ...order, status: "delivered" });
+        setOrder({ ...order, status: "completed" });
       }
 
       Swal.fire({
@@ -469,8 +461,6 @@ export default function OrderDetail() {
           </button>
         );
         break;
-
-      case "delivered":
       case "completed":
         buttons.push(
           <button
@@ -498,18 +488,6 @@ export default function OrderDetail() {
             className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
           >
             Mua lại sản phẩm
-          </button>
-        );
-        break;
-
-      case "returned":
-        buttons.push(
-          <button
-            key="track"
-            onClick={handleTrackOrder}
-            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
-          >
-            Theo dõi hoàn đơn
           </button>
         );
         break;
@@ -928,7 +906,7 @@ export default function OrderDetail() {
             </div>
 
             {/* Gợi ý sản phẩm tương tự cho trạng thái completed */}
-            {(order.status === "completed" || order.status === "delivered") && (
+            {(order.status === "completed") && (
               <div className="mt-6 bg-white rounded shadow !p-6">
                 <h3 className="text-lg font-semibold !mb-4 text-gray-800">
                   💡 Sản phẩm bạn có thể quan tâm

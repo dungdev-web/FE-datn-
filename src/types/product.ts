@@ -12,6 +12,7 @@ export interface IProduct {
   status: number;
   created_at: string;
   updated_at: string;
+  view: number;
   category: {
     categories_id: number;
     name: string;
@@ -91,7 +92,6 @@ export interface IReviewPayload {
   rating: number;
   content: string;
 }
-
 export interface ICompareProduct{
   product_compare_id:number;
   user_id:number;
@@ -148,10 +148,18 @@ export interface GetGendersResponse {
   data: IGender[];
 }
 export interface IProductVariantPayload {
+  product_variants_id?: number; // <-- thêm dòng này
   code_color: string;
   name_color: string;
   size_id: number;
   stock_quantity: number;
+}
+export interface VariantUI {
+  color: string; // "#FF0003|Xanh lá"
+  colorHex: string;
+  sizes: { size_id: number; product_variants_id: number; stock_quantity: number }[];
+  image: File | null;
+  imagePreview?: string;
 }
 
 export interface AddProductPayload {
@@ -180,6 +188,24 @@ export interface UpdateProductResponse {
   name: any;
   product: IProduct;
 }
+interface Variant {
+  color: string;        // "#FF0003|Xanh lá"
+  colorHex: string;     // "#FF0003"
+  sizes: string[];      // ["1","2"]
+  quantity: number;
+  image?: File | null;
+  imagePreview?: string;
+  oldVariantIds?: number[]; // lưu id cũ khi fetch product
+}
+
+interface ProductVariantsPayload {
+  code_color: string;
+  name_color: string;
+  size_id: number;
+  stock_quantity: number;
+  product_variants_id?: number;
+}
+
 export interface GetAllProductReviewParams {
   page?: number;
   limit?: number;

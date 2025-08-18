@@ -13,8 +13,8 @@ import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight, XCircle } from "lucide-react";
 import ProductIcons from "../../component/Products/ProductIcons";
-import SidebarFilter from "../../component/products/SidebarFilter";
-import MobileSidebarFilter from "../../component/products/MobileSidebarFilter";
+import SidebarFilter from "../../component/Products/SidebarFilter";
+import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
 import { API_BASE_URL } from "@/config/env";
 import { getFilteredProducts } from "@/services/productService"; 
 

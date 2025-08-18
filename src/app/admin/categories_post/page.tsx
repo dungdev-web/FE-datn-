@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Category } from "@/types/blog";
 import { getCategory } from "@/services/blogService";
 import { ArrowUpDown } from "lucide-react";
+import Swal from "sweetalert2";
 import { deleteCategoryPost } from "@/services/blogService";
 export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
@@ -23,6 +24,7 @@ export default function Categories() {
     "created_at"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [allCategories, setAllCategories] = useState<Category[]>([]); // chứa toàn bộ danh mục
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -47,11 +49,23 @@ export default function Categories() {
       setLoading(false);
     }
   };
-
+  const fetchAllCategories = async () => {
+    try {
+      const res = await getCategory({
+        page: 1,
+        limit: 1000, // hoặc backend cho phép lấy all thì càng tốt
+      });
+      setAllCategories(res.data);
+    } catch (error) {
+      console.error("Lỗi khi load all categories:", error);
+    }
+  };
   useEffect(() => {
     fetchData();
   }, [page, filterId, filterName, filterActive, searchText, sortBy, sortOrder]);
-
+  useEffect(() => {
+    fetchAllCategories(); // load tất cả danh mục cha 1 lần
+  }, []);
   const handleSort = (field: "name" | "created_at" | "updated_at") => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -60,21 +74,49 @@ export default function Categories() {
       setSortOrder("asc");
     }
   };
+
   const handleDelete = async (id: number) => {
     if (!id || isNaN(id)) {
-      alert("ID danh mục không hợp lệ");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "ID danh mục không hợp lệ",
+      });
       return;
     }
-    if (!confirm("Bạn có chắc muốn xóa danh mục này?")) return;
+
+    const result = await Swal.fire({
+      title: "Bạn có chắc muốn xóa?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await deleteCategoryPost(id);
-      alert("Xóa danh mục thành công");
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Xóa danh mục thành công",
+        timer: 2000,
+        showConfirmButton: false,
+      });
       fetchData(); // load lại danh sách sau khi xóa
     } catch (err) {
-      alert((err as Error).message || "Lỗi khi xóa danh mục");
+      Swal.fire({
+        icon: "error",
+        title: "Thất bại",
+        text: (err as Error).message || "Lỗi khi xóa danh mục",
+      });
     }
   };
+
   return (
     <div className="category-list">
       <h2>Danh sách danh mục bài viết</h2>
@@ -190,7 +232,15 @@ export default function Categories() {
                 <td className="!text-center">{cat.category_post_id}</td>
                 <td>{cat.name}</td>
                 <td>{cat.slug}</td>
-                <td>{cat.parent_id ?? "-"}</td>
+                <td>
+                  {cat.parent_id
+                    ? allCategories.find(
+                        (c) =>
+                          Number(c.category_post_id) === Number(cat.parent_id)
+                      )?.name || "Không xác định"
+                    : "Không có danh mục cha"}
+                </td>
+
                 <td>
                   {cat.created_at
                     ? new Date(cat.created_at).toLocaleDateString("vi-VN")
@@ -201,18 +251,18 @@ export default function Categories() {
                     ? new Date(cat.updated_at).toLocaleDateString("vi-VN")
                     : "-"}
                 </td>
-                <td>
+                <td className="flex">
                   <Link
                     href={`/admin/categories_post/${cat.category_post_id}`}
                     className="btn btn-edit"
                   >
-                    <i className="fa-solid fa-pen-to-square"></i> Sửa
+                    <i className="fa-solid fa-pen-to-square"></i>
                   </Link>
                   <button
                     className="btn btn-delete"
                     onClick={() => handleDelete(cat.category_post_id)}
                   >
-                    <i className="fa-solid fa-trash"></i> 
+                    <i className="fa-solid fa-trash"></i>
                   </button>
                 </td>
               </tr>

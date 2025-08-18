@@ -1,11 +1,11 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import {
-  GetAllProductReviewParams,
   IProduct,
   IReview,
   IReviewPayload,
   GetProductsDashboardParams,
   GetProductsDashboardResponse,
+  GetAllProductReviewParams,
   GetSizesResponse,
   ISize,
   GetGendersResponse,
@@ -723,33 +723,41 @@ export async function getAllProductReview({
     throw error;
   }
 }
-export async function getByIdReview(product_reviews_id:number) {
+export async function getByIdReview(product_reviews_id: number) {
   try {
-    const res = await fetch(`${API_BASE_URL}/product/all/reviews/${product_reviews_id}`);
+    const res = await fetch(
+      `${API_BASE_URL}/product/all/reviews/${product_reviews_id}`
+    );
     if (!res.ok) {
       throw new Error(`Lỗi API: ${res.status}`);
-      }
-      return await res.json();
-      } catch (error) {
-        console.error("Lỗi khi gọi API getByIdReview:", error);
-        throw error;
-        }
-
-  
+    }
+    return await res.json();
+  } catch (error) {
+    console.error("Lỗi khi gọi API getByIdReview:", error);
+    throw error;
+  }
 }
-export async function setStatusReview(product_reviews_id: number, status: string) {
+export async function setStatusReview(
+  product_reviews_id: number,
+  status: string
+) {
   try {
-    const res = await fetch(`${API_BASE_URL}/product/reviews/status/${product_reviews_id}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ status }),
-    });
+    const res = await fetch(
+      `${API_BASE_URL}/product/reviews/status/${product_reviews_id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      }
+    );
 
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.error || "Lỗi khi cập nhật trạng thái đánh giá");
+      throw new Error(
+        errorData.error || "Lỗi khi cập nhật trạng thái đánh giá"
+      );
     }
 
     return await res.json();
@@ -922,71 +930,20 @@ export async function getProductAdminById(id: number): Promise<GetProductByIdRes
     data: json as IProduct,
   };
 }
-export async function updateAdminProduct(
-  productId: number,
-  payload: AddProductPayload
-): Promise<UpdateProductResponse> {
-  const formData = new FormData();
 
-  // 1. Các field text/number thông thường
-  const basicFields: Record<string, any> = {
-    name: payload.name,
-    description: payload.description,
-    short_desc: payload.short_desc,
-    price: payload.price,
-    sale_price: payload.sale_price,
-    categories_id: payload.categories_id,
-    brand_id: payload.brand_id,
-    gender_id: payload.gender_id,
-    status: payload.status,
-  };
-
-  Object.entries(basicFields).forEach(([key, value]) => {
-    formData.append(key, value != null ? value.toString() : "");
+export async function deleteAdminProduct(
+  productId: number
+): Promise<IProduct> {
+  const res = await fetch(`${API_BASE_URL}/product/delete/${productId}`, {
+    method: "DELETE",
   });
-
-  // 2. Ảnh chính (nhiều ảnh)
-  payload.images.forEach((file) => {
-    if (file instanceof File) {
-      formData.append("images", file);
-    }
-  });
-
-  // 3. Ảnh variant (mới và cũ)
-  Object.entries(payload.variantImages).forEach(([code, file]) => {
-    if (file instanceof File) {
-      formData.append(`variant_image_${code}`, file); // ảnh mới
-    } else if (typeof file === "string" && file.trim() !== "") {
-      formData.append(`variant_image_old_${code}`, file); // ảnh cũ
-    }
-  });
-
-  // 4. Thêm product_variants JSON
-  formData.append(
-    "product_variants",
-    JSON.stringify(payload.product_variants)
-  );
-
-  // 5. Gửi request
-  const res = await fetch(
-    `${API_BASE_URL}/product/update-product/${productId}`,
-    {
-      method: "PUT",
-      body: formData,
-    }
-  );
 
   if (!res.ok) {
-    let errMsg = "Cập nhật sản phẩm thất bại";
-    try {
-      const err = await res.json();
-      errMsg = err.error || errMsg;
-    } catch {
-      // giữ nguyên errMsg mặc định
-    }
-    throw new Error(errMsg);
+    const err = await res.json();
+    throw new Error(err.error || "Xóa sản phẩm thất bại");
   }
 
-  return (await res.json()) as UpdateProductResponse;
+  const json = await res.json();
+  return json as IProduct;
 }
 

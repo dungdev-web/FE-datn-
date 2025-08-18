@@ -1,8 +1,5 @@
 "use client";
 import "../css/css.css";
-import { Settings } from "@mui/icons-material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import ScrollingNotification from "./ThongBao_dashboard";
 import { useState, useEffect, useRef } from "react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { logoutUser as apiLogoutUser } from "@/services/authService";

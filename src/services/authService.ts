@@ -378,12 +378,22 @@ export async function getAllUsersV2({
   email,
   user_id,
   phone,
+  search,
 }: Partial<InterfaceUser> & {
   page?: number;
   limit?: number;
   sortField?: string;
   sortDirection?: string;
-} = {}): Promise<InterfaceUser[]> {
+  search?: string;
+} = {}): Promise<{
+  data: {
+    users: InterfaceUser[];
+    total: number;
+    currentPage: number;
+    totalPages: number;
+    limit: number;
+  };
+}> {
   try {
     const params = new URLSearchParams({
       page: String(page),
@@ -398,6 +408,7 @@ export async function getAllUsersV2({
     if (email) params.append("email", email);
     if (user_id !== undefined) params.append("user_id", String(user_id));
     if (phone) params.append("phone", phone);
+    if (search) params.append("search", search);
 
     const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
 
@@ -405,10 +416,9 @@ export async function getAllUsersV2({
       throw new Error(`Lỗi server: ${res.status}`);
     }
 
-    const { data } = await res.json();
+    const response = await res.json();
 
-    // Map dữ liệu về đúng InterfaceUser
-    return data.users.map((u: any) => ({
+    const mappedUsers = response.data.users.map((u: any) => ({
       ship_address_id: String(u.ship_address_id ?? ""),
       user_id: Number(u.user_id ?? 0),
       name: u.name ?? "",
@@ -422,6 +432,16 @@ export async function getAllUsersV2({
       created_at: u.created_at ?? "",
       updated_at: u.updated_at ?? "",
     })) as InterfaceUser[];
+
+    return {
+      data: {
+        users: mappedUsers,
+        total: response.data.total || 0,
+        currentPage: response.data.currentPage || page,
+        totalPages: response.data.totalPages || 1,
+        limit: response.data.limit || limit,
+      },
+    };
   } catch (error) {
     console.error("Lỗi khi fetch danh sách người dùng (V2):", error);
     throw error;

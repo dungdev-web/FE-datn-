@@ -16,7 +16,7 @@ import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import SearchWithSuggestions from "./SearchWithSuggestions";
-import Search from "./showsearch";
+import Search from "./ShowSearch";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);

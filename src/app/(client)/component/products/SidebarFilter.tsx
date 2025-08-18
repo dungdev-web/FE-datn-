@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 import { getFilteredProducts } from "@/services/productService";
-import { Label } from "@mui/icons-material";
 
 interface Props {
   categories: ICategory[];

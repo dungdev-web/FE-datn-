@@ -12,13 +12,12 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-
 import ProductIcons from "./Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "./products/SidebarFilter";
-import MobileSidebarFilter from "./products/MobileSidebarFilter";
+import SidebarFilter from "./Products/SidebarFilter";
+import MobileSidebarFilter from "./Products/MobileSidebarFilter";
 
 export default function Product() {
   const params = useParams();
@@ -375,10 +374,9 @@ export default function Product() {
                                 {Array.isArray(sp.product_variants) &&
                                   [
                                     ...new Map(
-                                      sp.product_variants.map((v) => [
-                                        v.color.id,
-                                        v.color,
-                                      ])
+                                      sp.product_variants
+                                        .filter((v) => v.color) // chỉ lấy những variant có color
+                                        .map((v) => [v.color.id, v.color])
                                     ).values(),
                                   ].map((color) => (
                                     <span
@@ -593,10 +591,9 @@ export default function Product() {
                                   {Array.isArray(sp.product_variants) &&
                                     [
                                       ...new Map(
-                                        sp.product_variants.map((v) => [
-                                          v.color.id,
-                                          v.color,
-                                        ])
+                                        sp.product_variants
+                                          .filter((v) => v.color) // chỉ lấy những variant có color
+                                          .map((v) => [v.color.id, v.color])
                                       ).values(),
                                     ].map((color) => (
                                       <span
