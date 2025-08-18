@@ -157,15 +157,6 @@ export default function Add_pro() {
       return;
     }
 
-    if (!brand_id) {
-      Swal.fire(
-        "Thiếu nhãn hiệu",
-        "Vui lòng chọn nhãn hiệu cho sản phẩm.",
-        "warning"
-      );
-      return;
-    }
-
     if (!gender_id) {
       Swal.fire(
         "Thiếu thông tin",

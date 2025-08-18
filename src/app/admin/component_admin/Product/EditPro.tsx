@@ -410,12 +410,6 @@ export default function Add_pro() {
       Swal.fire("Thiếu danh mục", "Vui lòng chọn danh mục.", "warning");
       return;
     }
-
-    if (!selectedBrand) {
-      Swal.fire("Thiếu nhãn hiệu", "Vui lòng chọn nhãn hiệu.", "warning");
-      return;
-    }
-
     if (!selectedGender) {
       Swal.fire("Thiếu thông tin", "Vui lòng chọn giới tính.", "warning");
       return;

@@ -218,7 +218,7 @@ export default function Cart() {
               </div>
             </div>
 
-            {cart.cart_items.map((item: ICartItem) => {
+            {(cart?.cart_items ?? []).map((item: ICartItem) => {
               const price =
                 item.variant?.product?.sale_price ??
                 item.variant?.product?.price ??

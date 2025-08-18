@@ -125,26 +125,53 @@ export const useCart = () => {
     }
   };
 
-  const handleChangeQuantity = (
-    itemId: number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const num = parseInt(e.target.value, 10);
-    if (!isNaN(num) && num >= 1 && num <= 999) {
-      handleUpdateQuantity(itemId, num);
-    }
-  };
-
   const handlePlus = (itemId: number) => {
     const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
     if (!item) return;
+
+    const maxStock = item.variant?.stock_quantity ?? 0;
+
+    if (item.quantity >= maxStock) {
+      Swal.fire({
+        icon: "warning",
+        title: "Số lượng không đủ",
+        text: `Chỉ còn ${maxStock} sản phẩm trong kho.`,
+      });
+      return;
+    }
+
     handleUpdateQuantity(itemId, Math.min(999, item.quantity + 1));
   };
 
   const handleMinus = (itemId: number) => {
     const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
     if (!item) return;
+
     handleUpdateQuantity(itemId, Math.max(1, item.quantity - 1));
+  };
+
+  const handleChangeQuantity = (
+    itemId: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const num = parseInt(e.target.value, 10);
+    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
+    if (!item || isNaN(num)) return;
+
+    const maxStock = item.variant?.stock_quantity ?? 0;
+
+    if (num > maxStock) {
+      Swal.fire({
+        icon: "warning",
+        title: "Số lượng không đủ",
+        text: `Chỉ còn ${maxStock} sản phẩm trong kho.`,
+      });
+      return;
+    }
+
+    if (num >= 1 && num <= 999) {
+      handleUpdateQuantity(itemId, num);
+    }
   };
 
   useEffect(() => {

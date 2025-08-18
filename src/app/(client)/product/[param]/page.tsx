@@ -66,6 +66,29 @@ export default function Detail() {
       return;
     }
 
+    // ✅ Kiểm tra số lượng tồn kho trước khi thêm giỏ hàng
+    const selectedVariant = product.product_variants.find(
+      (v) => v.product_variants_id === variantId
+    );
+
+    if (!selectedVariant) {
+      Swal.fire({
+        icon: "error",
+        title: "Không tìm thấy biến thể",
+        text: "Vui lòng chọn lại sản phẩm.",
+      });
+      return;
+    }
+
+    if (quantity > selectedVariant.stock_quantity) {
+      Swal.fire({
+        icon: "warning",
+        title: "Số lượng không đủ",
+        text: `Chỉ còn ${selectedVariant.stock_quantity} sản phẩm trong kho.`,
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -100,7 +123,7 @@ export default function Detail() {
         showConfirmButton: false,
         timer: 1500,
       });
-      window.location.href = "/cart"; // reload cứng nếu không dùng router.refresh
+      window.location.href = "/cart"; // reload cứng
     } catch (error) {
       console.error("Lỗi khi thêm vào giỏ hàng:", error);
       Swal.fire({
@@ -541,45 +564,74 @@ export default function Detail() {
                                 .map((v) => [v.color.code_color, v.color])
                             ).values(),
                           ].map((color) => {
+                            // Tìm tất cả variant của màu này
+                            const colorVariants =
+                              product.product_variants.filter(
+                                (v) => v.color?.id === color.id
+                              );
+                            // Check xem có variant nào còn hàng không
+                            const isOutOfStock = colorVariants.every(
+                              (v) => v.stock_quantity <= 0
+                            );
+
                             return (
                               <div
                                 key={color.id}
-                                className="color-circle"
-                                onClick={() => {
-                                  setSelectedColorId(color.id);
-                                  setSelectedSizeId(null);
-
-                                  // Tìm variant theo màu đã chọn
-                                  const matchedVariant =
-                                    product.product_variants.find(
-                                      (v) => v.color?.id === color.id
-                                    );
-
-                                  // Ưu tiên ảnh theo màu, nếu không có thì fallback ảnh phụ
-                                  const imageUrl =
-                                    matchedVariant?.color?.images ||
-                                    product.images?.find(
-                                      (img) => img.type === "side"
-                                    )?.url ||
-                                    "logo/1.png";
-
-                                  setSelectedImage(
-                                    `${API_BASE_URL}/uploads/${imageUrl}`
-                                  );
-                                }}
+                                className="relative"
                                 style={{
-                                  backgroundColor: color.code_color,
-                                  width: 24,
-                                  height: 24,
-                                  borderRadius: "50%",
-                                  border:
-                                    selectedColorId === color.id
-                                      ? "2px solid #facc15"
-                                      : "1px solid #ccc",
-                                  cursor: "pointer",
+                                  display: "inline-block",
+                                  marginRight: 8,
                                 }}
-                                title={color.name_color}
-                              ></div>
+                              >
+                                <div
+                                  className="color-circle"
+                                  onClick={() => {
+                                    if (isOutOfStock) return; // ❌ Không cho click nếu hết hàng
+                                    setSelectedColorId(color.id);
+                                    setSelectedSizeId(null);
+
+                                    const matchedVariant =
+                                      product.product_variants.find(
+                                        (v) => v.color?.id === color.id
+                                      );
+                                    const imageUrl =
+                                      matchedVariant?.color?.images ||
+                                      product.images?.find(
+                                        (img) => img.type === "side"
+                                      )?.url ||
+                                      "logo/1.png";
+                                    setSelectedImage(
+                                      `${API_BASE_URL}/uploads/${imageUrl}`
+                                    );
+                                  }}
+                                  style={{
+                                    backgroundColor: color.code_color,
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: "50%",
+                                    border:
+                                      selectedColorId === color.id
+                                        ? "2px solid #facc15"
+                                        : "1px solid #ccc",
+                                    cursor: isOutOfStock
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    opacity: isOutOfStock ? 0.4 : 1,
+                                  }}
+                                  title={color.name_color}
+                                ></div>
+
+                                {isOutOfStock && (
+                                  <span
+                                    className="absolute top-1/2 left-1/2 text-red-600 text-lg font-bold"
+                                    style={{
+                                      transform: "translate(-50%, -50%)",
+                                    }}
+                                  >
+                                    ×
+                                  </span>
+                                )}
+                              </div>
                             );
                           })}
                         </div>
@@ -605,25 +657,50 @@ export default function Detail() {
                                 Number(a.size.number_size) -
                                 Number(b.size.number_size)
                             )
-                            .map((variant) => (
-                              <button
-                                key={variant.size.id}
-                                className="size-button"
-                                style={{
-                                  padding: "8px 12px",
-                                  marginRight: "5px",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "4px",
-                                  background: "#fff",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => {
-                                  setSelectedSizeId(variant.size.id);
-                                }}
-                              >
-                                {variant.size.number_size}
-                              </button>
-                            ))}
+                            .map((variant) => {
+                              const isOutOfStock = variant.stock_quantity <= 0;
+                              return (
+                                <button
+                                  key={variant.size.id}
+                                  className="size-button"
+                                  disabled={isOutOfStock}
+                                  style={{
+                                    padding: "8px 12px",
+                                    marginRight: "5px",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
+                                    background: isOutOfStock
+                                      ? "#f3f4f6"
+                                      : "#fff",
+                                    color: isOutOfStock ? "#999" : "#000",
+                                    cursor: isOutOfStock
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    position: "relative",
+                                  }}
+                                  onClick={() => {
+                                    if (isOutOfStock) return;
+                                    setSelectedSizeId(variant.size.id);
+                                  }}
+                                >
+                                  {variant.size.number_size}
+                                  {isOutOfStock && (
+                                    <span
+                                      style={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        color: "red",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      ×
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
                         </div>
                       </div>
 
