@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getIdCategoryPost } from "@/services/blogService";
 import { useUpdateCategoryPost, useCategories } from "@/hooks/useBlog";
 import { Category } from "@/types/blog";
+import Swal from "sweetalert2";
 export default function CategoryEdit() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -17,7 +18,7 @@ export default function CategoryEdit() {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
-  } = useCategories();
+  } = useCategories({ page: 1, limit: 1000 });
   const params = useParams();
   const category_post_id = Number(params.id);
   const generateSlug = (text: string) => {
@@ -43,18 +44,25 @@ export default function CategoryEdit() {
     }
 
     try {
-      const updatedCategory = await updateCategoriesPost(
-        category_post_id,
-        {
-          name: name.trim(),
-          slug: slug.trim() || generateSlug(name),
-          parent_id: parentId,
-        }
-      );
+      const updatedCategory = await updateCategoriesPost(category_post_id, {
+        name: name.trim(),
+        slug: slug.trim() || generateSlug(name),
+        parent_id: parentId,
+      });
 
-      alert(`Cập nhật danh mục thành công: ${updatedCategory.name}`);
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: `Danh mục đã được cập nhật thành công!`,
+        confirmButtonText: "OK",
+      });
     } catch (err) {
-      alert((err as Error).message || "Lỗi cập nhật danh mục");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Không thể cập nhật danh mục. Vui lòng thử lại!",
+        confirmButtonText: "Đóng",
+      });
     }
   };
 
@@ -184,7 +192,7 @@ export default function CategoryEdit() {
             {loading ? "Đang tạo..." : "Sửa"}
           </button>
           <Link
-            href={"/admin/categories"}
+            href={"/admin/categories_post"}
             className="btn btn-back"
             type="button"
           >

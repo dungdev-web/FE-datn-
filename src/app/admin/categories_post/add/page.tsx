@@ -2,8 +2,11 @@
 import { useState } from "react";
 import "@/app/admin/css/categories_add_admin.css";
 import Link from "next/link";
+import Swal from "sweetalert2";
 import { useAddCategoryPost, useCategories } from "@/hooks/useBlog";
+import { useRouter } from "next/navigation";
 export default function CategoryAdd() {
+  const router = useRouter(); 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [parentId, setParentId] = useState<number | null>(null);
@@ -13,16 +16,16 @@ export default function CategoryAdd() {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
-  } = useCategories();
+  } = useCategories({ page: 1, limit: 1000 });
 
   const generateSlug = (text: string) => {
     return text
       .toLowerCase()
-      .normalize("NFD") 
-      .replace(/[\u0300-\u036f]/g, "") 
-      .replace(/[^a-z0-9\s-]/g, "") 
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
       .trim()
-      .replace(/\s+/g, "-"); 
+      .replace(/\s+/g, "-");
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,8 +35,13 @@ export default function CategoryAdd() {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      alert("Tên danh mục không được để trống");
+     if (!name.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu thông tin",
+        text: "Tên danh mục không được để trống!",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
@@ -41,14 +49,25 @@ export default function CategoryAdd() {
       const newCategory = await addCategoriesPost({
         name: name.trim(),
         slug: slug.trim() || generateSlug(name),
-        parent_id: parentId, 
+        parent_id: parentId,
       });
-      alert(`Tạo danh mục thành công: ${newCategory.name}`);
-      // Reset form nếu cần
       setName("");
       setSlug("");
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Danh mục đã được thêm thành công!",
+        confirmButtonText: "OK",
+      }).then(() => {
+        router.push("/admin/categories_post"); 
+      });
     } catch (err) {
-      alert((err as Error).message || "Lỗi tạo danh mục");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Không thể thêm danh mục. Vui lòng thử lại!",
+        confirmButtonText: "Đóng",
+      });
     }
   };
   return (
@@ -89,7 +108,10 @@ export default function CategoryAdd() {
               >
                 <option value="">-- Không có danh mục cha --</option>
                 {categories?.data.map((cat) => (
-                  <option key={cat.category_post_id} value={cat.category_post_id}>
+                  <option
+                    key={cat.category_post_id}
+                    value={cat.category_post_id}
+                  >
                     {cat.name}
                   </option>
                 ))}
@@ -137,7 +159,7 @@ export default function CategoryAdd() {
             {loading ? "Đang tạo..." : "Thêm"}
           </button>
           <Link
-            href={"/admin/categories"}
+            href={"/admin/categories_post"}
             className="btn btn-back"
             type="button"
           >

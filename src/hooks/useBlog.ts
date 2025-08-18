@@ -8,13 +8,16 @@ import {
   updateCategoryPost,
 } from "@/services/blogService";
 
-export function useCategories() {
+export function useCategories(params?: { page?: number; limit?: number }) {
   const [categories, setCategories] = useState<CategoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    getCategory()
+    getCategory({
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 1000, 
+    })
       .then((res: CategoryResponse) => {
         setCategories(res);
         setLoading(false);
@@ -23,7 +26,7 @@ export function useCategories() {
         setError("Lỗi khi tải danh mục");
         setLoading(false);
       });
-  }, []);
+  }, [params?.page, params?.limit]);
 
   return { categories, loading, error };
 }

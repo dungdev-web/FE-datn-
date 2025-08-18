@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
 import { ArrowUpDown } from "lucide-react";
 import { ICategory } from "@/types/ICategory";
+import { API_BASE_URL } from "@/config/env";
 
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -222,7 +223,7 @@ export default function OrderPage() {
         <table className="order-table">
           <thead>
             <tr>
-              <th>Mã đơn hàng</th>
+              <th>Đơn hàng</th>
               <th>
                 Người nhận{" "}
                 <ArrowUpDown
@@ -253,7 +254,7 @@ export default function OrderPage() {
             </tr>
             <tr className="filter-row">
               <th>
-                <input type="text" placeholder="Lọc mã đơn..." />
+                <input type="text" placeholder="Lọc đơn..." />
               </th>
               <th>
                 <input
@@ -303,11 +304,11 @@ export default function OrderPage() {
           <tbody>
             {orders.map((order: any) => (
               <tr key={order.orders_id}>
-                <td>{order.orders_id}</td>
+                <td>#{order.orders_id}</td>
                 <td>{order.user?.name}</td>
                 <td>
-                  {order.user?.phone
-                    ? order.user?.phone
+                  {order.shipping_address?.phone
+                    ? order?.shipping_address?.phone
                     : "Không có số điện thoại"}
                 </td>
                 <td>
@@ -386,7 +387,20 @@ export default function OrderPage() {
               <ul className="order-detail-list">
                 <li>
                   <strong>Mã đơn hàng:</strong>{" "}
-                  <span>{selectedOrder?.orders_id}</span>
+                  <span>
+                    TERA
+                    {selectedOrder?.created_at
+                      ? String(
+                          new Date(selectedOrder.created_at).getDate()
+                        ).padStart(2, "0")
+                      : ""}
+                    {selectedOrder?.created_at
+                      ? String(
+                          new Date(selectedOrder.created_at).getMonth() + 1
+                        ).padStart(2, "0")
+                      : ""}
+                    {selectedOrder?.orders_id ?? ""}
+                  </span>
                 </li>
                 <li>
                   <strong>Người nhận:</strong>{" "}
@@ -419,13 +433,19 @@ export default function OrderPage() {
                           {item.variant.color?.name_color}
                         </span>
                       </div>
-
-                      <div className="text-sm text-gray-700 ">
-                        <strong>Số lượng - Giá: </strong>
-                        <span>{item.quantity}</span> -{" "}
-                        <span className="text-red-600 font-medium">
-                          {item.unit_price.toLocaleString("vi")} VNĐ
-                        </span>
+                      <div className="!mb-2 flex items-center justify-between">
+                        <div className="text-sm text-gray-700 ">
+                          <strong>Số lượng - Giá: </strong>
+                          <span>{item.quantity}</span> -{" "}
+                          <span className="text-red-600 font-medium">
+                            {item.unit_price.toLocaleString("vi")} VNĐ
+                          </span>
+                        </div>
+                        <img
+                          src={`${API_BASE_URL}/uploads/${item.variant.color.images}`}
+                          alt={`${item.variant?.product?.name}`}
+                          className="w-[15%]"
+                        />
                       </div>
                     </li>
                   );
