@@ -16,12 +16,13 @@ import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
 import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
 import Swal from "sweetalert2";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 export default function OrderDetail() {
   const params = useParams();
   const router = useRouter();
   const orderId = Number(params.detail);
-
+  const { handleAddToCart } = useAddToCart();
   const [order, setOrder] = useState<IOrder | null>(null);
   const [address, setAddress] = useState<AddressResponse | null>(null);
   const [user, setUser] = useState<IUser | null>(null);
@@ -358,9 +359,80 @@ export default function OrderDetail() {
     router.push(`/account/order/review/${orderId}`);
   };
 
-  const handleBuyAgain = () => {
-    // Logic để thêm lại tất cả sản phẩm vào giỏ hàng
-    window.location.href = "/cart"; // reload cứng
+  const handleBuyAgain = async () => {
+    if (!order?.order_items || order.order_items.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Không có sản phẩm",
+        text: "Đơn hàng này không có sản phẩm nào để mua lại.",
+      });
+      return;
+    }
+
+    try {
+      for (const item of order.order_items) {
+        const variantId = item.variant_id || item.variant?.id;
+        const stock = item.variant?.stock_quantity ?? 0;
+        const requestedQty = item.quantity;
+        const productName = getProductName(item);
+
+        if (stock <= 0) {
+          // Hết hàng
+          await Swal.fire({
+            icon: "warning",
+            title: "Hết hàng",
+            text: `${productName} hiện đã hết hàng.`,
+          });
+          continue;
+        }
+
+        if (stock < requestedQty) {
+          // Còn ít hơn số lượng muốn mua
+          const result = await Swal.fire({
+            icon: "warning",
+            title: "Số lượng không đủ",
+            text: `${productName} chỉ còn ${stock} sản phẩm. Bạn có muốn thêm vào giỏ hàng không?`,
+            showCancelButton: true,
+            confirmButtonText: "Đồng ý",
+            cancelButtonText: "Hủy",
+          });
+
+          if (!result.isConfirmed) {
+            continue; // bỏ qua sản phẩm này
+          }
+
+          // Nếu đồng ý → thêm số lượng còn lại
+          await handleAddToCart({
+            variant_id: variantId,
+            quantity: stock,
+            price: item.price,
+          });
+        } else {
+          // Số lượng đủ → thêm như bình thường
+          await handleAddToCart({
+            variant_id: variantId,
+            quantity: requestedQty,
+            price: item.price,
+          });
+        }
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã thêm sản phẩm vào giỏ hàng!",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        router.push("/cart");
+      });
+    } catch (error) {
+      console.error("Lỗi khi mua lại:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!",
+      });
+    }
   };
 
   const handleContactStore = () => {
