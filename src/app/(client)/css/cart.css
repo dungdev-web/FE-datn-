@@ -317,7 +317,7 @@
     }
 }
 
-.coupon-section {
+.coupon-section1 {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
@@ -327,7 +327,7 @@
     padding: 10px 0;
 }
 
-.coupon {
+.coupon1 {
     display: flex;
     align-items: stretch;
     border: 2px dashed #ccc;
@@ -341,7 +341,7 @@
     transition: all 0.3s ease;
 }
 
-.coupon:hover {
+.coupon1:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: translateY(-2px);
 }

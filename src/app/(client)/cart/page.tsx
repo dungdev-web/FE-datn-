@@ -348,7 +348,7 @@ export default function Cart() {
 
                 {isOpen && (
                   <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg mt-2 shadow-lg max-h-80 overflow-auto">
-                    <div className="coupon-section">
+                    <div className="coupon-section1">
                       {/* --- Mã đã lưu --- */}
                       {savedCoupons.length > 0 &&
                         savedCoupons.map((coupon) => (
@@ -359,7 +359,7 @@ export default function Cart() {
                               applyCoupon(coupon.code);
                               setIsOpen(false);
                             }}
-                            className={`coupon cursor-pointer flex gap-2 p-2 hover:bg-gray-100 transition ${
+                            className={`coupon1 cursor-pointer flex gap-2 p-2 hover:bg-gray-100 transition ${
                               couponInput === coupon.code ? "bg-green-100" : ""
                             }`}
                           >
@@ -415,7 +415,7 @@ export default function Cart() {
                         .map((coupon) => (
                           <div
                             key={coupon.code}
-                            className="coupon flex gap-2 p-2 bg-gray-100 text-gray-400 cursor-not-allowed"
+                            className="coupon1 flex gap-2 p-2 bg-gray-100 text-gray-400 cursor-not-allowed"
                           >
                             <div className="right-part font-bold text-xs text-gray-500">
                               PHIẾU GỢI Ý
