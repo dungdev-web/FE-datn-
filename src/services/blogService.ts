@@ -306,3 +306,23 @@ export async function deleteCategoryPost(category_post_id:number)
     throw error;
   }
 }
+//tăng view cho blog
+export async function updateViewPost(post_id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/${post_id}/view`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Lỗi khi cập nhật lượt xem");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("updateViewPost error:", error);
+    throw error;
+  }
+}

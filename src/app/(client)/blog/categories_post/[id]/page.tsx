@@ -5,7 +5,6 @@ import "../../../css/product.css";
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { API_BASE_URL } from "@/config/env";
-import { getLocalViews, increaseLocalViews } from "@/shared/until/viewTracker";
 import Link from "next/link";
 import AsideBlog from "@/app/(client)/component/Blog/AsideBlog";
 import { usePostsByCategory } from "@/hooks/useBlog";
@@ -73,10 +72,9 @@ export default function Blog() {
                     : item.content;
 
                 const safeHTML = shortContent;
-                const localViews = getLocalViews(item.post_id);
+                const localViews = (item.view);
 
                 const handleViewDetail = () => {
-                  increaseLocalViews(item.post_id);
                   window.location.href = `/blog/${item.post_id}`;
                 };
 
