@@ -1,4 +1,4 @@
-import { useCategories, usePostsByCategory } from "@/hooks/useBlog";
+import { useCategories, useFeaturedPosts, usePostsByCategory } from "@/hooks/useBlog";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -18,9 +18,7 @@ export default function AsideBlog() {
   const [openParentId, setOpenParentId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { posts, loading: postLoading } = usePostsByCategory(2);
-  console.log(selectedCategoryId);
-
+  const { posts, loading: postLoading } = useFeaturedPosts();  
   // Set danh mục mặc định khi có data
   useEffect(() => {
     // console.log("Categories từ hook:", categories);
@@ -141,7 +139,7 @@ export default function AsideBlog() {
           ) : posts.length === 0 ? (
             <p>Không có bài viết.</p>
           ) : (
-            posts.slice(0, 4).map((post) => (
+            posts.slice(0, 5).map((post) => (
               <div className="box-relate-blog" key={post.post_id}>
                 <Link href={`/blog/${post.post_id}`}>
                   <div
@@ -185,7 +183,7 @@ export default function AsideBlog() {
           ) : posts.length === 0 ? (
             <p>Không có bài viết.</p>
           ) : (
-            posts.slice(0, 4).map((post) => (
+            posts.slice(0, 5).map((post) => (
               <div className="box-relate-blog" key={post.post_id}>
                 <Link href={`/blog/${post.post_id}`}>
                   <div
