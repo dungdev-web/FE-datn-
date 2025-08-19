@@ -3,7 +3,7 @@ import "../css/login.css";
 import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Loader from "../component/Loader";
 import { Eye, EyeOff } from "lucide-react";
 import { validateField } from "@/hooks/useValidateLoginRegister";
@@ -23,7 +23,8 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
   const { user } = useAuthUser();
-
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
@@ -71,7 +72,7 @@ export default function Login() {
       if (res?.user?.role === "admin") {
         window.location.href = "/admin";
       } else {
-        window.location.href = "/account";
+        window.location.href = redirect || "/account";
       }
     } catch (err: any) {
       setShowLoader(false);
