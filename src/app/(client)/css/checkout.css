@@ -1,4 +1,3 @@
-
 .checkout-container {
     display: flex;
     max-width: 1280px;
@@ -7,7 +6,14 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin: 170px auto;
+    margin-top: 170px;
+    /* Giữ nguyên khoảng cách từ đầu trang */
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        margin-top: 40px;
+    }
 }
 
 .checkout-left,
@@ -28,7 +34,7 @@
 
 h3 {
     color: black;
-    padding-bottom:10px;
+    padding-bottom: 10px;
 }
 
 .checkout-right input,
@@ -57,7 +63,7 @@ textarea {
     height: 100px;
 }
 
-.checkout-right button {
+.checkout-right .button {
     background-color: #021688;
     color: white;
     border: none;
@@ -70,7 +76,25 @@ textarea {
 
 }
 
-.checkout-right button:hover {
+.checkout-right .button:hover {
+    background-color: #021371;
+}
+
+.checkout-right .button {
+    background-color: #021688;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+
+}
+
+
+.checkout-right .button:hover {
     background-color: #021371;
 }
 
@@ -78,11 +102,14 @@ textarea {
     display: flex;
     align-items: center;
     gap: 10px;
-   
+
 }
-.items{
-    border-top: 1px solid #cecdcd;  /* Ẩn viền trái */
-    border-bottom: 1px solid #cecdcd; /* Ẩn viền phải */
+
+.items {
+    border-top: 1px solid #cecdcd;
+    /* Ẩn viền trái */
+    border-bottom: 1px solid #cecdcd;
+    /* Ẩn viền phải */
     overflow-y: auto;
     max-height: calc(100vh - 480px);
 }
@@ -93,6 +120,15 @@ textarea {
     object-fit: cover;
 }
 
+.zalo {
+    border-radius: 70px;
+    margin-top: 10px;
+}
+
+.momo {
+    border-radius: 40px;
+    margin-top: 10px;
+}
 
 .boc1 {
     display: flex;
@@ -103,23 +139,28 @@ textarea {
     padding: 20px;
     box-sizing: border-box;
 }
+
 .boc1 label {
     width: 100%;
 }
-.discound{
-    display:flex;
-    gap:5px;
-    padding:10px 0;
+
+.discound {
+    display: flex;
+    gap: 5px;
+    padding: 10px 0;
     border-bottom: 1px solid #cecdcd;
 }
-.discound button{
-    width:30%;
+
+.discound .button {
+    width: 30% !important;
 }
+
 .tinhtien .tamtinh {
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
 }
+
 .checkout-left a {
     color: #2a9dcc;
     text-decoration: none;
@@ -136,6 +177,7 @@ textarea {
     border: 1px solid transparent;
     border-radius: .25rem;
 }
+
 #toTopBtn {
     position: fixed;
     bottom: 20px;
@@ -180,21 +222,201 @@ textarea {
     opacity: 1;
     visibility: visible;
 }
-.boc1 .input-radio:checked{
-    background: #337ab7 ;
-    border:none;
+
+.boc1 .input-radio:checked {
+    background: #337ab7;
+    border: none;
     border-radius: 50%;
 
-    cursor:pointer;
+    cursor: pointer;
 }
-@media (max-width: 768px) {
- .checkout-container{
-    margin: 30px auto;
-  }
-  .checkout-left, .checkout-right, .checkout-extra{
-    padding: 0PX;
-  }
+.discount-section h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
 
+.coupon-dropdown {
+  position: relative;
+  width: 100%;
+}
 
+.select-coupon {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 2px solid #22c55e;
+  border-radius: 6px;
+  background-color: #f9fefb;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
 
+.select-coupon::after {
+  content: "▼";
+  margin-left: auto;
+  transition: transform 0.3s;
+}
+
+.coupon-dropdown.open .select-coupon::after {
+  transform: rotate(180deg);
+}
+
+/* --- Coupon Section --- */
+.coupon-section1 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid #22c55e;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* --- Coupon Item --- */
+.coupon1 {
+  display: flex;
+  background: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.coupon1:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.left-part {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.right-part {
+  width: 20%;
+  background: #4bd963;
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 5px;
+  letter-spacing: 2px;
+}
+
+.code {
+  font-weight: bold;
+  font-size: 14px;
+  color: #ff0000;
+  margin-bottom: 4px;
+}
+
+.discount-box {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 6px;
+  margin-bottom: 4px;
+}
+
+.discount-box .title {
+  background: #ff0000;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 3px;
+}
+
+.discount-box .percent {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  display: block;
+  margin-top: 2px;
+}
+
+.desc {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.coupon-suggest {
+  background: #f3f4f6; /* màu nền khác */
+  color: #555;
+  cursor: not-allowed; /* cho biết có thể click */
+  transition: all 0.3s ease;
+  
+}
+
+.coupon-suggest:hover {
+  background: #e6f7e6; /* hover giống mã đã lưu */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.save-btn {
+  margin-top: 4px;
+  font-size: 16px;
+  text-decoration: underline;
+  color: #2563eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.suggest-label {
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin: 6px 0;
+}
+
+/* Applied / error */
+.applied {
+  color: #16a34a;
+  margin-top: 8px;
+}
+
+.applied button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  text-decoration: underline;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.error {
+  color: #dc2626;
+  margin-top: 6px;
+}
+
+.no-coupon {
+  text-align: center;
+  color: #555;
+  padding: 8px 0;
+}

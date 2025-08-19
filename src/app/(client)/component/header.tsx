@@ -1,15 +1,22 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import Search from "./showsearch";
-import TopCart from "./top_cart";
-import MenuRight from "./menu_right";
+
+import TopCart from "./TopCart";
+import MenuRight from "./MenuRight";
 import Link from "next/link";
 import LinkWithLoader from "./LinkContext";
-import { getCategories } from "@/services/categoryService";
+import { useRouter } from "next/navigation";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
-import { getBrands } from "@/services/brandService";
-
+import { getAllCategories } from "@/services/categoryService"; // service lấy all category trả về ICategory[]
+import { getAllBrands } from "@/services/brandService"; // service lấy all brand trả về IBrand[]
+import { getCartByUserId } from "@/services/cartService";
+import { getWishlistByUserId } from "@/services/wishlistService";
+import { getCompareProduct } from "@/services/productService";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import SearchWithSuggestions from "./SearchWithSuggestions";
+import Search from "./ShowSearch";
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -25,17 +32,49 @@ export default function Header() {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
-  const lastScrollTop = useRef(0); 
-  const userId = 1;
+  const lastScrollTop = useRef(0);
+  const { user } = useAuthUser();
   let hideTimeout = null;
+  const [keyword, setKeyword] = useState("");
+  const router = useRouter();
+  const {
+    wishlistCount,
+    compareCount,
+    cartCount: cartItemCount,
+    setWishlistCount,
+    setCompareCount,
+    setCartCount,
+  } = useGlobalStore();
 
+  const handleSearch = () => {
+    if (!keyword.trim()) return;
+    router.push(`/product?q=${encodeURIComponent(keyword)}`);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+  // Lấy danh mục categories (all)
   useEffect(() => {
-    getCategories().then(setCategories);
+    getAllCategories()
+      .then((res) => setCategories(res || []))
+      .catch((err) => {
+        console.error("Lỗi khi lấy categories:", err);
+        setCategories([]);
+      });
   }, []);
+
+  // Lấy danh sách brands (all)
   useEffect(() => {
-    getBrands().then(setBrands);
+    getAllBrands()
+      .then((res) => setBrands(res || []))
+      .catch((err) => {
+        console.error("Lỗi khi lấy brands:", err);
+        setBrands([]);
+      });
   }, []);
-  const parentCategories = categories.filter((cat) => cat.parent_id === null);
 
   useEffect(() => {
     const cartIcon = cartIconRef.current;
@@ -88,6 +127,50 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      if (!user?.id) return;
+
+      try {
+        const cartData = await getCartByUserId(user.id);
+        const totalItems =
+          cartData?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+        setCartCount(totalItems);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng giỏ hàng:", error);
+      }
+    };
+
+    fetchCartCount();
+  }, [user]);
+  useEffect(() => {
+    const fetchWishlistCount = async () => {
+      if (!user?.id) return;
+
+      try {
+        const wishlist = await getWishlistByUserId(user.id);
+        setWishlistCount(wishlist.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng yêu thích:", error);
+      }
+    };
+
+    fetchWishlistCount();
+  }, [user]);
+  useEffect(() => {
+    const fetchCompareCount = async () => {
+      if (!user?.id) return;
+
+      try {
+        const compare = await getCompareProduct(user.id);
+        setCompareCount(compare.length);
+      } catch (error) {
+        console.error("Lỗi khi lấy số lượng yêu thích:", error);
+      }
+    };
+
+    fetchCompareCount();
+  }, [user]);
   // Hàm mở tìm kiếm
   const toggleSearch = () => {
     setIsSearchOpen(true);
@@ -148,22 +231,13 @@ export default function Header() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
-      console.log(
-        "scrollY:",
-        currentScroll,
-        "lastScrollTop:",
-        lastScrollTop.current
-      );
 
       if (currentScroll > lastScrollTop.current) {
-        console.log("scrolling down -> hide nav");
         setShowNav(false);
       } else {
         if (currentScroll === 0) {
-          console.log("scrolling up to top -> show nav");
           setShowNav(true);
         } else {
-          console.log("scrolling up but not top -> hide nav");
           setShowNav(false);
         }
       }
@@ -175,7 +249,6 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -203,16 +276,16 @@ export default function Header() {
         <div className="icon-header">
           <div
             className={`iconuser-header div1 ${
-              userId === 1 ? "logged-in" : "logged-out"
+              user ? "logged-in" : "logged-out"
             }`}
           >
             <div className="login-mini inline-flex items-center px-2 py-1 rounded">
-              {userId === 1 ? (
+              {user ? (
                 <Link
                   href="/account"
                   className="cursor-pointer !text-white text-[14px] whitespace-nowrap"
                 >
-                  Chào Tan Truc
+                  Chào {user.name}
                 </Link>
               ) : (
                 <Link href="/login">
@@ -222,19 +295,29 @@ export default function Header() {
             </div>
           </div>
 
-          <div className="iconheart-header div">
+          <div
+            className="iconheart-header div data_wishlist"
+            data-count={user ? wishlistCount : 0}
+          >
             <Link href="/wishlist">
               <i className="fa-solid fa-heart"></i>
             </Link>
           </div>
-          <div className="iconcompare-header div">
+
+          <div
+            className="iconcompare-header div data_compare_product"
+            data-count={user ? compareCount : 0}
+          >
             <Link href="/compare_product">
               <i className="fa fa-exchange"></i>
             </Link>
           </div>
 
           <div className="cart-wrapper">
-            <div className="iconcart-header div">
+            <div
+              className="iconcart-header div data_cart"
+              data-count={user ? cartItemCount : 0}
+            >
               <Link href="/cart">
                 <i className="fa fa-shopping-bag" ref={cartIconRef}></i>
               </Link>
@@ -265,24 +348,29 @@ export default function Header() {
                   <div className="mega-columns-wrapper">
                     <div className="mega-column">
                       <h4>DANH MỤC MỚI NHẤT</h4>
-                      {categories.map((cat) => (
-                        <a
-                          key={cat.categories_id}
-                          href={`/product/${cat.slug}`}
-                        >
-                          {cat.name}
-                        </a>
-                      ))}
+                      {Array.isArray(categories) &&
+                        categories.map((cat) => (
+                          <a
+                            key={cat.categories_id}
+                            href={`/category/${cat.slug}`}
+                          >
+                            {cat.name}
+                          </a>
+                        ))}
                     </div>
 
                     <div className="mega-column">
                       <h4>NHÃN HIỆU MỚI NHẤT</h4>
                       <div className="mega-brands">
-                        {brands.map((brand) => (
-                          <a key={brand.brand_id} href={`/brand/${brand.slug}`}>
-                            {brand.name}
-                          </a>
-                        ))}
+                        {Array.isArray(brands) &&
+                          brands.map((brand) => (
+                            <a
+                              key={brand.brand_id}
+                              href={`/brand/${brand.brand_id}`}
+                            >
+                              {brand.name}
+                            </a>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -304,14 +392,7 @@ export default function Header() {
                 <LinkWithLoader href="/account">Tài khoản</LinkWithLoader>
               </li>
             </ul>
-            <div className="seach-nav">
-              <input
-                type="text"
-                placeholder="Tìm kiếm sản phẩm"
-                className="input-search-nav !text-black"
-              />
-              <i className="fa-solid fa-magnifying-glass"></i>
-            </div>
+            <SearchWithSuggestions />
           </div>
         </nav>
       )}

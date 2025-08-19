@@ -80,6 +80,7 @@ label {
 
 input[type="text"],
 input[type="number"],
+input[type="file"],
 select,
 textarea {
   width: 100%;
@@ -163,6 +164,8 @@ textarea {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  width: 10%;
+  text-align: center;
 }
 
 .choose-image-btn:hover {
@@ -206,7 +209,7 @@ textarea {
 }
 
 .dropdown-options {
-  display: none;
+  /* display: none; */
   position: absolute;
   top: 100%;
   left: 0;
@@ -296,6 +299,17 @@ textarea {
 
 .dropdown.show {
   display: block;
+}
+
+.dropdown-options.show {
+  display: block !important;
+}
+.dropdown-multiselect .dropdown-options {
+  display: none;
+}
+
+.dropdown-multiselect.open .dropdown-options {
+  display: block !important;
 }
 
 .color-search {

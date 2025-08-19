@@ -1,13 +1,16 @@
 "use client";
 import "../css/login.css";
+import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from "react-hot-toast";
-import Loader from "../component/loader";
+import Loader from "../component/Loader";
 import { Eye, EyeOff } from "lucide-react";
-import { validateField } from "@/hooks/validate_login_register";
+import { validateField } from "@/hooks/useValidateLoginRegister";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -17,6 +20,9 @@ export default function Login() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [rememberMe, setRememberMe] = useState(false);
+  const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
+  const { user } = useAuthUser();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -46,12 +52,35 @@ export default function Login() {
     if (!validateForm()) return;
 
     try {
-      const res = await loginUser({ usernameOrEmail, password });
-      localStorage.setItem("userId", res.user.id.toString());
       setShowLoader(true);
+      const res = await loginUser({ usernameOrEmail, password });
+
+      // Lưu user vào cookies và state
+      saveUserToCookies(res);
       setLoginSuccess(true);
+
+      // Hiển thị thông báo thành công
+      await Swal.fire({
+        title: "Đăng nhập thành công!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      if (res?.user?.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/account";
+      }
     } catch (err: any) {
-      toast.error(err.message);
+      setShowLoader(false);
+      Swal.fire({
+        title: "Đăng nhập thất bại",
+        text: err.message || "Có lỗi xảy ra",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -67,18 +96,6 @@ export default function Login() {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
     window.location.href = url;
   };
-
-  useEffect(() => {
-    if (showLoader && loginSuccess) {
-      const timer = setTimeout(() => {
-        setShowLoader(false);
-        toast.success("Đăng nhập thành công!");
-        router.push("/account");
-      }, 7000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [showLoader, loginSuccess]);
 
   return (
     <>
@@ -99,6 +116,13 @@ export default function Login() {
               <div>
                 <input
                   value={usernameOrEmail}
+                  className={`input ${
+                    errors.email
+                      ? "error"
+                      : usernameOrEmail.trim() !== ""
+                      ? "success"
+                      : ""
+                  }`}
                   onChange={(e) => {
                     setIdentifier(e.target.value);
                     setErrors((prev) => ({ ...prev, email: "" }));
@@ -115,60 +139,71 @@ export default function Login() {
                   }
                   type="text"
                   placeholder="Tài Khoản"
-                 
                 />
                 {errors.email && (
                   <p className="text-sm text-red-500 mt-1">{errors.email}</p>
                 )}
               </div>
 
-              <div style={{ position: "relative" }}>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Mật Khẩu"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setErrors((prev) => ({ ...prev, password: "" }));
-                  }}
-                  onBlur={(e) =>
-                    setErrors((prev) => ({
-                      ...prev,
-                      password: validateField({
-                        name: "password",
-                        value: e.target.value,
-                        formType: "login",
-                      }),
-                    }))
-                  }
-                 
-                />
+              <div className="password-field-container">
+                <div style={{ position: "relative" }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    className={`input ${
+                      errors.password
+                        ? "error"
+                        : password.trim() !== ""
+                        ? "success"
+                        : ""
+                    }`}
+                    placeholder="Mật Khẩu"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setErrors((prev) => ({ ...prev, password: "" }));
+                    }}
+                    onBlur={(e) =>
+                      setErrors((prev) => ({
+                        ...prev,
+                        password: validateField({
+                          name: "password",
+                          value: e.target.value,
+                          formType: "login",
+                        }),
+                      }))
+                    }
+                    style={{ paddingRight: "40px" }}
+                  />
+                  <div
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      cursor: "pointer",
+                      zIndex: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "24px",
+                      height: "24px",
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </div>
+                </div>
                 {errors.password && (
                   <p className="text-sm text-red-500 mt-1">{errors.password}</p>
                 )}
-                <div
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute",
-                    right: "10px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    cursor: "pointer",
-                  }}
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </div>
               </div>
-
-              <div className="remember-me">
-                <input type="checkbox" />
-                Lưu tài khoản
-              </div>
-
-              <button type="submit">Đăng nhập ngay</button>
+              <p className="foget-pw">
+                <Link href="/forgot-password">Quên mật khẩu?</Link>
+              </p>
+              <button type="submit" disabled={showLoader}>
+                {showLoader ? "Đang đăng nhập..." : "Đăng nhập ngay"}
+              </button>
             </form>
-
-            <Toaster position="bottom-right" />
 
             {showLoader && (
               <div className="loader-overlay">
@@ -176,18 +211,14 @@ export default function Login() {
               </div>
             )}
 
-            <br />
-            <h5><Link href="/forgot-password">
-            Quên mật khẩu?
-            </Link></h5>
-
+            <h3>Hoặc</h3>
             <button className="google-login" onClick={googleLogin}>
               <i className="fab fa-google"></i> Đăng nhập bằng Google
             </button>
 
             <div className="register-link">
               <p>
-                Bạn chưa có tài khoản Tera Shoes? {" "}
+                Bạn chưa có tài khoản Tera Shoes?{" "}
                 <Link href="/register">Đăng ký ngay</Link>
               </p>
             </div>

@@ -185,6 +185,23 @@ input:checked+.slider:before {
     transform: translateX(18px);
 }
 
+.category-table td img {
+  display: block;         /* để img là block giúp canh giữa dễ */
+  margin: 0 auto;        /* canh giữa ngang */
+  width: 100px;           /* cố định kích thước rộng */
+  height: 100px;          /* cố định kích thước cao */
+  object-fit: contain;   /* ảnh không bị biến dạng, giữ tỉ lệ */
+  border-radius: 4px;    /* bo nhẹ góc (tuỳ chọn) */
+  box-shadow: 0 0 4px rgba(0,0,0,0.1); /* bóng nhẹ (tuỳ chọn) */
+}
+
+.category-table td.status-column {
+  text-align: center;
+  vertical-align: middle;
+  /* nếu cần căn dọc giữa cho ô này */
+}
+
+
 @media (max-width: 768px) {
     .category-list {
         padding: 15px;

@@ -5,12 +5,59 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getInfoUser, checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";
-import LogoutLink from "../component/log_out";
+import LogoutLink from "../component/LogOut";
 import CheckTokenGuard from "@/store/CheckTokenGuard";
-import AccountSidebar from "../component/accountsidebar";
+import AccountSidebar from "../component/Account/AccountSidebar";
+import { updateUserService, uploadAvatarService } from "@/services/userService";
+import { toast } from "react-toastify";
+import { API_BASE_URL } from "@/config/env";
+import UploadImageProfile from "../component/Account/UploadImage";
+import InfoUpdateUser from "../component/Account/InfoUpdateUser";
+import { useGlobalStore } from "@/store/useGlobalStore";
+import { getOrdersByUserService } from "@/services/orderService";
+import { getAddressByUserId } from "@/services/addressService";
+interface Props {
+  user: IUser;
+  setUser: (user: IUser) => void;
+}
 export default function Account() {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const setOrderCount = useGlobalStore((state) => state.setOrderCount);
+  const setAddressCount = useGlobalStore((state) => state.setAddressCount);
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const tokenData = await checkToken();
+        if (!tokenData?.user?.id) return;
+
+        const [orders, addresses] = await Promise.all([
+          getOrdersByUserService({
+            userId: tokenData.user.id,
+            page: 1,
+            limit: 1,
+          }),
+          getAddressByUserId(tokenData.user.id),
+        ]);
+
+        if (orders?.pagination?.total !== undefined) {
+          setOrderCount(orders.pagination.total);
+        } else {
+          setOrderCount(orders?.orders?.length || 0);
+        }
+        if (Array.isArray(addresses)) {
+          setAddressCount(addresses.length);
+        } else {
+          setAddressCount(0);
+        }
+      } catch (err) {
+        console.error("Lỗi lấy số lượng đơn hàng/địa chỉ:", err);
+      }
+    };
+
+    fetchCounts();
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -20,6 +67,7 @@ export default function Account() {
         //   console.error("Token không tồn tại");
         //   return;
         // }
+        const token = document.cookie;
         const tokenData = await checkToken();
 
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
@@ -85,154 +133,19 @@ export default function Account() {
                 <div className="row">
                   <div className="col-xs-12 col-sm-12 col-lg-3 col-left-ac">
                     <AccountSidebar user={user} />
-
                   </div>
                   <div className="col-xs-12 col-sm-12 col-lg-9 col-right-ac">
                     <h1 className="title-head margin-top-0 ">
                       Thông tin tài khoản
                     </h1>
 
-                    {/* Avatar Header Card */}
-                    <div
-                      className="user-profile-header"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "20px",
-                        backgroundColor: "#f8f9fa",
-                        borderRadius: "8px",
-                        marginBottom: "20px",
-                        border: "1px solid #e9ecef",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <img
-                          src={
-                            user.picture 
-                              ? user.picture
-                              : user.avatar 
-                              ? user.avatar
-                              : "/images/default.png" 
-                          }
-                          className="img-avatar"
-                          alt="Avatar"
-                          style={{
-                            width: "80px",
-                            height: "80px",
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                            marginRight: "20px",
-                            border: "3px solid #007bff",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                          }}
-                        />
-                        <div>
-                          <h3 style={{ margin: "0 0 5px 0", color: "#333" }}>
-                            {user.name}
-                          </h3>
-                          <p
-                            style={{
-                              margin: "0",
-                              color: "#666",
-                              fontSize: "14px",
-                            }}
-                          >
-                            {user.email}
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                       className="btn-upload-avatar"
-                        style={{
-                          padding: "8px 16px",
-                          backgroundColor: "#021688",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "5px",
-                          cursor: "pointer",
-                          fontSize: "14px",
-                          fontWeight: "500",
-                          transition: "background-color 0.2s",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "5px",
-                        }}
-                        onMouseOver={(e) =>
-                          ((
-                            e.target as HTMLButtonElement
-                          ).style.backgroundColor = "#0056b3")
-                        }
-                        onMouseOut={(e) =>
-                          ((
-                            e.target as HTMLButtonElement
-                          ).style.backgroundColor = "#007bff")
-                        }
-                        onClick={() => {
-                          // Xử lý upload avatar
-                          const input = document.createElement("input");
-                          input.type = "file";
-                          input.accept = "image/*";
-                          input.onchange = (e) => {
-                            // Xử lý file được chọn
-                            const target = e.target as HTMLInputElement;
-                            if (target.files && target.files[0]) {
-                              console.log("File selected:", target.files[0]);
-                            }
-                          };
-                          input.click();
-                        }}
-                      >
-                        <i className="fa-solid fa-camera"></i> Đổi ảnh
-                      </button>
-                    </div>
-
-                    {/* Thông tin chi tiết */}
-                    <div
-                      className="form-signup name-account m992"
-                      style={{
-                        backgroundColor: "white",
-                        padding: "20px",
-                        borderRadius: "8px",
-                        border: "1px solid #e9ecef",
-                        fontSize: "14px",
-                      }}
-                    >
-                      <h4
-                        style={{
-                          marginBottom: "15px",
-                          color: "#333",
-                          fontSize: "16px",
-                        }}
-                      >
-                        Thông tin chi tiết
-                      </h4>
-
-                      <div style={{ marginBottom: "15px" }}>
-                        <strong style={{ color: "#555" }}>Họ tên:</strong>
-                        <span style={{ marginLeft: "10px" }}>{user.name}</span>
-                      </div>
-
-                      <div style={{ marginBottom: "15px" }}>
-                        <strong style={{ color: "#555" }}>Email:</strong>
-                        <span style={{ marginLeft: "10px" }}>{user.email}</span>
-                      </div>
-
-                      <div style={{ marginBottom: "15px" }}>
-                        <strong style={{ color: "#555" }}>Điện thoại:</strong>
-                        <span style={{ marginLeft: "10px" }}>
-                          +84{user.phone}
-                        </span>
-                      </div>
-
-                      <div style={{ marginBottom: "0" }}>
-                        <strong style={{ color: "#555" }}>Địa chỉ:</strong>
-                        <span style={{ marginLeft: "10px" }}>
-                          {user.address}
-                        </span>
-                      </div>
-                    </div>
+                    <UploadImageProfile
+                      user={user}
+                      setUser={setUser}
+                      uploadAvatarService={uploadAvatarService}
+                      API_BASE_URL={API_BASE_URL}
+                    />
+                    <InfoUpdateUser user={user} setUser={setUser} />
                   </div>
                 </div>
               </div>

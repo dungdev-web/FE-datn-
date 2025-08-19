@@ -1,171 +1,402 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../css/categories_admin.css";
 import Link from "next/link";
+import { ArrowUpDown } from "lucide-react";
+import { ICategory } from "@/types/ICategory";
+import Swal from "sweetalert2";
+import { deleteCategory, updateCategoryStatus } from "@/services/categoryService";
+
+type SortOrder = "asc" | "desc";
+
 export default function Categories() {
-  const [isSearching, setIsSearching] = useState(false);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(5);
+  const [totalPages, setTotalPages] = useState(1);
   const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [filterId, setFilterId] = useState("");
+  const [filterName, setFilterName] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  // State sort
+  const [sortConfig, setSortConfig] = useState<{
+    sortBy: string;
+    sortOrder: SortOrder;
+  }>({
+    sortBy: "",
+    sortOrder: "asc",
+  });
+
+  // Hàm fetch categories theo params filter + sort + page
+  const fetchCategories = async () => {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", String(page));
+      params.append("limit", String(limit));
+
+      if (filterId.trim() !== "") {
+        params.append("id", filterId.trim());
+      }
+      if (filterName.trim() !== "") {
+        params.append("name", filterName.trim());
+      }
+      if (searchText.trim()) {
+        params.append("keyword", searchText.trim());
+      }
+      if (statusFilter === "true") params.append("status", "1");
+      else if (statusFilter === "false") params.append("status", "0");
+
+      if (sortConfig.sortBy) {
+        params.append("sortBy", sortConfig.sortBy);
+        params.append("sortOrder", sortConfig.sortOrder);
+      }
+
+      const res = await fetch(
+        `http://localhost:3000/category?${params.toString()}`
+      );
+      if (!res.ok) throw new Error("Lỗi khi lấy danh mục");
+      const json = await res.json();
+
+      setCategories(json.data || []);
+      setTotalPages(json.totalPages || 1);
+    } catch (error) {
+      console.error(error);
+      setCategories([]);
+    }
+  };
+
+  // Reset page khi filter hoặc sort thay đổi
+  useEffect(() => {
+    setPage(1);
+  }, [filterId, filterName, statusFilter, searchText, sortConfig]);
+
+  // Gọi API khi page, filter hoặc sort thay đổi
+  useEffect(() => {
+    fetchCategories();
+  }, [page, filterId, filterName, statusFilter, searchText, sortConfig]);
+
+  const goToPage = (p: number) => {
+    if (p < 1 || p > totalPages) return;
+    setPage(p);
+  };
+
+  // Xử lý sort
+  const handleSort = (field: string) => {
+    setSortConfig((prev) => {
+      if (prev.sortBy === field) {
+        return {
+          sortBy: field,
+          sortOrder: prev.sortOrder === "asc" ? "desc" : "asc",
+        };
+      } else {
+        return { sortBy: field, sortOrder: "asc" };
+      }
+    });
+  };
+
+  // Component icon sort với onClick truyền từ ngoài
+  const SortIcon = ({
+    field,
+    onClick,
+  }: {
+    field: string;
+    onClick: () => void;
+  }) => {
+    const active = sortConfig.sortBy === field;
+    const direction = active ? sortConfig.sortOrder : undefined;
+    return (
+      <button
+        type="button"
+        title={`Sắp xếp theo ${field} (${direction ?? "chưa chọn"})`}
+        className="inline-block ml-2 p-0 border-0 bg-transparent align-middle"
+        onClick={onClick}
+        style={{ lineHeight: 0 }}
+        aria-label={`Sắp xếp theo ${field} (${direction ?? "chưa chọn"})`}
+      >
+        <ArrowUpDown
+          className={`w-4 h-4 cursor-pointer ${
+            active ? "text-blue-500" : "text-gray-400"
+          } ${direction === "asc" ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+    );
+  };
+
   return (
-      <div className="category-list">
-        <h2>Danh sách danh mục</h2>
+    <div className="category-list">
+      <h2>Danh sách danh mục</h2>
 
-        <div className="actions">
-          <Link href={"/admin/categories/add"} className="btn btn-add">
-            <i className="fa-solid fa-plus"></i> Thêm mới danh mục
-          </Link>
-          <button className="btn btn-refresh">
-            <i className="fa-solid fa-rotate-right"></i> Refresh
-          </button>
-          <div className={`search-toggle ${isSearching ? "active" : ""}`}>
-            {isSearching ? (
-              <input
-                type="text"
-                className="search-input"
-                autoFocus
-                placeholder="Nhập từ khóa..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                onBlur={() => {
-                  if (searchText === "") setIsSearching(false);
-                }}
-              />
-            ) : (
-              <button
-                className="btn btn-search"
-                onClick={() => setIsSearching(true)}
-              >
-                <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="actions">
+        <Link href={"/admin/categories/add"} className="btn btn-add">
+          <i className="fa-solid fa-plus"></i> Thêm mới danh mục
+        </Link>
+        <button
+          className="btn btn-refresh"
+          onClick={() => {
+            setSearchText("");
+            setStatusFilter("");
+            setFilterId("");
+            setFilterName("");
+            setSortConfig({ sortBy: "", sortOrder: "asc" });
+            setPage(1);
+          }}
+        >
+          <i className="fa-solid fa-rotate-right"></i> Làm mới
+        </button>
 
-        <table className="category-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên danh mục</th>
-              <th>Trạng thái danh mục</th>
-              <th>Thứ tự danh mục</th>
-              <th>Ngày tạo danh mục</th>
-              <th>Ngày sửa danh mục</th>
-              <th>Thao tác</th>
-            </tr>
-            <tr className="filter-row">
-              <th>
-                <input type="text" placeholder="Lọc ID..." />
-              </th>
-              <th>
-                <input type="text" placeholder="Lọc tên..." />
-              </th>
-              <th>
-                <select>
-                  <option value="">Tất cả</option>
-                  <option value="true">Hoạt động</option>
-                  <option value="false">Không hoạt động</option>
-                </select>
-              </th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>4</td>
-              <td>Dép Summer</td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>0</td>
-              <td>27-11-2021 19:07</td>
-              <td></td>
-              <td>
-                <Link href={"/admin/categories/edit"}>
-                  {" "}
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td>Giày Trẻ em</td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>0</td>
-              <td>22-08-2021 20:49</td>
-              <td>27-11-2021 19:07</td>
-              <td>
-                <Link href={"/admin/categories/edit"}>
-                  {" "}
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td>Giày Nữ</td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>0</td>
-              <td>22-08-2021 20:49</td>
-              <td></td>
-              <td>
-                <Link href={"/admin/categories/edit"}>
-                  {" "}
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>Giày Nam</td>
-              <td className="status-column">
-                <label className="switch">
-                  <input type="checkbox" defaultChecked />
-                  <span className="slider round"></span>
-                </label>
-              </td>
-              <td>0</td>
-              <td>22-08-2021 20:48</td>
-              <td></td>
-              <td>
-                <Link href={"/admin/categories/edit"}>
-                  {" "}
-                  <i className="fa-solid fa-pen edit-icon" title="Sửa mã"></i>
-                </Link>
-                <i className="fa-solid fa-trash delete-icon" title="Xóa mã"></i>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div className="pagination">
-          <button className="page-btn" disabled>
-            <i className="fa-solid fa-angle-left"></i>
-          </button>
-          <button className="page-btn active">1</button>
-          <button className="page-btn">2</button>
-          <button className="page-btn">3</button>
-          <button className="page-btn">
-            <i className="fa-solid fa-angle-right"></i>
-          </button>
+        <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+          {isSearching ? (
+            <input
+              type="text"
+              className="search-input"
+              autoFocus
+              placeholder="Nhập từ khóa..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setPage(1);
+                  setIsSearching(false);
+                }
+              }}
+              onBlur={() => {
+                if (searchText === "") setIsSearching(false);
+              }}
+            />
+          ) : (
+            <button
+              className="btn btn-search"
+              onClick={() => setIsSearching(true)}
+            >
+              <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+            </button>
+          )}
         </div>
       </div>
+
+      <table className="category-table">
+        <thead>
+          <tr>
+            <th className="px-4 py-2">
+              ID{" "}
+              <SortIcon
+                field="categories_id"
+                onClick={() => handleSort("categories_id")}
+              />
+            </th>
+            <th>
+              Tên danh mục{" "}
+              <SortIcon field="name" onClick={() => handleSort("name")} />
+            </th>
+            <th>Trạng thái danh mục</th>
+            <th>Ảnh</th>
+            <th>
+              Ngày tạo{" "}
+              <SortIcon
+                field="created_at"
+                onClick={() => handleSort("created_at")}
+              />
+            </th>
+            <th>
+              Ngày sửa{" "}
+              <SortIcon
+                field="updated_at"
+                onClick={() => handleSort("updated_at")}
+              />
+            </th>
+            <th>Thao tác</th>
+          </tr>
+          <tr className="filter-row">
+            <th>
+              <input
+                type="text"
+                placeholder="Lọc ID..."
+                value={filterId}
+                onChange={(e) => setFilterId(e.target.value)}
+              />
+            </th>
+            <th>
+              <input
+                type="text"
+                placeholder="Lọc tên..."
+                value={filterName}
+                onChange={(e) => setFilterName(e.target.value)}
+              />
+            </th>
+            <th>
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                }}
+              >
+                <option value="">Tất cả</option>
+                <option value="true">Hoạt động</option>
+                <option value="false">Không hoạt động</option>
+              </select>
+            </th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {categories.length === 0 ? (
+            <tr>
+              <td colSpan={7} style={{ textAlign: "center" }}>
+                Không có danh mục
+              </td>
+            </tr>
+          ) : (
+            categories.map((cat) => (
+              <tr key={cat.categories_id}>
+                <td>{cat.categories_id}</td>
+                <td>{cat.name}</td>
+                <td className="status-column">
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={cat.status === 1}
+                      onChange={async () => {
+                        const newStatus = cat.status === 1 ? 0 : 1;
+
+                        const result = await Swal.fire({
+                          title: "Xác nhận",
+                          text: `Bạn có chắc muốn ${
+                            newStatus === 1 ? "bật" : "tắt"
+                          } danh mục "${cat.name}"?`,
+                          icon: "question",
+                          showCancelButton: true,
+                          confirmButtonText: "Có",
+                          cancelButtonText: "Hủy",
+                        });
+
+                        if (!result.isConfirmed) return;
+
+                        const ok = await updateCategoryStatus(
+                          cat.categories_id,
+                          newStatus
+                        );
+
+                        if (ok) {
+                          setCategories((prev) =>
+                            prev.map((c) =>
+                              c.categories_id === cat.categories_id
+                                ? { ...c, status: newStatus }
+                                : c
+                            )
+                          );
+                          Swal.fire({
+                            title: "Thành công",
+                            text: "Cập nhật trạng thái thành công!",
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                          });
+                        } else {
+                          Swal.fire({
+                            title: "Lỗi",
+                            text: "Cập nhật trạng thái thất bại!",
+                            icon: "error",
+                          });
+                        }
+                      }}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                </td>
+                <td>
+                  <img
+                    src={`http://localhost:3000/uploads/${cat.image}`}
+                    alt={cat.name}
+                    style={{ width: 50, height: 50, objectFit: "contain" }}
+                  />
+                </td>
+                <td>{new Date(cat.created_at).toLocaleString("vi-VN")}</td>
+                <td>{new Date(cat.updated_at).toLocaleString("vi-VN")}</td>
+                <td>
+                  <Link href={`/admin/categories/edit/${cat.categories_id}`}>
+                    <i
+                      className="fa-solid fa-pen edit-icon"
+                      title="Sửa danh mục"
+                    ></i>
+                  </Link>
+                  <i
+                    className="fa-solid fa-trash delete-icon"
+                    title="Xóa danh mục"
+                    style={{ cursor: "pointer", marginLeft: 10 }}
+                    onClick={async () => {
+                      const confirm = await Swal.fire({
+                        title: "Xác nhận xóa",
+                        text: `Bạn có chắc muốn xóa danh mục "${cat.name}"?`,
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Xóa",
+                        cancelButtonText: "Hủy",
+                      });
+
+                      if (!confirm.isConfirmed) return;
+
+                      const res = await deleteCategory(cat.categories_id);
+
+                      if (res.success) {
+                        setCategories((prev) =>
+                          prev.filter(
+                            (c) => c.categories_id !== cat.categories_id
+                          )
+                        );
+                        Swal.fire({
+                          title: "Thành công",
+                          text: res.message,
+                          icon: "success",
+                          timer: 1500,
+                          showConfirmButton: false,
+                        });
+                      } else {
+                        Swal.fire({
+                          title: "Lỗi",
+                          text: res.message,
+                          icon: "error",
+                        });
+                      }
+                    }}
+                  ></i>
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+
+      <div className="pagination">
+        <button
+          className="page-btn"
+          disabled={page <= 1}
+          onClick={() => goToPage(page - 1)}
+        >
+          <i className="fa-solid fa-angle-left"></i>
+        </button>
+        {Array.from({ length: totalPages }).map((_, i) => (
+          <button
+            key={i + 1}
+            className={`page-btn ${page === i + 1 ? "active" : ""}`}
+            onClick={() => goToPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          className="page-btn"
+          disabled={page >= totalPages}
+          onClick={() => goToPage(page + 1)}
+        >
+          <i className="fa-solid fa-angle-right"></i>
+        </button>
+      </div>
+    </div>
   );
 }

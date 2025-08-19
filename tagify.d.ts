@@ -4,4 +4,5 @@ declare module '@yaireo/tagify' {
   export default Tagify;
 }
 declare module 'jsonwebtoken';
-declare module 'react-image-magnifiers';
+// declare module 'react-image-magnifiers';
+declare module 'quill-image-uploader';

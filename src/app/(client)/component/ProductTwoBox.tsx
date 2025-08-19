@@ -1,0 +1,187 @@
+"use client";
+import "../css/product.css";
+import "../css/home.css";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { IProduct } from "@/types/product";
+import ProductIcons from "./Products/ProductIcons";
+import { API_BASE_URL } from "@/config/env";
+export default function Show2sanpham({ products }: { products: IProduct[] }) {
+  const images = [
+    "https://file.hstatic.net/200000581855/file/1_5d0aee5d42d245f395b3bfbc9d46e9f3.png",
+    "https://file.hstatic.net/200000581855/file/2_5e1eb6264dce4a33b1c2ef620bd0232a.png",
+  ];
+
+  const [randomImage, setRandomImage] = useState(images[0]);
+
+  useEffect(() => {
+    const index = Math.floor(Math.random() * images.length);
+    setRandomImage(images[index]);
+  }, []);
+
+  if (!products?.length) return null;
+
+  return (
+    <div className="w-[47%] float-left box-container">
+      <div className="content">
+        <h3>{products[0]?.category?.name}</h3>
+        <p>
+          Xem tất cả <i className="fa-solid fa-angles-right"></i>
+        </p>
+      </div>
+      <div className="flex w-full">
+        <div className="images">
+          <img src={randomImage} alt="Ảnh ngẫu nhiên" />
+        </div>
+
+        <div className="slider-wrapper w-full">
+          <Swiper
+            modules={[Navigation, Pagination]}
+            spaceBetween={3}
+            slidesPerView={2}
+            loop
+            navigation
+            pagination={{ clickable: true, dynamicBullets: true }}
+            className="product-two-box"
+          >
+            {products.map((sp) => {
+              const productId = sp.products_id ?? sp.products_id;
+              const averageRating =
+                Array.isArray(sp.product_reviews) &&
+                sp.product_reviews.length > 0
+                  ? Math.round(
+                      sp.product_reviews.reduce(
+                        (sum, r) => sum + Number(r.rating),
+                        0
+                      ) / sp.product_reviews.length
+                    )
+                  : 0;
+
+              const discountPercent =
+                sp.price && sp.sale_price
+                  ? Math.round(((sp.price - sp.sale_price) / sp.price) * 100)
+                  : 0;
+
+              const sold = Array.isArray(sp.product_variants)
+                ? sp.product_variants.reduce(
+                    (sum, v) => sum + (v.stock_quantity || 0),
+                    0
+                  )
+                : 0;
+
+              const uniqueColors = Array.isArray(sp.product_variants)
+                ? [
+                    ...new Map(
+                      sp.product_variants
+                        .filter((v) => v.color) // chỉ lấy những variant có color
+                        .map((v) => [v.color.id, v.color])
+                    ).values(),
+                  ]
+                : [];
+
+              return (
+                <SwiperSlide key={productId}>
+                  <div className="product-itemlist-main">
+                    <div className="product-card">
+                      <div className="product-image">
+                        <Link href={`product/${sp.slug}`}>
+                          <img
+                            src={
+                              `${API_BASE_URL}/uploads/${sp.images?.[0]?.url}` ||
+                              "/images/placeholder.png"
+                            }
+                            alt={sp.name}
+                            className="!h-[150px] !w-[100%]"
+                          />
+                        </Link>
+                        <ProductIcons
+                          productId={productId}
+                          variant_id={
+                            sp.product_variants?.[0]?.product_variants_id ??
+                            null
+                          }
+                          price={sp.sale_price}
+                        />
+
+                        {discountPercent > 0 && (
+                          <span className="discount-tag">
+                            -{discountPercent}%
+                          </span>
+                        )}
+
+                        <span className="new-tag">
+                          <img
+                            src="/images/logo/title_image_1_tag.webp"
+                            alt=""
+                          />
+                          Mới
+                        </span>
+
+                        <div className="product-colors">
+                          {uniqueColors.map((color) => (
+                            <span
+                              key={color.id}
+                              className="color-item"
+                              data-color={color.name_color}
+                              style={{ backgroundColor: color.code_color }}
+                              title={color.name_color}
+                            ></span>
+                          ))}
+                        </div>
+
+                        <h4 className="product-title">{sp.name}</h4>
+
+                        <div className="product-price">
+                          {sp.sale_price > 0 && (
+                            <span className="old-price">
+                              <del>{sp.price.toLocaleString("vi")}đ</del>
+                            </span>
+                          )}
+                          <span className="new-price">
+                            {(sp.sale_price > 0
+                              ? sp.sale_price
+                              : sp.price
+                            ).toLocaleString("vi")}
+                            đ
+                          </span>
+                        </div>
+
+                        <div className="product-progress">
+                          <div className="progress-bar">
+                            <div
+                              className="progress-fill"
+                              style={{ width: "87%" }}
+                            >
+                              <span className="sold">
+                                Đã bán {sold} sản phẩm
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="product-rating">
+                          {Array.from({ length: 5 }, (_, i) =>
+                            i < averageRating ? (
+                              <i key={i} className="fa-solid fa-star"></i>
+                            ) : (
+                              <i key={i} className="fa-regular fa-star"></i>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+        </div>
+      </div>
+    </div>
+  );
+}

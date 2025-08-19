@@ -134,3 +134,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+public/images/banner/slider_1.jpg
+public/images/banner/slider_2.jpg

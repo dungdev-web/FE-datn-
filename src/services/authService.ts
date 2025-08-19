@@ -1,28 +1,28 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockUsers, saveMockUsers } from "@/mocks/mockUser";
-import { IUser } from "@/types/user";
+import { InterfaceUser, IUser } from "@/types/user";
 import { LoginCredentials } from "@/types/auth";
 import { RegisterCredentials } from "@/types/auth";
 
 // --------- LOGIN ---------
 export async function loginUser(
-  credentialss: LoginCredentials
+  credentials: LoginCredentials
 ): Promise<{ token: string; user: IUser }> {
   if (IS_MOCK) {
     const users = getMockUsers();
 
     const user = users.find(
       (u) =>
-        u.email === credentialss.usernameOrEmail ||
-        u.name === credentialss.usernameOrEmail
+        u.email === credentials.usernameOrEmail ||
+        u.name === credentials.usernameOrEmail
     );
 
     if (!user) {
       throw new Error("Tài khoản không tồn tại trong hệ thống");
     }
-    console.log("usernameOrEmail nhận được:", credentialss.usernameOrEmail);
+    console.log("usernameOrEmail nhận được:", credentials.usernameOrEmail);
 
-    if (user.password_hash !== credentialss.password) {
+    if (user.password_hash !== credentials.password) {
       throw new Error("Mật khẩu không đúng");
     }
 
@@ -31,27 +31,34 @@ export async function loginUser(
   const res = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(credentialss),
-    credentials: 'include' 
+    body: JSON.stringify(credentials), 
+    credentials: "include",
   });
+
   const data = await res.json();
-  // localStorage.setItem("token",data.token);
+
   if (!res.ok) {
     const errorMessage = data.error || data.message || "Đăng nhập thất bại";
     throw new Error(errorMessage);
   }
 
+  // Lưu token nếu dùng JWT
+  // localStorage.setItem("token", data.token);
+
   return data;
 }
 // --------- LOGIN GOOGLE -------
-export async function loginWithGoogle(): Promise<{ message: string; user: IUser }> {
+export async function loginWithGoogle(): Promise<{
+  message: string;
+  user: IUser;
+}> {
   const users = getMockUsers();
 
   // Giả lập thông tin Google trả về
   const googleEmail = "user.google@gmail.com";
   const googleName = "Google User";
 
-  let user = users.find(u => u.email === googleEmail);
+  let user = users.find((u) => u.email === googleEmail);
 
   if (!user) {
     // Nếu chưa có, tạo mới user
@@ -77,8 +84,8 @@ export async function loginWithGoogle(): Promise<{ message: string; user: IUser 
 // --------- CHECKTOKEN ---------
 export async function checkToken(): Promise<{ user: IUser } | null> {
   const res = await fetch(`${API_BASE_URL}/check-token`, {
-    method: 'GET',
-    credentials: 'include'
+    method: "GET",
+    credentials: "include",
   });
 
   if (!res.ok) {
@@ -106,7 +113,7 @@ export async function logoutUser(): Promise<{ message: string }> {
     const errorMessage = data.error || data.message || "Đăng xuất thất bại";
     throw new Error(errorMessage);
   }
-  localStorage.removeItem("token")
+  localStorage.removeItem("token");
   const data = await res.json();
   return data;
 }
@@ -155,6 +162,28 @@ export async function registerUser(
   if (!res.ok) throw new Error(data.message || "Đăng ký thất bại");
 
   return data;
+}
+export async function confirmEmailService(email: string, token: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/confirm-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, token }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Xác nhận email thất bại.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[Service] Lỗi xác nhận email:", error);
+    throw error;
+  }
 }
 
 // --------- GET USER INFO ---------
@@ -235,7 +264,7 @@ export async function sendResetPassword(
     return { message: "Đã gửi mã OTP đến email", otp };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/send-reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/forget`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -263,7 +292,7 @@ export async function resetPassword(
     }
 
     user.password_hash = newPassword;
-    user.updated_at = new Date().toISOString();
+    user.updated_at = new Date();
     delete user.reset_otp;
     delete user.otp_created_at;
 
@@ -273,7 +302,7 @@ export async function resetPassword(
     return { message: "Đổi mật khẩu thành công" };
   }
 
-  const res = await fetch(`${API_BASE_URL}/user/reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, otp, newPassword }),
@@ -284,3 +313,161 @@ export async function resetPassword(
 
   return data;
 }
+
+interface GetAllUsersParams {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortDirection?: string;
+  role?: string;
+  status?: number;
+  name?: string;
+  email?: string;
+  user_id?: number;
+  phone?: string;
+}
+// Admin 
+export async function getAllUsers({
+  page = 1,
+  limit = 20,
+  sortField = "created_at",
+  sortDirection = "desc",
+  role,
+  status,
+  name,
+  email,
+  user_id,
+  phone
+}: GetAllUsersParams = {}) {
+  try {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      sortField,
+      sortDirection
+    });
+
+    if (role) params.append("role", role);
+    if (status !== undefined) params.append("status", String(status));
+    if (name) params.append("name", name);
+    if (email) params.append("email", email);
+    if (user_id) params.append("user_id", String(user_id));
+    if (phone) params.append("phone", phone);
+
+    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi fetch danh sách người dùng:", error);
+    throw error;
+  }
+}
+export async function getAllUsersV2({
+  page = 1,
+  limit = 20,
+  sortField = "created_at",
+  sortDirection = "desc",
+  role,
+  status,
+  name,
+  email,
+  user_id,
+  phone,
+  search,
+}: Partial<InterfaceUser> & {
+  page?: number;
+  limit?: number;
+  sortField?: string;
+  sortDirection?: string;
+  search?: string;
+} = {}): Promise<{
+  data: {
+    users: InterfaceUser[];
+    total: number;
+    currentPage: number;
+    totalPages: number;
+    limit: number;
+  };
+}> {
+  try {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      sortField,
+      sortDirection,
+    });
+
+    if (role) params.append("role", role);
+    if (status !== undefined) params.append("status", String(status));
+    if (name) params.append("name", name);
+    if (email) params.append("email", email);
+    if (user_id !== undefined) params.append("user_id", String(user_id));
+    if (phone) params.append("phone", phone);
+    if (search) params.append("search", search);
+
+    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const response = await res.json();
+
+    const mappedUsers = response.data.users.map((u: any) => ({
+      ship_address_id: String(u.ship_address_id ?? ""),
+      user_id: Number(u.user_id ?? 0),
+      name: u.name ?? "",
+      email: u.email ?? "",
+      password: u.password,
+      phone: u.phone ?? null,
+      role: u.role ?? "user",
+      status: Number(u.status ?? 0),
+      avatar: u.avatar ?? null,
+      verify_otp: u.verify_otp ?? null,
+      created_at: u.created_at ?? "",
+      updated_at: u.updated_at ?? "",
+    })) as InterfaceUser[];
+
+    return {
+      data: {
+        users: mappedUsers,
+        total: response.data.total || 0,
+        currentPage: response.data.currentPage || page,
+        totalPages: response.data.totalPages || 1,
+        limit: response.data.limit || limit,
+      },
+    };
+  } catch (error) {
+    console.error("Lỗi khi fetch danh sách người dùng (V2):", error);
+    throw error;
+  }
+}
+export const updateUser = async (
+  userId: number | string,
+  updateData: { role: string; status: number }
+) => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/update-user/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Lỗi server: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error('[Service] Lỗi updateUser:', error);
+    throw error;
+  }
+};

@@ -1,82 +1,7 @@
-.intro-banner {
-    position: relative;
-    background: url('/images/banner/bando.png') no-repeat center center/cover;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #000;
-    text-align: center;
-    margin: 100px auto 0 auto;
-    /* thêm 50px khoảng cách top */
-}
-
-
-/* Nội dung chính giữa */
-.intro-content {
-    z-index: 2;
-}
-
-.intro-content h1 {
-    font-size: 40px;
-    font-weight: bold;
-    margin: 0 auto;
-}
-
-.intro-content p {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #555;
-}
-
-.intro-content p a {
-    color: #080808;
-    text-decoration: none;
-    font-weight: 700;
-    /* hoặc bold */
-}
-
-
-/* Icon bên phải */
-.intro-icon {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 2;
-}
-
-.icon-btn {
-    background: white;
-    border: 2px solid black;
-    border-radius: 8px;
-    padding: 8px 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.icon-btn i {
-    font-size: 20px;
-    color: black;
-}
-
-/* Background overlay mờ nhẹ nếu cần */
-.intro-banner::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.4);
-    z-index: 1;
-}
-
 .main-cart {
-   width: 90%;
-    margin: 20px auto;
-    
+    width: 90%;
+    margin: 0 auto;
+    padding: 30px;
 }
 
 .cart-container {
@@ -97,7 +22,8 @@
 .cart-header,
 .cart-item {
     display: grid;
-    grid-template-columns: 4fr 1fr 2fr 1.5fr;;
+    grid-template-columns: 4fr 1fr 2fr 1.5fr;
+    ;
     align-items: center;
     gap: 20px;
     padding: 15px 0;
@@ -300,6 +226,7 @@
     text-align: center;
     line-height: 20px;
     font-size: 14px;
+    transition: all .5s ease-in-out;
 }
 
 .progress-text p {
@@ -308,6 +235,11 @@
 }
 
 .progress-text .highlight {
+    color: #4bd963;
+    font-weight: bold;
+}
+
+.highlight {
     color: #4bd963;
     font-weight: bold;
 }
@@ -330,49 +262,215 @@
     margin-top: 20px;
     cursor: pointer;
 }
-@media (max-width: 768px) {
-     .main-cart{
-        width: 90%;
-     }
-     .cart-item{
-        gap: 9px;
-        padding: 5px 0;
-       
-     }
+
+.shipping-fee-label {
+    font-size: 13px;
+
+    font-weight: bold;
 }
-@media (max-width:991px){
-    .intro-banner{
+
+@media (max-width:991px) {
+    .intro-banner {
         margin-top: 30px;
     }
-    .cart-container{
+
+    .cart-container {
         display: block;
     }
-    .free-shipping-progress,.free-shipping,
-    .cart-header{
+
+    .free-shipping-progress,
+    .free-shipping,
+    .cart-header {
         display: none;
     }
-    .cart-item{
+
+    .cart-item {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         align-items: center;
     }
-    .product-info{
+
+    .product-info {
         display: block;
         width: 50%;
     }
-    .cart-item-price,.quantity-control,.cart-item-total{
+
+    .cart-item-price,
+    .quantity-control,
+    .cart-item-total {
         margin-top: 25px;
     }
-    .cart-item-total{
-        color: red;
+
+    .cart-item-total {
+        color: #4bd963;
     }
-    .remove-btn{
+
+    .remove-btn {
         color: black;
     }
 }
-@media (max-width:1198px){
-    .intro-banner{
+
+@media (max-width:1198px) {
+    .intro-banner {
         margin-top: 50px !important;
     }
-} 
+}
+
+.coupon-section1 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    /* ✅ Center all vouchers */
+    width: 100%;
+    padding: 10px 0;
+}
+
+.coupon1 {
+    display: flex;
+    align-items: stretch;
+    border: 2px dashed #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    /* ✅ Giới hạn chiều rộng cho đẹp */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.coupon1:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.left-part {
+    width: 80%;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.right-part {
+    width: 20%;
+    background: #4bd963;
+    writing-mode: vertical-rl;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+    padding: 10px 5px;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.code {
+    font-size: 14px;
+    color: #ff0000;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.discount-box {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.discount-box .title {
+    background: #ff0000;
+    color: white;
+    padding: 4px 6px;
+    font-size: 12px;
+    margin-bottom: 3px;
+    display: inline-block;
+    border-radius: 2px;
+}
+
+.discount-box .percent {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+}
+
+.desc {
+    font-size: 12px;
+    color: #555;
+    margin-bottom: 6px;
+}
+
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.apply-link {
+    font-size: 12px;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.copy-button {
+    background: #021688;
+    border: none;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    color: white;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* Coupon Dropdown Button */
+.coupon-dropdown button {
+  width: 100%;
+  background: #f9fefb; /* Nền xanh nhạt nhẹ */
+  border: 2px solid #22c55e; /* Màu viền xanh lá */
+  color: #111827; /* Màu chữ đậm */
+  font-size: 15px;
+  font-weight: 500;
+  padding: 5px 16px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.coupon-dropdown button:hover {
+  border-color: #16a34a;
+  background: #ecfdf5; /* Xanh nhẹ khi hover */
+  box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
+}
+
+.coupon-dropdown button:focus {
+  outline: none;
+  border-color: #15803d;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4);
+}
+
+/* Optional: Add a dropdown arrow icon */
+.coupon-dropdown .select-coupon::after {
+  content: "▼";
+  font-size: 12px;
+  margin-left: auto;
+  color: #16a34a;
+  transition: transform 0.3s ease;
+}
+
+/* Optional: Rotate arrow when open */
+.coupon-dropdown.open button::after {
+  transform: rotate(180deg);
+}

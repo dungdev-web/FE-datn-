@@ -1,7 +1,18 @@
 "use client";
-
+import {
+  getRecentOrders,
+  getStatusText,
+  getAllCategoryProduct,
+} from "@/services/dashboardService";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
+import exportStyledExcel from "../component_admin/Excel";
+import { IOrder } from "@/types/Order";
+import Swal from "sweetalert2";
+import { updateOrderStatus } from "@/services/orderService";
+import { ArrowUpDown } from "lucide-react";
+import { ICategory } from "@/types/ICategory";
+import { API_BASE_URL } from "@/config/env";
 
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -9,273 +20,356 @@ export default function OrderPage() {
   const [orderStatus, setOrderStatus] = useState("Chờ xác nhận");
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [sortField, setSortField] = useState<"name" | "phone" | "created_at">(
+    "created_at"
+  );
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [categoryProducts, setCategoryProducts] = useState<ICategory[]>([]);
 
-  const handleCloseModal = (modal) => {
+  const statusOrderFlow = [
+    "pending",
+    "processing",
+    "shipping",
+    "completed",
+    "cancelled",
+  ];
+
+  const excelData = orders.map((order: any) => ({
+    maDonHang: order.orders_id,
+    nguoiNhan: order.user?.name,
+    dienThoai: order.user?.phone,
+    trangThai: order.status,
+    sanPham: order.order_items
+      ?.map((i: any) => i.variant?.product?.name)
+      .join(", "),
+    ngayDat: new Date(order.created_at).toLocaleDateString("vi-VN"),
+  }));
+
+  const handleCloseModal = (modal: "view" | "update") => {
     if (modal === "view") setIsViewModalOpen(false);
     if (modal === "update") setIsUpdateModalOpen(false);
   };
 
-  const handleOpenModal = (modal) => {
-    if (modal === "view") setIsViewModalOpen(true);
-    if (modal === "update") setIsUpdateModalOpen(true);
+  const handleOpenModal = (type: "view" | "update", order: any) => {
+    setSelectedOrder(order);
+    if (type === "view") setIsViewModalOpen(true);
+    else if (type === "update") setIsUpdateModalOpen(true);
+  };
+  const handleUpdateClick = async () => {
+    if (!selectedOrder?.orders_id) {
+      console.error("orders_id is undefined");
+      return;
+    }
+
+    const currentIndex = statusOrderFlow.indexOf(selectedOrder.status);
+    const newIndex = statusOrderFlow.indexOf(orderStatus);
+
+    if (orderStatus !== "cancelled" && newIndex < currentIndex) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Không thể quay lại trạng thái trước",
+        text: `Không thể thay đổi từ "${getStatusText(
+          selectedOrder.status
+        )}" về "${getStatusText(orderStatus)}"`,
+        didOpen: () => {
+          const swalContainer = document.querySelector(
+            ".swal2-container"
+          ) as HTMLElement;
+          if (swalContainer) {
+            swalContainer.style.zIndex = "9999";
+          }
+        },
+      });
+      return;
+    }
+
+    try {
+      const data = await updateOrderStatus(
+        selectedOrder.orders_id,
+        orderStatus
+      );
+      if (data.success) {
+        await Swal.fire({
+          title: "Cập nhật thành công!",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+          didOpen: () => {
+            const swalContainer = document.querySelector(
+              ".swal2-container"
+            ) as HTMLElement;
+            if (swalContainer) {
+              swalContainer.style.zIndex = "9999";
+            }
+          },
+        });
+
+        // Đóng modal và làm mới trang
+        setIsUpdateModalOpen(false);
+        location.reload();
+      }
+    } catch (err) {
+      const error = err as Error;
+      console.error("Lỗi cập nhật:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Đã xảy ra lỗi khi cập nhật",
+        text: error.message || "Vui lòng thử lại sau.",
+      });
+    }
   };
 
-  const updateOrderStatus = () => {
-    alert("Trạng thái đơn hàng đã cập nhật thành: " + orderStatus);
-    handleCloseModal("update");
+  const fetchOrders = async () => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        search,
+        status: statusFilter,
+        categoryId: categoryFilter,
+        sortField: sortField || "created_at",
+        sortOrder: sortOrder || "desc",
+      });
+
+      const data = await getRecentOrders(params.toString());
+
+      if (data.success) {
+        setOrders(data.data);
+        setTotalPages(data.pagination.totalPages);
+      }
+    } catch (err) {
+      console.error("Lỗi gọi API:", err);
+    }
   };
+
+  useEffect(() => {
+    fetchOrders();
+  }, [page, limit, search, statusFilter, categoryFilter, sortOrder]);
+  const handleSort = (field: "name" | "phone" | "created_at") => {
+    if (sortField === field) {
+      // Nếu click lại cùng 1 field -> đảo chiều asc/desc
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      // Nếu click field khác -> set field mới và reset asc
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await getAllCategoryProduct();
+        // res có dạng { message: string, data: CategoryProduct[] }
+        setCategoryProducts(res.data);
+      } catch (error) {
+        console.error("Lỗi lấy danh mục sản phẩm:", error);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   return (
     <div>
-        <div className="order-list">
-          <h2>Danh sách đơn hàng</h2>
+      <div className="order-list">
+        <h2>Danh sách đơn hàng</h2>
 
-          <div className="actions">
-            <div className={`search-toggle ${isSearching ? "active" : ""}`}>
-              {isSearching ? (
+        <div className="actions">
+          <div className={`search-toggle ${isSearching ? "active" : ""}`}>
+            {isSearching ? (
+              <input
+                type="text"
+                className="search-input"
+                autoFocus
+                placeholder="Nhập từ khóa..."
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setSearchText(e.target.value);
+                }}
+                onBlur={() => {
+                  if (searchText === "") setIsSearching(false);
+                }}
+              />
+            ) : (
+              <button
+                className="btn btn-search"
+                onClick={() => {
+                  setIsSearching(true);
+                }}
+              >
+                <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+              </button>
+            )}
+          </div>
+          <button className="btn btn-refresh">
+            <i className="fa-solid fa-rotate-right"></i> Làm mới
+          </button>
+          <button
+            className="btn btn-export"
+            onClick={() => exportStyledExcel(excelData, "don-hang")}
+          >
+            <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
+          </button>
+        </div>
+
+        <table className="order-table">
+          <thead>
+            <tr>
+              <th>Đơn hàng</th>
+              <th>
+                Người nhận{" "}
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                  onClick={() => handleSort("name")}
+                  style={{ cursor: "pointer" }}
+                />{" "}
+              </th>
+              <th>
+                Điện thoại{" "}
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                  onClick={() => handleSort("phone")}
+                  style={{ cursor: "pointer" }}
+                />
+              </th>
+              <th>Trạng thái</th>
+              <th>Sản phẩm</th>
+              <th>
+                Ngày đặt{" "}
+                <ArrowUpDown
+                  className="inline-block ml-2 w-4 h-4 cursor-pointer"
+                  onClick={() => handleSort("created_at")}
+                  style={{ cursor: "pointer" }}
+                />
+              </th>
+              <th>Thao tác</th>
+            </tr>
+            <tr className="filter-row">
+              <th>
+                <input type="text" placeholder="Lọc đơn..." />
+              </th>
+              <th>
                 <input
                   type="text"
-                  className="search-input"
-                  autoFocus
-                  placeholder="Nhập từ khóa..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  onBlur={() => {
-                    if (searchText === "") setIsSearching(false);
-                  }}
+                  placeholder="Lọc tên khách hàng..."
+                  onChange={(e) => setSearch(e.target.value)}
                 />
-              ) : (
-                <button
-                  className="btn btn-search"
-                  onClick={() => setIsSearching(true)}
+              </th>
+              <th>
+                <input
+                  type="text"
+                  placeholder="Lọc số điện thoại..."
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </th>
+              <th>
+                <select onChange={(e) => setStatusFilter(e.target.value)}>
+                  <option value="">Tất cả trạng thái</option>
+                  <option value="pending">Chờ xử lý</option>
+                  <option value="processing">Đang xử lý</option>
+                  <option value="shipping">Đang giao hàng</option>
+                  <option value="completed">Hoàn thành</option>
+                  <option value="cancelled">Đã hủy</option>
+                  <option value="returned">Hoàn trả</option>
+                </select>
+              </th>
+              <th>
+                <select
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  value={categoryFilter}
                 >
-                  <i className="fa-solid fa-magnifying-glass"></i> Tìm kiếm
-                </button>
-              )}
-            </div>
-            <button className="btn btn-refresh">
-              <i className="fa-solid fa-rotate-right"></i> Refresh
-            </button>
-            <button className="btn btn-export">
-              <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
-            </button>
-          </div>
+                  <option value="">Tất cả</option>
+                  {categoryProducts.map((cat) => (
+                    <option
+                      key={cat.categories_id}
+                      value={String(cat.categories_id)}
+                    >
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order: any) => (
+              <tr key={order.orders_id}>
+                <td>#{order.orders_id}</td>
+                <td>{order.user?.name}</td>
+                <td>
+                  {order.shipping_address?.phone
+                    ? order?.shipping_address?.phone
+                    : "Không có số điện thoại"}
+                </td>
+                <td>
+                  <span className={`status-label status-${order.status}`}>
+                    {getStatusText(order.status)}
+                  </span>
+                </td>
+                <td>
+                  {order.order_items.map((item: any, idx: number) => (
+                    <span key={idx} className="category-tag">
+                      {item.variant?.product?.category?.name}
+                    </span>
+                  ))}
+                </td>
+                <td>
+                  {new Date(order.created_at).toLocaleDateString("vi-VN")}
+                </td>
+                <td>
+                  <i
+                    className="fa-solid fa-eye view-icon"
+                    title="Xem"
+                    onClick={() => handleOpenModal("view", order)}
+                  ></i>
+                  <i
+                    className="fa-solid fa-rotate view-status-icon"
+                    title="Cập nhật trạng thái"
+                    onClick={() => handleOpenModal("update", order)}
+                  ></i>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="pagination">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage(page - 1)}
+            className="page-btn"
+          >
+            <i className="fa-solid fa-angle-left"></i>
+          </button>
 
-          <table className="order-table">
-            <thead>
-              <tr>
-                <th>Mã đơn hàng</th>
-                <th>Người nhận</th>
-                <th>Điện thoại</th>
-                <th>Trạng thái</th>
-                <th>Sản phẩm</th>
-                <th>Ngày đặt</th>
-                <th>Thao tác</th>
-              </tr>
-              <tr className="filter-row">
-                <th>
-                  <input type="text" placeholder="Lọc mã đơn..." />
-                </th>
-                <th>
-                  <input type="text" placeholder="Lọc tên khách hàng..." />
-                </th>
-                <th>
-                  <input type="text" placeholder="Lọc số điện thoại..." />
-                </th>
-                <th>
-                  <select>
-                    <option value="">Tất cả trạng thái</option>
-                    <option value="pending">Chờ xác nhận</option>
-                    <option value="confirmed">Đã xác nhận</option>
-                    <option value="shipping">Đang giao hàng</option>
-                    <option value="delivered">Đã giao</option>
-                    <option value="cancelled">Đã hủy</option>
-                    <option value="returned">Hoàn trả</option>
-                  </select>
-                </th>
-                <th>
-                  <select>
-                    <option value="">Tất cả</option>
-                    <option value="Nike">Nike</option>
-                    <option value="Adidas">Adidas</option>
-                    <option value="Puma">Puma</option>
-                  </select>
-                </th>
-                <th></th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>ORD10001</td>
-                <td>Nguyễn Văn A</td>
-                <td>0901234567</td>
-                <td>
-                  <span className="status-label status-pending">
-                    Chờ xác nhận
-                  </span>
-                </td>
-                <td>
-                  <span className="category-tag">Giày thể thao</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i
-                    className="fa-solid fa-eye view-icon"
-                    title="Xem"
-                    onClick={() => handleOpenModal("view")}
-                  ></i>
-                  <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
-                    onClick={() => handleOpenModal("update")}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td>ORD10001</td>
-                <td>Nguyễn Văn A</td>
-                <td>0901234567</td>
-                <td>
-                  <span className="status-label status-confirmed">
-                    Đã xác nhận
-                  </span>
-                </td>
-                <td>
-                  <span className="category-tag">Giày thể thao</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i
-                    className="fa-solid fa-eye view-icon"
-                    title="Xem"
-                    onClick={() => handleOpenModal("view")}
-                  ></i>
-                  <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
-                    onClick={() => handleOpenModal("update")}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td>ORD10001</td>
-                <td>Nguyễn Văn A</td>
-                <td>0901234567</td>
-                <td>
-                  <span className="status-label status-delivered">
-                    Đã hoàn thành
-                  </span>
-                </td>
-                <td>
-                  <span className="category-tag">Giày thể thao</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i
-                    className="fa-solid fa-eye view-icon"
-                    title="Xem"
-                    onClick={() => handleOpenModal("view")}
-                  ></i>
-                  <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
-                    onClick={() => handleOpenModal("update")}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td>ORD10001</td>
-                <td>Nguyễn Văn A</td>
-                <td>0901234567</td>
-                <td>
-                  <span className="status-label status-shipping">
-                    Đang giao hàng
-                  </span>
-                </td>
-                <td>
-                  <span className="category-tag">Giày thể thao</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i
-                    className="fa-solid fa-eye view-icon"
-                    title="Xem"
-                    onClick={() => handleOpenModal("view")}
-                  ></i>
-                  <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
-                    onClick={() => handleOpenModal("update")}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td>ORD10001</td>
-                <td>Nguyễn Văn A</td>
-                <td>0901234567</td>
-                <td>
-                  <span className="status-label status-cancelled">Đã Hủy</span>
-                </td>
-                <td>
-                  <span className="category-tag">Giày thể thao</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i
-                    className="fa-solid fa-eye view-icon"
-                    title="Xem"
-                    onClick={() => handleOpenModal("view")}
-                  ></i>
-                  <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
-                    onClick={() => handleOpenModal("update")}
-                  ></i>
-                </td>
-              </tr>
-              <tr>
-                <td>ORD10001</td>
-                <td>Nguyễn Văn A</td>
-                <td>0901234567</td>
-                <td>
-                  <span className="status-label status-returned">Hoàn trả</span>
-                </td>
-                <td>
-                  <span className="category-tag">Giày thể thao</span>
-                </td>
-                <td>08-05-2025</td>
-                <td>
-                  <i
-                    className="fa-solid fa-eye view-icon"
-                    title="Xem"
-                    onClick={() => handleOpenModal("view")}
-                  ></i>
-                  <i
-                    className="fa-solid fa-rotate view-status-icon"
-                    title="Cập nhật trạng thái"
-                    onClick={() => handleOpenModal("update")}
-                  ></i>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={`page-btn ${page === i + 1 ? "active" : ""}`}
+              onClick={() => setPage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))}
 
-          <div className="pagination">
-            <button className="page-btn" disabled>
-              <i className="fa-solid fa-angle-left"></i>
-            </button>
-            <button className="page-btn active">1</button>
-            <button className="page-btn">2</button>
-            <button className="page-btn">3</button>
-            <button className="page-btn">4</button>
-            <button className="page-btn">...</button>
-            <button className="page-btn">10</button>
-            <button className="page-btn">
-              <i className="fa-solid fa-angle-right"></i>
-            </button>
-          </div>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage(page + 1)}
+            className="page-btn"
+          >
+            <i className="fa-solid fa-angle-right"></i>
+          </button>
         </div>
+      </div>
 
       {isViewModalOpen && (
         <div className="modal-overlay">
@@ -292,44 +386,117 @@ export default function OrderPage() {
             <div className="modal-body">
               <ul className="order-detail-list">
                 <li>
-                  <strong>Mã đơn hàng:</strong> <span>ORD10001</span>
+                  <strong>Mã đơn hàng:</strong>{" "}
+                  <span>
+                    TERA
+                    {selectedOrder?.created_at
+                      ? String(
+                          new Date(selectedOrder.created_at).getDate()
+                        ).padStart(2, "0")
+                      : ""}
+                    {selectedOrder?.created_at
+                      ? String(
+                          new Date(selectedOrder.created_at).getMonth() + 1
+                        ).padStart(2, "0")
+                      : ""}
+                    {selectedOrder?.orders_id ?? ""}
+                  </span>
                 </li>
                 <li>
-                  <strong>Người nhận:</strong> <span>Nguyễn Văn A</span>
+                  <strong>Người nhận:</strong>{" "}
+                  <span>{selectedOrder?.user.name}</span>
                 </li>
                 <li>
-                  <strong>Điện thoại:</strong> <span>0901234567</span>
+                  <strong>Điện thoại:</strong>{" "}
+                  <span>{selectedOrder?.user.phone}</span>
                 </li>
-                <li>
-                  <strong>Sản phẩm:</strong> <span>Giày thể thao </span>{" "}
-                  <span>(Size 42)</span>
-                </li>
-                <li>
+                {selectedOrder?.order_items?.map((item: any, index: number) => {
+                  return (
+                    <li
+                      key={index}
+                      className="!p-4 border rounded-lg shadow-sm bg-white !block"
+                    >
+                      <div className="!mb-2 text-base font-semibold text-gray-800">
+                        <span>Sản phẩm: </span>
+                        <span className="font-bold">
+                          {item.variant?.product?.name}
+                        </span>{" "}
+                        <span className="text-sm text-gray-600">
+                          (Size{" "}
+                          {item.variant?.size?.number_size ??
+                            item.size?.number_size ??
+                            "Không rõ"}
+                          )
+                        </span>{" "}
+                        -{" "}
+                        <span className="text-sm text-gray-600">
+                          {item.variant.color?.name_color}
+                        </span>
+                      </div>
+                      <div className="!mb-2 flex items-center justify-between">
+                        <div className="text-sm text-gray-700 ">
+                          <strong>Số lượng - Giá: </strong>
+                          <span>{item.quantity}</span> -{" "}
+                          <span className="text-red-600 font-medium">
+                            {item.unit_price.toLocaleString("vi")} VNĐ
+                          </span>
+                        </div>
+                        <img
+                          src={`${API_BASE_URL}/uploads/${item.variant.color.images}`}
+                          alt={`${item.variant?.product?.name}`}
+                          className="w-[15%]"
+                        />
+                      </div>
+                    </li>
+                  );
+                })}
+
+                {/* <li>
                   <strong>Màu:</strong> <span>Đen</span>
-                </li>
-                <li>
+                </li> */}
+                {/* <li>
                   <strong>Số Lượng - Giá:</strong> <span>2</span>{" "}
                   <span>700.000 VNĐ</span>
-                </li>
-                <li>
-                  <strong>Ngày đặt:</strong> <span>08-05-2025</span>
-                </li>
-                <li>
-                  <strong>Địa chỉ giao hàng:</strong>{" "}
-                  <span>123 Lý Thường Kiệt, Q.10, TP.HCM</span>
-                </li>
-                <li>
-                  <strong>Ghi chú:</strong>{" "}
-                  <span>Giao hàng trong giờ hành chính</span>
-                </li>
-                <li>
-                  <strong>Thanh toán:</strong>{" "}
-                  <span>COD (Thanh toán khi nhận hàng)</span>
-                </li>
-                <li>
-                  <strong>Trạng thái:</strong>{" "}
-                  <span className="badge badge-warning">Chờ xác nhận</span>
-                </li>
+                </li> */}
+
+                {selectedOrder && (
+                  <>
+                    <li>
+                      <strong>Ngày đặt:</strong>{" "}
+                      <span>
+                        {new Date(selectedOrder.created_at).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </span>
+                    </li>
+                    <li>
+                      <strong className="w-full">Địa chỉ giao hàng:</strong>{" "}
+                      <span className="text-right">
+                        {selectedOrder.shipping_address?.address_line}
+                      </span>
+                    </li>
+                    <li>
+                      <strong>Ghi chú:</strong>{" "}
+                      <span>{selectedOrder.comment}</span>
+                    </li>
+                    <li>
+                      <strong>Thanh toán:</strong>{" "}
+                      <span>{selectedOrder.payment_method?.name_method}</span>
+                    </li>
+                    <li>
+                      <strong>Tổng tiền:</strong>{" "}
+                      <span className="text-red-600 font-medium">
+                        {selectedOrder.total_amount.toLocaleString("vi")} VNĐ
+                      </span>
+                    </li>
+                    <li>
+                      <strong>Trạng thái:</strong>{" "}
+                      <span className={`badge status-${selectedOrder.status}`}>
+                        {getStatusText(selectedOrder.status)}
+                      </span>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
             <div className="modal-footer">
@@ -365,16 +532,24 @@ export default function OrderPage() {
                 value={orderStatus}
                 onChange={(e) => setOrderStatus(e.target.value)}
               >
-                <option value="Chờ xác nhận">Chờ xác nhận</option>
-                <option value="Đã xác nhận">Đã xác nhận</option>
-                <option value="Đang giao hàng">Đang giao hàng</option>
-                <option value="Đã giao">Đã giao</option>
-                <option value="Đã hủy">Đã hủy</option>
-                <option value="Hoàn trả">Hoàn trả</option>
+                {statusOrderFlow
+                  .filter((status) => {
+                    const currentIndex = statusOrderFlow.indexOf(orderStatus);
+                    const nextIndex = statusOrderFlow.indexOf(status);
+                    return (
+                      status === "cancelled" || // luôn cho phép hủy
+                      nextIndex >= currentIndex // không cho quay lại
+                    );
+                  })
+                  .map((status) => (
+                    <option key={status} value={status}>
+                      {getStatusText(status)}
+                    </option>
+                  ))}
               </select>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-close" onClick={updateOrderStatus}>
+              <button className="btn btn-close" onClick={handleUpdateClick}>
                 Cập nhật
               </button>
             </div>

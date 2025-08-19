@@ -2,41 +2,61 @@
 import "../../css/product.css";
 import "../../css/account.css";
 import Link from "next/link";
-import AccountSidebar from "../../component/accountsidebar";
+import AccountSidebar from "../../component/Account/AccountSidebar";
 import { IUser } from "@/types/user";
 import { useState, useEffect } from "react";
 import { checkToken } from "@/services/authService";
+import { changePasswordService } from "@/services/userService";
+import { toast, ToastContainer } from "react-toastify";
+import { useChangePasswordForm } from "@/hooks/usePasswordValidation";
+
 export default function Change_pass() {
   const [user, setUser] = useState<IUser | null>(null);
+  const { form, errors, handleChange, validateAll, resetForm } =
+    useChangePasswordForm();
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // const token = localStorage.getItem("token");
-        // if (!token) {
-        //   console.error("Token không tồn tại");
-        //   return;
-        // }
         const tokenData = await checkToken();
-
         if (!tokenData?.user?.id) throw new Error("Token không hợp lệ");
-
         setUser(tokenData.user);
-
-        // Nếu bạn muốn load thêm info từ DB (KHÔNG CẦN nếu tokenData.user đã đủ):
-        // const userInfo = await getInfoUser(tokenData.user.id);
-        // console.log(tokenData.user.id);
-
-        // setUser(userInfo);
       } catch (error) {
         console.error("Lỗi lấy thông tin người dùng:", error);
-        // Ví dụ: có thể redirect về trang login nếu cần
-        // router.push("/login");
       }
     };
 
     fetchUser();
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const isValid = validateAll();
+    if (!isValid) {
+      toast.error("Vui lòng kiểm tra lại thông tin.");
+      return;
+    }
+
+    try {
+      if (!user?.id) {
+        toast.error("Không tìm thấy thông tin người dùng.");
+        return;
+      }
+
+      await changePasswordService({
+        userId: Number(user?.id),
+        oldPassword: form.oldPassword,
+        newPassword: form.newPassword,
+      });
+
+      toast.success("Đổi mật khẩu thành công!");
+      resetForm();
+    } catch (err: any) {
+      toast.error(err.message || "Lỗi đổi mật khẩu.");
+    }
+  };
+
   return (
     <>
       <section
@@ -47,22 +67,20 @@ export default function Change_pass() {
           backgroundSize: "cover",
         }}
       >
-        {/* Lớp phủ làm mờ nền */}
         <div className="absolute inset-0 bg-gray-500/50 backdrop-blur-none z-0"></div>
-
         <div className="breadcrumb-container">
           <div className="title-page">
             <h2>Đổi mật khẩu</h2>
           </div>
           <ul className="breadcrumb">
             <li className="home">
-              <Link href={"/"} title="Trang chủ">
+              <Link href={"/"}>
                 <span>Trang chủ</span>
               </Link>
               <i className="fa fa-angle-right" aria-hidden="true"></i>
             </li>
             <li className="home">
-              <Link href={"/account"} title="Tài khoản">
+              <Link href={"/account"}>
                 <span>Tài khoản</span>
               </Link>
               <i className="fa fa-angle-right" aria-hidden="true"></i>
@@ -72,10 +90,10 @@ export default function Change_pass() {
                 <span>Đổi mật khẩu</span>
               </strong>
             </li>
-            <li></li>
           </ul>
         </div>
       </section>
+
       <main>
         <div className="container1">
           <div className="row">
@@ -87,19 +105,7 @@ export default function Change_pass() {
               <div className="row">
                 <div className="col-md-6 col-12">
                   <div className="page-login">
-                    <form
-                      method="post"
-                      action="/account/changepassword"
-                      id="change_customer_password"
-                      acceptCharset="UTF-8"
-                    >
-                      <input
-                        name="FormType"
-                        type="hidden"
-                        value="change_customer_password"
-                      />
-                      <input name="utf8" type="hidden" value="true" />
-
+                    <form id="change_customer_password" onSubmit={handleSubmit}>
                       <p>
                         Để đảm bảo tính bảo mật vui lòng đặt mật khẩu với ít
                         nhất 8 kí tự
@@ -111,22 +117,48 @@ export default function Change_pass() {
                           </label>
                           <input
                             type="password"
-                            name="OldPassword"
-                            id="OldPass"
-                            className="form-control form-control-lg"
+                            name="oldPassword"
+                            value={form.oldPassword}
+                            onChange={handleChange}
+                            className={`form-control outline-none form-control-lg ${
+                              errors.oldPassword
+                                ? "border !border-red-500"
+                                : form.oldPassword
+                                ? "border !border-green-500"
+                                : ""
+                            }`}
                           />
+                          {errors.oldPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.oldPassword}
+                            </p>
+                          )}
                         </fieldset>
+
                         <fieldset className="form-group">
                           <label>
                             Mật khẩu mới <span className="error">*</span>
                           </label>
                           <input
                             type="password"
-                            name="Password"
-                            id="changePass"
-                            className="form-control form-control-lg"
+                            name="newPassword"
+                            value={form.newPassword}
+                            onChange={handleChange}
+                            className={`form-control outline-none form-control-lg ${
+                              errors.newPassword
+                                ? "border !border-red-500"
+                                : form.newPassword
+                                ? "border !border-green-500"
+                                : ""
+                            }`}
                           />
+                          {errors.newPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.newPassword}
+                            </p>
+                          )}
                         </fieldset>
+
                         <fieldset className="form-group">
                           <label>
                             Xác nhận lại mật khẩu{" "}
@@ -134,12 +166,28 @@ export default function Change_pass() {
                           </label>
                           <input
                             type="password"
-                            name="ConfirmPassword"
-                            id="confirmPass"
-                            className="form-control form-control-lg"
+                            name="confirmPassword"
+                            value={form.confirmPassword}
+                            onChange={handleChange}
+                            className={`form-control outline-none form-control-lg ${
+                              errors.confirmPassword
+                                ? "border !border-red-500"
+                                : form.confirmPassword
+                                ? "border !border-green-500"
+                                : ""
+                            }`}
                           />
+                          {errors.confirmPassword && (
+                            <p className="text-red-500 text-sm mt-1">
+                              {errors.confirmPassword}
+                            </p>
+                          )}
                         </fieldset>
-                        <button className="button btn-edit-addr btn btn-primary btn-more">
+
+                        <button
+                          type="submit"
+                          className="button btn-edit-addr btn btn-primary btn-more"
+                        >
                           <i className="hoverButton"></i>Đặt lại mật khẩu
                         </button>
                       </div>
@@ -150,6 +198,7 @@ export default function Change_pass() {
             </div>
           </div>
         </div>
+        <ToastContainer position="top-right" autoClose={3000} />
       </main>
     </>
   );

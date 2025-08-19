@@ -1,5 +1,6 @@
 // mocks/mockUsers.ts
 
+import { API_BASE_URL } from "@/config/env";
 import { IProduct } from "@/types/product";
 const defaultProducts: IProduct[] = [
   {
@@ -34,31 +35,31 @@ const defaultProducts: IProduct[] = [
     images: [
       {
         images_id: 101,
-        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        url: `${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`,
         alt_text: "Converse Run Star Motion góc nghiêng",
         type: "thumbnail",
       },
       {
         images_id: 102,
-        url: "/images/products/chaybo/ConverseRunStarMotion(2).webp",
+        url: `${API_BASE_URL}/uploads/ConverseRunStarMotion(2).webp`,
         alt_text: "Converse Run Star Motion bên hông",
         type: "gallery",
       },
       {
         images_id: 103,
-        url: "/images/products/chaybo/ConverseRunStarMotion(1).webp",
+        url: `${API_BASE_URL}/uploads/ConverseRunStarMotion(1).webp`,
         alt_text: "Converse Run Star Motion bên hông",
         type: "gallery",
       },
       {
         images_id: 104,
-        url: "/images/products/chaybo/ConverseRunStarMotion.webp",
+        url: `${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`,
         alt_text: "Converse Run Star Motion bên hông",
         type: "gallery",
       },
     ],
 
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 1001,
         rating: "5",
@@ -79,7 +80,7 @@ const defaultProducts: IProduct[] = [
       },
     ],
 
-    variants: [
+    product_variants: [
       {
         product_variants_id: 201,
         sku: "CV-RSM-BLK-40",
@@ -88,7 +89,7 @@ const defaultProducts: IProduct[] = [
           id: 301,
           code_color: "#000000",
           name_color: "Đen",
-          image: "/images/products/chaybo/ConverseRunStarMotion.webp",
+          images: `${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`,
         },
         size: {
           id: 401,
@@ -103,7 +104,7 @@ const defaultProducts: IProduct[] = [
           id: 301,
           code_color: "#000000",
           name_color: "Đen",
-          image: "/images/products/chaybo/ConverseRunStarMotion.webp",
+          images: `${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`,
         },
         size: {
           id: 402,
@@ -118,7 +119,7 @@ const defaultProducts: IProduct[] = [
           id: 302,
           code_color: "#FFFFFF",
           name_color: "Trắng",
-          image: "/images/products/chaybo/ConverseRunStarMotion_white.webp",
+          images: `${API_BASE_URL}/uploads/ConverseRunStarMotion_white.webp`,
         },
         size: {
           id: 403,
@@ -151,12 +152,12 @@ const defaultProducts: IProduct[] = [
     images: [
       {
         images_id: 201,
-        url: "/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp",
+        url: `${API_BASE_URL}/uploads/AirJordanDMP1Retro(xanhlam).webp`,
         alt_text: "Giày Nike Pegasus 39",
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 2001,
         rating: "5",
@@ -185,7 +186,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 203,
         sku: "NK-PEG-GRN-42",
@@ -194,7 +195,8 @@ const defaultProducts: IProduct[] = [
           id: 303,
           code_color: "#00FF00",
           name_color: "Xanh lá",
-          image: "/images/products/chaybo/AirJordanDMP1Retro(xanhlam).webp",
+
+          images: `${API_BASE_URL}/uploads/AirJordanDMP1Retro(xanhlam).webp`,
         },
         size: { id: 403, number_size: "42" },
       },
@@ -206,7 +208,7 @@ const defaultProducts: IProduct[] = [
           id: 304,
           code_color: "#0000FF",
           name_color: "Xanh dương",
-          image: "/images/products/chaybo/AirJordanDMP1Retro(xanhduong).webp",
+          images: `${API_BASE_URL}/uploads/AirJordanDMP1Retro(xanhduong).webp`,
         },
         size: { id: 402, number_size: "41" },
       },
@@ -233,12 +235,12 @@ const defaultProducts: IProduct[] = [
     images: [
       {
         images_id: 301,
-        url: "/images/products/chaybo/GiàyNamAirJordan14Retro(do).webp",
+        url: `${API_BASE_URL}/uploads/GiàyNamAirJordan14Retro(do).webp`,
         alt_text: "Adidas Ultraboost",
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 3001,
         rating: "5",
@@ -258,7 +260,7 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 204,
         sku: "AD-UB22-BLU-43",
@@ -267,7 +269,8 @@ const defaultProducts: IProduct[] = [
           id: 304,
           code_color: "#FFFF00",
           name_color: "màu vàng",
-          image: "/images/products/chaybo/GiàyNamAirJordan14Retro(vang).webp",
+          images: `${API_BASE_URL}/uploads/GiàyNamAirJordan14Retro(vang).webp`,
+
         },
         size: { id: 404, number_size: "43" },
       },
@@ -279,7 +282,7 @@ const defaultProducts: IProduct[] = [
           id: 305,
           code_color: "#008000",
           name_color: "Xanh lá",
-          image: "/images/products/chaybo/GiàyNamAirJordan14Retro(xanhlam).webp",
+          images: `${API_BASE_URL}/uploads/GiàyNamAirJordan14Retro(xanhlam).webp`,
         },
         size: { id: 406, number_size: "41" },
        
@@ -292,7 +295,7 @@ const defaultProducts: IProduct[] = [
           id: 306,
           code_color: "#FF0000",
           name_color: "Màu đỏ",
-          image: "/images/products/chaybo/GiàyNamAirJordan14Retro(do).webp",
+          images: `${API_BASE_URL}/uploads/GiàyNamAirJordan14Retro(do).webp`,
         },
         size: { id: 405, number_size: "43" },
       },
@@ -319,12 +322,12 @@ const defaultProducts: IProduct[] = [
     images: [
       {
         images_id: 401,
-        url: "/images/products/chaybo/NeumelGRAYBROWNSnow(do).webp",
+        url: `${API_BASE_URL}/uploads/NeumelGRAYBROWNSnow(do).webp`,
         alt_text: "Puma Nitro 2",
         type: "thumbnail",
       },
     ],
-    reviews: [
+    product_reviews: [
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -344,16 +347,17 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
         stock_quantity: 12,
         color: {
           id: 305,
+
           code_color: "#FFFF00",
           name_color: "Màu vàng",
-          image: "/images/products/chaybo/NeumelGRAYBROWNSnow(vang).webp",
+          images: `${API_BASE_URL}/uploads/NeumelGRAYBROWNSnow(vang).webp`,
         },
         size: { id: 405, number_size: "40" },
       },
@@ -365,7 +369,7 @@ const defaultProducts: IProduct[] = [
           id: 306,
           code_color: "#0000FF",
           name_color: "Xanh dương",
-          image: "/images/products/chaybo/NeumelGRAYBROWNSnow(xanhduong).webp",
+          images: `${API_BASE_URL}/uploads/NeumelGRAYBROWNSnow(xanhduong).webp`,
         },
         size: { id: 405, number_size: "40" },
       },
@@ -377,7 +381,7 @@ const defaultProducts: IProduct[] = [
           id: 307,
           code_color: "#FF0000",
           name_color: "Màu đỏ",
-          image: "/images/products/chaybo/NeumelGRAYBROWNSnow(do).webp",
+          images: `${API_BASE_URL}/uploads/NeumelGRAYBROWNSnow(do).webp`,
         },
         size: { id: 407, number_size: "40" },
       },
@@ -404,12 +408,12 @@ const defaultProducts: IProduct[] = [
     images: [
       {
         images_id: 401,
-        url: "/images/products/chaybo/GiàyNamNikeAirMax(hong).webp",
+        url: `${API_BASE_URL}/uploads/GiàyNamNikeAirMax(hong).webp`,
         alt_text: "Puma Nitro 2",
         type: "thumbnail",
       },
     ],
-    reviews: [  
+    product_reviews: [  
       {
         product_reviews_id: 4001,
         rating: "4",
@@ -429,16 +433,17 @@ const defaultProducts: IProduct[] = [
         },
       },
     ],
-    variants: [
+    product_variants: [
       {
         product_variants_id: 205,
         sku: "PM-NITRO2-RED-40",
         stock_quantity: 12,
         color: {
           id: 305,
+
           code_color: "#FFFF00",
           name_color: "Màu hồng",
-          image: "/images/products/chaybo/GiàyNamNikeAirMax(hong).webp",
+          images: `${API_BASE_URL}/uploads/GiàyNamNikeAirMax(hong).webp`,
         },
         size: { id: 405, number_size: "40" },
       },
@@ -450,7 +455,7 @@ const defaultProducts: IProduct[] = [
           id: 306,
           code_color: "#0000FF",
           name_color: "Màu xanh dương",
-          image: "/images/products/chaybo/GiàyNamNikeAirMax(xanhduong).webp",
+          images: `${API_BASE_URL}/uploads/GiàyNamNikeAirMax(xanhduong).webp`,
         },
         size: { id: 405, number_size: "40" },
       },
@@ -462,7 +467,7 @@ const defaultProducts: IProduct[] = [
           id: 307,
           code_color: "#008000",
           name_color: "Màu xanh lá",
-          image: "/images/products/chaybo/GiàyNamNikeAirMax(xanhlam).webp",
+          images: `${API_BASE_URL}/uploads/GiàyNamNikeAirMax(xanhlam).webp`,
         },
         size: { id: 405, number_size: "40" },
       },
@@ -479,8 +484,8 @@ function normalizeProduct(p: any): IProduct {
     price: p.price,
     sale_price: p.sale_price,
     description: p.description,
-    variants: p.variants || [],
-    reviews: p.reviews || [],
+    product_variants: p.variants || [],
+    product_reviews: p.reviews || [],
   };
 }
 

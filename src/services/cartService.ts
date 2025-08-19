@@ -1,7 +1,54 @@
 import { IS_MOCK, API_BASE_URL } from "@/config/env";
 import { getMockCart, saveMockCart } from "@/mocks/mockCart";
-import { ICart, ICartItem, Addtocart } from "@/types/cart";
+import {
+  ICart,
+  ICartItem,
+  Addtocart,
+  RemoveFromCartRequest,
+  RemoveFromCartResponse,
+} from "@/types/cart";
+import { CheckoutRequest, CheckoutResponse } from "@/types/ICheckout";
+interface AddToCartResponse {
+  length: any;
+  message: string;
+  cart: ICartItem[]; // danh sách cart_items sau khi thêm
+}
 
+// Gọi API để thêm sản phẩm vào giỏ hàng
+export const addToCart = async ({
+  user_id,
+  variant_id,
+  quantity,
+}: Addtocart): Promise<AddToCartResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/addToCart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        variant_id,
+        quantity,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể thêm sản phẩm vào giỏ hàng.");
+    }
+
+    const data = await res.json();
+
+    return {
+      length: Array.isArray(data.cart) ? data.cart.length : 0,
+      message: data.message,
+      cart: data.cart, // kiểu này khớp với ICartItem[]
+    };
+  } catch (error) {
+    console.error("Lỗi khi thêm giỏ hàng:", error);
+    throw error;
+  }
+};
 // Thêm sản phẩm vào giỏ mock
 export async function addToMockCart(
   user_id: number,
@@ -19,13 +66,13 @@ export async function addToMockCart(
         user_id,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        items: [],
+        cart_items: [],
       };
       carts.push(cart);
     }
 
-    const existingItem = cart.items.find(
-      (item) => item.variant?.variant_id === variant_id
+    const existingItem = cart.cart_items.find(
+      (item) => item.variant?.product_variants_id === variant_id
     );
 
     if (existingItem) {
@@ -35,13 +82,17 @@ export async function addToMockCart(
       const newItem = {
         cart_items_id: Date.now(),
         cart_id: cart.carts_id,
-        variant: cart.items[0]?.variant,
+        variant_id: variant_id,
+        variant: cart.cart_items[0]?.variant,
         quantity,
         price,
+         sale_price: cart.cart_items[0]?.variant?.product?.sale_price || price, 
+  priceSale: cart.cart_items[0]?.variant?.product?.sale_price || price,  
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      cart.items.push(newItem);
+
+      cart.cart_items.push(newItem);
     }
 
     cart.updated_at = new Date().toISOString();
@@ -81,7 +132,7 @@ export async function getMockCartByUser(userId: number): Promise<ICart | null> {
     return carts.find((c) => c.user_id === userId) || null;
   }
   try {
-    const res = await fetch(`${API_BASE_URL}/cart/user/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +145,7 @@ export async function getMockCartByUser(userId: number): Promise<ICart | null> {
     }
 
     const json = await res.json();
-    return json.cart || null;
+    return json || null;
   } catch (error) {
     console.error("Lỗi khi gọi API giỏ hàng:", error);
     return null;
@@ -117,3 +168,162 @@ export async function clearMockCart(userId: number): Promise<ICart | null> {
   if (!res.ok) throw new Error("Không thể xóa giỏ hàng.");
   return null;
 }
+export const getCartByUserId = async (
+  userId: number
+): Promise<(ICart & { items: ICartItem[] }) | null> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Fetch failed: ${res.status} - ${errorText}`);
+    }
+
+    const data: ICart | null = await res.json();
+
+    if (!data) return { items: [] } as unknown as ICart & { items: ICartItem[] };
+
+    const cartWithItems = {
+      ...data,
+      items: (data.cart_items || []).map((item) => ({
+        ...item,
+        price: Number(item.price),
+      })),
+    };
+
+    return cartWithItems;
+  } catch (error) {
+    console.error("Lỗi lấy giỏ hàng:", error);
+    return { items: [] } as unknown as ICart & { items: ICartItem[] };
+  }
+};
+
+export const updateCartItem = async ({
+  user_id,
+  variant_id,
+  quantity,
+}: {
+  user_id: number;
+  variant_id: number;
+  quantity: number;
+}): Promise<ICartItem> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/cart/update`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        variant_id,
+        quantity,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể cập nhật sản phẩm trong giỏ hàng.");
+    }
+
+    const data: ICartItem = await res.json();
+
+    // Nếu cần ép kiểu `price` từ string -> number (nếu backend trả string)
+    data.price = Number(data.price);
+
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật giỏ hàng:", error);
+    throw error;
+  }
+};
+export const removeFromCart = async ({
+  user_id,
+  variant_id,
+}: RemoveFromCartRequest): Promise<RemoveFromCartResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/product/cart/remove`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ user_id, variant_id }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Không thể xóa sản phẩm khỏi giỏ hàng.");
+    }
+
+    const data: RemoveFromCartResponse = await res.json();
+
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi xóa sản phẩm khỏi giỏ hàng:", error);
+    throw error;
+  }
+};
+
+// Hàm gọi API
+export const checkoutOrder = async (
+  payload: CheckoutRequest
+): Promise<CheckoutResponse> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/payment/checkout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData.error || "Thanh toán thất bại.");
+    }
+
+    const data: CheckoutResponse = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi thanh toán:", error);
+    throw error;
+  }
+};
+export const getZaloPayOrderStatus = async (
+  appTransId: string
+): Promise<{
+  order_id: any;
+  return_code: number;
+  return_message: string;
+  sub_return_code: number;
+  sub_return_message: string;
+  is_processing: boolean;
+  amount: number;
+  zp_trans_id: number;
+  discount_amount: number;
+}> => {
+  try {
+    const res = await fetch(
+      `${API_BASE_URL}/payment/order-status/${appTransId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Không thể kiểm tra trạng thái thanh toán.");
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi kiểm tra trạng thái thanh toán:", error);
+    throw error;
+  }
+};

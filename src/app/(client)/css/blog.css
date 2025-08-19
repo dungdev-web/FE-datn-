@@ -1,4 +1,8 @@
 /* --- Desktop giữ nguyên px, không đổi --- */
+html {
+  scroll-behavior: smooth;
+}
+
 .intro-banner {
   position: relative;
   background: url("/images/banner/mega-menu-images2.webp") no-repeat center
@@ -68,8 +72,8 @@
   z-index: 1;
 }
 
-main {
-  width: 90%;
+.main_blog {
+  /* width: 90%; */
   margin: 0 auto;
   padding: 20px;
   display: flex;
@@ -250,7 +254,9 @@ article {
     height: auto;
   }
 }
-
+.content-blog {
+  width: 88%!important;
+}
 /* --- Responsive Mobile --- */
 @media (max-width: 768px) {
   .intro-content h1 {
@@ -280,6 +286,9 @@ article {
   .box-blog {
     gap: 15px;
   }
+  .content-blog {
+  width: 100%!important;
+}
 }
 /* sidebar */
 .mobile-sidebar {
@@ -295,6 +304,7 @@ article {
   border: none;
   margin: 10px;
   cursor: pointer;
+  width: 22%;
 }
 
 .close-sidebar-btn {
@@ -722,4 +732,12 @@ ul, ol {
 }
 .related-blogs a {
     color: #333;
+}
+blockquote {
+    font-size: 1.125em;
+    line-height: 1.45;
+    font-style: italic;
+    margin: 0 0 30px;
+    padding: 15px 30px;
+    border-left: 1px solid #e1e1e1;
 }

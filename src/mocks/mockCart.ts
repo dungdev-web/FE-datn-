@@ -1,4 +1,5 @@
 // mocks/mockCart.ts
+import { API_BASE_URL } from "@/config/env";
 import { ICartItem, ICart } from "@/types/cart";
 const defaultCart: ICart[] = [
   {
@@ -6,115 +7,64 @@ const defaultCart: ICart[] = [
     user_id: 4,
     created_at: "2025-06-22T10:00:00.000Z",
     updated_at: "2025-06-22T10:00:00.000Z",
-    items: [
+    cart_items: [
       {
         cart_items_id: 1,
         cart_id: 1,
-        variant: 
-          {
-            variant_id:2,
-            name: "Converse Run Star Motion",
-            color: {
-              id: 301,
-              code_color: "#000000",
-              name_color: "Đen",
-              image: "/images/products/chaybo/ConverseRunStarMotion.webp",
-            },
-            size: {
-              id: 401,
-              number_size: "41",
-            },
-          },
-        
+        variant_id: 2,
+        sale_price: 90000,
+        priceSale: 90000,
         quantity: 5,
         price: 1500000,
         created_at: "2025-06-22T10:00:00.000Z",
         updated_at: "2025-06-22T10:00:00.000Z",
-      },
-      {
-        cart_items_id: 2,
-        cart_id: 1,
-        variant: 
-          {
-            variant_id:2,
+        variant: {
+          product_variants_id: 2,
+          product_id: 1,
+          color_id: 301,
+          size_id: 401,
+          stock_quantity: 100,
+          sku: "SKU-ABC123",
+          product: {
+            products_id: 1,
             name: "Converse Run Star Motion",
-            color: {
-              id: 301,
-              code_color: "#000000",
-              name_color: "Đen",
-              image: "/images/products/chaybo/ConverseRunStarMotion.webp",
-            },
-            size: {
-              id: 401,
-              number_size: "41",
-            },
+            slug: "converse-run-star-motion",
+            description: "Mô tả dài",
+            short_desc: "Mô tả ngắn",
+            price: 2000000,
+            sale_price: 1500000,
+            categories_id: 1,
+            brand_id: 1,
+            gender_id: 1,
+            status: 1,
+            created_at: "2025-01-01T00:00:00.000Z",
+            updated_at: "2025-01-01T00:00:00.000Z",
+            images: [
+              {
+                images_id: 1,
+                url: `${API_BASE_URL}/uploads/ConverseRunStarMotion.webp`,
+                alt_text: "Ảnh sản phẩm",
+                type: "main",
+                product_id: 1,
+              },
+            ],
           },
-        
-        quantity: 1,
-        price: 2000000,
-        created_at: "2025-06-22T10:00:00.000Z",
-        updated_at: "2025-06-22T10:00:00.000Z",
-      },
-        {
-        cart_items_id: 3,
-        cart_id: 2,
-        variant: 
-          {
-            variant_id:2,
-            name: "Converse Run Star Motion",
-            color: {
-              id: 301,
-              code_color: "#000000",
-              name_color: "Đen",
-              image: "/images/products/chaybo/ConverseRunStarMotion.webp",
-            },
-            size: {
-              id: 401,
-              number_size: "31",
-            },
+          color: {
+            id: 301,
+            code_color: "#000000",
+            name_color: "Đen",
+            images: null,
           },
-        
-        quantity: 3,
-        price: 1200000,
-        created_at: "2025-06-22T11:00:00.000Z",
-        updated_at: "2025-06-22T11:00:00.000Z",
+          size: {
+            id: 401,
+            number_size: "41",
+          },
+        },
       },
     ],
   },
-   {
-    carts_id: 2,
-    user_id: 4,
-    created_at: "2025-06-22T11:00:00.000Z",
-    updated_at: "2025-06-22T11:00:00.000Z",
-    items: [
-      {
-        cart_items_id: 3,
-        cart_id: 2,
-        variant: 
-          {
-            variant_id:2,
-            name: "Converse Run Star Motion",
-            color: {
-              id: 301,
-              code_color: "#000000",
-              name_color: "Đen",
-              image: "/images/products/chaybo/ConverseRunStarMotion.webp",
-            },
-            size: {
-              id: 401,
-              number_size: "31",
-            },
-          },
-        
-        quantity: 3,
-        price: 1200000,
-        created_at: "2025-06-22T11:00:00.000Z",
-        updated_at: "2025-06-22T11:00:00.000Z",
-      },
-    ],
-  },
- 
 ];
+
 export const getMockCart = (): ICart[] => {
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem("mockCarts");

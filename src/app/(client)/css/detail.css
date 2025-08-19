@@ -97,9 +97,9 @@ main {
   position: relative !important;
 }
 
-.relative.product-image-block > .large-image {
+/* .relative.product-image-block > .large-image {
   border: 1px solid #03177e;
-}
+} */
 
 .relative.product-image-block > .large-image {
   margin-bottom: 10px;
@@ -136,7 +136,7 @@ main {
 .zoomWrapper {
   height: auto !important;
   margin: auto;
-  width: auto !important;
+  /* width: auto !important; */
 }
 
 .tns-outer {
@@ -176,10 +176,10 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid #ddd;
+  /* border: 1px solid #ddd; */
   padding: 1px;
   height: 106px;
-  border-color: #03177e;
+  /* border-color: #03177e; */
 }
 
 .tns-item .item img {
@@ -387,10 +387,10 @@ form {
   -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
   transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
 }
-
+/* 
 .hidden {
   display: none !important;
-}
+} */
 
 .details-pro .custom-btn-number .qtyminus {
   position: absolute;
@@ -1259,17 +1259,7 @@ a,
   margin-right: -15px;
   margin-left: -15px;
 }
-.categories-box,
-.aside-filter .filter-container {
-  border: 1px solid #cdcdcd;
-  border-top: none;
-  padding: 10px !important;
-}
-.categories-box {
-  background: #fff;
-  padding: 10px 0;
-  margin-bottom: 30px;
-}
+
 ul {
   list-style: none outside;
 }
@@ -1292,16 +1282,7 @@ ul {
   clear: left;
   font-size: 1.07143em;
 }
-.categories-box .lv1 li a {
-  padding-right: 20px;
-}
 
-.categories-box .lv1 li a {
-  font-size: 14px;
-  /* display: block; */
-  padding: 10px 0;
-  line-height: 2.5em;
-}
 a,
 .text-link {
   color: #333;
@@ -1531,9 +1512,9 @@ input[type="submit"] {
 .tt {
   display: inline-block;
 }
-.hidden {
+/* .hidden {
   display: none !important;
-}
+} */
 .tt span {
   color: #4bd963;
   font-weight: 500;
@@ -1730,6 +1711,9 @@ input[type="submit"] {
   }
 }
 @media (max-width: 768px) {
+  .sidebar-des{
+    display: none !important;
+  }
   .main_container {
     padding: 10px 30px;
   }
@@ -1758,6 +1742,7 @@ input[type="submit"] {
   }
 } */
 @media (min-width: 1024px) {
+  
   .open-filters,
   .filter-sidebar {
     display: none;
