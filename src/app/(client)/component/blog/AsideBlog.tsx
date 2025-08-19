@@ -3,18 +3,24 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { API_BASE_URL } from "@/config/env";
+import { useRouter } from "next/navigation";
 
 export default function AsideBlog() {
-  const { categories, loading: catLoading } = useCategories({ page: 1, limit: 1000 });
-  const [selectedCategoryId, setSelectedCategory] = useState<number | null>(null);
+  const router = useRouter();
+
+  const { categories, loading: catLoading } = useCategories({
+    page: 1,
+    limit: 1000,
+  });
+  const [selectedCategoryId, setSelectedCategory] = useState<number | null>(
+    null
+  );
   const [openParentId, setOpenParentId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { posts, loading: postLoading } = usePostsByCategory(
-     2
-  );
+  const { posts, loading: postLoading } = usePostsByCategory(2);
   console.log(selectedCategoryId);
-  
+
   // Set danh mục mặc định khi có data
   useEffect(() => {
     // console.log("Categories từ hook:", categories);
@@ -44,7 +50,7 @@ export default function AsideBlog() {
       .filter((cat) => cat.parent_id === null)
       .slice(0, 1000); // Giới hạn hiển thị 10 cha
     console.log(parentCategories);
-    
+
     return (
       <ul className={isMobile ? "" : "space-y-1"}>
         {parentCategories.map((parent) => {
@@ -56,8 +62,12 @@ export default function AsideBlog() {
           return (
             <li key={parent.category_post_id}>
               <div
-                onClick={() =>
-                  setOpenParentId(isOpen ? null : parent.category_post_id)
+                onClick={() =>{
+                  setOpenParentId(isOpen ? null : parent.category_post_id),
+                  router.push(
+                            `/blog/categories_post/${parent.category_post_id}`
+                          );
+                }
                 }
                 className="flex justify-between items-center cursor-pointer"
                 style={{
@@ -83,9 +93,12 @@ export default function AsideBlog() {
                     <li
                       key={child.category_post_id}
                       className="cursor-pointer hover:text-blue-500"
-                      onClick={() =>
-                        setSelectedCategory(child.category_post_id)
-                      }
+                      onClick={() => {
+                        setSelectedCategory(child.category_post_id),
+                          router.push(
+                            `/blog/categories_post/${child.category_post_id}`
+                          );
+                      }}
                     >
                       + {child.name}
                     </li>
