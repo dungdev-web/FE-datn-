@@ -1,9 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-const QuillEditor = dynamic(() => import("../../component_admin/blog/QuillEditorEdit"), {
-  ssr: false,
-});
+const QuillEditor = dynamic(
+  () => import("../../component_admin/Blog/QuillEditorEdit"),
+  {
+    ssr: false,
+  }
+);
 export default function EditlogPage() {
   return (
     <div>

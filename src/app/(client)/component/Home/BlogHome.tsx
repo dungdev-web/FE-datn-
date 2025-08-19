@@ -8,7 +8,7 @@ import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
 import "swiper/css";
 import "swiper/css/navigation";
-
+import Link from "next/link";
 export default function BlogHome() {
   const [blog, setBlog] = useState<IBlog[]>([]);
 
@@ -47,10 +47,12 @@ export default function BlogHome() {
       {blog.map((item) => (
         <SwiperSlide key={item.post_id}>
           <div className="blog-item">
+            <Link href={`/blog/${item.post_id}`}>
             <img
               src={`${API_BASE_URL}/uploads/blog/${item.thumbnail}`}
               alt={item.title}
             />
+            </Link>
             <div className="blog-info">
               <p className="blog-date">
                 {new Date(item.created_at).toLocaleDateString("vi-VN")}

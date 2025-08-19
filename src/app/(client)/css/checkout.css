@@ -230,117 +230,193 @@ textarea {
 
     cursor: pointer;
 }
-
-/* === Voucher Dropdown Button === */
-.voucher-dropdown button {
-    width: 100%;
-    background: #f9fefb;
-    border: 2px solid #22c55e;
-    color: #111827;
-    font-size: 15px;
-    font-weight: 500;
-    padding: 5px 16px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(34, 197, 94, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    margin-bottom: 10px;
+.discount-section h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
 }
 
-.voucher-dropdown button:hover {
-    border-color: #16a34a;
-    background: #ecfdf5;
-    box-shadow: 0 4px 8px rgba(34, 197, 94, 0.2);
+.coupon-dropdown {
+  position: relative;
+  width: 100%;
 }
 
-.voucher-dropdown button:focus {
-    outline: none;
-    border-color: #15803d;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.4);
+.select-coupon {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  border: 2px solid #22c55e;
+  border-radius: 6px;
+  background-color: #f9fefb;
+  color: #111827;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
-.voucher-dropdown button::after {
-    content: "▼";
-    font-size: 12px;
-    margin-left: auto;
-    color: #16a34a;
-    transition: transform 0.3s ease;
+.select-coupon::after {
+  content: "▼";
+  margin-left: auto;
+  transition: transform 0.3s;
 }
 
-.voucher-dropdown.open button::after {
-    transform: rotate(180deg);
+.coupon-dropdown.open .select-coupon::after {
+  transform: rotate(180deg);
 }
 
-/* === Dropdown content === */
-.voucher-dropdown .coupon-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 10px;
+/* --- Coupon Section --- */
+.coupon-section1 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fff;
+  border: 2px solid #22c55e;
+  border-radius: 6px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.voucher-dropdown .coupon {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
-    border: 2px dashed rgb(209, 207, 207);
-    border-radius: 8px;
-    background-color: #ffffff;
-    transition: background 0.3s;
+/* --- Coupon Item --- */
+.coupon1 {
+  display: flex;
+  background: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
-.voucher-dropdown .coupon:hover {
-    background-color: #f0fdf4;
-    cursor: pointer;
+.coupon1:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.voucher-dropdown .right-part {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    font-weight: bold;
-    color: white;
-    background-color: #22c55e;
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-size: 12px;
+.left-part {
+  flex: 1;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.voucher-dropdown .left-part {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.right-part {
+  width: 20%;
+  background: #4bd963;
+  writing-mode: vertical-rl;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 5px;
+  letter-spacing: 2px;
 }
 
-.voucher-dropdown .left-part .code {
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: red;
+.code {
+  font-weight: bold;
+  font-size: 14px;
+  color: #ff0000;
+  margin-bottom: 4px;
 }
 
-.voucher-dropdown .left-part .discount-box {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 6px;
+.discount-box {
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 6px;
+  margin-bottom: 4px;
 }
 
-.voucher-dropdown .left-part .title {
-    font-size: 13px;
-    font-weight: bold;
-    color: red;
+.discount-box .title {
+  background: #ff0000;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 3px;
 }
 
-.voucher-dropdown .left-part .percent {
-    font-size: 16px;
-    font-weight: bold;
-    color: black;
+.discount-box .percent {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+  display: block;
+  margin-top: 2px;
 }
 
-.voucher-dropdown .left-part .desc {
-    font-size: 12px;
-    color: #6b7280;
+.desc {
+  font-size: 12px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.coupon-suggest {
+  background: #f3f4f6; /* màu nền khác */
+  color: #555;
+  cursor: not-allowed; /* cho biết có thể click */
+  transition: all 0.3s ease;
+  
+}
+
+.coupon-suggest:hover {
+  background: #e6f7e6; /* hover giống mã đã lưu */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.save-btn {
+  margin-top: 4px;
+  font-size: 16px;
+  text-decoration: underline;
+  color: #2563eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.suggest-label {
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+  text-transform: uppercase;
+  margin: 6px 0;
+}
+
+/* Applied / error */
+.applied {
+  color: #16a34a;
+  margin-top: 8px;
+}
+
+.applied button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  text-decoration: underline;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.error {
+  color: #dc2626;
+  margin-top: 6px;
+}
+
+.no-coupon {
+  text-align: center;
+  color: #555;
+  padding: 8px 0;
 }

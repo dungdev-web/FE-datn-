@@ -3,15 +3,16 @@ import {
   getRecentOrders,
   getStatusText,
   getAllCategoryProduct,
-} from "@/services/dashboard";
+} from "@/services/dashboardService";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
-import exportStyledExcel from "../component_admin/excel";
+import exportStyledExcel from "../component_admin/Excel";
 import { IOrder } from "@/types/Order";
 import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
 import { ArrowUpDown } from "lucide-react";
 import { ICategory } from "@/types/ICategory";
+import { API_BASE_URL } from "@/config/env";
 
 export default function OrderPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -34,12 +35,11 @@ export default function OrderPage() {
   const [categoryProducts, setCategoryProducts] = useState<ICategory[]>([]);
 
   const statusOrderFlow = [
-    "pending", // Chờ xử lý
-    "processing", // Đang xử lý
-    "shipping", // Đang giao hàng
-    "delivered", // Đã giao
-    "completed", // Hoàn thành
-    "cancelled", // Đã hủy
+    "pending",
+    "processing",
+    "shipping",
+    "completed",
+    "cancelled",
   ];
 
   const excelData = orders.map((order: any) => ({
@@ -210,7 +210,7 @@ export default function OrderPage() {
             )}
           </div>
           <button className="btn btn-refresh">
-            <i className="fa-solid fa-rotate-right"></i> Refresh
+            <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
           <button
             className="btn btn-export"
@@ -223,7 +223,7 @@ export default function OrderPage() {
         <table className="order-table">
           <thead>
             <tr>
-              <th>Mã đơn hàng</th>
+              <th>Đơn hàng</th>
               <th>
                 Người nhận{" "}
                 <ArrowUpDown
@@ -254,7 +254,7 @@ export default function OrderPage() {
             </tr>
             <tr className="filter-row">
               <th>
-                <input type="text" placeholder="Lọc mã đơn..." />
+                <input type="text" placeholder="Lọc đơn..." />
               </th>
               <th>
                 <input
@@ -276,7 +276,6 @@ export default function OrderPage() {
                   <option value="pending">Chờ xử lý</option>
                   <option value="processing">Đang xử lý</option>
                   <option value="shipping">Đang giao hàng</option>
-                  <option value="delivered">Đã giao</option>
                   <option value="completed">Hoàn thành</option>
                   <option value="cancelled">Đã hủy</option>
                   <option value="returned">Hoàn trả</option>
@@ -305,11 +304,11 @@ export default function OrderPage() {
           <tbody>
             {orders.map((order: any) => (
               <tr key={order.orders_id}>
-                <td>{order.orders_id}</td>
+                <td>#{order.orders_id}</td>
                 <td>{order.user?.name}</td>
                 <td>
-                  {order.user?.phone
-                    ? order.user?.phone
+                  {order.shipping_address?.phone
+                    ? order?.shipping_address?.phone
                     : "Không có số điện thoại"}
                 </td>
                 <td>
@@ -388,7 +387,20 @@ export default function OrderPage() {
               <ul className="order-detail-list">
                 <li>
                   <strong>Mã đơn hàng:</strong>{" "}
-                  <span>{selectedOrder?.orders_id}</span>
+                  <span>
+                    TERA
+                    {selectedOrder?.created_at
+                      ? String(
+                          new Date(selectedOrder.created_at).getDate()
+                        ).padStart(2, "0")
+                      : ""}
+                    {selectedOrder?.created_at
+                      ? String(
+                          new Date(selectedOrder.created_at).getMonth() + 1
+                        ).padStart(2, "0")
+                      : ""}
+                    {selectedOrder?.orders_id ?? ""}
+                  </span>
                 </li>
                 <li>
                   <strong>Người nhận:</strong>{" "}
@@ -421,13 +433,19 @@ export default function OrderPage() {
                           {item.variant.color?.name_color}
                         </span>
                       </div>
-
-                      <div className="text-sm text-gray-700 ">
-                        <strong>Số lượng - Giá: </strong>
-                        <span>{item.quantity}</span> -{" "}
-                        <span className="text-red-600 font-medium">
-                          {item.unit_price.toLocaleString("vi")} VNĐ
-                        </span>
+                      <div className="!mb-2 flex items-center justify-between">
+                        <div className="text-sm text-gray-700 ">
+                          <strong>Số lượng - Giá: </strong>
+                          <span>{item.quantity}</span> -{" "}
+                          <span className="text-red-600 font-medium">
+                            {item.unit_price.toLocaleString("vi")} VNĐ
+                          </span>
+                        </div>
+                        <img
+                          src={`${API_BASE_URL}/uploads/${item.variant.color.images}`}
+                          alt={`${item.variant?.product?.name}`}
+                          className="w-[15%]"
+                        />
                       </div>
                     </li>
                   );

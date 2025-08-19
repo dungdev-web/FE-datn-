@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { registerUser } from "@/services/authService";
 import "../css/login.css";
-import { validateField } from "@/hooks/validate_login_register";
+import { validateField } from "@/hooks/useValidateLoginRegister";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 
@@ -13,7 +13,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
- const googleLogin = () => {
+  const googleLogin = () => {
     const clientId =
       "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
     const redirectUri = encodeURIComponent(
@@ -231,8 +231,8 @@ export default function Register() {
           <h3>Hoặc</h3>
 
           <button className="google-login" onClick={googleLogin}>
-              <i className="fab fa-google"></i> Đăng nhập bằng Google
-            </button>
+            <i className="fab fa-google"></i> Đăng nhập bằng Google
+          </button>
         </div>
       </div>
     </main>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { loginUser } from "@/services/authService";
 import { useRouter } from "next/navigation";
-import Loader from "../component/loader";
+import Loader from "./Loader";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 
@@ -44,7 +44,7 @@ export default function LoginMenu({
           title: "Đăng nhập thành công!",
           icon: "success",
           showConfirmButton: false,
-          timer: 2000, 
+          timer: 2000,
           timerProgressBar: true,
         });
         router.push("/account");

@@ -39,7 +39,11 @@ export default function Contact() {
       await sendContactToAdmin(form);
       await sendConfirmationToUser({ name: form.name, email: form.email });
       setSuccess(true);
-      toast.success("Gửi liên hệ thành công!");
+      Swal.fire({
+        title: "Gửi liên hệ thành công!",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
       setForm({ name: "", email: "", phone: "", message: "" });
     } catch (err: any) {
       const message = err.message || "Lỗi khi gửi liên hệ.";
@@ -90,7 +94,10 @@ export default function Contact() {
         <div className="contact-us">
           <div className="contact-left">
             <h3>Liên hệ</h3>
-            <p>Địa chỉ: QTSC Building 1, Đ. Quang Trung, Tân Hưng Thuận, Hóc Môn, Hồ Chí Minh, Việt Nam</p>
+            <p>
+              Địa chỉ: QTSC Building 1, Đ. Quang Trung, Tân Hưng Thuận, Hóc Môn,
+              Hồ Chí Minh, Việt Nam
+            </p>
             <p>
               Điện thoại: <span>0338538203</span>
             </p>

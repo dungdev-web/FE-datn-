@@ -4,6 +4,7 @@ import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { Group } from "three";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 
 type GLTFResult = {
   scene: Group;
@@ -90,7 +91,7 @@ export default function Banner3D() {
 
   return (
     <div
-      className="w-full min-h-screen h-auto md:!mt-20 text-blue-900 flex items-center justify-center overflow-hidden relative"
+      className="w-full min-h-[600px] h-auto md:!mt-40 text-blue-900 flex items-center justify-center overflow-hidden relative"
       style={{
         backgroundImage: isMobile
           ? "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)"
@@ -116,7 +117,7 @@ export default function Banner3D() {
                     : "transform translate-x-full opacity-0"
                 }`}
               >
-                <div className="!space-y-1">
+                <div className="!space-y-3">
                   <div className="inline-block">
                     <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white !px-3 !py-1 rounded-full text-xs sm:text-sm font-semibold">
                       NEW ARRIVAL
@@ -128,9 +129,6 @@ export default function Banner3D() {
                   <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl text-blue-600 font-semibold">
                     {slide.subtitle}
                   </h2>
-                  <p className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed max-w-2xl">
-                    {slide.description}
-                  </p>
                   <div className="flex flex-wrap gap-2">
                     {slide.features.map((feature, idx) => (
                       <span
@@ -155,12 +153,9 @@ export default function Banner3D() {
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row !gap-3 !pt-2">
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                    <Link href={"/product"} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                       MUA NGAY
-                    </button>
-                    <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold text-sm sm:text-base lg:text-lg !px-10 sm:!px-8 lg:!px-10 !py-2 sm:!py-3 rounded-full transition-all duration-300">
-                      CHI TIẾT
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -190,7 +185,7 @@ export default function Banner3D() {
           >
             <ambientLight intensity={1.5} />
             <directionalLight position={[2, 2, 5]} intensity={2} />
-            <ShoeModel url="/models/shoes1.glb" scale={isMobile ? 0.4 : 0.28} />
+            <ShoeModel url="/models/shoes1.glb" scale={isMobile ? 0.4 : 0.25} />
             <Environment preset="city" background={false} />
             <OrbitControls
               enableZoom={false}
