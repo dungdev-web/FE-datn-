@@ -38,6 +38,25 @@ export default function Detail() {
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
   const [coupon, setCoupon] = useState<ICoupon[]>([]);
+  const [addedToCartQuantities, setAddedToCartQuantities] = useState<{
+    [variantId: string]: number;
+  }>({});
+  const updateAddedToCart = (variantId: string, quantity: number) => {
+    const prev = JSON.parse(
+      localStorage.getItem("addedToCartQuantities") || "{}"
+    );
+    prev[variantId] = (prev[variantId] || 0) + quantity;
+    localStorage.setItem("addedToCartQuantities", JSON.stringify(prev));
+    setAddedToCartQuantities(prev);
+  };
+
+  useEffect(() => {
+    const saved = JSON.parse(
+      localStorage.getItem("addedToCartQuantities") || "{}"
+    );
+    setAddedToCartQuantities(saved);
+  }, []);
+
   const handleAddToCart = async () => {
     if (!selectedColorId) {
       Swal.fire({
@@ -57,79 +76,55 @@ export default function Detail() {
       return;
     }
 
-    if (!variantId) {
-      Swal.fire({
-        icon: "warning",
-        title: "Vui lòng chọn biến thể",
-        text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
-      });
-      return;
-    }
-
-    // ✅ Kiểm tra số lượng tồn kho trước khi thêm giỏ hàng
     const selectedVariant = product.product_variants.find(
       (v) => v.product_variants_id === variantId
     );
+    if (!selectedVariant) return;
 
-    if (!selectedVariant) {
+    const alreadyAdded = addedToCartQuantities[variantId] || 0;
+    const availableStock = selectedVariant.stock_quantity - alreadyAdded;
+
+    if (quantity > availableStock) {
       Swal.fire({
-        icon: "error",
-        title: "Không tìm thấy biến thể",
-        text: "Vui lòng chọn lại sản phẩm.",
+        icon: "info",
+        title: availableStock <= 0 ? "Hết hàng!" : "Số lượng không đủ",
+        text:
+          availableStock <= 0
+            ? `${product.name} đã hết hàng.`
+            : `Chỉ còn ${availableStock} sản phẩm trong kho.`,
       });
       return;
     }
-
-    if (quantity > selectedVariant.stock_quantity) {
-      Swal.fire({
-        icon: "warning",
-        title: "Số lượng không đủ",
-        text: `Chỉ còn ${selectedVariant.stock_quantity} sản phẩm trong kho.`,
-      });
-      return;
-    }
-
-    setLoading(true);
 
     try {
+      setLoading(true);
       const tokenData = await checkToken();
-      if (!tokenData?.user?.id) {
-        Swal.fire({
-          icon: "warning",
-          title: "Bạn chưa đăng nhập",
-          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
-          confirmButtonText: "Đăng nhập",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            router.push("/login");
-          }
-        });
-        return;
-      }
+      if (!tokenData?.user?.id) throw new Error("Chưa đăng nhập");
 
       const response = await addToCart({
-        user_id: tokenData.user.id,
-        variant_id: variantId,
+        userId: tokenData.user.id,
+        productVariantId: variantId,
         quantity,
-        price,
       });
 
-      console.log("Đã thêm vào giỏ hàng:", response);
-
-      Swal.fire({
-        icon: "success",
-        title: "Đã thêm vào giỏ hàng!",
-        text: response.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      window.location.href = "/cart"; // reload cứng
-    } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      if (response.success) {
+        updateAddedToCart(variantId, quantity);
+        Swal.fire({
+          icon: "success",
+          title: "Đã thêm vào giỏ hàng!",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          // Chuyển sang trang giỏ hàng và reload
+          window.location.href = "/cart";
+          // Hoặc chỉ reload nếu đã ở trang cart: window.location.reload();
+        });
+      }
+    } catch (err: any) {
       Swal.fire({
         icon: "error",
         title: "Lỗi!",
-        text: (error as Error).message || "Thêm sản phẩm thất bại",
+        text: err.message || "Thêm thất bại",
       });
     } finally {
       setLoading(false);
@@ -553,6 +548,7 @@ export default function Detail() {
                       </div>
                     </div>
                     <div className="form-product">
+                      {/* ------------------- COLOR PICKER ------------------- */}
                       <div className="swatch-color swatch clearfix">
                         <div className="header position-fixed">Màu sắc</div>
                         <div className="color-options">
@@ -563,14 +559,20 @@ export default function Detail() {
                                 .map((v) => [v.color.code_color, v.color])
                             ).values(),
                           ].map((color) => {
-                            // Tìm tất cả variant của màu này
+                            // Lọc các variant của màu này
                             const colorVariants =
                               product.product_variants.filter(
                                 (v) => v.color?.id === color.id
                               );
-                            // Check xem có variant nào còn hàng không
+
+                            // Kiểm tra số lượng còn lại trừ đi số đã thêm vào giỏ
                             const isOutOfStock = colorVariants.every(
-                              (v) => v.stock_quantity <= 0
+                              (v) =>
+                                v.stock_quantity -
+                                  (addedToCartQuantities[
+                                    v.product_variants_id
+                                  ] || 0) <=
+                                0
                             );
 
                             return (
@@ -585,7 +587,7 @@ export default function Detail() {
                                 <div
                                   className="color-circle"
                                   onClick={() => {
-                                    if (isOutOfStock) return; // ❌ Không cho click nếu hết hàng
+                                    if (isOutOfStock) return;
                                     setSelectedColorId(color.id);
                                     setSelectedSizeId(null);
 
@@ -636,6 +638,7 @@ export default function Detail() {
                         </div>
                       </div>
 
+                      {/* ------------------- SIZE PICKER ------------------- */}
                       <div className="swatch-size swatch clearfix">
                         <div className="header" style={{ background: "#fff" }}>
                           Kích thước
@@ -645,7 +648,7 @@ export default function Detail() {
                             ...new Map(
                               (selectedColorId
                                 ? product.product_variants.filter(
-                                    (v) => v?.color?.id === selectedColorId
+                                    (v) => v.color?.id === selectedColorId
                                   )
                                 : product.product_variants
                               ).map((v) => [v.size.id, v])
@@ -657,7 +660,13 @@ export default function Detail() {
                                 Number(b.size.number_size)
                             )
                             .map((variant) => {
-                              const isOutOfStock = variant.stock_quantity <= 0;
+                              const remainingStock =
+                                variant.stock_quantity -
+                                (addedToCartQuantities[
+                                  variant.product_variants_id
+                                ] || 0);
+                              const isOutOfStock = remainingStock <= 0;
+
                               return (
                                 <button
                                   key={variant.size.id}

@@ -16,7 +16,6 @@ export default function RelatedProductList({ categoryId }: Props) {
       try {
         const data = await getRelatedProducts(categoryId);
         setRelatedProducts(data);
-        console.log("👉 Dữ liệu trả về từ API (related products):", data);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm cùng loại:", error);
       }

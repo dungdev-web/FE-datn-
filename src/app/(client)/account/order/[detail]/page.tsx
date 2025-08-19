@@ -379,7 +379,7 @@ export default function OrderDetail() {
         if (stock <= 0) {
           // Hết hàng
           await Swal.fire({
-            icon: "warning",
+            icon: "info",
             title: "Hết hàng",
             text: `${productName} hiện đã hết hàng.`,
           });

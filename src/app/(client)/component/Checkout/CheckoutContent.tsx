@@ -113,6 +113,7 @@ export default function CheckoutContent() {
   const [userId, setUserId] = useState<number | null>(null);
   const DEFAULT_SHIPPING_FEE = 50000;
   const FREE_SHIPPING_THRESHOLD = 3000000;
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
 
   const normalizeProvinceName = (province: string): string => {
     return province.replace("Thành phố ", "").replace("Tỉnh ", "").trim();
@@ -123,8 +124,8 @@ export default function CheckoutContent() {
     const rawProvince = parts[parts.length - 1]?.trim() || "";
     return normalizeProvinceName(rawProvince);
   };
-  const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
-    useCoupon(subtotal, cart?.carts_id || "default");
+const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
+  useCoupon(subtotal, cart?.carts_id || "default", isCheckingOut);
 
   const [couponInput, setCouponInput] = useState("");
   const discountAmount = getDiscountAmount();
@@ -322,6 +323,8 @@ export default function CheckoutContent() {
     }
 
     try {
+      setIsCheckingOut(true); // ✅ bật cờ checkout
+
       const payment_method =
         paymentMethodId === 2
           ? { id: 2, code: paymentCode || "zalopay" }
@@ -361,6 +364,8 @@ export default function CheckoutContent() {
         text: response.message,
       }).then(() => {
         setCartCount(0);
+        resetCoupon(false);
+        setIsCheckingOut(false);
         localStorage.setItem(
           "checkout_shipping_fee",
           JSON.stringify(shippingFee)
@@ -368,6 +373,7 @@ export default function CheckoutContent() {
         router.push(`/payment_successful?orderId=${response.order.orders_id}`);
       });
     } catch (error: any) {
+      setIsCheckingOut(false);
       Swal.fire({
         icon: "error",
         title: "Lỗi khi thanh toán",

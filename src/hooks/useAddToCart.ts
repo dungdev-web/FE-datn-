@@ -45,7 +45,7 @@ export const useAddToCart = () => {
 
       if (variant.stock_quantity <= 0) {
         Swal.fire({
-          icon: "warning",
+          icon: "info",
           title: "Hết hàng!",
           text: "Sản phẩm này đã hết hàng, không thể thêm vào giỏ.",
         });
@@ -88,7 +88,7 @@ export const useAddToCart = () => {
 
           if (remaining <= 0) {
             Swal.fire({
-              icon: "warning",
+              icon: "info",
               title: "Hết hàng!",
               text: `${variant.name || "Sản phẩm"} đã hết hàng.`,
             });
