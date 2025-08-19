@@ -330,15 +330,15 @@ export default function Home() {
                         alt={product.name}
                       />
                     </Link>
-
                     <HotProductIcons
                       productId={productId}
-                      variant_id={
-                        product.product_variants[0]?.product_variants_id
-                      }
-                      price={product.sale_price}
-                    />
-
+                      variant={{
+                        id: product.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                        stock_quantity:
+                          product.product_variants?.[0]?.stock_quantity ?? 0,
+                        name: product.product_variants?.[0]?.name,
+                      }}
+                      price={0} />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -454,11 +454,13 @@ export default function Home() {
 
                       <HotProductIcons
                         productId={productId}
-                        variant_id={
-                          product.product_variants[0]?.product_variants_id
-                        }
-                        price={product.sale_price}
-                      />
+                        variant={{
+                          id: product.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                          stock_quantity:
+                            product.product_variants?.[0]?.stock_quantity ?? 0,
+                          name: product.product_variants?.[0]?.name,
+                        }}
+                        price={0} />
 
                       {discount > 0 && (
                         <span className="tag-discount">-{discount}%</span>

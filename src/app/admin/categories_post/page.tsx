@@ -4,13 +4,13 @@ import { useRouter } from "next/navigation";
 import "../css/categories_admin.css";
 import Link from "next/link";
 import { Category } from "@/types/blog";
-import { getCategory } from "@/services/blogService";
+import { getCategory, deleteCategoryPost } from "@/services/blogService";
 import { ArrowUpDown } from "lucide-react";
-import { deleteCategoryPost } from "@/services/blogService";
+
 export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const router = useRouter(); // khởi tạo router
+  const router = useRouter();
 
   const [filterId, setFilterId] = useState("");
   const [filterName, setFilterName] = useState("");
@@ -25,9 +25,11 @@ export default function Categories() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [categories, setCategories] = useState<Category[]>([]);
+  const [allCategories, setAllCategories] = useState<Category[]>([]); // chứa toàn bộ danh mục
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // Lấy dữ liệu phân trang
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -48,9 +50,26 @@ export default function Categories() {
     }
   };
 
+  // Lấy toàn bộ danh mục để tra cứu cha
+  const fetchAllCategories = async () => {
+    try {
+      const res = await getCategory({
+        page: 1,
+        limit: 1000, // hoặc backend cho phép lấy all thì càng tốt
+      });
+      setAllCategories(res.data);
+    } catch (error) {
+      console.error("Lỗi khi load all categories:", error);
+    }
+  };
+
   useEffect(() => {
     fetchData();
   }, [page, filterId, filterName, filterActive, searchText, sortBy, sortOrder]);
+
+  useEffect(() => {
+    fetchAllCategories(); // load tất cả danh mục cha 1 lần
+  }, []);
 
   const handleSort = (field: "name" | "created_at" | "updated_at") => {
     if (sortBy === field) {
@@ -60,6 +79,7 @@ export default function Categories() {
       setSortOrder("asc");
     }
   };
+
   const handleDelete = async (id: number) => {
     if (!id || isNaN(id)) {
       alert("ID danh mục không hợp lệ");
@@ -70,11 +90,13 @@ export default function Categories() {
     try {
       await deleteCategoryPost(id);
       alert("Xóa danh mục thành công");
-      fetchData(); // load lại danh sách sau khi xóa
+      fetchData();
+      fetchAllCategories(); // reload lại allCategories khi xóa
     } catch (err) {
       alert((err as Error).message || "Lỗi khi xóa danh mục");
     }
   };
+
   return (
     <div className="category-list">
       <h2>Danh sách danh mục bài viết</h2>
@@ -131,7 +153,7 @@ export default function Categories() {
               />
             </th>
             <th>Slug</th>
-            <th>Parent ID</th>
+            <th>Danh mục cha</th>
             <th title="Sort by Created At">
               Ngày tạo{" "}
               <ArrowUpDown
@@ -185,38 +207,43 @@ export default function Categories() {
               <td colSpan={7}>Đang tải...</td>
             </tr>
           ) : categories.length > 0 ? (
-            categories.map((cat) => (
-              <tr key={cat.category_post_id}>
-                <td className="!text-center">{cat.category_post_id}</td>
-                <td>{cat.name}</td>
-                <td>{cat.slug}</td>
-                <td>{cat.parent_id ?? "-"}</td>
-                <td>
-                  {cat.created_at
-                    ? new Date(cat.created_at).toLocaleDateString("vi-VN")
-                    : "-"}
-                </td>
-                <td>
-                  {cat.updated_at
-                    ? new Date(cat.updated_at).toLocaleDateString("vi-VN")
-                    : "-"}
-                </td>
-                <td>
-                  <Link
-                    href={`/admin/categories_post/${cat.category_post_id}`}
-                    className="btn btn-edit"
-                  >
-                    <i className="fa-solid fa-pen-to-square"></i> Sửa
-                  </Link>
-                  <button
-                    className="btn btn-delete"
-                    onClick={() => handleDelete(cat.category_post_id)}
-                  >
-                    <i className="fa-solid fa-trash"></i> 
-                  </button>
-                </td>
-              </tr>
-            ))
+            categories.map((cat) => {
+              const parent = allCategories.find(
+                (p) => p.category_post_id === cat.parent_id
+              );
+              return (
+                <tr key={cat.category_post_id}>
+                  <td className="!text-center">{cat.category_post_id}</td>
+                  <td>{cat.name}</td>
+                  <td>{cat.slug}</td>
+                  <td>{parent ? parent.name : "Không có danh mục cha"}</td>
+                  <td>
+                    {cat.created_at
+                      ? new Date(cat.created_at).toLocaleDateString("vi-VN")
+                      : "-"}
+                  </td>
+                  <td>
+                    {cat.updated_at
+                      ? new Date(cat.updated_at).toLocaleDateString("vi-VN")
+                      : "-"}
+                  </td>
+                  <td>
+                    <Link
+                      href={`/admin/categories_post/${cat.category_post_id}`}
+                      className="btn btn-edit"
+                    >
+                      <i className="fa-solid fa-pen-to-square"></i> Sửa
+                    </Link>
+                    <button
+                      className="btn btn-delete"
+                      onClick={() => handleDelete(cat.category_post_id)}
+                    >
+                      <i className="fa-solid fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              );
+            })
           ) : (
             <tr>
               <td colSpan={7}>Không có dữ liệu</td>

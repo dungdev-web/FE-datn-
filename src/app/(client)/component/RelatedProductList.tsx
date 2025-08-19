@@ -29,7 +29,7 @@ export default function RelatedProductList({ categoryId }: Props) {
     <div className="product-grid slider-wrapper">
       {Array.isArray(relatedProducts) && relatedProducts.length > 0 ? (
         relatedProducts.map((product) => (
-          <Product4box key={product.products_id} sp={product} />
+          <Product4box key={product.product_variants_id} sp={product} />
         ))
       ) : (
         <p>Không có sản phẩm liên quan.</p>

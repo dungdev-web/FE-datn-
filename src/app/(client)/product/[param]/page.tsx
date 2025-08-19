@@ -361,7 +361,6 @@ export default function Detail() {
       </div>
     );
   }
-
   return (
     <>
       <section

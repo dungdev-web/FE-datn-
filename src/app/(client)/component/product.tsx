@@ -9,7 +9,7 @@ export default function Product4box(props: any) {
   if (!sp) return null;
 
   const productId = sp.products_id ?? sp.products_id;
-
+  const variants = sp.product_variants || [];
   const averageRating =
     sp?.product_reviews?.length > 0
       ? Math.round(
@@ -22,7 +22,7 @@ export default function Product4box(props: any) {
     sp.price && sp.sale_price
       ? Math.round(((sp.price - sp.sale_price) / sp.price) * 100)
       : 0;
-
+console.log("Product Variants:", variants);
   return (
     <>
       <div className="hot-product-card" style={{ width: "230px" }}>
@@ -44,8 +44,12 @@ export default function Product4box(props: any) {
           <div className="hot-product-icons">
             <ProductIcons
               productId={productId}
-              variant_id={sp.product_variants?.[0]?.product_variants_id}
-              price={sp.sale_price}
+              variant={{
+                id: sp.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                stock_quantity: sp.product_variants?.[0]?.stock_quantity ?? 0,
+                name: sp.product_variants?.[0]?.name,
+              }}
+              price={0}
             />
           </div>
 

@@ -1,4 +1,7 @@
 export interface IProduct {
+  color: any;
+  stock_quantity: number;
+  product_variants_id: number;
   brand_id: any;
   gender_id: any;
   categories_id: any;
@@ -55,6 +58,7 @@ export interface IProduct {
     };
   }[];
   product_variants: {
+    name: string | undefined;
     image_url: string;
     product_variants_id: number;
     sku: string;

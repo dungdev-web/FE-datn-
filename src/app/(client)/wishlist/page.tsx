@@ -170,12 +170,15 @@ export default function Wishlist() {
                           </Link>
                           <ProductIcons
                             productId={product.products_id}
-                            variant_id={variant.product_variants_id ?? null}
+                            variant={{
+                              id: variant.product_variants_id, // 👈 lấy product_variants_id từ DB
+                              stock_quantity: variant.stock_quantity ?? 0,
+                              name: variant.name,
+                            }}
                             price={product.sale_price}
                             onWishlistChange={() =>
                               handleRemoveWishlistItem(product.products_id)
-                            }
-                          />
+                            } />
                           {product.price > product.sale_price && (
                             <span className="discount-tag">
                               -
@@ -243,12 +246,15 @@ export default function Wishlist() {
                           />
                           <ProductIcons
                             productId={product.products_id}
-                            variant_id={variant?.product_variants_id ?? null}
+                            variant={{
+                              id: variant.product_variants_id, // 👈 lấy product_variants_id từ DB
+                              stock_quantity: variant.stock_quantity ?? 0,
+                              name: variant.name,
+                            }}
                             price={product.sale_price}
                             onWishlistChange={() =>
                               handleRemoveWishlistItem(product.products_id)
-                            }
-                          />
+                            } />
                           {product.price > product.sale_price && (
                             <span className="discount-tag">
                               -
