@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // ✅ thêm useState
 import { getFilteredProducts } from "@/services/productService";
 
 interface Props {
@@ -50,6 +50,11 @@ export default function MobileSidebarFilter({
   sortBy,
   sortOrder,
 }: Props) {
+  // ✅ state lưu lịch sử filter
+  const [filterHistory, setFilterHistory] = useState<
+    { selectedBrandIds: number[]; selectedGender: string | null; selectedPriceRange: { min: number; max: number } | null }[]
+  >([]);
+
   const applyFilters = async () => {
     const brandSlug = selectedBrandIds.length
       ? brandsList.find((b) => b.brand_id === selectedBrandIds[0])?.slug
@@ -75,6 +80,7 @@ export default function MobileSidebarFilter({
     }
   };
 
+  // Gọi API khi filter thay đổi
   useEffect(() => {
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,6 +95,32 @@ export default function MobileSidebarFilter({
     sortOrder,
   ]);
 
+  // ✅ Lưu lịch sử filter
+  useEffect(() => {
+    setFilterHistory((prev) => [
+      ...prev,
+      { selectedBrandIds, selectedGender, selectedPriceRange },
+    ]);
+  }, [selectedBrandIds, selectedGender, selectedPriceRange]);
+
+  // ✅ Undo filter
+  const handleUndo = () => {
+    if (filterHistory.length > 1) {
+      const newHistory = [...filterHistory];
+      newHistory.pop(); // bỏ trạng thái hiện tại
+      const last = newHistory[newHistory.length - 1];
+
+      handleGenderChange(last.selectedGender || "");
+      handlePriceChange(last.selectedPriceRange);
+      if (last.selectedBrandIds.length > 0) {
+        handleBrandCheckboxChange(last.selectedBrandIds[0]);
+      } else {
+        handleBrandCheckboxChange(-1);
+      }
+
+      setFilterHistory(newHistory);
+    }
+  };
   return (
     <div id="filter-sidebar" className={isActive ? "active" : ""}>
       {/* Danh mục */}
@@ -152,6 +184,96 @@ export default function MobileSidebarFilter({
             <span>Bộ lọc</span>
           </h2>
         </div>
+        {/* ✅ Phần hiển thị filter đã chọn (giống Desktop) */}
+        {(selectedBrandIds.length > 0 ||
+          (selectedGender && selectedGender !== "") ||
+          selectedPriceRange !== null) && (
+          <div className="aside-item !px-3 !py-2">
+            <div className="aside-title-me flex justify-between items-center">
+              <div className="flex items-center !gap-2">
+                {/* Nút Undo */}
+                {filterHistory && filterHistory.length > 0 && (
+                  <button
+                    onClick={handleUndo}
+                    className="text-blue-600 hover:text-blue-800 !gap-4"
+                    title="Quay lại bộ lọc trước đó"
+                  >
+                    <i className="fa fa-undo"></i>
+                  </button>
+                )}
+                <span className="font-semibold !mr-10">Bạn chọn</span>
+              </div>
+
+              {/* Nút Bỏ hết */}
+              <button
+                className="flex items-center gap-2 text-sm text-blue-600 hover:underline whitespace-nowrap"
+                onClick={() => {
+                  handleGenderChange("");
+                  handlePriceChange(null);
+                  handleBrandCheckboxChange(-1);
+                }}
+              >
+                <i className="fa fa-times-circle !gap-5"></i> Bỏ hết
+              </button>
+            </div>
+
+            {/* Danh sách filter đã chọn */}
+            <ul className="mt-2 space-y-2 !p-2 text-sm ">
+              {selectedPriceRange && (
+                <li className="flex !gap-6">
+                  <span>
+                    {selectedPriceRange.min.toLocaleString("vi-VN")}đ -{" "}
+                    {selectedPriceRange.max.toLocaleString("vi-VN")}đ
+                  </span>
+                  <button
+                    onClick={() => handlePriceChange(null)}
+                    className="text-red-500 ml-2"
+                    title="Xoá giá"
+                  >
+                    <i className="fa fa-times-circle"></i>
+                  </button>
+                </li>
+              )}
+
+              {selectedBrandIds.map((id) => {
+                const brand = brandsList.find((b) => b.brand_id === id);
+                if (!brand) return null;
+                return (
+                  <li key={id} className="flex !gap-26.5 ">
+                    <span>{brand.name}</span>
+                    <button
+                      onClick={() => handleBrandCheckboxChange(-1)}
+                      className="text-red-500 ml-2"
+                      title="Xoá thương hiệu"
+                    >
+                      <i className="fa fa-times-circle"></i>
+                    </button>
+                  </li>
+                );
+              })}
+
+              {selectedGender && (
+                <li className="flex !gap-25.5trưa">
+                  <span>
+                    {selectedGender === "nam"
+                      ? "Giày Nam"
+                      : selectedGender === "nữ"
+                      ? "Giày Nữ"
+                      : "Khác"}
+                  </span>
+                  <button
+                    onClick={() => handleGenderChange("")}
+                    className="text-red-500 ml-2"
+                    title="Xoá loại"
+                  >
+                    <i className="fa fa-times-circle"></i>
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
+
         <div className="filter-container">
           {/* Giá */}
           <aside className="aside-item filter-price">
@@ -218,28 +340,62 @@ export default function MobileSidebarFilter({
               </h2>
             </div>
             <div className="aside-content filter-group">
-              <ul>
+             <ul>
                 {[
-                  { label: "Giày Nam", value: "male" },
-                  { label: "Giày Nữ", value: "female" },
+                  { label: "Giày Nam", value: "nam" },
+                  { label: "Giày Nữ", value: "nữ" },
+                  { label: "Khác", value: "khác" },
                 ].map((type) => (
                   <li
                     key={type.value}
-                    className="filter-item filter-item--check-box filter-item--green"
+                    className="filter-item filter-item--check-box"
                   >
-                    <span>
-                      <label>
-                        <input
-                          type="radio"
-                          name="gender"
-                          value={type.value}
-                          checked={selectedGender === type.value}
-                          onChange={() => handleGenderChange(type.value)}
-                        />
-                        <i className="fa"></i>
-                        {type.label}
-                      </label>
-                    </span>
+                    <label
+                      style={{
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="gender"
+                        checked={selectedGender === type.value}
+                        onChange={() => handleGenderChange(type.value)}
+                        style={{ display: "none" }}
+                      />
+                      <span
+                        style={{
+                          width: "14px",
+                          height: "14px",
+                          borderRadius: "50%",
+                          border: "2px solid #ccc",
+                          backgroundColor:
+                            selectedGender === type.value
+                              ? "#007bff"
+                              : "transparent",
+                          position: "relative",
+                          display: "inline-block",
+                        }}
+                      >
+                        {selectedGender === type.value && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: "50%",
+                              left: "50%",
+                              transform: "translate(-50%, -50%)",
+                              width: "6px",
+                              height: "6px",
+                              borderRadius: "50%",
+                              backgroundColor: "white",
+                            }}
+                          />
+                        )}
+                      </span>
+                      {type.label}
+                    </label>
                   </li>
                 ))}
               </ul>
@@ -298,4 +454,4 @@ export default function MobileSidebarFilter({
       </aside>
     </div>
   );
-}
+};
