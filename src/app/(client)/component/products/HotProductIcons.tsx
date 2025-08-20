@@ -31,7 +31,7 @@ export default function HotProductIcons({  productId,
       ></i>
 
       <div className="icon-hover-group">
-        <i className="fa-solid fa-eye"></i>
+         <i className="fa-solid fa-eye icon-eye"></i>
         <i
           className="fa fa-shopping-bag position-relative"
             onClick={() =>
