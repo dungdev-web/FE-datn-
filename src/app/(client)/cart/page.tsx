@@ -497,7 +497,7 @@ export default function Cart() {
                   Đã áp dụng mã <strong>{appliedCoupon.code}</strong>{" "}
                   <button
                     className="ml-2 text-blue-600 underline"
-                    onClick={resetCoupon}
+                    onClick={() => resetCoupon()}
                   >
                     Hủy
                   </button>

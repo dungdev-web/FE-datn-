@@ -124,8 +124,8 @@ export default function CheckoutContent() {
     const rawProvince = parts[parts.length - 1]?.trim() || "";
     return normalizeProvinceName(rawProvince);
   };
-const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
-  useCoupon(subtotal, cart?.carts_id || "default", isCheckingOut);
+  const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
+    useCoupon(subtotal, cart?.carts_id || "default", isCheckingOut);
 
   const [couponInput, setCouponInput] = useState("");
   const discountAmount = getDiscountAmount();
@@ -800,7 +800,7 @@ const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
           {appliedCoupon && (
             <p className="applied">
               Đã áp dụng mã <strong>{appliedCoupon.code}</strong>
-              <button onClick={resetCoupon}>Hủy</button>
+              <button onClick={() => resetCoupon()}>Hủy</button>
             </p>
           )}
         </div>
