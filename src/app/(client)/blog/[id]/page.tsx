@@ -8,6 +8,7 @@ import { IBlog } from "@/types/blog";
 import AsideBlog from "../../component/Blog/AsideBlog";
 import DOMPurify from "dompurify";
 import { usePostsByCategory } from "@/hooks/useBlog";
+import { updateViewPost } from "@/services/blogService";
 
 export default function Detail_blog() {
   const params = useParams();
@@ -60,6 +61,11 @@ export default function Detail_blog() {
       });
 
       setModifiedContent(doc.body.innerHTML);
+    }
+  }, [post]);
+  useEffect(() => {
+    if (post?.post_id) {
+      updateViewPost(post.post_id);
     }
   }, [post]);
 
@@ -127,9 +133,9 @@ export default function Detail_blog() {
                   <div className="wrap-title-toc">
                     <h2>Nội dung bài viết</h2>
                     <div id="toc">
-                      <ol className="toc-list">
+                      <ol className="toc-list" style={{paddingLeft:"30px"}}>
                         {strongTexts.map((text, idx) => (
-                          <li className="toc-list-item" key={idx}>
+                          <li className="toc-list-item" key={idx} style={{whiteSpace:"normal",overflowWrap:"anywhere"}}>
                             <a href={`#section-${idx}`} className="toc-link">
                               {text}
                             </a>

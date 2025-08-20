@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Category } from "@/types/blog";
 import { getCategory, deleteCategoryPost } from "@/services/blogService";
 import { ArrowUpDown } from "lucide-react";
-
+import Swal from "sweetalert2";
 export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -23,9 +23,9 @@ export default function Categories() {
     "created_at"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [allCategories, setAllCategories] = useState<Category[]>([]); // chứa toàn bộ danh mục
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [allCategories, setAllCategories] = useState<Category[]>([]); // chứa toàn bộ danh mục
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
@@ -49,8 +49,6 @@ export default function Categories() {
       setLoading(false);
     }
   };
-
-  // Lấy toàn bộ danh mục để tra cứu cha
   const fetchAllCategories = async () => {
     try {
       const res = await getCategory({
@@ -62,15 +60,12 @@ export default function Categories() {
       console.error("Lỗi khi load all categories:", error);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, [page, filterId, filterName, filterActive, searchText, sortBy, sortOrder]);
-
   useEffect(() => {
     fetchAllCategories(); // load tất cả danh mục cha 1 lần
   }, []);
-
   const handleSort = (field: "name" | "created_at" | "updated_at") => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -82,18 +77,44 @@ export default function Categories() {
 
   const handleDelete = async (id: number) => {
     if (!id || isNaN(id)) {
-      alert("ID danh mục không hợp lệ");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "ID danh mục không hợp lệ",
+      });
       return;
     }
-    if (!confirm("Bạn có chắc muốn xóa danh mục này?")) return;
+
+    const result = await Swal.fire({
+      title: "Bạn có chắc muốn xóa?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       await deleteCategoryPost(id);
-      alert("Xóa danh mục thành công");
-      fetchData();
-      fetchAllCategories(); // reload lại allCategories khi xóa
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Xóa danh mục thành công",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      fetchData(); // load lại danh sách sau khi xóa
+
     } catch (err) {
-      alert((err as Error).message || "Lỗi khi xóa danh mục");
+      Swal.fire({
+        icon: "error",
+        title: "Thất bại",
+        text: (err as Error).message || "Lỗi khi xóa danh mục",
+      });
     }
   };
 
@@ -207,43 +228,46 @@ export default function Categories() {
               <td colSpan={7}>Đang tải...</td>
             </tr>
           ) : categories.length > 0 ? (
-            categories.map((cat) => {
-              const parent = allCategories.find(
-                (p) => p.category_post_id === cat.parent_id
-              );
-              return (
-                <tr key={cat.category_post_id}>
-                  <td className="!text-center">{cat.category_post_id}</td>
-                  <td>{cat.name}</td>
-                  <td>{cat.slug}</td>
-                  <td>{parent ? parent.name : "Không có danh mục cha"}</td>
-                  <td>
-                    {cat.created_at
-                      ? new Date(cat.created_at).toLocaleDateString("vi-VN")
-                      : "-"}
-                  </td>
-                  <td>
-                    {cat.updated_at
-                      ? new Date(cat.updated_at).toLocaleDateString("vi-VN")
-                      : "-"}
-                  </td>
-                  <td>
-                    <Link
-                      href={`/admin/categories_post/${cat.category_post_id}`}
-                      className="btn btn-edit"
-                    >
-                      <i className="fa-solid fa-pen-to-square"></i> Sửa
-                    </Link>
-                    <button
-                      className="btn btn-delete"
-                      onClick={() => handleDelete(cat.category_post_id)}
-                    >
-                      <i className="fa-solid fa-trash"></i>
-                    </button>
-                  </td>
-                </tr>
-              );
-            })
+            categories.map((cat) => (
+              <tr key={cat.category_post_id}>
+                <td className="!text-center">{cat.category_post_id}</td>
+                <td>{cat.name}</td>
+                <td>{cat.slug}</td>
+                <td>
+                  {cat.parent_id
+                    ? allCategories.find(
+                        (c) =>
+                          Number(c.category_post_id) === Number(cat.parent_id)
+                      )?.name || "Không xác định"
+                    : "Không có danh mục cha"}
+                </td>
+
+                <td>
+                  {cat.created_at
+                    ? new Date(cat.created_at).toLocaleDateString("vi-VN")
+                    : "-"}
+                </td>
+                <td>
+                  {cat.updated_at
+                    ? new Date(cat.updated_at).toLocaleDateString("vi-VN")
+                    : "-"}
+                </td>
+                <td className="flex">
+                  <Link
+                    href={`/admin/categories_post/${cat.category_post_id}`}
+                    className="btn btn-edit"
+                  >
+                    <i className="fa-solid fa-pen-to-square"></i>
+                  </Link>
+                  <button
+                    className="btn btn-delete"
+                    onClick={() => handleDelete(cat.category_post_id)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            ))
           ) : (
             <tr>
               <td colSpan={7}>Không có dữ liệu</td>

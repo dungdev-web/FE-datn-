@@ -6,6 +6,7 @@ import { ICategory } from "@/types/ICategory";
 // Lấy bài viết
 export async function getPost(
   page: number,
+  id?: number | null, // 👈 cho phép null hoặc không truyền
   title?: string,
   status?: string,
   sortBy: string = "created_at", // mặc định sort theo created_at
@@ -28,6 +29,7 @@ export async function getPost(
     });
 
     if (title) queryParams.append("title", title);
+    if (id) queryParams.append("id", id.toString());
     if (status !== undefined && status !== "") {
       queryParams.append("status", status.toString());
     }
@@ -89,6 +91,7 @@ export async function getPostById(id: number): Promise<IBlog | null> {
 
 export async function getCategory(params?: {
   page?: number;
+  limit?:number;
   name?: string;
   id?: number;
   slug?: string;
@@ -98,7 +101,7 @@ export async function getCategory(params?: {
   try {
     const query = new URLSearchParams({
       page: String(params?.page ?? 1),
-      limit: "10",
+      limit: String(params?.limit),
       name: params?.name ?? "",
       id: params?.id ? String(params.id) : "",
       slug: params?.slug ?? "",
@@ -301,5 +304,47 @@ export async function deleteCategoryPost(category_post_id:number)
   } catch (error) {
     console.error("deleteCategoryPost error:", error);
     throw error;
+  }
+}
+//tăng view cho blog
+export async function updateViewPost(post_id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/${post_id}/view`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Lỗi khi cập nhật lượt xem");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("updateViewPost error:", error);
+    throw error;
+  }
+}
+//bài viết nổi bật
+export async function getFeaturedPost(page: number = 1, limit: number = 10) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/featured?page=${page}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch featured posts");
+    }
+
+    const data = await res.json();
+    return data?.data || [];
+  } catch (error) {
+    console.error("Error getFeaturedPost:", error);
+    return [];
   }
 }

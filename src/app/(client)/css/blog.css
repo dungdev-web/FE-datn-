@@ -595,7 +595,7 @@ a,
     margin-right: 15px;
 }
 .wrap-title-toc ol {
-    list-style-position: inside;
+    list-style-position: outside;
     padding-left: 10px;
 }
 ol {

@@ -4,7 +4,7 @@ import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { ICartItem } from "@/types/cart";
 import { ICoupon } from "@/types/coupon";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import {
   getProductDetail,
   getBestSellingMockProducts,
@@ -38,6 +38,8 @@ export default function Detail() {
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
   const [coupon, setCoupon] = useState<ICoupon[]>([]);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const handleAddToCart = async () => {
     if (!selectedColorId) {
       Swal.fire({
@@ -94,6 +96,10 @@ export default function Detail() {
     try {
       const tokenData = await checkToken();
       if (!tokenData?.user?.id) {
+        const currentUrl =
+          pathname +
+          (searchParams.toString() ? `?${searchParams.toString()}` : "");
+
         Swal.fire({
           icon: "warning",
           title: "Bạn chưa đăng nhập",
@@ -101,7 +107,7 @@ export default function Detail() {
           confirmButtonText: "Đăng nhập",
         }).then((result) => {
           if (result.isConfirmed) {
-            router.push("/login");
+            router.push(`/login?redirect=${encodeURIComponent(currentUrl)}`);
           }
         });
         return;
