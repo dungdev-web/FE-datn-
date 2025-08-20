@@ -3,11 +3,12 @@ import "../css/css.css";
 import { useState, useEffect } from "react";
 import "../css/dashboard.css";
 import "../css/blog_add.css";
-import { getPost } from "@/services/blogService"; 
-import { IBlog } from "@/types/blog"; 
+import { getPost } from "@/services/blogService";
+import { IBlog } from "@/types/blog";
 import Link from "next/link";
 import { ArrowUpDown } from "lucide-react";
 import { useDeletePost } from "@/hooks/useAddBlog";
+import Swal from "sweetalert2";
 export default function Blog() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
@@ -16,29 +17,44 @@ export default function Blog() {
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [id, setId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<"created_at" | "updated_at" | "title">(
     "created_at"
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const { deletePost } = useDeletePost();
   const handleDelete = async (postId: number) => {
-    if (confirm("Bạn có chắc chắn muốn xóa bài viết này?")) {
-      try {
-        await deletePost(postId);
-        setPosts((prevPosts) => prevPosts.filter((post) => post.post_id !== postId));
-      } catch (error) {
-        console.error("Lỗi khi xóa bài viết:", error);
+    Swal.fire({
+      title: "Bạn có chắc chắn?",
+      text: "Hành động này sẽ xóa bài viết vĩnh viễn!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deletePost(postId);
+          setPosts((prevPosts) =>
+            prevPosts.filter((post) => post.post_id !== postId)
+          );
+
+          Swal.fire("Đã xóa!", "Bài viết đã được xóa thành công.", "success");
+        } catch (error) {
+          console.error("Lỗi khi xóa bài viết:", error);
+          Swal.fire("Lỗi!", "Không thể xóa bài viết.", "error");
+        }
       }
-    }
+    });
   };
 
-  useEffect(() => {
-    fetchPosts();
-  }, [page]);
   useEffect(() => {
     async function fetchData() {
       const result = await getPost(
         page,
+        id,
         searchText,
         statusFilter,
         sortBy,
@@ -48,17 +64,8 @@ export default function Blog() {
       setTotalPages(result.totalPages);
     }
     fetchData();
-  }, [page, searchText, statusFilter, sortBy, sortOrder]);
+  }, [page, searchText, statusFilter, sortBy, sortOrder, id]);
 
-  const fetchPosts = async () => {
-    try {
-      const res = await getPost(page);
-      setPosts(res.posts);
-      setTotalPages(res.totalPages);
-    } catch (error) {
-      console.error("Lỗi khi lấy danh sách bài viết:", error);
-    }
-  };
   const toggleSort = (field: "created_at" | "updated_at" | "title") => {
     if (sortBy === field) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
@@ -75,7 +82,9 @@ export default function Blog() {
 
         <div className="post-actions">
           <button className="btn btn-add">
-            <Link href="/admin/blog/add"><i className="fa-solid fa-plus"></i> Thêm mới bài viết</Link>
+            <Link href="/admin/blog/add">
+              <i className="fa-solid fa-plus"></i> Thêm mới bài viết
+            </Link>
           </button>
           <button
             className="btn btn-refresh"
@@ -139,7 +148,18 @@ export default function Blog() {
               <th>Thao tác</th>
             </tr>
             <tr className="filter-row">
-              <th></th>
+              <th>
+                <input
+                  type="text"
+                  placeholder="Lọc theo id..."
+                  value={id ?? ""} // nếu null thì hiển thị rỗng
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setId(value ? Number(value) : null); // nếu có thì parse số, không thì null
+                    setCurrentPage(1);
+                  }}
+                />
+              </th>
               <th>
                 <input
                   type="text"

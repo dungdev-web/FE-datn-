@@ -670,13 +670,13 @@ const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
             </button>
 
             {isOpen && (
-              <div className="coupon-section">
+              <div className="coupon-section1">
                 {/* --- Mã đã lưu --- */}
                 {savedCoupons.length > 0 &&
                   savedCoupons.map((coupon) => (
                     <div
                       key={coupon.code}
-                      className={`coupon ${
+                      className={`coupon1 ${
                         couponInput === coupon.code ? "bg-green-50" : ""
                       }`}
                       onClick={() => {
@@ -729,7 +729,7 @@ const { appliedCoupon, applyCoupon, error, getDiscountAmount, resetCoupon } =
                   .map((coupon) => (
                     <div
                       key={coupon.code}
-                      className={`coupon coupon-suggest ${
+                      className={`coupon1 coupon-suggest ${
                         couponInput === coupon.code ? "bg-green-50" : ""
                       }`}
                       style={{ cursor: "not-allowed" }} // ❌ không cho click cả box

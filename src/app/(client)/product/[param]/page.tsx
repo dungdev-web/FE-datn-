@@ -4,7 +4,7 @@ import { IProduct, IReview, IReviewPayload } from "@/types/product";
 import { ICartItem } from "@/types/cart";
 import { ICoupon } from "@/types/coupon";
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import {
   getProductDetail,
   getBestSellingMockProducts,
@@ -56,6 +56,8 @@ export default function Detail() {
     );
     setAddedToCartQuantities(saved);
   }, []);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const handleAddToCart = async () => {
     if (!selectedColorId) {
@@ -99,14 +101,28 @@ export default function Detail() {
     try {
       setLoading(true);
       const tokenData = await checkToken();
-      if (!tokenData?.user?.id) throw new Error("Chưa đăng nhập");
+      if (!tokenData?.user?.id) {
+        const currentUrl =
+          pathname +
+          (searchParams.toString() ? `?${searchParams.toString()}` : "");
 
+        Swal.fire({
+          icon: "warning",
+          title: "Bạn chưa đăng nhập",
+          text: "Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.",
+          confirmButtonText: "Đăng nhập",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            router.push(`/login?redirect=${encodeURIComponent(currentUrl)}`);
+          }
+        });
+        return;
+      }
       const response = await addToCart({
         userId: tokenData.user.id,
         productVariantId: variantId,
         quantity,
       });
-
       if (response.success) {
         updateAddedToCart(variantId, quantity);
         Swal.fire({
