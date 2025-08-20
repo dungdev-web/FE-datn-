@@ -652,19 +652,19 @@ export default function OrderDetail() {
           </div>
           <ul className="breadcrumb">
             <li className="home">
-              <Link href="/">Trang chủ</Link>
+              <Link href="/"><span>Trang chủ</span></Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account">Tài khoản</Link>
+              <Link href="/account"><span>Tài khoản</span></Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account/order">Đơn hàng</Link>
+              <Link href="/account/order"><span>Đơn hàng</span></Link>
               <i className="fa fa-angle-right" />
             </li>
             <li>
-              <strong>Chi tiết đơn hàng</strong>
+              <strong><span>Chi tiết đơn hàng</span></strong>
             </li>
           </ul>
         </div>
