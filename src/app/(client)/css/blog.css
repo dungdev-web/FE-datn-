@@ -440,7 +440,6 @@ main > aside:not(.mobile-sidebar) {
 
 .breadcrumb-container .breadcrumb{
   z-index: 10;
-  top: 45px !important;
   margin: 0 auto;
   font-size: 12px;
 }
