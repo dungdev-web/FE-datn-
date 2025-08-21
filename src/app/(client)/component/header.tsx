@@ -50,8 +50,6 @@ export default function Header() {
     if (!keyword.trim()) return;
     router.push(`/product?q=${encodeURIComponent(keyword)}`);
   };
-   console.log("API response:", res);
-      console.log("Role from res:", res?.user?.role);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -251,6 +249,8 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  console.log("User trong Header:", user);
+
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -393,6 +393,11 @@ export default function Header() {
               <li>
                 <LinkWithLoader href="/account">Tài khoản</LinkWithLoader>
               </li>
+              {user?.role?.toLowerCase() === "admin" && (
+                <li>
+                  <LinkWithLoader href="/admin">Quản lí</LinkWithLoader>
+                </li>
+              )}
             </ul>
             <SearchWithSuggestions />
           </div>

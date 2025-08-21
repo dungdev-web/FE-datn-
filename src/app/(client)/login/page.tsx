@@ -24,7 +24,7 @@ export default function Login() {
   const { getUserFromCookies, saveUserToCookies } = useAuthCookie();
   const { user } = useAuthUser();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/";
+  const redirect = searchParams.get("redirect") || "/account";
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
 
