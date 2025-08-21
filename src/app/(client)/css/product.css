@@ -116,9 +116,9 @@ main{
 
 .breadcrumb-container .breadcrumb{
   z-index: 10;
-
   margin: 0 auto;
   font-size: 12px;
+  top: 50px;
 }
 }
 .breadcrumb-container {
@@ -176,13 +176,12 @@ main{
 .breadcrumb {
   margin: 0;
   font-size: 1em;
-  padding: 4px 0;
+
   background-color: initial;
   border-radius: 0;
 }
 
 .breadcrumb {
-  padding: 8px 15px;
   margin-top: 180px;
   list-style: none;
   /* background-color: #f5f5f5; */
