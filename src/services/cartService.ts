@@ -43,7 +43,6 @@ export const addToCart = async ({
 
     return data;
 
-    return data;
   } catch (error: any) {
     if (typeof error === "object") {
       throw error;

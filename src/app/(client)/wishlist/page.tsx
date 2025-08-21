@@ -70,7 +70,7 @@ export default function Wishlist() {
             </ul>
           </div>
         </section>
-        <div className="container1 py-10 px-4 text-center !mt-6 !mb-6">
+        <div className="container py-10 px-4 text-center !mt-6 !mb-6">
           <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
             <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
             <p className="text-lg font-medium text-red-600">

@@ -25,6 +25,7 @@ export const useAddToCart = () => {
     variant,
     quantity = 1,
   }: AddToCartParams) => {
+    console.log("Đã gọi handleAddToCart với:", variant, quantity);
     try {
       if (!variant?.id) {
         Swal.fire({
@@ -70,6 +71,7 @@ export const useAddToCart = () => {
         productVariantId: variant.id,
         quantity,
       });
+console.log("addToCart response:", response);
 
       if (response?.success === false) {
         if (
