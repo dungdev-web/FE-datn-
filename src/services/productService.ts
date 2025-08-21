@@ -389,7 +389,6 @@ export async function getReviewProduct(productId: number): Promise<IReview[]> {
 export async function addProduct(
   payload: AddProductPayload
 ): Promise<AddProductResponse> {
-  
   const url = `${API_BASE_URL}/product/add-product`;
 
   const formData = new FormData();
@@ -654,7 +653,10 @@ export async function addCompareProduct(userId: number, productID: number) {
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.error || "Lỗi không xác định");
+    throw {
+      status: res.status,
+      message: data.message || data.error || "Lỗi không xác định",
+    };
   }
 
   return data;
@@ -913,9 +915,10 @@ export async function getGenders(): Promise<GetGendersResponse> {
     data: json as IGender[],
   };
 }
-export async function getProductAdminById(id: number): Promise<GetProductByIdResponse> {
+export async function getProductAdminById(
+  id: number
+): Promise<GetProductByIdResponse> {
   if (IS_MOCK) {
- 
   }
 
   const url = `${API_BASE_URL}/product/proadmin/${id}`;
@@ -931,9 +934,7 @@ export async function getProductAdminById(id: number): Promise<GetProductByIdRes
   };
 }
 
-export async function deleteAdminProduct(
-  productId: number
-): Promise<IProduct> {
+export async function deleteAdminProduct(productId: number): Promise<IProduct> {
   const res = await fetch(`${API_BASE_URL}/product/delete/${productId}`, {
     method: "DELETE",
   });
@@ -946,4 +947,3 @@ export async function deleteAdminProduct(
   const json = await res.json();
   return json as IProduct;
 }
-
