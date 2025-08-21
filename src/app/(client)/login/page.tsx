@@ -60,20 +60,25 @@ export default function Login() {
       saveUserToCookies(res);
       setLoginSuccess(true);
 
-      // Hiển thị thông báo thành công
-      await Swal.fire({
+      // Sau khi login thành công
+      console.log("API response:", res);
+      console.log("Role from res:", res?.user?.role);
+
+      // Điều hướng theo role ngay lập tức
+      if (res?.user?.role?.toLowerCase() === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = redirect || "/account";
+      }
+
+      // Hiển thị thông báo thành công (không await)
+      Swal.fire({
         title: "Đăng nhập thành công!",
         icon: "success",
         showConfirmButton: false,
         timer: 2000,
         timerProgressBar: true,
       });
-
-      if (res?.user?.role === "admin") {
-        window.location.href = "/admin";
-      } else {
-        window.location.href = redirect || "/account";
-      }
     } catch (err: any) {
       setShowLoader(false);
       Swal.fire({

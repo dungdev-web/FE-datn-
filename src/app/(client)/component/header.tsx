@@ -50,6 +50,8 @@ export default function Header() {
     if (!keyword.trim()) return;
     router.push(`/product?q=${encodeURIComponent(keyword)}`);
   };
+   console.log("API response:", res);
+      console.log("Role from res:", res?.user?.role);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
