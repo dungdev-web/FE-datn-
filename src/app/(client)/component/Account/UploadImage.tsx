@@ -62,7 +62,7 @@ export default function UploadImageProfile({
               : "/images/default.png"
           }
           alt="Avatar"
-          className="w-[80px] h-[80px] rounded-full object-cover !mr-[20px] border-[3px] border-[#007bff] shadow-md"
+           className="w-[80px] aspect-square rounded-full object-cover !mr-[20px] border-[3px] border-[#007bff] shadow-md"
         />
 
         <div>
@@ -82,7 +82,8 @@ export default function UploadImageProfile({
           ((e.target as HTMLButtonElement).style.backgroundColor = "#007bff")
         }
       >
-        <i className="fa-solid fa-camera"></i> Đổi ảnh
+        <i className="fa-solid fa-camera"></i>
+        <span className="hidden md:!inline">Đổi ảnh</span>
       </button>
     </div>
   );
