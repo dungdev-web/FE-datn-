@@ -2,12 +2,14 @@
   "name": "my-nextjs-app",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev  -p 3001",
-    "build": "npm install --legacy-peer-deps && next build",
-    "start": "next start -p 3001",
-    "lint": "next lint"
-  },
+"scripts": {
+  "dev": "next dev -p 3001",
+  "build": "next build && next export",
+  "start": "next start -p 3001",
+  "lint": "next lint",
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d out"
+},
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -61,6 +63,7 @@
     "@types/react-dom": "^19",
     "autoprefixer": "^10.4.21",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
+    "gh-pages": "^6.3.0",
     "postcss": "^8.5.4",
     "tailwindcss": "^4.1.8",
     "typescript": "^5"
