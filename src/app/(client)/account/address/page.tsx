@@ -1,6 +1,6 @@
 "use client";
 
-import "@/app/(client)css/product.css";
+import "@/app/(client)/css/product.css";
 import "@/app/(client)/css/account.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
