@@ -17,6 +17,7 @@ export interface IOrder {
   shipping_address: {
     shipping_address_id: number;
     address_line: string;
+    phone:string;
   };
   shipping_fee: number;
   user: {

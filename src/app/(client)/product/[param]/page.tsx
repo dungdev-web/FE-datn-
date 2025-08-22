@@ -39,9 +39,9 @@ export default function Detail() {
   const [content, setContent] = useState<string>("");
   const [coupon, setCoupon] = useState<ICoupon[]>([]);
   const [addedToCartQuantities, setAddedToCartQuantities] = useState<{
-    [variantId: string]: number;
+    [variantId: number]: number;
   }>({});
-  const updateAddedToCart = (variantId: string, quantity: number) => {
+  const updateAddedToCart = (variantId: number, quantity: number) => {
     const prev = JSON.parse(
       localStorage.getItem("addedToCartQuantities") || "{}"
     );
@@ -78,7 +78,7 @@ export default function Detail() {
       return;
     }
 
-    const selectedVariant = product.product_variants.find(
+    const selectedVariant = product?.product_variants.find(
       (v) => v.product_variants_id === variantId
     );
     if (!selectedVariant) return;
@@ -92,7 +92,7 @@ export default function Detail() {
         title: availableStock <= 0 ? "Hết hàng!" : "Số lượng không đủ",
         text:
           availableStock <= 0
-            ? `${product.name} đã hết hàng.`
+            ? `${product?.name} đã hết hàng.`
             : `Chỉ còn ${availableStock} sản phẩm trong kho.`,
       });
       return;

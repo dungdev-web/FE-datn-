@@ -46,8 +46,8 @@ export default function Add_pro() {
   const [selectedGender, setSelectedGender] = useState<number | "">("");
   const [name, setName] = useState("");
   const [shortDesc, setShortDesc] = useState("");
-  const [price, setPrice] = useState("");
-  const [salePrice, setSalePrice] = useState("");
+  const [price, setPrice] = useState<string>("");
+  const [salePrice, setSalePrice] = useState<string>("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<string>("Mở bán");
   const [variantImagesOld, setVariantImagesOld] = useState<
@@ -55,7 +55,9 @@ export default function Add_pro() {
   >({});
   const [variants, setVariants] = useState<Variant[]>([
     {
-      color: "black|Đen",
+      colorKey: null,
+      product_variants_id: undefined,
+      color: "#000000|Đen",
       colorHex: "#000000",
       image: null,
       sizes: [],
@@ -250,7 +252,9 @@ export default function Add_pro() {
     setVariants((prev) => [
       ...prev,
       {
-        color: "#000000|Đen", // thay 'black' bằng hex
+        colorKey: null,
+        product_variants_id: undefined,
+        color: "#000000|Đen",
         colorHex: "#000000",
         image: null,
         sizes: [],
@@ -310,8 +314,8 @@ export default function Add_pro() {
         setDescription(data.description || "");
         setName(data.name || "");
         setShortDesc(data.short_desc || "");
-        setPrice(data.price || "");
-        setSalePrice(data.sale_price || "");
+        setPrice(data.price ? String(data.price) : "");
+        setSalePrice(data.sale_price ? String(data.sale_price) : "");
         setSelectedBrand(data.brand_id || "");
         setSelectedCategory(data.categories_id || "");
         setSelectedGender(data.gender_id || "");
@@ -687,7 +691,7 @@ export default function Add_pro() {
             Ảnh sản phẩm <small>(Lưu ý: Nền đế nền trắng)</small>
           </label>
           <div className="product-images">
-            {product?.images?.map((img) => (
+            {product?.images?.map((img:any) => (
               <div className="image-thumb" key={img.images_id}>
                 <img
                   src={`${API_BASE_URL}/uploads/${img.url}`}
