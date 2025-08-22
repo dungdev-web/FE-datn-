@@ -122,179 +122,206 @@ export default function Compare_product() {
       <main style={{ marginTop: "30px" }} className="main">
         <div className="container2">
           <div className="row">
-            {/* <div className="col-xs-12 col-sm-12 col-md-12" id="none">
-            <div className="null-table d-block">
-              <p className="img-empty">
-                <i className="fa fa-archive" aria-hidden="true"></i>
-              </p>
-              <p>Bạn chưa có sản phẩm nào để so sánh hãy thêm vào nhé</p>
+           {compare.length === 0 ? (
+  // Nếu chưa có sản phẩm -> hiển thị block trống
+  <div className="col-xs-12 col-sm-12 col-md-12" id="none">
+    <div className="null-table d-block">
+      <p className="img-empty">
+        <i className="fa fa-archive" aria-hidden="true"></i>
+      </p>
+      <p>Bạn chưa có sản phẩm nào để so sánh hãy thêm vào nhé</p>
+    </div>
+  </div>
+) : (
+  <>
+    {/* Desktop Compare Table */}
+    <div className="col-xs-12 col-sm-12 col-md-12" id="pageCompare">
+      <div className="content-page compare-table table-responsive d-block">
+        <table className="table">
+          <tbody>
+            <tr className="image">
+              <td>Hình ảnh</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  <img
+                    className="img-fluid w-[250px]"
+                    src={
+                      `${API_BASE_URL}/uploads/${item.product.images?.[0]?.url}` ||
+                      "/default.jpg"
+                    }
+                    alt={
+                      item.product.images?.[0]?.alt_text || item.product.name
+                    }
+                  />
+                </td>
+              ))}
+            </tr>
+
+            <tr className="title">
+              <td>Tên sản phẩm</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  <h3>
+                    <a href={`/product/${item.product.slug}`}>
+                      {item.product.name}
+                    </a>
+                  </h3>
+                </td>
+              ))}
+            </tr>
+
+            <tr className="price">
+              <td>Giá</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  {item.product.sale_price > 0
+                    ? `${item.product.sale_price.toLocaleString()}₫`
+                    : `${item.product.price.toLocaleString()}₫`}
+                </td>
+              ))}
+            </tr>
+
+            <tr className="available">
+              <td>Tình trạng</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  {item.product.product_variants?.reduce(
+                    (sum, v) => sum + (v?.stock_quantity || 0),
+                    0
+                  ) > 0
+                    ? "Còn hàng"
+                    : "Hết hàng"}
+                </td>
+              ))}
+            </tr>
+
+            <tr className="type">
+              <td>Loại</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  {item.product.category?.name || "Đang cập nhật ..."}
+                </td>
+              ))}
+            </tr>
+
+            <tr className="vendor">
+              <td>Nhà cung cấp</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  {item.product.brand?.name || "Đang cập nhật ..."}
+                </td>
+              ))}
+            </tr>
+
+            <tr className="description itemMainCompare">
+              <td>Công dụng nổi bật</td>
+              {compare.map((item) => (
+                <td key={item.product_compare_id}>
+                  <p>{item.product.short_desc || "Đang cập nhật..."}</p>
+                  <a
+                    className="remove-item removeItem cursor-pointer"
+                    data-compare={item.product.slug}
+                    onClick={() =>
+                      handleRemoveCompare(item.product.products_id)
+                    }
+                  >
+                    Xóa
+                  </a>
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* Mobile Compare Card */}
+    <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mb-4 mt-[20px] mobile">
+      {compare.map((item) => (
+        <div key={item.product_compare_id} className="flex">
+          {/* Product Image - Left side */}
+          <div className="w-32 h-32 bg-gray-50 flex justify-center items-center flex-shrink-0">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
+              <img
+                className="img-fluid"
+                src={
+                  `${API_BASE_URL}/uploads/${item.product.images?.[0]?.url}` ||
+                  "/default.jpg"
+                }
+                alt={item.product.name}
+              />
             </div>
-          </div> */}
-            <div className="col-xs-12 col-sm-12 col-md-12" id="pageCompare">
-              <div className="content-page compare-table table-responsive d-block">
-                <table className="table">
-                  <tbody>
-                    <tr className="image">
-                      <td>Hình ảnh</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          <img
-                            className="img-fluid"
-                            src={
-                              `${API_BASE_URL}/uploads/${item.product.images?.[0]?.url}` ||
-                              "/default.jpg"
-                            }
-                            alt={
-                              item.product.images?.[0]?.alt_text ||
-                              item.product.name
-                            }
-                          />
-                        </td>
-                      ))}
-                    </tr>
+          </div>
 
-                    <tr className="title">
-                      <td>Tên sản phẩm</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          <h3>
-                            <a href={`/product/${item.product.slug}`}>
-                              {item.product.name}
-                            </a>
-                          </h3>
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="price">
-                      <td>Giá</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          {item.product.sale_price > 0
-                            ? `${item.product.sale_price.toLocaleString()}₫`
-                            : `${item.product.price.toLocaleString()}₫`}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="available">
-                      <td>Tình trạng</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          {item.product.product_variants?.reduce(
-                            (sum, v) => sum + (v?.stock_quantity || 0),
-                            0
-                          ) > 0
-                            ? "Còn hàng"
-                            : "Hết hàng"}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="type">
-                      <td>Loại</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          {item.product.category?.name || "Đang cập nhật ..."}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="vendor">
-                      <td>Nhà cung cấp</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          {item.product.brand?.name || "Đang cập nhật ..."}
-                        </td>
-                      ))}
-                    </tr>
-
-                    <tr className="description itemMainCompare">
-                      <td>Công dụng nổi bật</td>
-                      {compare.map((item) => (
-                        <td key={item.product_compare_id}>
-                          <p>{item.product.short_desc || "Đang cập nhật..."}</p>
-                          <a
-                            className="remove-item removeItem cursor-pointer"
-                            data-compare={item.product.slug}
-                            onClick={() =>
-                              handleRemoveCompare(item.product.products_id)
-                            }
-                          >
-                            Xóa
-                          </a>
-                        </td>
-                      ))}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mb-4 mt-[20px] mobile">
-              <div className="flex">
-                {/* Product Image - Left side */}
-                <div className="w-32 h-32 bg-gray-50 flex justify-center items-center flex-shrink-0">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-200 to-blue-300 rounded-lg flex items-center justify-center">
-                    <img
-                      className="img-fluid"
-                      src="//bizweb.dktcdn.net/thumb/medium/100/505/077/products/layer1d87b62817a694e059205f86f.jpg?v=1702350240540"
-                      alt="Giày Nam Nike Air Max"
-                    />
-                  </div>
-                </div>
-
-                {/* Product Details - Right side */}
-                <div className="flex-1 !p-[10px]">
-                  <div className="space-y-2">
-                    {/* Product Name */}
-                    <div className="flex items-center !justify-between">
-                      <h3 className="font-semibold text-gray-900 text-sm leading-tight">
-                        Giày Nam Nike Air Max
-                      </h3>
-                      {/* Tình trạng */}
-                      <div className="text-xs text-gray-500">
-                        Tình trạng:{" "}
-                        <span className="text-xs text-gray-600">Còn hàng</span>
-                      </div>
-                    </div>
-
-                    {/* Price */}
-                    <div>
-                      <span className="text-lg font-bold text-red-600">
-                        3.200.000₫
-                      </span>
-                    </div>
-
-                    {/* Supplier */}
-                    <div className="text-xs text-gray-500">
-                      Loại:{" "}
-                      <span className="text-xs text-gray-600">
-                        Đang cập nhật...
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Nhà cung cấp:{" "}
-                      <span className="text-xs text-gray-600">
-                        Đang cập nhật...
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Công dụng nổi b:{" "}
-                      <span className="text-xs text-gray-600">
-                        Đang cập nhật...
-                      </span>
-                    </div>
-
-                    {/* Action Button */}
-                    <div className="pt-1">
-                      <button className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-4 rounded transition-colors duration-200 !p-[5px]">
-                        Xóa
-                      </button>
-                    </div>
-                  </div>
+          {/* Product Details - Right side */}
+          <div className="flex-1 !p-[10px]">
+            <div className="space-y-2">
+              {/* Product Name */}
+              <div className="flex items-center !justify-between">
+                <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+                  {item.product.name}
+                </h3>
+                {/* Tình trạng */}
+                <div className="text-xs text-gray-500">
+                  Tình trạng:{" "}
+                  <span className="text-xs text-gray-600">
+                    {item.product.product_variants?.reduce(
+                      (sum, v) => sum + (v?.stock_quantity || 0),
+                      0
+                    ) > 0
+                      ? "Còn hàng"
+                      : "Hết hàng"}
+                  </span>
                 </div>
               </div>
+
+              {/* Price */}
+              <div>
+                <span className="text-lg font-bold text-red-600">
+                  {item.product.sale_price > 0
+                    ? `${item.product.sale_price.toLocaleString()}₫`
+                    : `${item.product.price.toLocaleString()}₫`}
+                </span>
+              </div>
+
+              {/* Supplier */}
+              <div className="text-xs text-gray-500">
+                Loại:{" "}
+                <span className="text-xs text-gray-600">
+                  {item.product.category?.name || "Đang cập nhật ..."}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                Nhà cung cấp:{" "}
+                <span className="text-xs text-gray-600">
+                  {item.product.brand?.name || "Đang cập nhật ..."}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                Công dụng nổi bật:{" "}
+                <span className="text-xs text-gray-600">
+                  {item.product.short_desc || "Đang cập nhật..."}
+                </span>
+              </div>
+
+              {/* Action Button */}
+              <div className="pt-1">
+                <button
+                  onClick={() => handleRemoveCompare(item.product.products_id)}
+                  className="bg-green-500 hover:bg-green-600 text-white text-xs font-medium py-1.5 px-4 rounded transition-colors duration-200 !p-[5px]"
+                >
+                  Xóa
+                </button>
+              </div>
             </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </>
+)}
+
+            
           </div>
         </div>
       </main>

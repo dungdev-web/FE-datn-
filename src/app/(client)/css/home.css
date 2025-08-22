@@ -143,7 +143,7 @@
   gap: 10px;
 }
 
-/* Ẩn icon với hiệu ứng mượt */
+/* Các icon trong hover mặc định ẩn */
 .product-icons .hover-icons {
   display: flex;
   flex-direction: column;
@@ -151,6 +151,20 @@
   opacity: 0;
   transform: translateY(-10px);
   transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Hover card thì hiện icon (desktop) */
+.product-card:hover .product-icons .hover-icons {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Luôn hiện icon trên mobile */
+@media (max-width: 768px) {
+  .product-icons .hover-icons {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
 }
 
 /* Style cho các icon */
@@ -165,17 +179,24 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hover vào icon thì glow + scale lên */
+/* Hover vào icon thì glow + scale */
 .product-icons i:hover {
   transform: scale(1.3) rotate(5deg);
-  box-shadow: 0 0 12px rgb(2, 22, 136, 0.5);
-  color: #021688;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.5);
+  color: #007bff;
 }
-.icon-favorite.active {
-  color: #e0245e !important; /* đỏ nổi bật */
-  background-color: #ffe6ee; /* nền nhẹ */
-  box-shadow: 0 0 12px rgba(224, 36, 94, 0.6);
-  transform: scale(1.3);
+
+/* Trên mobile ẩn icon eye */
+@media (max-width: 768px) {
+  .product-icons .hover-icons .icon-eye {
+    display: none !important;
+  }
+
+  /* vẫn luôn hiện cart + compare */
+  .product-icons .hover-icons {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
 }
 
 .discount-tag {
@@ -681,23 +702,46 @@
   border-bottom: 1px solid #eee;
   display: block; /* Thêm dòng này để tránh khoảng trắng dưới ảnh */
 }
-
 .hot-product-icons {
   position: absolute;
   top: 8px;
   right: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px; /* tạo khoảng cách đều nhau giữa các icon */
+  gap: 8px;
 }
 
+/* Nhóm icon mặc định ẩn */
 .hot-product-icons .icon-hover-group {
-  display: none;
-  transition: all 3s ease-in;
+  display: flex;
   flex-direction: column;
-  gap: 8px; /* tạo khoảng cách đều nhau giữa các icon */
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
+/* Desktop: hover thì hiện */
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover .hot-product-icons .icon-hover-group {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile: luôn hiện icon, nhưng ẩn con mắt */
+@media (max-width: 768px) {
+  .hot-product-icons .icon-hover-group {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  .hot-product-icons .icon-hover-group .icon-eye {
+    display: none !important;
+  }
+}
+
+/* Style chung cho icon */
 .hot-product-icons i {
   background: #fff;
   border-radius: 50%;
@@ -708,12 +752,12 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hover vào icon thì glow + scale lên */
 .hot-product-icons i:hover {
   transform: scale(1.3) rotate(5deg);
   box-shadow: 0 0 12px #0c2b63;
   color: #0c2b63;
 }
+
 
 .tag-discount {
   position: absolute;

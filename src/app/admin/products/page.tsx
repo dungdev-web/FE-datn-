@@ -14,6 +14,8 @@ import { IBrand } from "@/types/IBrand";
 import { ICategory } from "@/types/ICategory";
 import { IProduct } from "@/types/product";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function Products() {
   // State dữ liệu
@@ -248,6 +250,66 @@ export default function Products() {
     // gọi lại fetchProducts (useEffect sẽ tự chạy sau khi state thay đổi)
     fetchProducts();
   };
+  const handleExport = async () => {
+    try {
+      // Gọi API lấy tất cả sản phẩm
+      const res = await getProductsDashboard({
+        page: 1,
+        limit: 10000, // set limit lớn để lấy hết
+        sortField: sortConfig.sortBy,
+        sortOrder: sortConfig.sortOrder,
+        productCode: filters.productCode || undefined,
+        productName: filters.productName || undefined,
+        brandId: filters.brandId ? Number(filters.brandId) : undefined,
+        categoryId: filters.categoryId ? Number(filters.categoryId) : undefined,
+        minSalePrice: filters.minPrice ? Number(filters.minPrice) : undefined,
+        maxSalePrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+        minQuantity: filters.minQuantity
+          ? Number(filters.minQuantity)
+          : undefined,
+        maxQuantity: filters.maxQuantity
+          ? Number(filters.maxQuantity)
+          : undefined,
+      });
+
+      if (!res.data || res.data.length === 0) {
+        Swal.fire("Thông báo", "Không có dữ liệu để xuất!", "info");
+        return;
+      }
+
+      const data = res.data.map((product) => {
+        const firstVariant = product.product_variants?.[0] || {};
+        const sku = firstVariant.sku || "";
+        const stockQuantity = firstVariant.stock_quantity || 0;
+
+        return {
+          "Mã SP": sku,
+          "Tên sản phẩm": product.name,
+          "Nhãn hiệu": product.brand?.name || "",
+          "Danh mục": product.category?.name || "",
+          "Giá bán": product.price,
+          "Giá KM": product.sale_price,
+          "Ngày tạo": new Date(product.created_at).toLocaleDateString(),
+          "Ngày sửa": new Date(product.updated_at).toLocaleDateString(),
+          "Số lượng": stockQuantity,
+        };
+      });
+
+      // Xuất file Excel
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Products");
+
+      const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+      const blob = new Blob([excelBuffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, `products_${Date.now()}.xlsx`);
+    } catch (error) {
+      console.error(error);
+      Swal.fire("Lỗi", "Xuất dữ liệu thất bại!", "error");
+    }
+  };
 
   return (
     <>
@@ -267,7 +329,7 @@ export default function Products() {
             <i className="fa-solid fa-rotate-right"></i> Làm mới
           </button>
 
-          <button className="btn btn-export">
+          <button className="btn btn-export" onClick={handleExport}>
             <i className="fa-solid fa-file-export"></i> Xuất dữ liệu
           </button>
         </div>

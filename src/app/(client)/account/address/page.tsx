@@ -47,14 +47,14 @@ export default function Address() {
   const [addressList, setAddressList] = useState<AddressFormData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const setAddressCount = useGlobalStore((state) => state.setAddressCount);
-  
+
   const fetchAddresses = async () => {
     if (!user?.id) return;
     try {
       setIsLoading(true);
       const res = await getAddressByUserId(user.id);
       console.log("🔍 Raw API response:", res);
-      
+
       const addresses: AddressFormData[] = Array.isArray(res)
         ? res
             .filter((item: any) => {
@@ -68,7 +68,8 @@ export default function Address() {
                 id: item.id || item.ship_address_id, // Thử cả 2 trường
                 full_name: item.full_name,
                 phone: item.phone,
-                address_line_part: parsed.address_line_part || item.address_line_part,
+                address_line_part:
+                  parsed.address_line_part || item.address_line_part,
                 country: item.country || "Vietnam",
                 province_code: "",
                 province_name: parsed.province || item.province || "",
@@ -83,7 +84,7 @@ export default function Address() {
               return mappedAddress;
             })
         : [];
-      
+
       console.log("📍 Final processed addresses:", addresses);
       setAddressList(addresses);
       setAddressCount(addresses.length);
@@ -100,13 +101,14 @@ export default function Address() {
   }, [user?.id]);
 
   function parseAddressLine(address_line: string) {
-    if (!address_line) return {
-      address_line_part: "",
-      ward: "",
-      district: "",
-      province: "",
-    };
-    
+    if (!address_line)
+      return {
+        address_line_part: "",
+        ward: "",
+        district: "",
+        province: "",
+      };
+
     const parts = address_line.split(",").map((s) => s.trim());
     return {
       address_line_part: parts[0] || "",
@@ -181,13 +183,12 @@ export default function Address() {
 
       // Đóng form và refresh danh sách
       setShowEditForm(false);
-      
+
       // Delay nhỏ để đảm bảo database được cập nhật
       setTimeout(async () => {
         console.log("🔄 Refreshing address list...");
         await fetchAddresses();
       }, 500);
-      
     } catch (error: any) {
       console.error("❌ Error in handleAddOrUpdate:", error);
       await Swal.fire("Lỗi", "Lỗi khi lưu địa chỉ: " + error.message, "error");
@@ -236,7 +237,9 @@ export default function Address() {
 
       if (result.isConfirmed) {
         // Hiển thị danh sách địa chỉ khác để chọn làm mặc định
-        const otherAddresses = addressList.filter(addr => addr.id !== addressId);
+        const otherAddresses = addressList.filter(
+          (addr) => addr.id !== addressId
+        );
         const addressOptions = otherAddresses.reduce((acc, addr, index) => {
           acc[index.toString()] = `${addr.full_name} - ${addr.address_line}`;
           return acc;
@@ -266,11 +269,15 @@ export default function Address() {
                 address_line: newDefaultAddress.address_line ?? "",
                 is_default: true,
               });
-              
+
               // Sau đó xóa địa chỉ cũ
               await deleteAddress(addressId);
               await fetchAddresses();
-              Swal.fire("Thành công!", "Đã cập nhật địa chỉ mặc định và xóa địa chỉ cũ.", "success");
+              Swal.fire(
+                "Thành công!",
+                "Đã cập nhật địa chỉ mặc định và xóa địa chỉ cũ.",
+                "success"
+              );
             } catch (error: any) {
               Swal.fire("Lỗi!", "Có lỗi xảy ra: " + error.message, "error");
             }
@@ -317,15 +324,15 @@ export default function Address() {
   const handleEditClick = (address: AddressFormData) => {
     console.log("📝 Edit clicked for address:", address);
     console.log("📝 Address ID:", address.id);
-    
+
     setFormMode("edit");
     // Đảm bảo tất cả dữ liệu được copy đầy đủ
-    setAddressData({ 
+    setAddressData({
       ...address,
       // Đảm bảo ID được giữ lại
-      id: address.id 
+      id: address.id,
     });
-    
+
     setTimeout(() => {
       setShowEditForm(true);
     }, 50); // Delay nhỏ để đảm bảo state được cập nhật
@@ -348,15 +355,21 @@ export default function Address() {
           </div>
           <ul className="breadcrumb">
             <li className="home">
-              <Link href="/">Trang chủ</Link>
+              <Link href="/">
+                <span>Địa chỉ của bạn</span>
+              </Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account">Tài khoản</Link>
+              <Link href="/account">
+                <span>Tài khoản</span>
+              </Link>
               <i className="fa fa-angle-right" />
             </li>
             <li>
-              <strong>Địa chỉ của bạn</strong>
+              <strong>
+                <span>Địa chỉ của bạn</span>
+              </strong>
             </li>
           </ul>
         </div>

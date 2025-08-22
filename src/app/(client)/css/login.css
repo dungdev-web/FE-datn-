@@ -4,7 +4,7 @@
   background-color: white;
   border-radius: 10px;
   padding: 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); */
   width: 90%;
   max-width: 75%;
   overflow: hidden;
@@ -187,20 +187,20 @@ input[type="password"]::-webkit-textfield-decoration-container {
 /* Medium-sized devices (e.g., tablets) */
 @media (max-width: 768px) {
   .auth-container {
+     flex-direction: column;
+    align-items: center;
+    margin: 40px auto;
     padding: 20px;
-    flex-direction: column; /* Stack image and form vertically */
-    margin: 80px auto;
+    width: 100%;
   }
   .intro-banner {
     display: none;
   }
-  /* .auth-container img {
-        display: none;
-    } */
 
   .form-container {
     margin-left: 0;
     width: 100%;
+    max-width: 400px;
   }
 
   .form-container h2 {
@@ -209,7 +209,7 @@ input[type="password"]::-webkit-textfield-decoration-container {
 
   .form-container input,
   .form-container button {
-    font-size: 14px; /* Slightly smaller text on mobile */
+    font-size: 14px;
   }
 
   .form-container .remember-me label,
@@ -229,7 +229,6 @@ input[type="password"]::-webkit-textfield-decoration-container {
     display: none;
   }
   .auth-container {
-    /* margin-bottom: 30px; */
     width: 100%;
   }
   .form-container .remember-me {
@@ -246,18 +245,28 @@ input[type="password"]::-webkit-textfield-decoration-container {
 /* Small-sized devices (e.g., mobile phones) */
 @media (max-width: 480px) {
   .auth-container {
-    margin-top: 100px;
-    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 60px;
+    width: 100%;
+    padding: 0px;
   }
 
-  .form-container input,
-  .form-container button {
-    font-size: 13px; /* Adjust font size for mobile */
-    padding: 8px;
+  .form-container {
+    width: 100%;
+    max-width: 400px;
+    margin-left: 0;
   }
 
   .form-container h2 {
     font-size: 18px;
+  }
+
+  .form-container input,
+  .form-container button {
+    font-size: 13px;
+    padding: 8px;
   }
 
   .form-container .remember-me label,

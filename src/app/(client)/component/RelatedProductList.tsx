@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { IProduct } from "@/types/product";
 import { getRelatedProducts } from "@/services/productService"; 
 import Product4box from "./Product";
+
 interface Props {
   categoryId: number;
 }
@@ -16,7 +17,6 @@ export default function RelatedProductList({ categoryId }: Props) {
       try {
         const data = await getRelatedProducts(categoryId);
         setRelatedProducts(data);
-        console.log("👉 Dữ liệu trả về từ API (related products):", data);
       } catch (error) {
         console.error("Lỗi khi lấy sản phẩm cùng loại:", error);
       }

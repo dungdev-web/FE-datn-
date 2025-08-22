@@ -95,15 +95,14 @@ export default function ProductSale() {
                       />
                     </Link>
 
-                    {/* ✅ Sử dụng đúng productId */}
                     <ProductIcons
                       productId={productId}
-                      variant_id={
-                        product.product_variants?.[0]?.product_variants_id ??
-                        null
-                      }
-                      price={product.sale_price}
-                    />
+                      variant={{
+                        id: variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                        stock_quantity: variants?.[0]?.stock_quantity ?? 0,
+                        name: variants?.[0]?.name,
+                      }}
+                      price={0} />
 
                     {discount > 0 && (
                       <span className="discount-tag">-{discount}%</span>

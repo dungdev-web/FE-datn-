@@ -16,38 +16,33 @@ export default function CheckTokenGuard({ children }: Props) {
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        // const token = localStorage.getItem("token");
-        //  if (!token) {
-        //   console.error("Token không tồn tại");
-        //   return;
-        // }
         const data = await checkToken();
         if (!data) {
           await Swal.fire({
-            icon: "error",
-            title: "Token không hợp lệ",
-            text: "Bạn sẽ được chuyển hướng sau giây lát...",
-            timer: 2000,
+            icon: "warning",
+            title: "Phiên đăng nhập đã hết hạn",
+            text: "Vui lòng đăng nhập lại để tiếp tục.",
+            timer: 2500,
             showConfirmButton: false,
             timerProgressBar: true,
           });
           setTimeout(() => {
             router.replace("/login");
-          }, 2000);
+          }, 2500);
         }
       } catch (err) {
         console.error("Token lỗi:", err);
         await Swal.fire({
-          icon: "error",
-          title: "Lỗi kiểm tra token",
-          text: "Bạn sẽ được chuyển hướng sau giây lát...",
-          timer: 2000,
+          icon: "warning",
+          title: "Không thể xác thực phiên làm việc",
+          text: "Vui lòng đăng nhập lại để tiếp tục.",
+          timer: 2500,
           showConfirmButton: false,
           timerProgressBar: true,
         });
         setTimeout(() => {
           router.replace("/login");
-        }, 2000);
+        }, 2500);
       } finally {
         setLoading(false);
       }

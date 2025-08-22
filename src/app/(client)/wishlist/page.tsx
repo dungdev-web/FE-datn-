@@ -70,7 +70,7 @@ export default function Wishlist() {
             </ul>
           </div>
         </section>
-        <div className="container1 py-10 px-4 text-center !mt-6 !mb-6">
+        <div className="container py-10 px-4 text-center !mt-6 !mb-6">
           <div className="inline-flex flex-col items-center justify-center gap-3 bg-red-50 border border-red-300 p-6 rounded-md shadow-sm">
             <i className="fa-solid fa-circle-exclamation text-red-500 text-4xl"></i>
             <p className="text-lg font-medium text-red-600">
@@ -170,12 +170,15 @@ export default function Wishlist() {
                           </Link>
                           <ProductIcons
                             productId={product.products_id}
-                            variant_id={variant.product_variants_id ?? null}
+                            variant={{
+                              id: variant.product_variants_id, // 👈 lấy product_variants_id từ DB
+                              stock_quantity: variant.stock_quantity ?? 0,
+                              name: variant.name,
+                            }}
                             price={product.sale_price}
                             onWishlistChange={() =>
                               handleRemoveWishlistItem(product.products_id)
-                            }
-                          />
+                            } />
                           {product.price > product.sale_price && (
                             <span className="discount-tag">
                               -
@@ -233,6 +236,7 @@ export default function Wishlist() {
                     >
                       <div className="product-card">
                         <div className="product-image">
+                            <Link href={`/product/${product.slug}`}>
                           <img
                             src={
                               image
@@ -241,14 +245,18 @@ export default function Wishlist() {
                             }
                             alt={product.name}
                           />
+                          </Link>
                           <ProductIcons
                             productId={product.products_id}
-                            variant_id={variant?.product_variants_id ?? null}
+                            variant={{
+                              id: variant.product_variants_id, // 👈 lấy product_variants_id từ DB
+                              stock_quantity: variant.stock_quantity ?? 0,
+                              name: variant.name,
+                            }}
                             price={product.sale_price}
                             onWishlistChange={() =>
                               handleRemoveWishlistItem(product.products_id)
-                            }
-                          />
+                            } />
                           {product.price > product.sale_price && (
                             <span className="discount-tag">
                               -

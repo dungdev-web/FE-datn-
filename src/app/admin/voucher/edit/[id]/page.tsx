@@ -82,7 +82,7 @@ export default function VoucherEdit() {
     Swal.fire("Lỗi", "Giá trị giảm phải lớn hơn 0.", "error");
     return;
   }
-  if (form.discount_type === "percentage" && form.discount_value > 100) {
+  if (form.discount_type === "percentage" && Number(form.discount_value) > 100) {
     Swal.fire(
       "Lỗi",
       "Giá trị giảm phần trăm không được vượt quá 100%.",

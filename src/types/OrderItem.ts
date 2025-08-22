@@ -1,6 +1,10 @@
 export interface IOrderItem {
+  price: number;
+  variant_id: any;
   order_items_id: number;
   variant: {
+    stock_quantity: number;
+    id: any;
     variant_id: number;
     product_id: number;
     color: {

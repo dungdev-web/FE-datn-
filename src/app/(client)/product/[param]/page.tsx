@@ -38,8 +38,27 @@ export default function Detail() {
   const [rating, setRating] = useState<number>(0);
   const [content, setContent] = useState<string>("");
   const [coupon, setCoupon] = useState<ICoupon[]>([]);
+  const [addedToCartQuantities, setAddedToCartQuantities] = useState<{
+    [variantId: number]: number;
+  }>({});
+  const updateAddedToCart = (variantId: number, quantity: number) => {
+    const prev = JSON.parse(
+      localStorage.getItem("addedToCartQuantities") || "{}"
+    );
+    prev[variantId] = (prev[variantId] || 0) + quantity;
+    localStorage.setItem("addedToCartQuantities", JSON.stringify(prev));
+    setAddedToCartQuantities(prev);
+  };
+
+  useEffect(() => {
+    const saved = JSON.parse(
+      localStorage.getItem("addedToCartQuantities") || "{}"
+    );
+    setAddedToCartQuantities(saved);
+  }, []);
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
   const handleAddToCart = async () => {
     if (!selectedColorId) {
       Swal.fire({
@@ -59,18 +78,28 @@ export default function Detail() {
       return;
     }
 
-    if (!variantId) {
+    const selectedVariant = product?.product_variants.find(
+      (v) => v.product_variants_id === variantId
+    );
+    if (!selectedVariant) return;
+
+    const alreadyAdded = addedToCartQuantities[variantId] || 0;
+    const availableStock = selectedVariant.stock_quantity - alreadyAdded;
+
+    if (quantity > availableStock) {
       Swal.fire({
-        icon: "warning",
-        title: "Vui lòng chọn biến thể",
-        text: "Bạn cần chọn đúng biến thể trước khi thêm vào giỏ hàng.",
+        icon: "info",
+        title: availableStock <= 0 ? "Hết hàng!" : "Số lượng không đủ",
+        text:
+          availableStock <= 0
+            ? `${product?.name} đã hết hàng.`
+            : `Chỉ còn ${availableStock} sản phẩm trong kho.`,
       });
       return;
     }
 
-    setLoading(true);
-
     try {
+      setLoading(true);
       const tokenData = await checkToken();
       if (!tokenData?.user?.id) {
         const currentUrl =
@@ -89,30 +118,29 @@ export default function Detail() {
         });
         return;
       }
-
       const response = await addToCart({
-        user_id: tokenData.user.id,
-        variant_id: variantId,
+        userId: tokenData.user.id,
+        productVariantId: variantId,
         quantity,
-        price,
       });
-
-      console.log("Đã thêm vào giỏ hàng:", response);
-
-      Swal.fire({
-        icon: "success",
-        title: "Đã thêm vào giỏ hàng!",
-        text: response.message,
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      window.location.href = "/cart"; // reload cứng
-    } catch (error) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", error);
+      if (response.success) {
+        updateAddedToCart(variantId, quantity);
+        Swal.fire({
+          icon: "success",
+          title: "Đã thêm vào giỏ hàng!",
+          timer: 1500,
+          showConfirmButton: false,
+        }).then(() => {
+          // Chuyển sang trang giỏ hàng và reload
+          window.location.href = "/cart";
+          // Hoặc chỉ reload nếu đã ở trang cart: window.location.reload();
+        });
+      }
+    } catch (err: any) {
       Swal.fire({
         icon: "error",
         title: "Lỗi!",
-        text: (error as Error).message || "Thêm sản phẩm thất bại",
+        text: err.message || "Thêm thất bại",
       });
     } finally {
       setLoading(false);
@@ -344,7 +372,6 @@ export default function Detail() {
       </div>
     );
   }
-
   return (
     <>
       <section
@@ -537,6 +564,7 @@ export default function Detail() {
                       </div>
                     </div>
                     <div className="form-product">
+                      {/* ------------------- COLOR PICKER ------------------- */}
                       <div className="swatch-color swatch clearfix">
                         <div className="header position-fixed">Màu sắc</div>
                         <div className="color-options">
@@ -547,50 +575,86 @@ export default function Detail() {
                                 .map((v) => [v.color.code_color, v.color])
                             ).values(),
                           ].map((color) => {
+                            // Lọc các variant của màu này
+                            const colorVariants =
+                              product.product_variants.filter(
+                                (v) => v.color?.id === color.id
+                              );
+
+                            // Kiểm tra số lượng còn lại trừ đi số đã thêm vào giỏ
+                            const isOutOfStock = colorVariants.every(
+                              (v) =>
+                                v.stock_quantity -
+                                  (addedToCartQuantities[
+                                    v.product_variants_id
+                                  ] || 0) <=
+                                0
+                            );
+
                             return (
                               <div
                                 key={color.id}
-                                className="color-circle"
-                                onClick={() => {
-                                  setSelectedColorId(color.id);
-                                  setSelectedSizeId(null);
-
-                                  // Tìm variant theo màu đã chọn
-                                  const matchedVariant =
-                                    product.product_variants.find(
-                                      (v) => v.color?.id === color.id
-                                    );
-
-                                  // Ưu tiên ảnh theo màu, nếu không có thì fallback ảnh phụ
-                                  const imageUrl =
-                                    matchedVariant?.color?.images ||
-                                    product.images?.find(
-                                      (img) => img.type === "side"
-                                    )?.url ||
-                                    "logo/1.png";
-
-                                  setSelectedImage(
-                                    `${API_BASE_URL}/uploads/${imageUrl}`
-                                  );
-                                }}
+                                className="relative"
                                 style={{
-                                  backgroundColor: color.code_color,
-                                  width: 24,
-                                  height: 24,
-                                  borderRadius: "50%",
-                                  border:
-                                    selectedColorId === color.id
-                                      ? "2px solid #facc15"
-                                      : "1px solid #ccc",
-                                  cursor: "pointer",
+                                  display: "inline-block",
+                                  marginRight: 8,
                                 }}
-                                title={color.name_color}
-                              ></div>
+                              >
+                                <div
+                                  className="color-circle"
+                                  onClick={() => {
+                                    if (isOutOfStock) return;
+                                    setSelectedColorId(color.id);
+                                    setSelectedSizeId(null);
+
+                                    const matchedVariant =
+                                      product.product_variants.find(
+                                        (v) => v.color?.id === color.id
+                                      );
+                                    const imageUrl =
+                                      matchedVariant?.color?.images ||
+                                      product.images?.find(
+                                        (img) => img.type === "side"
+                                      )?.url ||
+                                      "logo/1.png";
+                                    setSelectedImage(
+                                      `${API_BASE_URL}/uploads/${imageUrl}`
+                                    );
+                                  }}
+                                  style={{
+                                    backgroundColor: color.code_color,
+                                    width: 24,
+                                    height: 24,
+                                    borderRadius: "50%",
+                                    border:
+                                      selectedColorId === color.id
+                                        ? "2px solid #facc15"
+                                        : "1px solid #ccc",
+                                    cursor: isOutOfStock
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    opacity: isOutOfStock ? 0.4 : 1,
+                                  }}
+                                  title={color.name_color}
+                                ></div>
+
+                                {isOutOfStock && (
+                                  <span
+                                    className="absolute top-1/2 left-1/2 text-red-600 text-lg font-bold"
+                                    style={{
+                                      transform: "translate(-50%, -50%)",
+                                    }}
+                                  >
+                                    ×
+                                  </span>
+                                )}
+                              </div>
                             );
                           })}
                         </div>
                       </div>
 
+                      {/* ------------------- SIZE PICKER ------------------- */}
                       <div className="swatch-size swatch clearfix">
                         <div className="header" style={{ background: "#fff" }}>
                           Kích thước
@@ -600,7 +664,7 @@ export default function Detail() {
                             ...new Map(
                               (selectedColorId
                                 ? product.product_variants.filter(
-                                    (v) => v?.color?.id === selectedColorId
+                                    (v) => v.color?.id === selectedColorId
                                   )
                                 : product.product_variants
                               ).map((v) => [v.size.id, v])
@@ -611,25 +675,56 @@ export default function Detail() {
                                 Number(a.size.number_size) -
                                 Number(b.size.number_size)
                             )
-                            .map((variant) => (
-                              <button
-                                key={variant.size.id}
-                                className="size-button"
-                                style={{
-                                  padding: "8px 12px",
-                                  marginRight: "5px",
-                                  border: "1px solid #ccc",
-                                  borderRadius: "4px",
-                                  background: "#fff",
-                                  cursor: "pointer",
-                                }}
-                                onClick={() => {
-                                  setSelectedSizeId(variant.size.id);
-                                }}
-                              >
-                                {variant.size.number_size}
-                              </button>
-                            ))}
+                            .map((variant) => {
+                              const remainingStock =
+                                variant.stock_quantity -
+                                (addedToCartQuantities[
+                                  variant.product_variants_id
+                                ] || 0);
+                              const isOutOfStock = remainingStock <= 0;
+
+                              return (
+                                <button
+                                  key={variant.size.id}
+                                  className="size-button"
+                                  disabled={isOutOfStock}
+                                  style={{
+                                    padding: "8px 12px",
+                                    marginRight: "5px",
+                                    border: "1px solid #ccc",
+                                    borderRadius: "4px",
+                                    background: isOutOfStock
+                                      ? "#f3f4f6"
+                                      : "#fff",
+                                    color: isOutOfStock ? "#999" : "#000",
+                                    cursor: isOutOfStock
+                                      ? "not-allowed"
+                                      : "pointer",
+                                    position: "relative",
+                                  }}
+                                  onClick={() => {
+                                    if (isOutOfStock) return;
+                                    setSelectedSizeId(variant.size.id);
+                                  }}
+                                >
+                                  {variant.size.number_size}
+                                  {isOutOfStock && (
+                                    <span
+                                      style={{
+                                        position: "absolute",
+                                        top: "50%",
+                                        left: "50%",
+                                        transform: "translate(-50%, -50%)",
+                                        color: "red",
+                                        fontWeight: "bold",
+                                      }}
+                                    >
+                                      ×
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
                         </div>
                       </div>
 

@@ -11,7 +11,7 @@ import { deleteCategoryPost } from "@/services/blogService";
 export default function Categories() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
-  const router = useRouter(); // khởi tạo router
+  const router = useRouter();
 
   const [filterId, setFilterId] = useState("");
   const [filterName, setFilterName] = useState("");
@@ -25,11 +25,11 @@ export default function Categories() {
   );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [allCategories, setAllCategories] = useState<Category[]>([]); // chứa toàn bộ danh mục
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // Lấy dữ liệu phân trang
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -173,7 +173,7 @@ export default function Categories() {
               />
             </th>
             <th>Slug</th>
-            <th>Parent ID</th>
+            <th>Danh mục cha</th>
             <th title="Sort by Created At">
               Ngày tạo{" "}
               <ArrowUpDown
