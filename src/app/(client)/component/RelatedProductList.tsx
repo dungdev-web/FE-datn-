@@ -5,6 +5,7 @@ import { IProduct } from "@/types/product";
 import { getRelatedProducts } from "@/services/productService"; 
 import Product4box from "./Product";
 
+
 interface Props {
   categoryId: number;
 }

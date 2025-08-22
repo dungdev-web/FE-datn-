@@ -4,7 +4,7 @@ import { IProduct } from "@/types/product";
 import Link from "next/link";
 
 import { API_BASE_URL } from "@/config/env";
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const reviews = product.product_reviews || [];

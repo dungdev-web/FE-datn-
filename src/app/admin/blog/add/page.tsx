@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 const QuillEditor = dynamic(
-  () => import("../../component_admin/Blog/QuillEditorAdd"),
+  () => import("@/app/admin/component_admin/Blog/QuillEditorAdd"),
   {
     ssr: false,
   }

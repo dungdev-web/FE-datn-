@@ -4,8 +4,8 @@ import "../../css/product.css";
 import "../../css/account.css";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import EditAddressForm from "../../component/Account/EditAddressForm";
-import AccountSidebar from "../../component/Account/AccountSidebar";
+import EditAddressForm from "@/app/(client)/component/Account/EditAddressForm";
+import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
 import {
   addAddressService,
   updateAddress,
