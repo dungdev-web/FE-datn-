@@ -7,7 +7,9 @@ import { useEffect } from "react";
 export default function GoogleCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
- const setUser = useGlobalStore((state) => state.setUser);
+  const redirect = searchParams.get("redirect") || "/";
+
+  const setUser = useGlobalStore((state) => state.setUser);
   useEffect(() => {
     const code = searchParams.get("code");
 
@@ -23,7 +25,13 @@ export default function GoogleCallback() {
           if (data.user) {
             setUser(data.user);
           }
-          router.push("/account");
+          if (redirect) {
+            // ưu tiên redirect param
+            window.location.href = redirect;
+          } else {
+            // fallback sang trang compare_product
+            router.push("/compare_product");
+          }
         })
         .catch((err) => console.error("Login error", err));
     }

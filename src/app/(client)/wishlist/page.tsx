@@ -236,6 +236,7 @@ export default function Wishlist() {
                     >
                       <div className="product-card">
                         <div className="product-image">
+                            <Link href={`/product/${product.slug}`}>
                           <img
                             src={
                               image
@@ -244,6 +245,7 @@ export default function Wishlist() {
                             }
                             alt={product.name}
                           />
+                          </Link>
                           <ProductIcons
                             productId={product.products_id}
                             variant={{

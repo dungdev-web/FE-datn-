@@ -253,7 +253,7 @@ export default function MobileSidebarFilter({
               })}
 
               {selectedGender && (
-                <li className="flex !gap-25.5trưa">
+                <li className="flex !gap-25.5">
                   <span>
                     {selectedGender === "nam"
                       ? "Giày Nam"

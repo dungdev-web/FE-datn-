@@ -6,13 +6,13 @@
 }
 
 .container1 {
-    max-width: 1320px;
-    width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-    margin-right: auto;
-    margin-left: auto;
-  }
+  max-width: 1320px;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
 
 .row::after {
   clear: both;
@@ -22,41 +22,63 @@
   display: table;
   content: " ";
 }
+
 .product-card {
-    width: 100% !important;
-}
-.product-grid-wishlist-list{
-    display: none;
-}
-@media (max-width: 768px) {
-    .container1{
-        padding-right: 20px;
-    padding-left: 20px;
-    }
-    .product-grid-wishlist{
-        display: none;
-    }
-.product-card,
-.product-image img {
   width: 100% !important;
-  height: 215px;
 }
-.hover-icons{
-    display: none !important;
-}
+
 .product-grid-wishlist-list {
-  grid-template-columns: repeat(2, 1fr);
-  width: 1075px;
-  max-width: 100%;
-  display: grid;
+  display: none;
 }
-.product-image img {
-  width: 100% !important;
-}
-.product-rating{
+
+/* ================= Mobile (<= 768px) ================= */
+@media (max-width: 768px) {
+  .container1 {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  /* Ẩn lưới 4 cột, hiện lưới dạng list */
+  .product-grid-wishlist {
+    display: none;
+  }
+  .product-grid-wishlist-list {
+    grid-template-columns: repeat(2, 1fr);
+    width: 1075px;
+    max-width: 100%;
+    display: grid;
+    gap: 10px;
+  }
+
+  /* Card và ảnh */
+  .product-card,
+  .product-image img {
+    width: 100% !important;
+    height: 215px;
+  }
+  .product-image img {
+    width: 100% !important;
+  }
+
+  /* Luôn hiện icon trên mobile */
+  .hover-icons {
+    display: flex !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    gap: 10px;
+  }
+
+  /* Ẩn icon con mắt 👁 */
+  .hover-icons .fa-eye {
+    display: none !important;
+  }
+
+  .product-rating {
     font-size: smaller;
+  }
 }
-}
+
+/* ================= Mobile nhỏ (<= 570px) ================= */
 @media (max-width: 570px) {
   .container1 {
     padding-left: 10px;
@@ -77,21 +99,21 @@
     object-fit: cover;
   }
 
+  /* Vẫn giữ logic: hiện icon, ẩn 👁 */
   .hover-icons {
+    display: flex !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  .hover-icons .fa-eye {
     display: none !important;
   }
 }
 
-
-/* Mobile hiển thị, desktop ẩn */
-@media (max-width: 768px) {
-  .product-grid-wishlist {
-    display: none;
-  }
-
-  .product-grid-wishlist-list {
-    display: grid;
-    grid-template-columns: 1fr; /* hoặc 2 cột tuỳ thiết kế */
-    gap: 10px;
+/* ================= Desktop giữ nguyên hover ================= */
+@media (hover: hover) and (pointer: fine) {
+  .product-card:hover .hover-icons {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

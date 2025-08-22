@@ -15,25 +15,37 @@ interface DecodedToken {
 async function verifyAppToken(token: string): Promise<DecodedToken | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET, { algorithms: ["HS256"] });
+    console.log("🔑 [AppToken Verified] Payload:", payload);
     return payload as DecodedToken;
-  } catch {
+  } catch (err) {
+    console.error("❌ [AppToken Verify Failed]:", (err as Error).message);
+    console.error(err);
     return null;
   }
 }
 
 async function createAppToken(user: { id?: number; email: string; role: string }) {
-  return await new SignJWT({ id: user.id, email: user.email, role: user.role })
+  const token = await new SignJWT({ id: user.id, email: user.email, role: user.role })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("1h")
     .sign(JWT_SECRET);
+
+  console.log("✅ [AppToken Created]:", { email: user.email, role: user.role });
+  return token;
 }
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   let token = req.cookies.get("token")?.value;
 
-  if (!token) return NextResponse.redirect(new URL("/login", req.url));
+  console.log("📥 [Incoming Request]:", pathname);
+  console.log("🍪 [Token From Cookie]:", token);
+
+  if (!token) {
+    console.warn("⚠️ [No Token] Redirecting to /login");
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
   let decoded = await verifyAppToken(token);
   let role = decoded?.role?.toLowerCase();
@@ -41,8 +53,12 @@ export async function middleware(req: NextRequest) {
   // fallback cho Google token
   if (!decoded) {
     try {
+      console.log("🔄 [Fallback] Trying to decode Google token...");
+
       const base64Payload = token.split(".")[1];
       const googlePayload = JSON.parse(Buffer.from(base64Payload, "base64").toString("utf-8"));
+
+      console.log("🔑 [Google Token Payload]:", googlePayload);
 
       if (!googlePayload.email) throw new Error("Invalid Google token");
 
@@ -57,22 +73,24 @@ export async function middleware(req: NextRequest) {
       decoded = await verifyAppToken(appToken);
       role = decoded?.role?.toLowerCase();
 
-      console.log("✅ Created JWT app from Google token:", decoded?.email, "role:", role);
+      console.log("✅ [Google → AppToken Migration]:", decoded);
       return res;
     } catch (err) {
-      console.error("❌ Invalid token:", err);
+      console.error("❌ [Google Token Invalid]:", (err as Error).message);
+      console.error(err);
       return NextResponse.redirect(new URL("/login", req.url));
     }
   }
 
   // /admin chỉ admin
   if (pathname.startsWith("/admin") && role !== "admin") {
+    console.warn("⛔ [Unauthorized Admin Access]:", decoded?.email, "role:", role);
     return NextResponse.redirect(new URL("/403", req.url));
   }
 
   // /account tất cả user
   if (pathname === "/account") {
-    console.log("✅ User authenticated for /account:", decoded.email, "role:", role);
+    console.log("✅ [User Authenticated] /account:", decoded?.email, "role:", role);
   }
 
   return NextResponse.next();

@@ -67,7 +67,7 @@ export default function AsideBlog() {
                           );
                 }
                 }
-                className="flex justify-between items-center cursor-pointer"
+                className="cursor-pointer"
                 style={{
                   fontWeight:
                     selectedCategoryId === parent.category_post_id

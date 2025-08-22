@@ -408,7 +408,7 @@ export default function OrderPage() {
                 </li>
                 <li>
                   <strong>Điện thoại:</strong>{" "}
-                  <span>{selectedOrder?.user.phone}</span>
+                  <span>{selectedOrder?.shipping_address.phone}</span>
                 </li>
                 {selectedOrder?.order_items?.map((item: any, index: number) => {
                   return (
