@@ -73,7 +73,7 @@ export default function VoucherAdd() {
       return;
     }
 
-    if (form.discount_type === "percentage" && form.discount_value > 100) {
+    if (form.discount_type === "percentage" && Number(form.discount_value) > 100) {
       Swal.fire({
         icon: "error",
         title: "Lỗi",
