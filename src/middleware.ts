@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { jwtVerify, SignJWT } from "jose";
+const { jwtVerify, SignJWT } =  require("jose");
 
 const rawSecret = process.env.JWT_SECRET || "my_test_secret_key_123";
 const JWT_SECRET = new TextEncoder().encode(rawSecret);
