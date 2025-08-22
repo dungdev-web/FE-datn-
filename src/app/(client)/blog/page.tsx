@@ -8,6 +8,8 @@ import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
 import Link from "next/link";
 import AsideBlog from "../component/Blog/AsideBlog";
+
+
 export default function Blog() {
   const [post, setPost] = useState<IBlog[]>([]);
   const [page, setPage] = useState(1);

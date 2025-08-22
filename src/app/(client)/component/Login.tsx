@@ -4,7 +4,7 @@ import { useAuthCookie } from "@/hooks/useAuthCookie";
 import { loginUser, loginWithGoogle } from "@/services/authService";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Loader from "../component/Loader";
+import Loader from "./Loader";
 import { Eye, EyeOff } from "lucide-react";
 import { validateField } from "@/hooks/useValidateLoginRegister";
 import Link from "next/link";

@@ -18,9 +18,9 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "@/app/(client)/component/ProductTwoBox";
-import Banner3D from "src/app/(client)/component/Home/Banner3D";
-import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
-import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
+import Banner3D from "@/app/(client)/component/Home/Banner3D";
+import HotProductIcons from "@/app/(client)/component/Products/HotProductIcons";
+import HotspotLookbook from "@/app/(client)/component/Home/HotspotProduct";
 
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
