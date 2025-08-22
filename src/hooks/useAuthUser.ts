@@ -10,13 +10,11 @@ export function useAuthUser() {
   useEffect(() => {
     if (!user) {
       checkToken().then((data) => {
-         console.log("checkToken data:", data);  // 👉 log tại đây
         if (data?.user) {
           setUser(data.user);
         }
       });
     }
   }, [user, setUser]);
-
   return { user };
 }

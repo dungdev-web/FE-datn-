@@ -947,3 +947,71 @@ export async function deleteAdminProduct(productId: number): Promise<IProduct> {
   const json = await res.json();
   return json as IProduct;
 }
+export async function updateAdminProduct(
+  productId: number,
+  payload: AddProductPayload
+): Promise<UpdateProductResponse> {
+  const formData = new FormData();
+
+  // 1. Các field text/number thông thường
+  const basicFields: Record<string, any> = {
+    name: payload.name,
+    description: payload.description,
+    short_desc: payload.short_desc,
+    price: payload.price,
+    sale_price: payload.sale_price,
+    categories_id: payload.categories_id,
+    brand_id: payload.brand_id,
+    gender_id: payload.gender_id,
+    status: payload.status,
+  };
+
+  Object.entries(basicFields).forEach(([key, value]) => {
+    formData.append(key, value != null ? value.toString() : "");
+  });
+
+  // 2. Ảnh chính (nhiều ảnh)
+  payload.images.forEach((file) => {
+    if (file instanceof File) {
+      formData.append("images", file);
+    }
+  });
+
+  // 3. Ảnh variant (mới và cũ)
+  Object.entries(payload.variantImages).forEach(([code, file]) => {
+    if (file instanceof File) {
+      formData.append(`variant_image_${code}`, file); // ảnh mới
+    } else if (typeof file === "string" && file.trim() !== "") {
+      formData.append(`variant_image_old_${code}`, file); // ảnh cũ
+    }
+  });
+
+  // 4. Thêm product_variants JSON
+  formData.append(
+    "product_variants",
+    JSON.stringify(payload.product_variants)
+  );
+
+  // 5. Gửi request
+  const res = await fetch(
+    `${API_BASE_URL}/product/update-product/${productId}`,
+    {
+      method: "PUT",
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    let errMsg = "Cập nhật sản phẩm thất bại";
+    try {
+      const err = await res.json();
+      errMsg = err.error || errMsg;
+    } catch {
+      // giữ nguyên errMsg mặc định
+    }
+    throw new Error(errMsg);
+  }
+
+  const json = await res.json();
+  return json as UpdateProductResponse;
+}
