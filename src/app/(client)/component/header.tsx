@@ -16,7 +16,8 @@ import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 import SearchWithSuggestions from "./SearchWithSuggestions";
-import Search from "./ShowSearch";
+import Search from "./showsearch";
+
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function Header() {
   const [brands, setBrands] = useState<IBrand[]>([]);
   const navRef = useRef(0);
   const lastScrollTop = useRef(0);
-  const { user } = useAuthUser();
+  const { user  } = useAuthUser();
   let hideTimeout = null;
   const [keyword, setKeyword] = useState("");
   const router = useRouter();
@@ -249,6 +250,11 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  console.log("User trong Header:", user);
+  console.log("Role:", user?.role);
+  console.log("Header render, user:", user);
+
   return (
     <div className="header-nav-bg ">
       {isScrolledUp && <div className="bg-header-layer"></div>}
@@ -391,6 +397,11 @@ export default function Header() {
               <li>
                 <LinkWithLoader href="/account">Tài khoản</LinkWithLoader>
               </li>
+              {user?.role?.toLowerCase() === "admin" && (
+                <li>
+                  <LinkWithLoader href="/admin">Quản lý</LinkWithLoader>
+                </li>
+              )}
             </ul>
             <SearchWithSuggestions />
           </div>
