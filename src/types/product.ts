@@ -1,4 +1,7 @@
 export interface IProduct {
+  color: any;
+  stock_quantity: number;
+  product_variants_id: number;
   brand_id: any;
   gender_id: any;
   categories_id: any;
@@ -55,6 +58,7 @@ export interface IProduct {
     };
   }[];
   product_variants: {
+    name: string | undefined;
     image_url: string;
     product_variants_id: number;
     sku: string;
@@ -72,6 +76,7 @@ export interface IProduct {
     };
   }[];
 }
+
 export interface IReview {
   product_reviews_id: number;
   user_id: number;
@@ -173,8 +178,8 @@ export interface AddProductPayload {
   gender_id: number;
   status: number;
   product_variants: IProductVariantPayload[];
-  images: File[]; // ảnh chính
-  variantImages: Record<string, File>; // key = code_color
+  images: (string | File)[];  // cho phép cả URL và File
+  variantImages: Record<string, File | string>; // ✅ Cho phép File hoặc string
 }
 
 export interface AddProductResponse {

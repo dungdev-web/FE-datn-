@@ -16,12 +16,13 @@ import { IUser } from "@/types/user";
 import { IOrder } from "@/types/Order";
 import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
 import Swal from "sweetalert2";
+import { useAddToCart } from "@/hooks/useAddToCart";
 
 export default function OrderDetail() {
   const params = useParams();
   const router = useRouter();
   const orderId = Number(params.detail);
-
+  const { handleAddToCart } = useAddToCart();
   const [order, setOrder] = useState<IOrder | null>(null);
   const [address, setAddress] = useState<AddressResponse | null>(null);
   const [user, setUser] = useState<IUser | null>(null);
@@ -358,10 +359,78 @@ export default function OrderDetail() {
     router.push(`/account/order/review/${orderId}`);
   };
 
-  const handleBuyAgain = () => {
-    // Logic để thêm lại tất cả sản phẩm vào giỏ hàng
-    router.push("/cart");
-  };
+  const handleBuyAgain = async () => {
+  if (!order?.order_items || order.order_items.length === 0) {
+    Swal.fire({
+      icon: "info",
+      title: "Không có sản phẩm",
+      text: "Đơn hàng này không có sản phẩm nào để mua lại.",
+    });
+    return;
+  }
+
+  try {
+    for (const item of order.order_items) {
+      const variant = item.variant; // 👈 lấy luôn object variant
+      const stock = variant?.stock_quantity ?? 0;
+      const requestedQty = item.quantity;
+      const productName = getProductName(item);
+
+      if (!variant) continue; // nếu ko có variant thì bỏ qua
+
+      if (stock <= 0) {
+        await Swal.fire({
+          icon: "info",
+          title: "Hết hàng",
+          text: `${productName} hiện đã hết hàng.`,
+        });
+        continue;
+      }
+
+      if (stock < requestedQty) {
+        const result = await Swal.fire({
+          icon: "warning",
+          title: "Số lượng không đủ",
+          text: `${productName} chỉ còn ${stock} sản phẩm. Bạn có muốn thêm vào giỏ hàng không?`,
+          showCancelButton: true,
+          confirmButtonText: "Đồng ý",
+          cancelButtonText: "Hủy",
+        });
+
+        if (!result.isConfirmed) continue;
+
+        // Nếu đồng ý → thêm số lượng còn lại
+        await handleAddToCart({
+          variant,      // 👈 truyền object
+          quantity: stock,
+        });
+      } else {
+        // Số lượng đủ
+        await handleAddToCart({
+          variant,      // 👈 truyền object
+          quantity: requestedQty,
+        });
+      }
+    }
+
+    Swal.fire({
+      icon: "success",
+      title: "Đã thêm sản phẩm vào giỏ hàng!",
+      showConfirmButton: false,
+      timer: 1500,
+    }).then(() => {
+      router.push("/cart");
+    });
+  } catch (error) {
+    console.error("Lỗi khi mua lại:", error);
+    Swal.fire({
+      icon: "error",
+      title: "Lỗi",
+      text: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!",
+    });
+  }
+};
+
 
   const handleContactStore = () => {
     // Logic liên hệ cửa hàng
@@ -534,7 +603,7 @@ export default function OrderDetail() {
       </div>
     );
   }
-
+  console.log("Order detail:", order);
   if (error) {
     return (
       <div className="!p-4 text-center text-red-600">
@@ -580,19 +649,19 @@ export default function OrderDetail() {
           </div>
           <ul className="breadcrumb">
             <li className="home">
-              <Link href="/">Trang chủ</Link>
+              <Link href="/"><span>Trang chủ</span></Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account">Tài khoản</Link>
+              <Link href="/account"><span>Tài khoản</span></Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account/order">Đơn hàng</Link>
+              <Link href="/account/order"><span>Đơn hàng</span></Link>
               <i className="fa fa-angle-right" />
             </li>
             <li>
-              <strong>Chi tiết đơn hàng</strong>
+              <strong><span>Chi tiết đơn hàng</span></strong>
             </li>
           </ul>
         </div>
@@ -877,7 +946,9 @@ export default function OrderDetail() {
                     <div className="flex justify-between text-gray-700">
                       <span>Khuyến mại:</span>
                       <span className="font-medium">
-                        {order.coupons_id ? "-" : "0"}₫
+                        {order.coupon
+                          ? `-${order.coupon.discount_value.toLocaleString()}₫`
+                          : "0₫"}
                       </span>
                     </div>
                     <div className="flex justify-between text-gray-700">
@@ -906,7 +977,7 @@ export default function OrderDetail() {
             </div>
 
             {/* Gợi ý sản phẩm tương tự cho trạng thái completed */}
-            {(order.status === "completed") && (
+            {order.status === "completed" && (
               <div className="mt-6 bg-white rounded shadow !p-6">
                 <h3 className="text-lg font-semibold !mb-4 text-gray-800">
                   💡 Sản phẩm bạn có thể quan tâm

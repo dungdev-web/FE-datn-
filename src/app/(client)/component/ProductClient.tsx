@@ -12,12 +12,12 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "./Products/SidebarFilter";
-import MobileSidebarFilter from "./Products/MobileSidebarFilter";
+import SidebarFilter from "@/app/(client)/component/Products/SidebarFilter";
+import MobileSidebarFilter from "@/app/(client)/component/Products/MobileSidebarFilter";
 
 export default function Product() {
   const params = useParams();
@@ -354,12 +354,14 @@ export default function Product() {
 
                               <ProductIcons
                                 productId={sp.products_id}
-                                variant_id={
-                                  sp.product_variants?.[0]?.product_variants_id
-                                }
-                                price={sp.sale_price}
-                              />
-
+                                variant={{
+                                  id: sp.product_variants?.[0]
+                                    ?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                                  stock_quantity:
+                                    sp.product_variants?.[0]?.stock_quantity ?? 0,
+                                  name: sp.product_variants?.[0]?.name,
+                                }}
+                                price={0} />
                               <span className="discount-tag">
                                 -
                                 {Math.round(
@@ -520,12 +522,15 @@ export default function Product() {
                                 </Link>
                                 <ProductIcons
                                   productId={sp.products_id}
-                                  variant_id={
-                                    sp.product_variants?.[0]
-                                      ?.product_variants_id
-                                  }
-                                  price={sp.sale_price}
-                                />
+                                  variant={{
+                                    id: sp.product_variants?.[0]
+                                      ?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                                    stock_quantity:
+                                      sp.product_variants?.[0]?.stock_quantity ??
+                                      0,
+                                    name: sp.product_variants?.[0]?.name,
+                                  }}
+                                  price={0} />
                               </div>
 
                               <div className="flex flex-col">

@@ -8,7 +8,7 @@ import "swiper/css/navigation";
 import { useEffect, useState } from "react";
 import { IProduct } from "@/types/product";
 import { getDealProducts } from "@/services/productService";
-import ProductCardSlider from "./ProductCardSlider"; 
+import ProductCardSlider from "@/app/(client)/component/ProductCardSlider"; 
 
 export default function Show1sanpham() {
   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);

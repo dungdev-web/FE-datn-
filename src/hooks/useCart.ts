@@ -84,45 +84,79 @@ export const useCart = () => {
     }
   };
 
-  const handleRemoveItem = async (cartItemId: number) => {
-    const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
-    const userId = cart?.user_id;
-    if (!item || !userId) return;
+const handleRemoveItem = async (cartItemId: number) => {
+  const item = cart?.cart_items.find((i) => i.cart_items_id === cartItemId);
+  const userId = cart?.user_id;
+  if (!item || !userId) return;
 
-    const confirmResult = await Swal.fire({
-      title: "Bạn có chắc muốn xoá?",
-      text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Xoá",
-      cancelButtonText: "Huỷ",
+  const confirmResult = await Swal.fire({
+    title: "Bạn có chắc muốn xoá?",
+    text: "Sản phẩm sẽ bị xoá khỏi giỏ hàng.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Xoá",
+    cancelButtonText: "Huỷ",
+  });
+
+  if (!confirmResult.isConfirmed) return;
+
+  try {
+    const res = await removeFromCart({
+      user_id: userId,
+      variant_id: item.variant_id,
     });
 
-    if (!confirmResult.isConfirmed) return;
+    if (res.data.count > 0) {
+      // Giảm số lượng trong global store
+      for (let i = 0; i < item.quantity; i++) decrementCart();
 
-    try {
-      const res = await removeFromCart({
-        user_id: userId,
-        variant_id: item.variant_id,
-      });
-
-      if (res.data.count > 0) {
-        for (let i = 0; i < item.quantity; i++) decrementCart();
-        await Swal.fire(
-          "Đã xoá!",
-          "Sản phẩm đã được xoá khỏi giỏ hàng.",
-          "success"
-        );
-        await fetchCart();
-      } else {
-        Swal.fire("Không tìm thấy!", "Sản phẩm đã bị xoá trước đó.", "info");
+      // Xoá khỏi localStorage
+      const prev = JSON.parse(localStorage.getItem("addedToCartQuantities") || "{}");
+      if (prev[item.variant_id]) {
+        delete prev[item.variant_id];
+        localStorage.setItem("addedToCartQuantities", JSON.stringify(prev));
       }
-    } catch (error) {
-      console.error("Lỗi khi xoá sản phẩm:", error);
-      Swal.fire("Lỗi!", "Không thể xoá sản phẩm. Vui lòng thử lại.", "error");
+
+      await Swal.fire(
+        "Đã xoá!",
+        "Sản phẩm đã được xoá khỏi giỏ hàng.",
+        "success"
+      );
+      await fetchCart();
+    } else {
+      Swal.fire("Không tìm thấy!", "Sản phẩm đã bị xoá trước đó.", "info");
     }
+  } catch (error) {
+    console.error("Lỗi khi xoá sản phẩm:", error);
+    Swal.fire("Lỗi!", "Không thể xoá sản phẩm. Vui lòng thử lại.", "error");
+  }
+};
+
+  const handlePlus = (itemId: number) => {
+    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
+    if (!item) return;
+
+    const maxStock = item.variant?.stock_quantity ?? 0;
+
+    if (item.quantity >= maxStock) {
+      Swal.fire({
+        icon: "warning",
+        title: "Số lượng không đủ",
+        text: `Chỉ còn ${maxStock} sản phẩm trong kho.`,
+      });
+      return;
+    }
+
+    handleUpdateQuantity(itemId, Math.min(999, item.quantity + 1));
+  };
+
+  const handleMinus = (itemId: number) => {
+    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
+    if (!item) return;
+
+    handleUpdateQuantity(itemId, Math.max(1, item.quantity - 1));
   };
 
   const handleChangeQuantity = (
@@ -130,21 +164,23 @@ export const useCart = () => {
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const num = parseInt(e.target.value, 10);
-    if (!isNaN(num) && num >= 1 && num <= 999) {
+    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
+    if (!item || isNaN(num)) return;
+
+    const maxStock = item.variant?.stock_quantity ?? 0;
+
+    if (num > maxStock) {
+      Swal.fire({
+        icon: "warning",
+        title: "Số lượng không đủ",
+        text: `Chỉ còn ${maxStock} sản phẩm trong kho.`,
+      });
+      return;
+    }
+
+    if (num >= 1 && num <= 999) {
       handleUpdateQuantity(itemId, num);
     }
-  };
-
-  const handlePlus = (itemId: number) => {
-    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
-    if (!item) return;
-    handleUpdateQuantity(itemId, Math.min(999, item.quantity + 1));
-  };
-
-  const handleMinus = (itemId: number) => {
-    const item = cart?.cart_items.find((i) => i.cart_items_id === itemId);
-    if (!item) return;
-    handleUpdateQuantity(itemId, Math.max(1, item.quantity - 1));
   };
 
   useEffect(() => {
