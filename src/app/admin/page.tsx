@@ -3,8 +3,8 @@ import "./css/dashboard.css";
 import "./css/css.css";
 import "./css/order_admin.css";
 import { useState, useEffect } from "react";
-import SideBar from "./component_admin/Sidebar";
-import RevenueAndVisitsChart from "./component_admin/Chart";
+import SideBar from "@/app/admin/component_admin/Sidebar";
+import RevenueAndVisitsChart from "@/app/admin/component_admin/Chart";
 import { API_BASE_URL } from "@/config/env";
 import {
   getCountProduct,

@@ -2,7 +2,7 @@
 import "../../css/product.css";
 import "../../css/account.css";
 import Link from "next/link";
-import AccountSidebar from "../../component/Account/AccountSidebar";
+import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
 import { useState, useEffect } from "react";
 import { checkToken } from "@/services/authService";
 import { IUser } from "@/types/user";

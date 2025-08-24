@@ -12,12 +12,12 @@ import { IProduct } from "@/types/product";
 import { ICategory } from "@/types/ICategory";
 import { IBrand } from "@/types/IBrand";
 
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 
 import "@/app/(client)/css/pagination.css";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "./Products/SidebarFilter";
-import MobileSidebarFilter from "./Products/MobileSidebarFilter";
+import SidebarFilter from "@/app/(client)/component/Products/SidebarFilter";
+import MobileSidebarFilter from "@/app/(client)/component/Products/MobileSidebarFilter";
 
 export default function Product() {
   const params = useParams();
