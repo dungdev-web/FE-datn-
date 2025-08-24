@@ -41,7 +41,7 @@ export default function  Product4box(props: any) {
               }
             />
           </Link>
-          <div className="hot-product-icons">
+        
             <ProductIcons
               productId={productId}
               variant={{
@@ -51,7 +51,7 @@ export default function  Product4box(props: any) {
               }}
               price={0}
             />
-          </div>
+   
 
           {discountPercent > 0 && (
             <span className="tag-discount">-{discountPercent}%</span>

@@ -445,8 +445,7 @@ nav {
   }
 }
 
-/* danh mục sản phẩm */
-
+/* Khung chính */
 .category-main {
   text-align: center;
   padding: 30px;
@@ -455,7 +454,6 @@ nav {
 
 .category-main h4 {
   font-size: 16px;
-
   color: gray;
 }
 
@@ -464,78 +462,42 @@ nav {
   margin-bottom: 30px;
 }
 
+/* Responsive cho tablet */
 @media (max-width: 768px) {
   .category-main h1 {
     font-size: 24px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
-   .category-main1 {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    padding: 5px;
+  .category-main1 {
+    width: 100%;
   }
-
 }
 
+/* Responsive cho mobile nhỏ */
 @media (max-width: 480px) {
   .category-main h1 {
     font-size: 20px;
     margin-bottom: 5px;
   }
-  
   .category-main1 {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    padding: 5px;
+    width: 100%;
+      opacity: 1; /* hiện luôn */
   }
 }
+
+/* Swiper wrapper */
 .category-main1 {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  width: 90%;
+  margin: 0 auto;
 }
 
+/* Box từng item */
 .category-main1-item {
   position: relative;
   overflow: hidden;
-  width: 23%;
-  min-width: 200px;
-  height: 450px;
   cursor: pointer;
   transition: transform 0.3s ease;
-}
-
-/* Responsive cho mobile */
-@media (max-width: 768px) {
-  .category-main1-item {
-    width: 48%;
-    min-width: unset;
-    margin: 1%;
-  }
-  
-  .category-main1-item {
-    width: 48%;
-    min-width: unset;
-    height: 300px;
-  }
-
-}
-
-.category-main1-item:hover {
-  flex-basis: 400px;
-  flex-grow: 6;
-}
-
-.category-main1-item {
-  position: relative;
-  overflow: hidden;
-  width: 23%;
-  min-width: 200px;
-  height: 450px;
-  /* ← Thêm dòng này để tăng chiều cao */
-  cursor: pointer;
-  transition: transform 0.3s ease;
+  border-radius: 10px;
 }
 
 .category-main1-item img {
@@ -543,8 +505,10 @@ nav {
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+  border-radius: 10px;
 }
 
+/* Chữ overlay */
 .category-main1-item h4 {
   position: absolute;
   bottom: 0;
@@ -556,13 +520,12 @@ nav {
   font-size: 16px;
   padding: 10px;
   text-align: center;
-  opacity: 0;
+  opacity: 0; /* mặc định ẩn trên desktop */
   transition: opacity 0.4s ease;
   backdrop-filter: blur(4px);
-}
-
-.category-main1-item:hover h4 {
-  opacity: 1;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  z-index: 2;
 }
 
 /* Hover effect */
@@ -571,7 +534,16 @@ nav {
 }
 
 .category-main1-item:hover h4 {
-  opacity: 1;
+  opacity: 1; /* hiện chữ khi hover */
+}
+
+@media (max-width: 620px) {
+  .category-main1 {
+   width: 100%;
+  }
+  .category-main1-item h4 {
+    opacity: 1; /* hiện luôn */
+  }
 }
 
 .marquee-wrapper {
