@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { API_BASE_URL } from "@/config/env";
 import Link from "next/link";
-import AsideBlog from "@/app/(client)/component/Blog/AsideBlog";
+import AsideBlog from "../../..//component/Blog/AsideBlog";
 import { usePostsByCategory } from "@/hooks/useBlog";
 export default function Blog() {
   const params = useParams();
