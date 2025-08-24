@@ -16,6 +16,5 @@ export function useAuthUser() {
       });
     }
   }, [user, setUser]);
-
   return { user };
 }

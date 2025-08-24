@@ -6,12 +6,12 @@ import "./css/product.css";
 import Header from "./component/Header";
 import Footer from "./component/Footer";
 import ButtonToTop from "./component/ButtonToTop";
-import { CompareProvider } from "./component/ProductCompare/CompareContext";
-import { LoaderProvider } from "./component/LinkWithLoader";
-import ContactFloatingButton from "./component/ContactFloatingButton";
+import { CompareProvider } from "@/app/(client)/component/ProductCompare/CompareContext";
+import { LoaderProvider } from "@/app/(client)/component/LinkWithLoader";
+import ContactFloatingButton from "@/app/(client)/component/ContactFloatingButton";
 import { ToastContainer } from "react-toastify";
-import TawkToWidget from "./component/TawkToWidget";
-import FloatChatBot from "./component/FloatChatBot";
+import TawkToWidget from "@/app/(client)/component/TawkToWidget";
+import FloatChatBot from "@/app/(client)/component/FloatChatBot";
 export default function RootLayout({
   children,
 }: Readonly<{

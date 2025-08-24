@@ -11,7 +11,7 @@ import {
   getReviewProduct,
   addReviewProduct,
 } from "@/services/productService";
-import RelatedProductList from "../../component/RelatedProductList";
+import RelatedProductList from "@/app/(client)/component/RelatedProductList";
 import Swal from "sweetalert2";
 import { checkToken } from "@/services/authService";
 import { addToMockCart } from "@/services/cartService";

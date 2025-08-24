@@ -1,7 +1,7 @@
 "use client";
 import "./admin.css";
-import Header_admin from "./component_admin/Header_admin";
-import SideBar from "./component_admin/Sidebar";
+import Header_admin from "@/app/admin/component_admin/Header_admin";
+import SideBar from "@/app/admin/component_admin/Sidebar";
 import { useState } from "react";
 import { Toaster } from "react-hot-toast";
 

@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { loginUser } from "@/services/authService";
 import { useRouter } from "next/navigation";
-import Loader from "./Loader";
+
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import Loader from "./Loader";
 
 export default function LoginMenu({
   isOpen,
