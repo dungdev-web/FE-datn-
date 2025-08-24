@@ -1469,17 +1469,6 @@
   .banner img {
     height: 500px !important;
   }
-
-  .category-main1 {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-  }
-
-  .category-main1-item {
-    width: 100% !important;
-  }
-
   .category-main {
     margin-top: -60px;
   }
@@ -1622,16 +1611,6 @@
 
   .banner img {
     height: 300px !important;
-  }
-
-  .category-main1 {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    padding: 5px;
-  }
-
-  .category-main1-item {
-    margin-top: 5px;
   }
 
   .category-main {
