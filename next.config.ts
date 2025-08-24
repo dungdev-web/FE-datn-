@@ -4,7 +4,7 @@ const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["example.com"], // domain ảnh mà API trả về
+    domains: ["example.com"], // domain ảnh API trả về
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
