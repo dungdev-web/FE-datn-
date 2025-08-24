@@ -11,7 +11,8 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { GG_BASE_URL } from "@/config/env";
+
+import { GOOGLE_REDIRECT_URI, NEXT_DOMAIN_URL } from "@/config/env";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -90,11 +91,11 @@ export default function Login() {
     const clientId =
       "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
     const redirectUri = encodeURIComponent(
-      `${GG_BASE_URL}/google/callback`
+      `${GOOGLE_REDIRECT_URI}/google/callback`
     );
     const scope = encodeURIComponent("profile email");
     const responseType = "code";
-
+    console.log("next domain", redirectUri)
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=${responseType}&scope=${scope}`;
     window.location.href = url;
   };
