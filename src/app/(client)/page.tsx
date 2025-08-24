@@ -6,7 +6,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useEffect, useState, useRef, use } from "react";
 
-import BlogHome from "./component/Home/BlogHome";
 import CouponApp from "@/app/(client)/component/Coupon";
 import FlashSale from "@/app/(client)/component/FlashSale";
 import { IProduct } from "@/types/product";
