@@ -18,7 +18,7 @@ export default function FloatingContactButtons() {
       {isOpen && (
         <div className="flex flex-col items-center gap-3 transition-all duration-300">
           <a
-            href="https://facebook.com/yourpage"
+            href="https://www.facebook.com/share/1Ro1xU7Bbw/?mibextid=wwXIfr"
             target="_blank"
             rel="noopener noreferrer"
             className="w-14 h-14 rounded-full !bg-blue-700 flex items-center justify-center shadow-lg hover:scale-110 transition"
@@ -27,7 +27,7 @@ export default function FloatingContactButtons() {
             <Globe size={24} className="text-white" />
           </a>
           <a
-            href="tel:0901234567"
+            href="tel:0338538203"
             className="w-14 h-14 rounded-full !bg-green-500 flex items-center justify-center shadow-lg hover:scale-110 transition"
             aria-label="Gọi điện"
           >
