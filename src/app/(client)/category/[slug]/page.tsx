@@ -13,9 +13,9 @@ import { IBrand } from "@/types/IBrand";
 import { getAllBrands } from "@/services/brandService";
 import { getFilteredProducts } from "@/services/productService"; // Thêm
 
-import ProductIcons from "../../component/Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "../../component/Products/SidebarFilter";
+import SidebarFilter from "@/app/(client)/component/Products/SidebarFilter";
 import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
 
 interface Params {
