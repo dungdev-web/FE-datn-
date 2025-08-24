@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useEffect, useState, useRef, use } from "react";
 
-import BlogHome from "@/app/(client)/component/Blog/AsideBlog";
+
 import CouponApp from "@/app/(client)/component/Coupon";
 import FlashSale from "@/app/(client)/component/FlashSale";
 import { IProduct } from "@/types/product";
@@ -22,6 +22,7 @@ import Banner3D from "@/app/(client)/component/Home/Banner3D";
 import HotProductIcons from "@/app/(client)/component/Products/HotProductIcons";
 import HotspotLookbook from "@/app/(client)/component/Home/HotspotProduct";
 import Show1sanpham from "@/app/(client)/component/ProductHome";
+import BlogHome from "./component/Home/BlogHome";
 
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);

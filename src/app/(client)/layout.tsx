@@ -3,8 +3,7 @@ import "./globals.css";
 import "./css/style.css";
 import "./css/product.css";
 
-import Header from "./component/Header";
-import Footer from "./component/Footer";
+
 import ButtonToTop from "./component/ButtonToTop";
 import { CompareProvider } from "@/app/(client)/component/ProductCompare/CompareContext";
 import { LoaderProvider } from "@/app/(client)/component/LinkWithLoader";
@@ -12,6 +11,8 @@ import ContactFloatingButton from "@/app/(client)/component/ContactFloatingButto
 import { ToastContainer } from "react-toastify";
 import TawkToWidget from "@/app/(client)/component/TawkToWidget";
 import FloatChatBot from "@/app/(client)/component/FloatChatBot";
+import Header from "./component/Header";
+import Footer from "./component/Footer";
 export default function RootLayout({
   children,
 }: Readonly<{
