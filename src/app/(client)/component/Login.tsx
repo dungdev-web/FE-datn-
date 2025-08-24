@@ -11,6 +11,7 @@ import Link from "next/link";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { useAuthUser } from "@/hooks/useAuthUser";
+import { GG_BASE_URL } from "@/config/env";
 
 export default function Login() {
   const [usernameOrEmail, setIdentifier] = useState("");
@@ -89,7 +90,7 @@ export default function Login() {
     const clientId =
       "235575927586-1ldvr8n16m7ose9db21aa0nvqhnb9m0a.apps.googleusercontent.com";
     const redirectUri = encodeURIComponent(
-      `http://localhost:3001/google/callback`
+      `${GG_BASE_URL}/google/callback`
     );
     const scope = encodeURIComponent("profile email");
     const responseType = "code";
