@@ -306,3 +306,45 @@ export async function deleteCategoryPost(category_post_id:number)
     throw error;
   }
 }
+//tăng view cho blog
+export async function updateViewPost(post_id: number) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/${post_id}/view`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Lỗi khi cập nhật lượt xem");
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("updateViewPost error:", error);
+    throw error;
+  }
+}
+//bài viết nổi bật
+export async function getFeaturedPost(page: number = 1, limit: number = 10) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/featured?page=${page}&limit=${limit}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch featured posts");
+    }
+
+    const data = await res.json();
+    return data?.data || [];
+  } catch (error) {
+    console.error("Error getFeaturedPost:", error);
+    return [];
+  }
+}

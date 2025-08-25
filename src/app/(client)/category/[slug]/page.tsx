@@ -13,10 +13,11 @@ import { IBrand } from "@/types/IBrand";
 import { getAllBrands } from "@/services/brandService";
 import { getFilteredProducts } from "@/services/productService"; // Thêm
 
-import ProductIcons from "../../component/Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
-import SidebarFilter from "../../component/Products/SidebarFilter";
-import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
+import SidebarFilter from "@/app/(client)/component/Products/SidebarFilter";
+
+import MobileSidebarFilter from "@/app/(client)/component/Products/MobileSidebarFilter";
 
 interface Params {
   params: {
@@ -368,10 +369,15 @@ export default function CategoryPage() {
 
                               <ProductIcons
                                 productId={sp.products_id}
-                                variant_id={
-                                  sp.product_variants?.[0]?.product_variants_id
-                                }
-                                price={sp.sale_price}
+                                variant={{
+                                  id: sp.product_variants?.[0]
+                                    ?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                                  stock_quantity:
+                                    sp.product_variants?.[0]
+                                      ?.stock_quantity ?? 0,
+                                  name: sp.product_variants?.[0]?.name,
+                                }}
+                                price={0}
                               />
 
                               <span className="discount-tag">
@@ -532,14 +538,13 @@ export default function CategoryPage() {
                                     style={{ height: "221px" }}
                                   />
                                 </Link>
-                                <ProductIcons
-                                  productId={sp.products_id}
-                                  variant_id={
-                                    sp.product_variants?.[0]
-                                      ?.product_variants_id
-                                  }
-                                  price={sp.sale_price}
-                                />
+                               <ProductIcons
+                                           productId={sp.products_id}
+                                           variant={{
+                                             id: sp.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                                             stock_quantity: sp.product_variants?.[0]?.stock_quantity ?? 0,
+                                             name: sp.product_variants?.[0]?.name,
+                                           }} price={0}          />
                               </div>
 
                               <div className="flex flex-col">

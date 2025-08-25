@@ -2,8 +2,9 @@
 
 import { IProduct } from "@/types/product";
 import Link from "next/link";
-import ProductIcons from "./Products/ProductIcons";
+
 import { API_BASE_URL } from "@/config/env";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 
 export default function ProductCardSlider({ product }: { product: IProduct }) {
   const reviews = product.product_reviews || [];
@@ -47,12 +48,12 @@ export default function ProductCardSlider({ product }: { product: IProduct }) {
           </Link>
 
           <ProductIcons
-            productId={productId}
-            variant_id={
-              product.product_variants?.[0]?.product_variants_id ?? null
-            }
-            price={product.sale_price}
-          />
+            productId={product.products_id}
+            variant={{
+              id: product.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+              stock_quantity: product.product_variants?.[0]?.stock_quantity ?? 0,
+              name: product.product_variants?.[0]?.name,
+            }} price={0}          />
 
           {discount > 0 && <span className="discount-tag">-{discount}%</span>}
 

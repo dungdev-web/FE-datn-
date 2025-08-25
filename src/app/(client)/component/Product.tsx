@@ -1,10 +1,10 @@
 "use client";
 
 import { IProduct } from "@/types/product";
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 import Link from "next/link";
-export default function Product4box(props: any) {
+export default function  Product4box(props: any) {
   const sp = props.sp as IProduct;
   if (!sp) return null;
 
@@ -44,8 +44,12 @@ export default function Product4box(props: any) {
           <div className="hot-product-icons">
             <ProductIcons
               productId={productId}
-              variant_id={sp.product_variants?.[0]?.product_variants_id}
-              price={sp.sale_price}
+              variant={{
+                id: sp.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                stock_quantity: sp.product_variants?.[0]?.stock_quantity ?? 0,
+                name: sp.product_variants?.[0]?.name,
+              }}
+              price={0}
             />
           </div>
 

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import ProductSale from "./ProductSale";
+import ProductSale from "@/app/(client)/component/ProductSale";
 
 export default function SalePage() {
   const [timeLeft, setTimeLeft] = useState({

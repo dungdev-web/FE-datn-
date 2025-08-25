@@ -47,9 +47,7 @@ export default function Footer() {
             <li>
               <Link href="/contact">Liên hệ</Link>
             </li>
-            <li>
-              <a href="#">Hệ thống cửa hàng</a>
-            </li>{" "}
+            
             {/* Giữ nguyên nếu là liên kết ngoài hoặc chưa có route */}
           </ul>
         </div>
@@ -75,21 +73,21 @@ export default function Footer() {
           </div>
 
           <div className="social-icons" style={{ width: "322px" }}>
-            <a href="#">
+            <Link href="https://x.com/TeraShoes">
               <i className="fab fa-twitter"></i>
-            </a>
-            <a href="#">
+            </Link>
+            <Link href="https://www.facebook.com/share/1Ro1xU7Bbw/?mibextid=wwXIfr">
               <i className="fab fa-facebook-f"></i>
-            </a>
-            <a href="#">
+            </Link>
+            <Link href="https://www.pinterest.com/terashoes/">
               <i className="fab fa-pinterest-p"></i>
-            </a>
-            <a href="#">
+            </Link>
+            <Link href="https://www.instagram.com/_lcb.28th08/">
               <i className="fab fa-instagram"></i>
-            </a>
-            <a href="#">
+            </Link>
+            <Link href="https://www.youtube.com/@TERASHOES">
               <i className="fab fa-youtube"></i>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

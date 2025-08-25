@@ -6,9 +6,9 @@ import { checkToken } from "@/services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ICoupon } from "@/types/coupon";
-import AccountSidebar from "../../component/Account/AccountSidebar";
+import AccountSidebar from "@/app/(client)/component/Account/AccountSidebar";
 import { useGlobalStore } from "@/store/useGlobalStore"; // ✅ Import thêm
-import "../../css/account.css";
+import "@/app/(client)/css/account.css";
 import { IUser } from "@/types/user";
 
 // ======================= CouponCard =======================

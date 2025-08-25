@@ -1,6 +1,6 @@
 // "use client";
 import { Suspense } from "react";
-import GoogleCallback from "../../component/GoogleCallback";
+import GoogleCallback from "@/app/(client)/component/GoogleCallback";
 
 export default function Page() {
   return (

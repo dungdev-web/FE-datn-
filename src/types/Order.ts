@@ -1,4 +1,5 @@
 import { AddressResponse } from "./address";
+import { ICoupon } from "./coupon";
 import { IOrderItem } from "./OrderItem";
 
 export interface IOrder {
@@ -16,6 +17,7 @@ export interface IOrder {
   shipping_address: {
     shipping_address_id: number;
     address_line: string;
+    phone:string;
   };
   shipping_fee: number;
   user: {
@@ -26,6 +28,7 @@ export interface IOrder {
   }
   payment_status: string;
   coupons_id: number | null;
+  coupon?: ICoupon | null;
   comment: string | null;
   created_at: string;
   updated_at: string;

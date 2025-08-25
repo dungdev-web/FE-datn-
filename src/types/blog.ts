@@ -6,6 +6,7 @@ export interface IBlog {
   thumbnail: string;
   images: string[] | null;
   status: number;
+  view:number;
   category_post_id: number;
   author_id: number;
   created_at: string;

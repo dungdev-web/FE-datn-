@@ -9,46 +9,51 @@ import {
 } from "@/types/cart";
 import { CheckoutRequest, CheckoutResponse } from "@/types/ICheckout";
 interface AddToCartResponse {
+  error: any;
   length: any;
   message: string;
   cart: ICartItem[]; // danh sách cart_items sau khi thêm
 }
 
-// Gọi API để thêm sản phẩm vào giỏ hàng
 export const addToCart = async ({
-  user_id,
-  variant_id,
+  userId,
+  productVariantId,
   quantity,
-}: Addtocart): Promise<AddToCartResponse> => {
+}: {
+  userId: number;
+  productVariantId: number;
+  quantity: number;
+}): Promise<any> => {
   try {
+    const payload = { user_id: userId, productVariantId, quantity };
     const res = await fetch(`${API_BASE_URL}/product/addToCart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
       },
-      body: JSON.stringify({
-        user_id,
-        variant_id,
-        quantity,
-      }),
+      body: JSON.stringify(payload),
     });
 
-    if (!res.ok) {
-      throw new Error("Không thể thêm sản phẩm vào giỏ hàng.");
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok || data.success === false) {
+      throw data; // ném object lỗi để hook xử lý
     }
 
-    const data = await res.json();
+    return data;
 
-    return {
-      length: Array.isArray(data.cart) ? data.cart.length : 0,
-      message: data.message,
-      cart: data.cart, // kiểu này khớp với ICartItem[]
+  } catch (error: any) {
+    if (typeof error === "object") {
+      throw error;
+    }
+    throw {
+      success: false,
+      message: error?.message || "Thêm sản phẩm thất bại",
     };
-  } catch (error) {
-    console.error("Lỗi khi thêm giỏ hàng:", error);
-    throw error;
   }
 };
+
 // Thêm sản phẩm vào giỏ mock
 export async function addToMockCart(
   user_id: number,
@@ -86,8 +91,8 @@ export async function addToMockCart(
         variant: cart.cart_items[0]?.variant,
         quantity,
         price,
-         sale_price: cart.cart_items[0]?.variant?.product?.sale_price || price, 
-  priceSale: cart.cart_items[0]?.variant?.product?.sale_price || price,  
+        sale_price: cart.cart_items[0]?.variant?.product?.sale_price || price,
+        priceSale: cart.cart_items[0]?.variant?.product?.sale_price || price,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
@@ -187,7 +192,8 @@ export const getCartByUserId = async (
 
     const data: ICart | null = await res.json();
 
-    if (!data) return { items: [] } as unknown as ICart & { items: ICartItem[] };
+    if (!data)
+      return { items: [] } as unknown as ICart & { items: ICartItem[] };
 
     const cartWithItems = {
       ...data,

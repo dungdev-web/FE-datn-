@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev  -p 3001",
-    "build": "npm install --legacy-peer-deps && next build",
+    "build": "next build",
     "start": "next start -p 3001",
     "lint": "next lint"
   },
@@ -23,6 +23,7 @@
     "filepond": "^4.32.7",
     "filepond-plugin-image-preview": "^4.6.12",
     "formidable": "^3.5.4",
+    "jose": "^6.0.13",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
@@ -45,6 +46,7 @@
     "sweetalert2": "^11.6.13",
     "swiper": "^11.2.10",
     "three": "^0.178.0",
+    "xlsx": "^0.18.5",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

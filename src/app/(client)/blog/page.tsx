@@ -6,9 +6,10 @@ import { useState, useEffect } from "react";
 import { IBlog } from "@/types/blog";
 import { getPost } from "@/services/blogService";
 import { API_BASE_URL } from "@/config/env";
-import { getLocalViews, increaseLocalViews } from "@/shared/until/viewTracker";
 import Link from "next/link";
-import AsideBlog from "../component/Blog/AsideBlog";
+import AsideBlog from "@/app/(client)/component/Blog/AsideBlog";
+
+
 export default function Blog() {
   const [post, setPost] = useState<IBlog[]>([]);
   const [page, setPage] = useState(1);
@@ -89,9 +90,8 @@ export default function Blog() {
                   : item.content;
 
               const safeHTML = shortContent;
-              const localViews = getLocalViews(item.post_id);
+              const localViews = (item.view);
               const handleViewDetail = () => {
-                increaseLocalViews(item.post_id);
                 window.location.href = `/blog/${item.post_id}`;
               };
               return (

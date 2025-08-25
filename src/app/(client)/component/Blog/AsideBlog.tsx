@@ -1,20 +1,24 @@
-import { useCategories, usePostsByCategory } from "@/hooks/useBlog";
+import { useCategories, useFeaturedPosts, usePostsByCategory } from "@/hooks/useBlog";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { API_BASE_URL } from "@/config/env";
+import { useRouter } from "next/navigation";
 
 export default function AsideBlog() {
-  const { categories, loading: catLoading } = useCategories({ page: 1, limit: 1000 });
-  const [selectedCategoryId, setSelectedCategory] = useState<number | null>(null);
+  const router = useRouter();
+
+  const { categories, loading: catLoading } = useCategories({
+    page: 1,
+    limit: 1000,
+  });
+  const [selectedCategoryId, setSelectedCategory] = useState<number | null>(
+    null
+  );
   const [openParentId, setOpenParentId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const { posts, loading: postLoading } = usePostsByCategory(
-     2
-  );
-  console.log(selectedCategoryId);
-  
+  const { posts, loading: postLoading } = useFeaturedPosts();  
   // Set danh mục mặc định khi có data
   useEffect(() => {
     // console.log("Categories từ hook:", categories);
@@ -44,7 +48,7 @@ export default function AsideBlog() {
       .filter((cat) => cat.parent_id === null)
       .slice(0, 1000); // Giới hạn hiển thị 10 cha
     console.log(parentCategories);
-    
+
     return (
       <ul className={isMobile ? "" : "space-y-1"}>
         {parentCategories.map((parent) => {
@@ -56,10 +60,14 @@ export default function AsideBlog() {
           return (
             <li key={parent.category_post_id}>
               <div
-                onClick={() =>
-                  setOpenParentId(isOpen ? null : parent.category_post_id)
+                onClick={() =>{
+                  setOpenParentId(isOpen ? null : parent.category_post_id),
+                  router.push(
+                            `/blog/categories_post/${parent.category_post_id}`
+                          );
                 }
-                className="flex justify-between items-center cursor-pointer"
+                }
+                className="cursor-pointer"
                 style={{
                   fontWeight:
                     selectedCategoryId === parent.category_post_id
@@ -83,9 +91,12 @@ export default function AsideBlog() {
                     <li
                       key={child.category_post_id}
                       className="cursor-pointer hover:text-blue-500"
-                      onClick={() =>
-                        setSelectedCategory(child.category_post_id)
-                      }
+                      onClick={() => {
+                        setSelectedCategory(child.category_post_id),
+                          router.push(
+                            `/blog/categories_post/${child.category_post_id}`
+                          );
+                      }}
                     >
                       + {child.name}
                     </li>
@@ -128,7 +139,7 @@ export default function AsideBlog() {
           ) : posts.length === 0 ? (
             <p>Không có bài viết.</p>
           ) : (
-            posts.slice(0, 4).map((post) => (
+            posts.slice(0, 5).map((post) => (
               <div className="box-relate-blog" key={post.post_id}>
                 <Link href={`/blog/${post.post_id}`}>
                   <div
@@ -172,7 +183,7 @@ export default function AsideBlog() {
           ) : posts.length === 0 ? (
             <p>Không có bài viết.</p>
           ) : (
-            posts.slice(0, 4).map((post) => (
+            posts.slice(0, 5).map((post) => (
               <div className="box-relate-blog" key={post.post_id}>
                 <Link href={`/blog/${post.post_id}`}>
                   <div
