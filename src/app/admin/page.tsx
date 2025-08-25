@@ -26,11 +26,12 @@ import {
   getStatusText,
   formatDate,
 } from "@/services/dashboardService";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export default function Home_admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [data, setData] = useState<any>({});
-
+  const { user, loading } = useAuthUser(["admin"]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -93,9 +94,10 @@ export default function Home_admin() {
         console.error("Failed to fetch dashboard data:", error);
       }
     };
-
     fetchData();
   }, []);
+   if (loading) return <p>Đang kiểm tra quyền truy cập...</p>;
+  if (!user) return null; 
   return (
     <div>
       {/* <SideBar isCollapsed1={isCollapsed} setIsCollapsed1={setIsCollapsed} /> */}

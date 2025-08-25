@@ -44,44 +44,52 @@ const RevenueAndVisitsChart = () => {
   const [revenuesMonthly, setRevenuesMonthly] = useState<number[]>([]);
 
   useEffect(() => {
-    const fetchWeeklyRevenue = async () => {
-      try {
-        const data = await getRevernueWeekly();
+  const fetchWeeklyRevenue = async () => {
+    try {
+      const data = await getRevernueWeekly();
 
-        const labelList = data.map((item: any) => {
-          const [engDay] = item.day.split(" ");
-          return dayMap[engDay] || engDay;
-        });
+      const labelList = data.map((item: any) => {
+        const [engDay] = item.day.split(" ");
+        return dayMap[engDay] || engDay;
+      });
 
-        const revenueList = data.map((item: any) => item.revenue);
+      // ép âm về 0
+      const revenueList = data.map((item: any) =>
+        item.revenue < 0 ? 0 : item.revenue
+      );
 
-        setLabelsWeekly(labelList);
-        setRevenuesWeekly(revenueList);
-      } catch (err) {
-        console.error("Lỗi khi fetch doanh thu tuần:", err);
-      }
-    };
+      setLabelsWeekly(labelList);
+      setRevenuesWeekly(revenueList);
+    } catch (err) {
+      console.error("Lỗi khi fetch doanh thu tuần:", err);
+    }
+  };
 
-    fetchWeeklyRevenue();
-  }, []);
+  fetchWeeklyRevenue();
+}, []);
 
-  useEffect(() => {
-    const fetchMonthlyRevenue = async () => {
-      try {
-        const data = await getRevernueYearly();
+useEffect(() => {
+  const fetchMonthlyRevenue = async () => {
+    try {
+      const data = await getRevernueYearly();
 
-        const labelList = data.map((item: any) => item.month);
-        const revenueList = data.map((item: any) => item.revenue);
+      const labelList = data.map((item: any) => item.month);
 
-        setLabelsMonthly(labelList);
-        setRevenuesMonthly(revenueList);
-      } catch (err) {
-        console.error("Lỗi khi fetch doanh thu tháng:", err);
-      }
-    };
+      // ép âm về 0
+      const revenueList = data.map((item: any) =>
+        item.revenue < 0 ? 0 : item.revenue
+      );
 
-    fetchMonthlyRevenue();
-  }, []);
+      setLabelsMonthly(labelList);
+      setRevenuesMonthly(revenueList);
+    } catch (err) {
+      console.error("Lỗi khi fetch doanh thu tháng:", err);
+    }
+  };
+
+  fetchMonthlyRevenue();
+}, []);
+
   const labels = ["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "CN"];
 
   const revenueData = {
@@ -114,31 +122,32 @@ const RevenueAndVisitsChart = () => {
   };
 
   const commonOptions = {
-    responsive: true,
-    plugins: {
-      tooltip: {
-        callbacks: {
-          label: function (context: TooltipItem<"line" | "bar">) {
-            const value = context.raw as number;
-            const label = context.dataset.label;
+  responsive: true,
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: function (context: TooltipItem<"line" | "bar">) {
+          const value = context.raw as number;
+          const label = context.dataset.label;
+          return `${label ?? ""}: ${value.toLocaleString("vi-VN")} ₫`;
+        },
+      },
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true, // ✅ chặn trục âm
+      ticks: {
+        callback: function (tickValue: string | number) {
+          return typeof tickValue === "number"
+            ? tickValue.toLocaleString("vi-VN")
+            : tickValue;
+        },
+      },
+    },
+  },
+};
 
-            return `${label ?? ""}: ${value.toLocaleString("vi-VN")} ₫`;
-          },
-        },
-      },
-    },
-    scales: {
-      y: {
-        ticks: {
-          callback: function (tickValue: string | number) {
-            return typeof tickValue === "number"
-              ? tickValue.toLocaleString("vi-VN")
-              : tickValue;
-          },
-        },
-      },
-    },
-  };
 
   return (
     <div className="charts-wrapper">

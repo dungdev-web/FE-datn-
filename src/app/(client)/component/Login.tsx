@@ -59,7 +59,7 @@ export default function Login() {
       const res = await loginUser({ usernameOrEmail, password });
 
       // Lưu user vào cookies và state
-      saveUserToCookies(res);
+      // saveUserToCookies(res);
       setLoginSuccess(true);
 
       // Hiển thị thông báo thành công
