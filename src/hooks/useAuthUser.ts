@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { checkToken } from "@/services/authService";
 import { useGlobalStore } from "@/store/useGlobalStore";
 
-export function useAuthUser(requiredRoles?: string[]) {
+// useAuthUser.ts
+export function useAuthUser(requiredRoles?: string[], requireAuth: boolean = false) {
   const user = useGlobalStore((state) => state.user);
   const setUser = useGlobalStore((state) => state.setUser);
   const router = useRouter();
@@ -21,12 +22,12 @@ export function useAuthUser(requiredRoles?: string[]) {
           if (requiredRoles && !requiredRoles.includes(data.user.role)) {
             router.replace("/403");
           }
-        } else {
+        } else if (requireAuth) {
           router.replace("/login");
         }
       } catch (err) {
         console.error("Token invalid:", err);
-        router.replace("/login");
+        if (requireAuth) router.replace("/login");
       } finally {
         setLoading(false);
       }
@@ -40,7 +41,8 @@ export function useAuthUser(requiredRoles?: string[]) {
       }
       setLoading(false);
     }
-  }, [user, setUser, requiredRoles, router]);
+  }, [user, setUser, requiredRoles, requireAuth, router]);
 
   return { user, loading };
 }
+

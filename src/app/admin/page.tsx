@@ -97,7 +97,7 @@ export default function Home_admin() {
     fetchData();
   }, []);
    if (loading) return <p>Đang kiểm tra quyền truy cập...</p>;
-  if (!user) return null; // tránh render nhầm
+  if (!user) return null; 
   return (
     <div>
       {/* <SideBar isCollapsed1={isCollapsed} setIsCollapsed1={setIsCollapsed} /> */}
