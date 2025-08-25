@@ -14,7 +14,7 @@ export default function GoogleCallback() {
     const code = searchParams.get("code");
 
     if (code) {
-      fetch(`${API_BASE_URL}/google/callback`, {
+      fetch(`${API_BASE_URL}/user/google/callback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),
@@ -25,6 +25,8 @@ export default function GoogleCallback() {
           if (data.user) {
             setUser(data.user);
           }
+          console.log("gg nè",data);
+          
           if (redirect) {
             // ưu tiên redirect param
             window.location.href = redirect;
