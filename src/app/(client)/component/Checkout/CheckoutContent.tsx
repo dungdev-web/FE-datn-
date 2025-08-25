@@ -462,7 +462,7 @@ export default function CheckoutContent() {
               country={"vn"}
               value={phone}
               onChange={setPhone}
-              inputClass="!w-full !border !px-4 !py-3 !rounded !border-gray-300 focus:!border-blue-500 focus:!outline-none"
+              inputClass="!w-full !border !px-4 !py-3 !rounded !border-gray-300 focus:!border-blue-500 focus:!outline-none !pl-[48px] !pr-[10px]"
               containerClass="!mb-3"
               placeholder="Số điện thoại"
             />
