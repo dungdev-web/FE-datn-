@@ -28,7 +28,7 @@ export async function loginUser(
 
     return { token: "mock-token-123", user };
   }
-  const res = await fetch(`${API_BASE_URL}/login`, {
+  const res = await fetch(`${API_BASE_URL}/user/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials), 
@@ -83,7 +83,7 @@ export async function loginWithGoogle(): Promise<{
 }
 // --------- CHECKTOKEN ---------
 export async function checkToken(): Promise<{ user: IUser } | null> {
-  const res = await fetch(`${API_BASE_URL}/check-token`, {
+  const res = await fetch(`${API_BASE_URL}/user/check-token`, {
     method: "GET",
     credentials: "include",
   });
@@ -103,7 +103,7 @@ export async function logoutUser(): Promise<{ message: string }> {
     return { message: "Đăng xuất mock thành công" };
   }
 
-  const res = await fetch(`${API_BASE_URL}/logout`, {
+  const res = await fetch(`${API_BASE_URL}/user/logout`, {
     method: "POST",
     credentials: "include",
   });
@@ -152,7 +152,7 @@ export async function registerUser(
     return { message: "OTP đã gửi. Vui lòng xác thực.", user: newUser, otp };
   }
 
-  const res = await fetch(`${API_BASE_URL}/register`, {
+  const res = await fetch(`${API_BASE_URL}/user/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(formData),
@@ -165,7 +165,7 @@ export async function registerUser(
 }
 export async function confirmEmailService(email: string, token: string) {
   try {
-    const response = await fetch(`${API_BASE_URL}/confirm-email`, {
+    const response = await fetch(`${API_BASE_URL}/user/confirm-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -264,7 +264,7 @@ export async function sendResetPassword(
     return { message: "Đã gửi mã OTP đến email", otp };
   }
 
-  const res = await fetch(`${API_BASE_URL}/forget`, {
+  const res = await fetch(`${API_BASE_URL}/user/forget`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -302,7 +302,7 @@ export async function resetPassword(
     return { message: "Đổi mật khẩu thành công" };
   }
 
-  const res = await fetch(`${API_BASE_URL}/reset-password`, {
+  const res = await fetch(`${API_BASE_URL}/user/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, otp, newPassword }),
@@ -354,7 +354,7 @@ export async function getAllUsers({
     if (user_id) params.append("user_id", String(user_id));
     if (phone) params.append("phone", phone);
 
-    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
+    const res = await fetch(`${API_BASE_URL}/user/all-user?${params.toString()}`);
 
     if (!res.ok) {
       throw new Error(`Lỗi server: ${res.status}`);
@@ -410,7 +410,7 @@ export async function getAllUsersV2({
     if (phone) params.append("phone", phone);
     if (search) params.append("search", search);
 
-    const res = await fetch(`${API_BASE_URL}/all-user?${params.toString()}`);
+    const res = await fetch(`${API_BASE_URL}/user/all-user?${params.toString()}`);
 
     if (!res.ok) {
       throw new Error(`Lỗi server: ${res.status}`);
@@ -452,7 +452,7 @@ export const updateUser = async (
   updateData: { role: string; status: number }
 ) => {
   try {
-    const res = await fetch(`${API_BASE_URL}/update-user/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/user/update-user/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

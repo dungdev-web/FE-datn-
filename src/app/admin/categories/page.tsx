@@ -6,6 +6,7 @@ import { ArrowUpDown } from "lucide-react";
 import { ICategory } from "@/types/ICategory";
 import Swal from "sweetalert2";
 import { deleteCategory, updateCategoryStatus } from "@/services/categoryService";
+import { API_BASE_URL } from "@/config/env";
 
 type SortOrder = "asc" | "desc";
 
@@ -54,7 +55,7 @@ export default function Categories() {
       }
 
       const res = await fetch(
-        `http://localhost:3000/category?${params.toString()}`
+        `${API_BASE_URL}/category?${params.toString()}`
       );
       if (!res.ok) throw new Error("Lỗi khi lấy danh mục");
       const json = await res.json();
@@ -311,7 +312,7 @@ export default function Categories() {
                 </td>
                 <td>
                   <img
-                    src={`http://localhost:3000/uploads/${cat.image}`}
+                    src={`${API_BASE_URL}/uploads/${cat.image}`}
                     alt={cat.name}
                     style={{ width: 50, height: 50, objectFit: "contain" }}
                   />

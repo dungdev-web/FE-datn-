@@ -89,7 +89,7 @@ export async function middleware(req: NextRequest) {
   }
 
   // /account tất cả user
-  if (pathname === "/account") {
+if (pathname === "/account") {
     console.log("✅ [User Authenticated] /account:", decoded?.email, "role:", role);
   }
 
