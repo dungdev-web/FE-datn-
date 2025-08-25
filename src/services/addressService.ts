@@ -13,7 +13,7 @@ export async function getAddressByUserId(
   userId: number
 ): Promise<AddressResponse> {
   try {
-    const res = await fetch(`${API_BASE_URL}/addresses/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/user/addresses/${userId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -36,7 +36,7 @@ export const getAddressByIdService = async (
   addressId: number
 ): Promise<AddressResponse | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/addressesbyid/${addressId}`, {
+    const res = await fetch(`${API_BASE_URL}/user/addressesbyid/${addressId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export const getAddressByIdService = async (
 };
 export async function getDefaultAddressService(userId: number): Promise<AddressResponse | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/user_default_address/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/user/user_default_address/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export async function updateAddress(
   }
 ): Promise<any> {
   try {
-    const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
+    const res = await fetch(`${API_BASE_URL}/user/addresses/${addressId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export async function addAddressService(data: {
 }) {
   console.log("🔍 Sending address payload:", data);
 
-  const response = await fetch(`${API_BASE_URL}/add-address`, {
+  const response = await fetch(`${API_BASE_URL}/user/add-address`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
@@ -152,7 +152,7 @@ export async function addAddressService(data: {
 }
 export async function deleteAddress(addressId: number): Promise<any> {
   try {
-    const res = await fetch(`${API_BASE_URL}/addresses/${addressId}`, {
+    const res = await fetch(`${API_BASE_URL}/user/addresses/${addressId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
