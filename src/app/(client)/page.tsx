@@ -5,10 +5,9 @@ import "swiper/css/autoplay";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useEffect, useState, useRef, use } from "react";
-import Show1sanpham from "./component/ProductHome";
-import BlogHome from "./component/Home/BlogHome";
-import CouponApp from "./component/Coupon";
-import FlashSale from "./component/FlashSale";
+
+import CouponApp from "@/app/(client)/component/Coupon";
+import FlashSale from "@/app/(client)/component/FlashSale";
 import { IProduct } from "@/types/product";
 import { API_BASE_URL } from "@/config/env";
 import {
@@ -18,10 +17,15 @@ import {
 } from "@/services/productService";
 import Link from "next/link";
 import Show2sanpham from "@/app/(client)/component/ProductTwoBox";
-import Banner3D from "src/app/(client)/component/Home/Banner3D";
-import HotProductIcons from "src/app/(client)/component/Products/HotProductIcons";
-import HotspotLookbook from "src/app/(client)/component/Home/HotspotProduct";
-
+import Banner3D from "@/app/(client)/component/Home/Banner3D";
+import HotProductIcons from "@/app/(client)/component/Products/HotProductIcons";
+import HotspotLookbook from "@/app/(client)/component/Home/HotspotProduct";
+import Show1sanpham from "@/app/(client)/component/ProductHome";
+import BlogHome from "./component/Home/BlogHome";
+import { ICategory } from "@/types/ICategory";
+import { getAllCategories } from "@/services/categoryService";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Grid } from "swiper/modules";
 export default function Home() {
   const [openIndex, setOpenIndex] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,13 +38,19 @@ export default function Home() {
   const [cateproducts2, serCateProducts2] = useState<IProduct[]>([]);
   const [cateproducts3, serCateProducts3] = useState<IProduct[]>([]);
   const [featureproducts, serFretureProducts] = useState<IProduct[]>([]);
-
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const videoURL = "https://www.youtube.com/embed/b7WP23NK12Q?autoplay=1";
 
   const handlePlay = () => {
     setIsPlaying(true);
   };
-
+  useEffect(() => {
+    async function fetchData() {
+      const data = await getAllCategories();
+      setCategories(data);
+    }
+    fetchData();
+  }, []);
   const handleClose = () => {
     setIsPlaying(false);
     if (videoRef.current) {
@@ -176,22 +186,42 @@ export default function Home() {
           <h4>Toàn bộ sản phẩm đều là hàng chính hãng</h4>
           <h1>DANH MỤC SẢN PHẨM</h1>
           <div className="category-main1">
-            <div className="category-main1-item">
-              <img src="/images/category/chaybo.webp" alt="" />
-              <h4>CHẠY BỘ</h4>
-            </div>
-            <div className="category-main1-item">
-              <img src="/images/category/leonui.webp" alt="" />
-              <h4>LEO NÚI</h4>
-            </div>
-            <div className="category-main1-item">
-              <img src="/images/category/quanvot.webp" alt="" />
-              <h4>QUẦN VỢT</h4>
-            </div>
-            <div className="category-main1-item">
-              <img src="/images/category/bongro.webp" alt="" />
-              <h4>GIÀY BÓNG RỔ</h4>
-            </div>
+            <Swiper
+              modules={[Navigation, Grid]} // thêm Grid
+              spaceBetween={20}
+              navigation
+              breakpoints={{
+                320: {
+                  slidesPerView: 2, // 2 ảnh 1 hàng
+                  grid: { rows: 2, fill: "row" }, // xuống hàng 2 dòng
+                  spaceBetween: 10,
+                },
+                640: {
+                  slidesPerView: 2,
+                  grid: { rows: 2, fill: "row" },
+                  spaceBetween: 15,
+                },
+                1024: {
+                  slidesPerView: 4,
+                  grid: { rows: 1 },
+                  spaceBetween: 20,
+                },
+              }}
+            >
+              {categories.map((cat) => (
+                <SwiperSlide key={cat.categories_id}>
+                  <div className="category-main1-item">
+                    <Link href={`/category/${cat.slug}`}>
+                      <img
+                        src={`${API_BASE_URL}/uploads/${cat.image}`}
+                        alt={cat.name}
+                      />
+                    </Link>
+                    <h4>{cat.name}</h4>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
         <div className="marquee-wrapper">
@@ -338,7 +368,8 @@ export default function Home() {
                           product.product_variants?.[0]?.stock_quantity ?? 0,
                         name: product.product_variants?.[0]?.name,
                       }}
-                      price={0} />
+                      price={0}
+                    />
                     <span className="tag-discount">-{discount}%</span>
                   </div>
                   <div className="hot-product-content">
@@ -455,12 +486,14 @@ export default function Home() {
                       <HotProductIcons
                         productId={productId}
                         variant={{
-                          id: product.product_variants?.[0]?.product_variants_id, // 👈 lấy product_variants_id từ DB
+                          id: product.product_variants?.[0]
+                            ?.product_variants_id, // 👈 lấy product_variants_id từ DB
                           stock_quantity:
                             product.product_variants?.[0]?.stock_quantity ?? 0,
                           name: product.product_variants?.[0]?.name,
                         }}
-                        price={0} />
+                        price={0}
+                      />
 
                       {discount > 0 && (
                         <span className="tag-discount">-{discount}%</span>

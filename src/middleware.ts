@@ -38,8 +38,10 @@ async function createAppToken(user: { id?: number; email: string; role: string }
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   let token = req.cookies.get("token")?.value;
+
   console.log("📥 [Incoming Request]:", pathname);
   console.log("🍪 [Token From Cookie]:", token);
+
   if (!token) {
     console.warn("⚠️ [No Token] Redirecting to /login");
     return NextResponse.redirect(new URL("/login", req.url));
@@ -48,49 +50,29 @@ export async function middleware(req: NextRequest) {
   let decoded = await verifyAppToken(token);
   let role = decoded?.role?.toLowerCase();
 
-  // log khi đã verify thành công
-  if (decoded) {
-    console.log("🔑 Decoded token:", decoded);
-    console.log("👤 Email:", decoded.email, "| Role:", role);
-  }
-
   // fallback cho Google token
   if (!decoded) {
     try {
       console.log("🔄 [Fallback] Trying to decode Google token...");
 
       const base64Payload = token.split(".")[1];
-      const googlePayload = JSON.parse(
-        Buffer.from(base64Payload, "base64").toString("utf-8")
-      );
-
-      console.log("🌐 Google token payload:", googlePayload);
+      const googlePayload = JSON.parse(Buffer.from(base64Payload, "base64").toString("utf-8"));
 
       console.log("🔑 [Google Token Payload]:", googlePayload);
 
       if (!googlePayload.email) throw new Error("Invalid Google token");
 
-      // lấy role từ googlePayload nếu có, mặc định là "user"
-      const roleFromGoogle = googlePayload.role
-        ? googlePayload.role.toLowerCase()
-        : "user";
+      // tạo JWT app token với role = 'user'
+      const appToken = await createAppToken({ email: googlePayload.email, role: "user" });
 
-      // tạo JWT app token với role dynamic
-      const appToken = await createAppToken({
-        email: googlePayload.email,
-        role: roleFromGoogle,
-        id: googlePayload.userId,
-      });
-
+      // set cookie mới
       const res = NextResponse.next();
-      res.cookies.set("token", appToken, {
-        httpOnly: true,
-        path: "/",
-        maxAge: 3600,
-      });
+      res.cookies.set("token", appToken, { httpOnly: true, path: "/", maxAge: 3600 });
 
+      // cập nhật decoded & role
       decoded = await verifyAppToken(appToken);
       role = decoded?.role?.toLowerCase();
+
       console.log("✅ [Google → AppToken Migration]:", decoded);
       return res;
     } catch (err) {
@@ -110,11 +92,10 @@ export async function middleware(req: NextRequest) {
   if (pathname === "/account") {
     console.log("✅ [User Authenticated] /account:", decoded?.email, "role:", role);
   }
-  
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account",],
+  matcher: ["/admin/:path*", "/account"],
 };

@@ -15,7 +15,7 @@ import { getCartByUserId } from "@/services/cartService";
 import { getWishlistByUserId } from "@/services/wishlistService";
 import { getCompareProduct } from "@/services/productService";
 import { useGlobalStore } from "@/store/useGlobalStore";
-import SearchWithSuggestions from "./SearchWithSuggestions";
+import SearchWithSuggestions from "@/app/(client)/component/SearchWithSuggestions";
 import Search from "./ShowSearch";
 
 export default function Header() {

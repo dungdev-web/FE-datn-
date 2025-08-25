@@ -10,11 +10,11 @@ import { getBrands } from "@/services/brandService";
 import { IBrand } from "@/types/IBrand";
 import "@/app/(client)/css/pagination.css";
 import { ChevronDown, ChevronRight, XCircle } from "lucide-react";
-import ProductIcons from "../../component/Products/ProductIcons";
-import SidebarFilter from "../../component/Products/SidebarFilter";
-import MobileSidebarFilter from "../../component/Products/MobileSidebarFilter";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 import { getFilteredProducts } from "@/services/productService";
+import SidebarFilter from "@/app/(client)/component/Products/SidebarFilter";
+import MobileSidebarFilter from "@/app/(client)/component/Products/MobileSidebarFilter";
 
 export default function CategoryPage() {
   const params = useParams();

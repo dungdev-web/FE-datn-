@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { getPostById } from "@/services/blogService";
 import { IBlog } from "@/types/blog";
-import AsideBlog from "../../component/Blog/AsideBlog";
+import AsideBlog from "@/app/(client)/component/Blog/AsideBlog";
 import DOMPurify from "dompurify";
 import { usePostsByCategory } from "@/hooks/useBlog";
 import { updateViewPost } from "@/services/blogService";

@@ -1,10 +1,10 @@
 "use client";
 
 import { IProduct } from "@/types/product";
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 import Link from "next/link";
-export default function Product4box(props: any) {
+export default function  Product4box(props: any) {
   const sp = props.sp as IProduct;
   if (!sp) return null;
 
@@ -41,7 +41,7 @@ export default function Product4box(props: any) {
               }
             />
           </Link>
-          <div className="hot-product-icons">
+        
             <ProductIcons
               productId={productId}
               variant={{
@@ -51,7 +51,7 @@ export default function Product4box(props: any) {
               }}
               price={0}
             />
-          </div>
+   
 
           {discountPercent > 0 && (
             <span className="tag-discount">-{discountPercent}%</span>

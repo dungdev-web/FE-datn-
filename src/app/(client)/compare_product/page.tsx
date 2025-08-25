@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { getCompareProduct } from "@/services/productService";
 import { ICompareProduct } from "@/types/product";
 import { checkToken } from "@/services/authService";
-import { useCompare } from "../component/ProductCompare/CompareContext";
+import { useCompare } from "@/app/(client)/component/ProductCompare/CompareContext";
 import { deleteCompareProduct } from "@/services/productService";
 import { useRemoveCompare } from "@/hooks/useAddToCompare";
 import Swal from "sweetalert2";

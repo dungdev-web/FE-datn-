@@ -9,7 +9,7 @@ import { IProduct } from "@/types/product";
 import { getDealProducts } from "@/services/productService";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import ProductIcons from "./Products/ProductIcons";
+import ProductIcons from "@/app/(client)/component/Products/ProductIcons";
 import { API_BASE_URL } from "@/config/env";
 export default function ProductSale() {
   const [dealProducts, setDealProducts] = useState<IProduct[]>([]);

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import ConfirmEmailOtpWrapper from "../component/Register/ConfirmEmailOtpWrapper";
+import ConfirmEmailOtpWrapper from "@/app/(client)/component/Register/ConfirmEmailOtpWrapper";
 
 export default function VerifyEmailPage() {
   return (

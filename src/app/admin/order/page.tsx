@@ -6,7 +6,7 @@ import {
 } from "@/services/dashboardService";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
-import exportStyledExcel from "../component_admin/Excel";
+import exportStyledExcel from "@/app/admin/component_admin/Excel";
 import { IOrder } from "@/types/Order";
 import Swal from "sweetalert2";
 import { updateOrderStatus } from "@/services/orderService";
