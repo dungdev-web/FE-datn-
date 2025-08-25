@@ -11,9 +11,12 @@ export function useAuthCookie() {
   };
 
   const getUserFromCookies = (): StoredUser => {
+      console.log( "token", Cookies.get("token"));
     return {
       token: Cookies.get("token") || null,
     };
+  
+    
   };
 
   return {
