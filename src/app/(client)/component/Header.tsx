@@ -251,9 +251,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  console.log("User trong Header:", user);
-  console.log("Role:", user?.role);
-  console.log("Header render, user:", user);
 
   return (
     <div className="header-nav-bg ">
