@@ -3,6 +3,7 @@ export interface IOrderItem {
   variant_id: any;
   order_items_id: number;
   variant: {
+    product_variants_id: any;
     stock_quantity: number;
     id: any;
     variant_id: number;

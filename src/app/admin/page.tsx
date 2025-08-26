@@ -72,7 +72,6 @@ export default function Home_admin() {
           getRecentOrders(),
         ]);
         console.log("📦 tổng theo năm:", recentOreders);
-
         setData({
           products,
           brands,
@@ -290,7 +289,7 @@ export default function Home_admin() {
                   <td>
                     {order.order_items.map((item: any, idx: number) => (
                       <div key={idx}>
-                        {item.variant.product.name} ({item.quantity} cái)
+                        {item.variant.product.name} ({item.quantity} đôi)
                       </div>
                     ))}
                   </td>
@@ -324,7 +323,7 @@ export default function Home_admin() {
                   <div className="product-info">
                     <p className="name">{item.name}</p>
                     <p className="sold">
-                      Đã bán: <strong>{item.sold_count}</strong> cái
+                      Đã bán: <strong>{item.sold_count}</strong> đôiđôi
                     </p>
                     <p className="revenue">
                       Doanh thu:{" "}
@@ -361,7 +360,7 @@ export default function Home_admin() {
                     </p>
                     <p className="stock">
                       Tồn kho:{" "}
-                      <span className="low">{item.stock_quantity}</span> cái
+                      <span className="low">{item.stock_quantity}</span> đôi
                     </p>
                   </div>
                 </div>

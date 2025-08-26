@@ -360,77 +360,81 @@ export default function OrderDetail() {
   };
 
   const handleBuyAgain = async () => {
-  if (!order?.order_items || order.order_items.length === 0) {
-    Swal.fire({
-      icon: "info",
-      title: "Không có sản phẩm",
-      text: "Đơn hàng này không có sản phẩm nào để mua lại.",
-    });
-    return;
-  }
-
-  try {
-    for (const item of order.order_items) {
-      const variant = item.variant; // 👈 lấy luôn object variant
-      const stock = variant?.stock_quantity ?? 0;
-      const requestedQty = item.quantity;
-      const productName = getProductName(item);
-
-      if (!variant) continue; // nếu ko có variant thì bỏ qua
-
-      if (stock <= 0) {
-        await Swal.fire({
-          icon: "info",
-          title: "Hết hàng",
-          text: `${productName} hiện đã hết hàng.`,
-        });
-        continue;
-      }
-
-      if (stock < requestedQty) {
-        const result = await Swal.fire({
-          icon: "warning",
-          title: "Số lượng không đủ",
-          text: `${productName} chỉ còn ${stock} sản phẩm. Bạn có muốn thêm vào giỏ hàng không?`,
-          showCancelButton: true,
-          confirmButtonText: "Đồng ý",
-          cancelButtonText: "Hủy",
-        });
-
-        if (!result.isConfirmed) continue;
-
-        // Nếu đồng ý → thêm số lượng còn lại
-        await handleAddToCart({
-          variant,      // 👈 truyền object
-          quantity: stock,
-        });
-      } else {
-        // Số lượng đủ
-        await handleAddToCart({
-          variant,      // 👈 truyền object
-          quantity: requestedQty,
-        });
-      }
+    if (!order?.order_items || order.order_items.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Không có sản phẩm",
+        text: "Đơn hàng này không có sản phẩm nào để mua lại.",
+      });
+      return;
     }
 
-    Swal.fire({
-      icon: "success",
-      title: "Đã thêm sản phẩm vào giỏ hàng!",
-      showConfirmButton: false,
-      timer: 1500,
-    }).then(() => {
-      router.push("/cart");
-    });
-  } catch (error) {
-    console.error("Lỗi khi mua lại:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Lỗi",
-      text: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!",
-    });
-  }
-};
+    try {
+      for (const item of order.order_items) {
+        const rawVariant = item.variant; // dữ liệu variant trả về từ API
+        const stock = rawVariant?.stock_quantity ?? 0;
+        const requestedQty = item.quantity;
+        const productName = getProductName(item);
 
+        if (!rawVariant) continue;
+
+        // Chuẩn hóa về đúng interface Variant mà useAddToCart cần
+        const normalizedVariant = {
+          id: rawVariant.product_variants_id, // 👈 map sang id
+          stock_quantity: rawVariant.stock_quantity,
+          name: rawVariant.product?.name || "Sản phẩm",
+        };
+
+        if (stock <= 0) {
+          await Swal.fire({
+            icon: "info",
+            title: "Hết hàng",
+            text: `${productName} hiện đã hết hàng.`,
+          });
+          continue;
+        }
+
+        if (stock < requestedQty) {
+          const result = await Swal.fire({
+            icon: "warning",
+            title: "Số lượng không đủ",
+            text: `${productName} chỉ còn ${stock} sản phẩm. Bạn có muốn thêm vào giỏ hàng không?`,
+            showCancelButton: true,
+            confirmButtonText: "Đồng ý",
+            cancelButtonText: "Hủy",
+          });
+
+          if (!result.isConfirmed) continue;
+
+          await handleAddToCart({
+            variant: normalizedVariant,
+            quantity: stock,
+          });
+        } else {
+          await handleAddToCart({
+            variant: normalizedVariant,
+            quantity: requestedQty,
+          });
+        }
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Đã thêm sản phẩm vào giỏ hàng!",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        router.push("/cart");
+      });
+    } catch (error) {
+      console.error("Lỗi khi mua lại:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!",
+      });
+    }
+  };
 
   const handleContactStore = () => {
     // Logic liên hệ cửa hàng
@@ -649,19 +653,27 @@ export default function OrderDetail() {
           </div>
           <ul className="breadcrumb">
             <li className="home">
-              <Link href="/"><span>Trang chủ</span></Link>
+              <Link href="/">
+                <span>Trang chủ</span>
+              </Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account"><span>Tài khoản</span></Link>
+              <Link href="/account">
+                <span>Tài khoản</span>
+              </Link>
               <i className="fa fa-angle-right" />
             </li>
             <li className="home">
-              <Link href="/account/order"><span>Đơn hàng</span></Link>
+              <Link href="/account/order">
+                <span>Đơn hàng</span>
+              </Link>
               <i className="fa fa-angle-right" />
             </li>
             <li>
-              <strong><span>Chi tiết đơn hàng</span></strong>
+              <strong>
+                <span>Chi tiết đơn hàng</span>
+              </strong>
             </li>
           </ul>
         </div>
