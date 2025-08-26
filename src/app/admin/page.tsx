@@ -28,6 +28,7 @@ import {
 } from "@/services/dashboardService";
 import { useAuthUser } from "@/hooks/useAuthUser";
 
+import Link from "next/link";
 export default function Home_admin() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [data, setData] = useState<any>({});
@@ -378,17 +379,19 @@ export default function Home_admin() {
           <ul className="notification-list">
             {data.pendingOrders?.data.length > 0 ? (
               data.pendingOrders.data.map((order: any, index: number) => (
-                <li key={index}>
-                  <strong>Đơn #{order.orders_id}</strong> – Khách:{" "}
-                  <em>{order.user.name}</em>
-                  <br />
-                  Ngày đặt:{" "}
-                  {new Date(order.created_at).toLocaleDateString("vi-VN")} –
-                  Tổng tiền:{" "}
-                  <strong>
-                    {order?.total_amount.toLocaleString("vi-VN")}₫
-                  </strong>
-                </li>
+                <Link href="/admin/order">
+                  <li key={index}>
+                    <strong>Đơn #{order.orders_id}</strong> – Khách:{" "}
+                    <em>{order.user.name}</em>
+                    <br />
+                    Ngày đặt:{" "}
+                    {new Date(order.created_at).toLocaleDateString("vi-VN")} –
+                    Tổng tiền:{" "}
+                    <strong>
+                      {order?.total_amount.toLocaleString("vi-VN")}₫
+                    </strong>
+                  </li>
+                </Link>
               ))
             ) : (
               <li>Không có đơn hàng nào đang chờ xác nhận</li>

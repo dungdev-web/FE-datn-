@@ -734,7 +734,7 @@ export default function Add_pro() {
         style={{ display: "none" }}
       >
         <div className="form-group">
-          <label>Nhập biến thể sản phẩm (Màu - Size - Giá - Số lượng)</label>
+          <label>Nhập biến thể sản phẩm (Màu - ảnh sản phẩm - size - Số lượng)</label>
           <div id="variant-list">
             {variants.map((variant, index) => (
               <div

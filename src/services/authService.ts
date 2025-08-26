@@ -194,8 +194,7 @@ export async function getInfoUser(id: number | string): Promise<IUser> {
     if (!user) throw new Error("Không tìm thấy người dùng");
     return user;
   }
-
-  const res = await fetch(`${API_BASE_URL}/user/${id}`);
+  const res = await fetch(`${API_BASE_URL}/user/user/${id}`);
   if (!res.ok) throw new Error("Lỗi khi lấy thông tin người dùng");
   const data = await res.json();
   return data.user;
