@@ -30,6 +30,13 @@ export const getStatusText = (status: string)=> {
     default: return "Không xác định";
   }
 }
+export const getPaymentStatusText = (status: string)=> {
+  switch (status) {
+    case "PROCESSING": return "Chưa thanh toán";
+    case "PAID": return "Đã thanh toán";
+    default: return "Không xác định";
+  }
+}
 
 // Format ngày (ISO -> dd-mm-yyyy)
 export const formatDate = (dateString: string)=> {

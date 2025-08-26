@@ -3,6 +3,7 @@ import {
   getRecentOrders,
   getStatusText,
   getAllCategoryProduct,
+  getPaymentStatusText,
 } from "@/services/dashboardService";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
@@ -498,9 +499,15 @@ export default function OrderPage() {
                       </span>
                     </li>
                     <li>
-                      <strong>Trạng thái:</strong>{" "}
+                      <strong>Trạng thái vận chuyển:</strong>{" "}
                       <span className={`badge status-${selectedOrder.status}`}>
                         {getStatusText(selectedOrder.status)}
+                      </span>
+                    </li>
+                    <li>
+                      <strong>Trạng thái thanh toán:</strong>{" "}
+                      <span className={`badge status-${selectedOrder.status}`}>
+                        {getPaymentStatusText(selectedOrder.payment_status)}
                       </span>
                     </li>
                   </>
