@@ -814,7 +814,7 @@ input.btn-primary[type="submit"] {
   }
 }
 
-.coupon-section {
+.coupon-section1 {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
@@ -824,12 +824,12 @@ input.btn-primary[type="submit"] {
 }
 
 @media (max-width: 768px) {
-  .coupon-section {
+  .coupon-section1 {
     gap: 0;
   }
 }
 
-.coupon {
+.coupon1 {
   width: 30%;
   background: white;
   border: 2px dashed #ccc;
@@ -840,8 +840,8 @@ input.btn-primary[type="submit"] {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.coupon::before,
-.coupon::after {
+.coupon1::before,
+.coupon1::after {
   content: "";
   width: 10px;
   background: #fff;
@@ -851,7 +851,7 @@ input.btn-primary[type="submit"] {
   z-index: 2;
 }
 
-.coupon::before {
+.coupon1::before {
   left: 80%;
   border-left: 1px dashed #ccc;
 }
@@ -986,7 +986,7 @@ input.btn-primary[type="submit"] {
 
 /* Tablet */
 @media (max-width: 992px) {
-  .coupon {
+  .coupon1 {
     width: 45%;
     /* 2 coupon trên 1 hàng */
   }
@@ -994,7 +994,7 @@ input.btn-primary[type="submit"] {
 
 /* Mobile */
 @media (max-width: 600px) {
-  .coupon {
+  .coupon1 {
     width: 90%;
     /* 1 coupon trên 1 hàng */
   }

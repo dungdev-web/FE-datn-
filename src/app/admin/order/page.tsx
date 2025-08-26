@@ -60,9 +60,17 @@ export default function OrderPage() {
 
   const handleOpenModal = (type: "view" | "update", order: any) => {
     setSelectedOrder(order);
-    if (type === "view") setIsViewModalOpen(true);
-    else if (type === "update") setIsUpdateModalOpen(true);
+
+    if (type === "update") {
+      setOrderStatus(order.status); // ✅ gán đúng trạng thái hiện tại
+      setIsUpdateModalOpen(true);
+    }
+
+    if (type === "view") {
+      setIsViewModalOpen(true);
+    }
   };
+
   const handleUpdateClick = async () => {
     if (!selectedOrder?.orders_id) {
       console.error("orders_id is undefined");
@@ -517,7 +525,7 @@ export default function OrderPage() {
             <div className="modal-header">
               <h3>Cập nhật trạng thái</h3>
               <span
-                className="close-icon"
+                className="close-icon cursor-pointer"
                 onClick={() => handleCloseModal("update")}
               >
                 &times;
@@ -536,10 +544,10 @@ export default function OrderPage() {
                   .filter((status) => {
                     const currentIndex = statusOrderFlow.indexOf(orderStatus);
                     const nextIndex = statusOrderFlow.indexOf(status);
-                    return (
-                      status === "cancelled" || // luôn cho phép hủy
-                      nextIndex >= currentIndex // không cho quay lại
-                    );
+
+                    if (currentIndex === -1) return true; // lần đầu chưa set thì show tất cả
+
+                    return status === "cancelled" || nextIndex >= currentIndex;
                   })
                   .map((status) => (
                     <option key={status} value={status}>

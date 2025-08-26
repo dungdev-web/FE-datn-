@@ -280,7 +280,7 @@ export default function Home_admin() {
                 <tr key={index}>
                   <td>{order.orders_id}</td>
                   <td>{order.user.name}</td>
-                  <td>{order.user.phone || "Không có số điện thoại"}</td>
+                  <td>{order?.shipping_address?.phone|| "Không có số điện thoại"}</td>
                   <td>
                     <span className={`status-label status-${order.status}`}>
                       {getStatusText(order.status)}

@@ -30,7 +30,7 @@ function CouponCard({
   onSaveCoupon: (code: string) => void;
 }) {
   return (
-    <div className="coupon">
+    <div className="coupon1">
       <div className="left-part">
         <div className="code">Mã: {code}</div>
         <div className="discount-box">
@@ -215,7 +215,7 @@ export default function MyVoucher() {
               <AccountSidebar  user={user}/>
             </div>
             <div className="col-xs-12 col-sm-12 col-lg-9">
-              <div className="coupon-section">
+              <div className="coupon-section1">
                 {coupons.length > 0 ? (
                   coupons.map((coupon, index) => (
                     <CouponCard
