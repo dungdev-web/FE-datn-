@@ -57,3 +57,10 @@ export const getCountPostCategories = () => fetchDashboardData("post-categories"
 export const getCountOrders = () => fetchDashboardData("orders");
 export const getRecentOrders = (query = "") => fetchDashboardData("recent-orders?" + query);
 export const getAllCategoryProduct = ()=> fetchDashboardData("category_product");
+export const getPaymentStatusText = (status: string)=> {
+  switch (status) {
+    case "PROCESSING": return "Chưa thanh toán";
+    case "PAID": return "Đã thanh toán";
+    default: return "Không xác định";
+  }
+}

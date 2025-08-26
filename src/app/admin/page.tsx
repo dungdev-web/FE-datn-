@@ -96,8 +96,8 @@ export default function Home_admin() {
     };
     fetchData();
   }, []);
-   if (loading) return <p>Đang kiểm tra quyền truy cập...</p>;
-  if (!user) return null; 
+  if (loading) return <p>Đang kiểm tra quyền truy cập...</p>;
+  if (!user) return null;
   return (
     <div>
       {/* <SideBar isCollapsed1={isCollapsed} setIsCollapsed1={setIsCollapsed} /> */}
@@ -280,7 +280,9 @@ export default function Home_admin() {
                 <tr key={index}>
                   <td>{order.orders_id}</td>
                   <td>{order.user.name}</td>
-                  <td>{order.user.phone || "Không có số điện thoại"}</td>
+                  <td>
+                    {order?.shipping_address?.phone || "Không có số điện thoại"}
+                  </td>
                   <td>
                     <span className={`status-label status-${order.status}`}>
                       {getStatusText(order.status)}
@@ -289,7 +291,7 @@ export default function Home_admin() {
                   <td>
                     {order.order_items.map((item: any, idx: number) => (
                       <div key={idx}>
-                        {item.variant.product.name} ({item.quantity} đôi)
+                        {item.variant.product.name} ({item.quantity} cái)
                       </div>
                     ))}
                   </td>

@@ -3,6 +3,7 @@ import {
   getRecentOrders,
   getStatusText,
   getAllCategoryProduct,
+  getPaymentStatusText,
 } from "@/services/dashboardService";
 import { useState, useEffect } from "react";
 import "../css/order_admin.css";
@@ -60,9 +61,17 @@ export default function OrderPage() {
 
   const handleOpenModal = (type: "view" | "update", order: any) => {
     setSelectedOrder(order);
-    if (type === "view") setIsViewModalOpen(true);
-    else if (type === "update") setIsUpdateModalOpen(true);
+
+    if (type === "update") {
+      setOrderStatus(order.status); // ✅ gán đúng trạng thái hiện tại
+      setIsUpdateModalOpen(true);
+    }
+
+    if (type === "view") {
+      setIsViewModalOpen(true);
+    }
   };
+
   const handleUpdateClick = async () => {
     if (!selectedOrder?.orders_id) {
       console.error("orders_id is undefined");
@@ -72,13 +81,32 @@ export default function OrderPage() {
     const currentIndex = statusOrderFlow.indexOf(selectedOrder.status);
     const newIndex = statusOrderFlow.indexOf(orderStatus);
 
-    if (orderStatus !== "cancelled" && newIndex < currentIndex) {
+    // Nếu Completed rồi thì không cho đổi nữa
+    if (selectedOrder.status === "completed") {
+      await Swal.fire({
+icon: "info",
+        title: "Đơn hàng đã hoàn thành",
+        text: "Không thể thay đổi trạng thái sau khi đã hoàn thành.",
+        didOpen: () => {
+          const swalContainer = document.querySelector(
+            ".swal2-container"
+          ) as HTMLElement;
+          if (swalContainer) {
+            swalContainer.style.zIndex = "9999";
+          }
+        },
+      });
+      return;
+    }
+
+    // Không cho quay lùi, chỉ cho đi tới (hoặc Cancel nếu chưa Completed)
+    if (orderStatus !== "cancelled" && newIndex !== currentIndex + 1) {
       await Swal.fire({
         icon: "warning",
-        title: "Không thể quay lại trạng thái trước",
-        text: `Không thể thay đổi từ "${getStatusText(
+        title: "Không hợp lệ",
+        text: `Bạn chỉ có thể chuyển từ "${getStatusText(
           selectedOrder.status
-        )}" về "${getStatusText(orderStatus)}"`,
+        )}" sang bước kế tiếp.`,
         didOpen: () => {
           const swalContainer = document.querySelector(
             ".swal2-container"
@@ -159,7 +187,7 @@ export default function OrderPage() {
       // Nếu click lại cùng 1 field -> đảo chiều asc/desc
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
-      // Nếu click field khác -> set field mới và reset asc
+// Nếu click field khác -> set field mới và reset asc
       setSortField(field);
       setSortOrder("asc");
     }
@@ -251,7 +279,7 @@ export default function OrderPage() {
                 />
               </th>
               <th>Thao tác</th>
-            </tr>
+</tr>
             <tr className="filter-row">
               <th>
                 <input type="text" placeholder="Lọc đơn..." />
@@ -330,7 +358,7 @@ export default function OrderPage() {
                   <i
                     className="fa-solid fa-eye view-icon"
                     title="Xem"
-                    onClick={() => handleOpenModal("view", order)}
+onClick={() => handleOpenModal("view", order)}
                   ></i>
                   <i
                     className="fa-solid fa-rotate view-status-icon"
@@ -416,7 +444,7 @@ export default function OrderPage() {
                       key={index}
                       className="!p-4 border rounded-lg shadow-sm bg-white !block"
                     >
-                      <div className="!mb-2 text-base font-semibold text-gray-800">
+<div className="!mb-2 text-base font-semibold text-gray-800">
                         <span>Sản phẩm: </span>
                         <span className="font-bold">
                           {item.variant?.product?.name}
@@ -484,15 +512,21 @@ export default function OrderPage() {
                       <span>{selectedOrder.payment_method?.name_method}</span>
                     </li>
                     <li>
-                      <strong>Tổng tiền:</strong>{" "}
+<strong>Tổng tiền:</strong>{" "}
                       <span className="text-red-600 font-medium">
                         {selectedOrder.total_amount.toLocaleString("vi")} VNĐ
                       </span>
                     </li>
                     <li>
-                      <strong>Trạng thái:</strong>{" "}
+                      <strong>Trạng thái vận chuyển:</strong>{" "}
                       <span className={`badge status-${selectedOrder.status}`}>
                         {getStatusText(selectedOrder.status)}
+                      </span>
+                    </li>
+                    <li>
+                      <strong>Trạng thái thanh toán:</strong>{" "}
+                      <span className={`badge status-${selectedOrder.status}`}>
+                        {getPaymentStatusText(selectedOrder.payment_status)}
                       </span>
                     </li>
                   </>
@@ -517,7 +551,7 @@ export default function OrderPage() {
             <div className="modal-header">
               <h3>Cập nhật trạng thái</h3>
               <span
-                className="close-icon"
+                className="close-icon cursor-pointer"
                 onClick={() => handleCloseModal("update")}
               >
                 &times;
@@ -534,12 +568,17 @@ export default function OrderPage() {
               >
                 {statusOrderFlow
                   .filter((status) => {
+                    // Nếu chưa có trạng thái hiện tại → hiển thị tất cả
+                    if (!orderStatus) return true;
+
                     const currentIndex = statusOrderFlow.indexOf(orderStatus);
                     const nextIndex = statusOrderFlow.indexOf(status);
-                    return (
-                      status === "cancelled" || // luôn cho phép hủy
-                      nextIndex >= currentIndex // không cho quay lại
-                    );
+
+                    // Cho phép chọn "cancelled" ở bất kỳ bước nào
+                    if (status === "cancelled") return true;
+
+                    // Chỉ cho phép đi tới trạng thái hiện tại hoặc tiếp theo
+                    return nextIndex >= currentIndex;
                   })
                   .map((status) => (
                     <option key={status} value={status}>
@@ -549,7 +588,7 @@ export default function OrderPage() {
               </select>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-close" onClick={handleUpdateClick}>
+<button className="btn btn-close" onClick={handleUpdateClick}>
                 Cập nhật
               </button>
             </div>
