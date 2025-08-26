@@ -355,10 +355,13 @@ export default function OrderDetail() {
     router.push(`/account/order/track/${orderId}`);
   };
 
-  const handleReviewProducts = () => {
-    router.push(`/account/order/review/${orderId}`);
-  };
-
+const handleReviewProducts = (orderItem: any) => {
+  const productId = orderItem?.variant?.product?.products_id;
+  if (productId) {
+    router.push(`/product/${productId}?tab=reviews`);
+  }
+};
+console.log(order)
   const handleBuyAgain = async () => {
   if (!order?.order_items || order.order_items.length === 0) {
     Swal.fire({
@@ -531,23 +534,29 @@ export default function OrderDetail() {
         );
         break;
       case "completed":
-        buttons.push(
-          <button
-            key="review"
-            onClick={handleReviewProducts}
-            className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
-          >
-            Đánh giá sản phẩm
-          </button>,
-          <button
-            key="buy-again"
-            onClick={handleBuyAgain}
-            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
-          >
-            Mua lại
-          </button>
-        );
-        break;
+  // Tạo button đánh giá cho từng sản phẩm
+  order?.order_items?.forEach((item, index) => {
+    buttons.push(
+      <button
+        key={`review-${index}`}
+        onClick={() => handleReviewProducts(item)}
+        className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+      >
+        Đánh giá {item.variant?.product?.name || 'sản phẩm'}
+      </button>
+    );
+  });
+
+  buttons.push(
+    <button
+      key="buy-again"
+      onClick={handleBuyAgain}
+      className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+    >
+      Mua lại
+    </button>
+  );
+  break;
 
       case "cancelled":
         buttons.push(
