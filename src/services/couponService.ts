@@ -59,7 +59,7 @@ export async function saveUserCoupon(
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/user/user-vouchers`, {
+    const res = await fetch(`${API_BASE_URL}/user-vouchers`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

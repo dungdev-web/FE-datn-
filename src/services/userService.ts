@@ -5,7 +5,7 @@ export async function changePasswordService(data: {
   oldPassword: string;
   newPassword: string;
 }) {
-  const response = await fetch(`${API_BASE_URL}/user/change-pass`, {
+  const response = await fetch(`${API_BASE_URL}/change-pass`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -35,7 +35,7 @@ export async function updateUserService(data: {
   if (data.email) formData.append("email", data.email);
   if (data.phone) formData.append("phone", data.phone);
 
-  const response = await fetch(`${API_BASE_URL}/user/update`, {
+  const response = await fetch(`${API_BASE_URL}/update`, {
     method: "PUT",
     credentials: "include",
     body: formData,
@@ -54,7 +54,7 @@ export async function uploadAvatarService(userId: number, avatar: File) {
   formData.append("userId", userId.toString());
   formData.append("avatar", avatar);
 
-  const response = await fetch(`${API_BASE_URL}/user/update`, {
+  const response = await fetch(`${API_BASE_URL}/update`, {
     method: "PUT",
     credentials: "include",
     body: formData,
@@ -69,7 +69,7 @@ export async function uploadAvatarService(userId: number, avatar: File) {
   return result.user;
 }
 export async function getUserProfileService(userId: number) {
-  const response = await fetch(`${API_BASE_URL}/user/profile/${userId}`, {
+  const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
     method: "GET",
     credentials: "include",
   });

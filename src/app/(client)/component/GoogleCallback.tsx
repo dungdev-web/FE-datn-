@@ -14,7 +14,7 @@ export default function GoogleCallback() {
     const code = searchParams.get("code");
 
     if (code) {
-      fetch(`${API_BASE_URL}/user/google/callback`, {
+      fetch(`${API_BASE_URL}/google/callback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code }),

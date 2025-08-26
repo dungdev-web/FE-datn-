@@ -137,7 +137,7 @@ export async function getMockCartByUser(userId: number): Promise<ICart | null> {
     return carts.find((c) => c.user_id === userId) || null;
   }
   try {
-    const res = await fetch(`${API_BASE_URL}/user/get-cart/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -177,7 +177,7 @@ export const getCartByUserId = async (
   userId: number
 ): Promise<(ICart & { items: ICartItem[] }) | null> => {
   try {
-    const res = await fetch(`${API_BASE_URL}/user/get-cart/${userId}`, {
+    const res = await fetch(`${API_BASE_URL}/get-cart/${userId}`, {
       method: "GET",
       credentials: "include",
       headers: {

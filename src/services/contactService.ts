@@ -7,7 +7,7 @@ export async function sendContactToAdmin(data: {
   phone: string;
   message: string;
 }) {
-  const res = await fetch(`${API_BASE_URL}/user/contact`, {
+  const res = await fetch(`${API_BASE_URL}/contact`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -21,7 +21,7 @@ export async function sendConfirmationToUser(data: {
   name: string;
   email: string;
 }) {
-  const res = await fetch(`${API_BASE_URL}/user/send`, {
+  const res = await fetch(`${API_BASE_URL}/send`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
