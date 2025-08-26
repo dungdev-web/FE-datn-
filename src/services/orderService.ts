@@ -16,7 +16,7 @@ export interface GetOrdersParams {
 export const getOrderDetailService = async (orderId: number) => {
   try {
     console.log("Fetching order detail for ID:", orderId);
-    const res = await fetch(`${API_BASE_URL}/user/orders/${orderId}`);
+    const res = await fetch(`${API_BASE_URL}/orders/${orderId}`);
 
     if (!res.ok) {
       const errData = await res.json();
@@ -83,7 +83,7 @@ export const getOrdersByUserService = async ({
 
 export async function updateOrderStatus(orderId: number, status: string) {
   try {
-    const response = await fetch(`${API_BASE_URL}/user/update-order-status/${orderId}`, {
+    const response = await fetch(`${API_BASE_URL}/update-order-status/${orderId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

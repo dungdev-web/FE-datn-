@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
   }
 
   try {
-    const res = await fetch(`${API_BASE_URL}/user/check-token`, {
+    const res = await fetch(`${API_BASE_URL}/check-token`, {
       method: "GET",
       headers: {
         cookie: `token=${token}`, // tự attach cookie

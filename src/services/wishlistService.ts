@@ -9,7 +9,7 @@ import { API_BASE_URL } from "@/config/env";
 export const getWishlistByUserId = async (
   userId: number
 ): Promise<IWishlistItemWithProduct[]> => {
-  const response = await fetch(`${API_BASE_URL}/user/wishlist/${userId}`, {
+  const response = await fetch(`${API_BASE_URL}/wishlist/${userId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

@@ -292,7 +292,6 @@ textarea {
   background: #fff;
   border: 2px dashed #ccc;
   border-radius: 6px;
-  /* overflow: hidden; */
   transition: all 0.3s ease;
   cursor: pointer;
 }
