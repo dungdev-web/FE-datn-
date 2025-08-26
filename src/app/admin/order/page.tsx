@@ -81,13 +81,32 @@ export default function OrderPage() {
     const currentIndex = statusOrderFlow.indexOf(selectedOrder.status);
     const newIndex = statusOrderFlow.indexOf(orderStatus);
 
-    if (orderStatus !== "cancelled" && newIndex < currentIndex) {
+    // Nếu Completed rồi thì không cho đổi nữa
+    if (selectedOrder.status === "completed") {
+      await Swal.fire({
+        icon: "info",
+        title: "Đơn hàng đã hoàn thành",
+        text: "Không thể thay đổi trạng thái sau khi đã hoàn thành.",
+        didOpen: () => {
+          const swalContainer = document.querySelector(
+            ".swal2-container"
+          ) as HTMLElement;
+          if (swalContainer) {
+            swalContainer.style.zIndex = "9999";
+          }
+        },
+      });
+      return;
+    }
+
+    // Không cho quay lùi, chỉ cho đi tới (hoặc Cancel nếu chưa Completed)
+    if (orderStatus !== "cancelled" && newIndex !== currentIndex + 1) {
       await Swal.fire({
         icon: "warning",
-        title: "Không thể quay lại trạng thái trước",
-        text: `Không thể thay đổi từ "${getStatusText(
+        title: "Không hợp lệ",
+        text: `Bạn chỉ có thể chuyển từ "${getStatusText(
           selectedOrder.status
-        )}" về "${getStatusText(orderStatus)}"`,
+        )}" sang bước kế tiếp.`,
         didOpen: () => {
           const swalContainer = document.querySelector(
             ".swal2-container"
@@ -549,12 +568,17 @@ export default function OrderPage() {
               >
                 {statusOrderFlow
                   .filter((status) => {
+                    // Nếu chưa có trạng thái hiện tại → hiển thị tất cả
+                    if (!orderStatus) return true;
+
                     const currentIndex = statusOrderFlow.indexOf(orderStatus);
                     const nextIndex = statusOrderFlow.indexOf(status);
 
-                    if (currentIndex === -1) return true; // lần đầu chưa set thì show tất cả
+                    // Cho phép chọn "cancelled" ở bất kỳ bước nào
+                    if (status === "cancelled") return true;
 
-                    return status === "cancelled" || nextIndex >= currentIndex;
+                    // Chỉ cho phép đi tới trạng thái hiện tại hoặc tiếp theo
+                    return nextIndex >= currentIndex;
                   })
                   .map((status) => (
                     <option key={status} value={status}>

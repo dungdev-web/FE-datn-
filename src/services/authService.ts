@@ -28,7 +28,7 @@ export async function loginUser(
 
     return { token: "mock-token-123", user };
   }
-  const res = await fetch(`${API_BASE_URL}/login`, {
+  const res = await fetch(`${API_BASE_URL}/user/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(credentials), 

@@ -6,74 +6,12 @@ import { logoutUser as apiLogoutUser } from "@/services/authService";
 import { API_BASE_URL } from "@/config/env";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+
+import { getNotification } from "@/services/dashboardService";
 interface HeaderAdminProps {
   toggleSidebar: () => void;
 }
-const notifications = [
-  {
-    id: 1,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "UI/UX Design",
-    time: "2 min ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...",
-    date: "today",
-  },
-  {
-    id: 2,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "Message",
-    time: "1 hour ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500...",
-    date: "today",
-  },
-  {
-    id: 3,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "Forms",
-    time: "2 hour ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500...",
-    date: "yesterday",
-  },
-  {
-    id: 4,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "Forms",
-    time: "2 hour ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500...",
-    date: "yesterday",
-  },
-  {
-    id: 5,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "Forms",
-    time: "2 hour ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500...",
-    date: "yesterday",
-  },
-  {
-    id: 6,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "Forms",
-    time: "2 hour ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500...",
-    date: "yesterday",
-  },
-  {
-    id: 7,
-    avatar: "/images/logo/anhdep.jpg",
-    title: "Forms",
-    time: "2 hour ago",
-    content:
-      "Lorem Ipsum has been the industry's standard dummy text ever since the 1500...",
-    date: "yesterday",
-  },
-];
+
 export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
   const [showDarkMenu, setShowDarkMenu] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -83,7 +21,31 @@ export default function Header_admin({ toggleSidebar }: HeaderAdminProps) {
   const [openNote, setOpenNote] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRef1 = useRef<HTMLDivElement>(null);
-const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  const router = useRouter();
+  useEffect(() => {
+  async function fetchNotifications() {
+    setLoading(true);
+    try {
+      const res = await getNotification();
+
+      if (res.success) {
+        setNotifications(res.data); // chỉ lấy mảng data
+      } else {
+        toast.error("Không thể lấy thông báo");
+      }
+    } catch (err: any) {
+      toast.error("Không thể lấy thông báo");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchNotifications();
+}, []);
 
   // Đóng khi click ra ngoài
   useEffect(() => {
@@ -109,15 +71,15 @@ const router = useRouter();
       document.removeEventListener("mousedown", handleClickOutsideNote);
   }, []);
   const handleLogout = async () => {
-  try {
-    await apiLogoutUser();
-    toast.success("Đăng xuất thành công");
-    router.push("/login"); // hoặc "/" nếu bạn muốn quay về trang chủ
-  } catch (err: any) {
-    console.error("Lỗi đăng xuất:", err.message);
-    toast.error("Đăng xuất thất bại: " + err.message);
-  }
-};
+    try {
+      await apiLogoutUser();
+      toast.success("Đăng xuất thành công");
+      router.push("/login"); // hoặc "/" nếu bạn muốn quay về trang chủ
+    } catch (err: any) {
+      console.error("Lỗi đăng xuất:", err.message);
+      toast.error("Đăng xuất thất bại: " + err.message);
+    }
+  };
   // Toggle menu hiển thị
   const toggleDarkMenu = () => {
     setShowDarkMenu((prev) => !prev);
@@ -162,11 +124,12 @@ const router = useRouter();
             ☰
           </button>
         </div>
+
         <div className="header-right">
+          {/* Dark mode toggle */}
           <div className="header-icon" onClick={toggleDarkMenu}>
             <i className="fa-solid fa-sun"></i>
           </div>
-          {/* Submenu dark/light */}
           <ul
             ref={menuRef}
             className={`submenu-dark-mode ${showDarkMenu ? "show" : ""}`}
@@ -183,21 +146,25 @@ const router = useRouter();
               )}
             </li>
           </ul>
+
           <div className="header-icon">
             <i className="fa-solid fa-gear"></i>
           </div>
+
+          {/* Notifications */}
           <div className="relative" ref={dropdownRef1}>
             <div
               className="header-icon notification-badge cursor-pointer"
               onClick={() => setOpenNote(!openNote)}
             >
               <i className="fa-solid fa-bell "></i>
-              <span className="absolute top-0 right-0 bg-red-500 w-2.5 h-2.5 rounded-full border border-white"></span>
+              {notifications.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 w-2.5 h-2.5 rounded-full border border-white"></span>
+              )}
             </div>
 
             {openNote && (
               <div className="menunote absolute right-0 !mt-2 w-96 bg-white shadow-lg rounded-md z-50 flex flex-col max-h-[500px]">
-                {/* Header */}
                 <div className="flex justify-between items-center border-b !px-4 !py-2">
                   <h4 className="text-lg font-semibold">Notifications</h4>
                   <button className="text-blue-500 text-sm">
@@ -205,54 +172,33 @@ const router = useRouter();
                   </button>
                 </div>
 
-                {/* Scrollable content */}
                 <div className="flex-1 overflow-y-auto !px-4 !py-2 space-y-3">
-                  <p className="text-xs text-gray-500">Today</p>
-                  {notifications
-                    .filter((n) => n.date === "today")
-                    .map((n) => (
-                      <div key={n.id} className="flex gap-3">
+                  {loading ? (
+                    <p className="text-gray-500 text-sm">Đang tải...</p>
+                  ) : notifications.length === 0 ? (
+                    <p className="text-gray-500 text-sm">Không có thông báo</p>
+                  ) : (
+                    notifications.map((n, idx) => (
+                      <div key={idx} className="flex gap-3">
                         <img
-                          src={n.avatar}
+                          src="/images/logo/anhdep.jpg"
                           alt="avatar"
                           className="w-10 h-10 rounded-full"
                         />
                         <div className="flex-1">
                           <div className="flex justify-between items-center">
-                            <h5 className="font-semibold">{n.title}</h5>
+                            <h5 className="font-semibold">{n.type}</h5>
                             <span className="text-xs text-gray-400">
-                              {n.time}
+                              {new Date(n.created_at).toLocaleString("vi-VN")}
                             </span>
                           </div>
-                          <p className="text-sm text-gray-600">{n.content}</p>
+                          <p className="text-sm text-gray-600">{n.message}</p>
                         </div>
                       </div>
-                    ))}
-
-                  <p className="text-xs text-gray-500 mt-4">Yesterday</p>
-                  {notifications
-                    .filter((n) => n.date === "yesterday")
-                    .map((n) => (
-                      <div key={n.id} className="flex gap-3">
-                        <img
-                          src={n.avatar}
-                          alt="avatar"
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center">
-                            <h5 className="font-semibold">{n.title}</h5>
-                            <span className="text-xs text-gray-400">
-                              {n.time}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-600">{n.content}</p>
-                        </div>
-                      </div>
-                    ))}
+                    ))
+                  )}
                 </div>
 
-                {/* Fixed bottom button */}
                 <div className="border-t text-center !px-4 !py-2">
                   <button className="text-red-500 text-sm font-medium hover:underline">
                     Clear all Notifications
@@ -261,6 +207,8 @@ const router = useRouter();
               </div>
             )}
           </div>
+
+          {/* User menu */}
           <div className="relative inline-block text-left" ref={dropdownRef}>
             <div
               className="header-icon cursor-pointer"
@@ -271,7 +219,6 @@ const router = useRouter();
 
             {open && (
               <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 overflow-hidden">
-                {/* Header */}
                 <div className="bg-sky-500 text-white !p-4 flex items-center gap-3">
                   <img
                     src={`${API_BASE_URL}/uploads/${user?.avatar}`}
@@ -311,19 +258,6 @@ const router = useRouter();
           </div>
         </div>
       </div>
-      {/* <div className="sub-header">
-        <div className="sub-header-left">
-          <Settings />
-        </div>
-         
-        <div className="sub-header-right">
-          
-          <span className="home-icon">
-            <i className="fa-solid fa-house"></i>
-          </span>{" "}
-          / <span> Trang dashboard</span>
-        </div>
-      </div> */}
     </>
   );
 }

@@ -146,7 +146,7 @@ export default function Home() {
       try {
         const data = await getProductsByCategory("giày chạy bộ");
         const data1 = await getProductsByCategory("giày bóng rổ");
-        const data2 = await getProductsByCategory("sneaker");
+        const data2 = await getProductsByCategory("giày sneaker");
         const data3 = await getProductsByCategory("giày tập gym");
         if (Array.isArray(data)) {
           serCateProducts(data.slice(0, 10));
