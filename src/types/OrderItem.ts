@@ -1,4 +1,6 @@
 export interface IOrderItem {
+  product: any;
+  id: Key | null | undefined;
   price: number;
   variant_id: any;
   order_items_id: number;
@@ -13,6 +15,7 @@ export interface IOrderItem {
       name_color: string;
     };
     product: {
+      slug(slug: any): void;
       name: string;
       image_url: string;
     };

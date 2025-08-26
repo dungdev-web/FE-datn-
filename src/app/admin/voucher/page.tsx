@@ -324,16 +324,7 @@ export default function Voucher() {
                       title="Sửa mã"
                     ></i>
                   </Link>
-                  <i
-                    className="fa-solid fa-trash delete-icon"
-                    title="Xóa mã"
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      alert(
-                        `Xóa mã ${voucher.code} - ID ${voucher.coupons_id}`
-                      )
-                    }
-                  ></i>
+               
                 </td>
               </tr>
             ))

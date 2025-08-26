@@ -355,8 +355,8 @@ export default function OrderDetail() {
     router.push(`/account/order/track/${orderId}`);
   };
 
-  const handleReviewProducts = () => {
-    router.push(`/account/order/review/${orderId}`);
+  const handleViewProduct = (slug: string) => {
+    router.push(`/product/${slug}`);
   };
 
   const handleBuyAgain = async () => {
@@ -534,24 +534,26 @@ export default function OrderDetail() {
           </button>
         );
         break;
-      case "completed":
-        buttons.push(
-          <button
-            key="review"
-            onClick={handleReviewProducts}
-            className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
-          >
-            Đánh giá sản phẩm
-          </button>,
-          <button
-            key="buy-again"
-            onClick={handleBuyAgain}
-            className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
-          >
-            Mua lại
-          </button>
-        );
-        break;
+   case "completed":
+  buttons.push(
+    order?.order_items?.map((item) => (
+      <button
+        key={item.order_items_id}
+        onClick={() => handleViewProduct(item.variant.product.slug)}
+        className="bg-green-600 hover:bg-green-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+      >
+        Đánh giá sản phẩm {getProductName(item)}
+      </button>
+    )),
+    <button
+      key="buy-again"
+      onClick={handleBuyAgain}
+      className="bg-blue-600 hover:bg-blue-700 text-white !px-6 !py-2 rounded-full font-medium transition-colors"
+    >
+      Mua lại
+    </button>
+  );
+  break;
 
       case "cancelled":
         buttons.push(
