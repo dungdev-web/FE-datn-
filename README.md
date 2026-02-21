@@ -30,7 +30,7 @@
 
 ---
 
-## 🛠️ Công nghệ sử dụng
+## Công nghệ sử dụng
 
 ### Giao diện
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
@@ -47,7 +47,7 @@
 
 ---
 
-## 📁 Cấu trúc thư mục
+## Cấu trúc thư mục
 
 ```
 FE-DATN-/
