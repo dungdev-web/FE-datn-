@@ -10,25 +10,21 @@
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white)
 ![ZaloPay](https://img.shields.io/badge/ZaloPay-0068FF?style=flat-square&logo=zalo&logoColor=white)
 ![OpenAI](https://img.shields.io/badge/OpenAI_GPT--3.5-412991?style=flat-square&logo=openai&logoColor=white)
-
-[![Frontend Repo](https://img.shields.io/badge/Frontend_Repo-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/dungdev-web/FE-datn-)
-[![Backend Repo](https://img.shields.io/badge/Backend_Repo-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/dungdev-web/BE-datn-)
-
 </div>
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---|---|
-| 🛍️ **Product Catalog** | Browse & filter shoes by category, size, price |
-| 🛒 **Shopping Cart** | Add to cart, update quantity, checkout |
-| 💳 **ZaloPay Payment** | Integrated ZaloPay payment gateway |
-| 🤖 **AI Chatbot** | GPT-3.5 Turbo powered assistant *(in development)* |
-| 👤 **Authentication** | Login / Register for customers |
-| 🔧 **Admin Dashboard** | Manage products, orders & users |
-| 📦 **Order Management** | Track & manage orders |
+| **Product Catalog** | Browse & filter shoes by category, size, price |
+| **Shopping Cart** | Add to cart, update quantity, checkout |
+| **ZaloPay Payment** | Integrated ZaloPay payment gateway |
+| **AI Chatbot** | GPT-3.5 Turbo powered assistant *(in development)* |
+| **Authentication** | Login / Register for customers |
+| **Admin Dashboard** | Manage products, orders & users |
+| **Order Management** | Track & manage orders |
 
 ---
 
@@ -45,7 +41,6 @@
 ![OpenAI](https://img.shields.io/badge/OpenAI_GPT--3.5_Turbo-412991?style=flat-square&logo=openai&logoColor=white)
 
 ### State & Utilities
-![Redux](https://img.shields.io/badge/Redux-764ABC?style=flat-square&logo=redux&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat-square&logo=axios&logoColor=white)
 
 ---
@@ -75,7 +70,7 @@ FE-DATN-/
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -100,9 +95,12 @@ cp .env.example .env
 ### Environment Variables
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
-NEXT_PUBLIC_ZALOPAY_APP_ID=your_zalopay_app_id
-OPENAI_API_KEY=your_openai_api_key
+BASE_URL=http://localhost:3000
+JWT_SECRET=
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_USE_MOCK=false
+NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3001
+NEXT_DOMAIN=http://localhost:3001
 ```
 
 ### Run Development Server
@@ -111,15 +109,15 @@ OPENAI_API_KEY=your_openai_api_key
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3001](http://localhost:3001) in your browser.
 
 ---
 
-## 🤖 AI Chatbot
+## AI Chatbot
 
 This project integrates **OpenAI GPT-3.5 Turbo** as a shopping assistant chatbot.
 
-> ⚠️ **Note:** The chatbot is currently using the base GPT-3.5 Turbo model and has **not yet been fine-tuned** on shoe product data. Responses may not always be product-specific. Training/fine-tuning is planned for a future update.
+> **Note:** The chatbot is currently using the base GPT-3.5 Turbo model and has **not yet been fine-tuned** on shoe product data. Responses may not always be product-specific. Training/fine-tuning is planned for a future update.
 
 **Planned improvements:**
 - Fine-tune model on product catalog data
@@ -128,7 +126,7 @@ This project integrates **OpenAI GPT-3.5 Turbo** as a shopping assistant chatbot
 
 ---
 
-## 💳 ZaloPay Integration
+## ZaloPay Integration
 
 Payment flow using ZaloPay sandbox environment:
 
@@ -140,20 +138,3 @@ User Checkout → Create Order → ZaloPay Payment Request → Callback → Orde
 
 ---
 
-## 📸 Screenshots
-
-> Coming soon...
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-<div align="center">
-
-Made with ❤️ by [Lưu Đức Dũng](https://github.com/dungdev-web)
-
-</div>
