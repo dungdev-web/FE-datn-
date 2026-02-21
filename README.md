@@ -1,8 +1,8 @@
 <div align="center">
 
-# 👟 ShoesShop — Frontend
+# 👟 ShoesShop — Giao diện người dùng
 
-**A modern e-commerce platform for shoes with ZaloPay integration & AI Chatbot**
+**Nền tảng thương mại điện tử giày hiện đại tích hợp ZaloPay & Chatbot AI**
 
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
@@ -10,59 +10,61 @@
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white)
 ![ZaloPay](https://img.shields.io/badge/ZaloPay-0068FF?style=flat-square&logo=zalo&logoColor=white)
 ![OpenAI](https://img.shields.io/badge/OpenAI_GPT--3.5-412991?style=flat-square&logo=openai&logoColor=white)
+
+
 </div>
 
 ---
 
-## Features
+## Tính năng
 
-| Feature | Description |
+| Tính năng | Mô tả |
 |---|---|
-| **Product Catalog** | Browse & filter shoes by category, size, price |
-| **Shopping Cart** | Add to cart, update quantity, checkout |
-| **ZaloPay Payment** | Integrated ZaloPay payment gateway |
-| **AI Chatbot** | GPT-3.5 Turbo powered assistant *(in development)* |
-| **Authentication** | Login / Register for customers |
-| **Admin Dashboard** | Manage products, orders & users |
-| **Order Management** | Track & manage orders |
+| **Danh mục sản phẩm** | Duyệt & lọc giày theo danh mục, size, giá |
+| **Giỏ hàng** | Thêm vào giỏ, cập nhật số lượng, thanh toán |
+| **Thanh toán ZaloPay** | Tích hợp cổng thanh toán ZaloPay |
+| **Chatbot AI** | Trợ lý mua sắm dùng GPT-3.5 Turbo *(đang phát triển)* |
+| **Xác thực** | Đăng nhập / Đăng ký cho khách hàng |
+| **Trang quản trị** | Quản lý sản phẩm, đơn hàng & người dùng |
+| **Quản lý đơn hàng** | Theo dõi & xử lý đơn hàng |
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Công nghệ sử dụng
 
-### Frontend
+### Giao diện
 ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat-square&logo=tailwind-css&logoColor=white)
 
-### Integrations
+### Tích hợp
 ![ZaloPay](https://img.shields.io/badge/ZaloPay-0068FF?style=flat-square&logo=zalo&logoColor=white)
 ![OpenAI](https://img.shields.io/badge/OpenAI_GPT--3.5_Turbo-412991?style=flat-square&logo=openai&logoColor=white)
 
-### State & Utilities
+### Thư viện & Tiện ích
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat-square&logo=axios&logoColor=white)
 
 ---
 
-## 📁 Project Structure
+## 📁 Cấu trúc thư mục
 
 ```
 FE-DATN-/
 ├── 📂 src/
 │   ├── 📂 app/
-│   │   ├── 📂 (client)/     # Customer-facing pages
-│   │   └── 📂 admin/        # Admin dashboard pages
-│   ├── 📂 config/           # App configuration
+│   │   ├── 📂 (client)/     # Trang dành cho khách hàng
+│   │   └── 📂 admin/        # Trang quản trị
+│   ├── 📂 config/           # Cấu hình ứng dụng
 │   ├── 📂 hooks/            # Custom React hooks
-│   ├── 📂 mocks/            # Mock data for development
-│   ├── 📂 routers/          # Route definitions
-│   ├── 📂 services/         # API service layer
-│   ├── 📂 shared/           # Shared components & layouts
+│   ├── 📂 mocks/            # Dữ liệu giả cho phát triển
+│   ├── 📂 routers/          # Định nghĩa routes
+│   ├── 📂 services/         # Lớp gọi API
+│   ├── 📂 shared/           # Components & layout dùng chung
 │   ├── 📂 store/            # Redux store & slices
-│   ├── 📂 types/            # TypeScript type definitions
-│   └── 📂 utils/            # Helper functions
-├── middleware.ts             # Next.js middleware (auth guard)
+│   ├── 📂 types/            # Định nghĩa TypeScript types
+│   └── 📂 utils/            # Các hàm tiện ích
+├── middleware.ts             # Next.js middleware (bảo vệ route)
 ├── next.config.ts
 ├── tsconfig.json
 └── .env.example
@@ -70,29 +72,29 @@ FE-DATN-/
 
 ---
 
-## Getting Started
+## Hướng dẫn cài đặt
 
-### Prerequisites
+### Yêu cầu
 
 - Node.js `>= 18`
-- npm or yarn
-- Backend server running (see [BE-DATN-](https://github.com/dungdev-web/BE-datn-))
+- npm hoặc yarn
+- Backend đang chạy (xem [BE-DATN-](https://github.com/dungdev-web/BE-datn-))
 
-### Installation
+### Cài đặt
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/dungdev-web/FE-datn-.git
 cd FE-datn-
 
-# Install dependencies
+# Cài đặt dependencies
 npm install
 
-# Setup environment variables
+# Cấu hình biến môi trường
 cp .env.example .env
 ```
 
-### Environment Variables
+### Biến môi trường
 
 ```env
 BASE_URL=http://localhost:3000
@@ -103,38 +105,38 @@ NEXT_PUBLIC_GOOGLE_REDIRECT_URI=http://localhost:3001
 NEXT_DOMAIN=http://localhost:3001
 ```
 
-### Run Development Server
+### Chạy môi trường phát triển
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser.
+Mở [http://localhost:3001](http://localhost:3001) trên trình duyệt.
 
 ---
 
-## AI Chatbot
+## Chatbot AI
 
-This project integrates **OpenAI GPT-3.5 Turbo** as a shopping assistant chatbot.
+Dự án tích hợp **OpenAI GPT-3.5 Turbo** làm trợ lý mua sắm thông minh.
 
-> **Note:** The chatbot is currently using the base GPT-3.5 Turbo model and has **not yet been fine-tuned** on shoe product data. Responses may not always be product-specific. Training/fine-tuning is planned for a future update.
+> **Lưu ý:** Chatbot hiện đang dùng model GPT-3.5 Turbo cơ bản và **chưa được huấn luyện** trên dữ liệu sản phẩm giày. Câu trả lời có thể chưa chính xác với sản phẩm. Việc fine-tune sẽ được thực hiện trong phiên bản tiếp theo.
 
-**Planned improvements:**
-- Fine-tune model on product catalog data
-- Train on FAQ & order support scenarios
-- Add context-aware product recommendations
+**Kế hoạch cải thiện:**
+- Fine-tune model trên dữ liệu danh mục sản phẩm
+- Huấn luyện xử lý FAQ & hỗ trợ đơn hàng
+- Thêm gợi ý sản phẩm theo ngữ cảnh
 
 ---
 
-## ZaloPay Integration
+## Tích hợp ZaloPay
 
-Payment flow using ZaloPay sandbox environment:
+Luồng thanh toán sử dụng môi trường sandbox của ZaloPay:
 
 ```
-User Checkout → Create Order → ZaloPay Payment Request → Callback → Order Confirmed
+Khách thanh toán → Tạo đơn hàng → Gửi yêu cầu ZaloPay → Callback → Xác nhận đơn hàng
 ```
 
-> Make sure to configure ZaloPay sandbox credentials in `.env` before testing.
+> Cần cấu hình thông tin sandbox ZaloPay trong file `.env` trước khi kiểm thử.
 
 ---
 
